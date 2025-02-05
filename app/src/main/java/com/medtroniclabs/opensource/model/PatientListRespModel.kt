@@ -77,7 +77,8 @@ data class PatientListRespModel(
     val nextMedicalReviewDate: String? = null,
     val phq4score: String? = null,
     val gad7Score: String? = null,
-    val phq9Score: String? = null
+    val phq9Score: String? = null,
+    var isActive:Boolean?=null,
 ) : Serializable
 
 data class PregnancyDetails(

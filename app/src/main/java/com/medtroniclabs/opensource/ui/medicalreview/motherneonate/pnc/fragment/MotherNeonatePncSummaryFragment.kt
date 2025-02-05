@@ -13,6 +13,7 @@ import androidx.fragment.app.setFragmentResult
 import com.medtroniclabs.opensource.R
 import com.medtroniclabs.opensource.appextensions.gone
 import com.medtroniclabs.opensource.appextensions.setExpandableText
+import com.medtroniclabs.opensource.appextensions.visible
 import com.medtroniclabs.opensource.common.CommonUtils
 import com.medtroniclabs.opensource.common.CommonUtils.combineText
 import com.medtroniclabs.opensource.common.CommonUtils.convertListToString
@@ -42,7 +43,7 @@ import com.medtroniclabs.opensource.ui.medicalreview.utils.MedicalReviewTypeEnum
 import com.medtroniclabs.opensource.ui.mypatients.viewmodel.PatientDetailViewModel
 
 
-class MotherNeonatePncSummaryFragment : BaseFragment(), View.OnClickListener {
+class MotherNeonatePncSummaryFragment(var isShowNeonate: Boolean) : BaseFragment(), View.OnClickListener {
     private lateinit var binding: FragmentMotherNeonarePncSummaryBinding
     var adapter: CustomSpinnerAdapter? = null
     private var datePickerDialog: DatePickerDialog? = null
@@ -60,8 +61,8 @@ class MotherNeonatePncSummaryFragment : BaseFragment(), View.OnClickListener {
 
     companion object {
         const val TAG = "MotherNeonateSummary"
-        fun newInstance(): MotherNeonatePncSummaryFragment {
-            return MotherNeonatePncSummaryFragment()
+        fun newInstance(isShowNeonate: Boolean): MotherNeonatePncSummaryFragment {
+            return MotherNeonatePncSummaryFragment(isShowNeonate)
         }
     }
 
@@ -71,8 +72,21 @@ class MotherNeonatePncSummaryFragment : BaseFragment(), View.OnClickListener {
         getPncPatientStatus(MedicalReviewTypeEnums.PNC_MOTHER_REVIEW.name)
         clickListener()
         attachObservers()
+        showNeonateSummary()
     }
 
+    private fun showNeonateSummary() {
+        if (isShowNeonate) {
+            if (patientDetailViewModel.patientDetailsNeonateLiveData.value?.data?.isActive==false)
+            {
+                binding.neonateSummary.cardSummary.gone()
+            }else{
+                binding.neonateSummary.cardSummary.visible()
+            }
+        } else {
+            binding.neonateSummary.cardSummary.gone()
+        }
+    }
     private fun getPncSummaryDetails() = viewModel.getPncSummaryDetails()
     private fun getPncPatientStatus(category: String) =
         viewModel.setPncReqToGetMetaForPatientStatus(category = category)
@@ -106,12 +120,12 @@ class MotherNeonatePncSummaryFragment : BaseFragment(), View.OnClickListener {
             DateUtils.DATE_ddMMyyyy
         )
         if (viewModel.motherNeonateAlive) {
-                viewModel.pncMotherPatientStatus = resource
-                viewModel.pncMotherPatientStatus?.let {
-                    initializePatientStatus(it, binding.motherSummary)
-                }
-                getPncPatientStatus(MedicalReviewTypeEnums.PNC_CHILD_REVIEW.name)
-                    } else {
+            viewModel.pncMotherPatientStatus = resource
+            viewModel.pncMotherPatientStatus?.let {
+                initializePatientStatus(it, binding.motherSummary)
+            }
+            getPncPatientStatus(MedicalReviewTypeEnums.PNC_CHILD_REVIEW.name)
+        } else {
             binding.motherSummary.tvNextMedicalReviewLabel.gone()
             binding.motherSummary.tvNextMedicalReviewSeparator.gone()
             binding.motherSummary.tvNextMedicalReviewLabelText.gone()
@@ -206,7 +220,7 @@ class MotherNeonatePncSummaryFragment : BaseFragment(), View.OnClickListener {
                 } ?: requireContext().getString(R.string.empty__)
 
         }
-       patientDetailViewModel.dateOfDelivery?.let {
+        patientDetailViewModel.dateOfDelivery?.let {
             DateUtils.convertStringToDate(
                 it,
                 DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
@@ -292,7 +306,7 @@ class MotherNeonatePncSummaryFragment : BaseFragment(), View.OnClickListener {
             dropDownList.add(
                 hashMapOf<String, Any>(
                     DefinedParams.NAME to
-                        item.name,
+                            item.name,
                     DefinedParams.Value to item.value
                 )
             )
@@ -399,15 +413,15 @@ class MotherNeonatePncSummaryFragment : BaseFragment(), View.OnClickListener {
     private fun updateNextFollowUpDate() {
         binding.motherSummary.tvNextMedicalReviewLabelText.isEnabled = true
 
-}
+    }
 
-override fun onClick(v: View?) {
-    when (v?.id) {
-        binding.motherSummary.tvNextMedicalReviewLabelText.id -> {
-            showDatePickerDialog()
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            binding.motherSummary.tvNextMedicalReviewLabelText.id -> {
+                showDatePickerDialog()
+            }
         }
     }
-}
     private fun notAliveFlow() {
         setFragmentResult(
             MedicalReviewDefinedParams.NOT_ALIVE, bundleOf(

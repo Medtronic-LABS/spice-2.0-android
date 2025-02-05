@@ -62,6 +62,8 @@ class MotherNeonatePNCViewModel @Inject constructor(
     val childDetailsLiveData = MutableLiveData<Resource<PatientListRespModel>>()
     var labourDeliveryDetails:CreateLabourDeliveryRequest?=null
     var neonateOutCome:String?=null
+    var neonatePatientId:String?=null
+    var isChildActive:Boolean?=false
 
     fun getMotherPncStaticData() {
         viewModelScope.launch(dispatcherIO) {
@@ -175,7 +177,7 @@ class MotherNeonatePNCViewModel @Inject constructor(
                         details,
                         true
                     ) },labourDTO=labourDeliveryDetails?.motherDTO?.labourDTO,
-                    neonateOutcome = labourDeliveryDetails?.neonateDTO?.neonateOutcome
+                    neonateOutcome = labourDeliveryDetails?.motherDTO?.neonateOutcome
                 ).apply {
                     setCommonFields(
                         clinicalNotesViewModel,

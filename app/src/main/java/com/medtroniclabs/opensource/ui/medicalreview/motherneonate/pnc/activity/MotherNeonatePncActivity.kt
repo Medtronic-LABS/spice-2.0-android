@@ -367,23 +367,23 @@ class MotherNeonatePncActivity : BaseActivity(), View.OnClickListener, AncVisitC
         if (intent?.getBooleanExtra(DefinedParams.DirectPNCFlow,false) != true){
             viewModel.neonateOutCome=details.pregnancyDetails?.neonatalOutcomes
         }
-            viewModel.pncVisit = details.pregnancyDetails?.pncVisitMedicalReview?.takeIf { true }?.plus(1) ?: 1
+        viewModel.pncVisit = details.pregnancyDetails?.pncVisitMedicalReview?.takeIf { true }?.plus(1) ?: 1
         //        viewModel.getChildMemberId(details.childPatientId)
-
+        viewModel.neonatePatientId=details.pregnancyDetails?.neonatePatientId
         viewModel.memberId = details.memberId
         if (viewModel.isSwipe) {
-                val summaryFragment =
-                    getFragmentById(supportFragmentManager, (R.id.diagnosisFragment))
-                if (summaryFragment is MotherNeonatePncSummaryFragment) {
-                    viewModel.saveMotherNeonatePncData()
-                } else {
-                    bpWeightViewModel.fetchWeight(MotherNeonateAncRequest(memberId = viewModel.memberId))
-                    bpWeightViewModel.fetchBloodPressure(MotherNeonateAncRequest(memberId = viewModel.memberId))
-                }
+            val summaryFragment =
+                getFragmentById(supportFragmentManager, (R.id.diagnosisFragment))
+            if (summaryFragment is MotherNeonatePncSummaryFragment) {
+//                    viewModel.saveMotherNeonatePncData()
             } else {
-                hideLoading()
-                initView()
+                bpWeightViewModel.fetchWeight(MotherNeonateAncRequest(memberId = viewModel.memberId))
+                bpWeightViewModel.fetchBloodPressure(MotherNeonateAncRequest(memberId = viewModel.memberId))
             }
+        } else {
+            hideLoading()
+            initView()
+        }
     }
 
     private fun initView() {
@@ -428,15 +428,15 @@ class MotherNeonatePncActivity : BaseActivity(), View.OnClickListener, AncVisitC
     private fun validateStatus(flowValue: String?) {
         viewModel.aliveStatus?.let {
             if (it) {
-                    if (viewModel.motherLiveStatus == getString(R.string.no)) {
-                        if(binding.tvAliveStatus.text==(getString(R.string.is_the_baby_alive))) {
-                            updatePrescriptionInvestigationVisible(false)
-                        }else{
-                            updatePrescriptionInvestigationVisible(true)
-                        }
-                    } else {
+                if (viewModel.motherLiveStatus == getString(R.string.no)) {
+                    if(binding.tvAliveStatus.text==(getString(R.string.is_the_baby_alive))) {
+                        updatePrescriptionInvestigationVisible(false)
+                    }else{
                         updatePrescriptionInvestigationVisible(true)
                     }
+                } else {
+                    updatePrescriptionInvestigationVisible(true)
+                }
                 binding.blurView.gone()
                 binding.btnSubmit.isEnabled = true
             } else {
@@ -676,11 +676,23 @@ class MotherNeonatePncActivity : BaseActivity(), View.OnClickListener, AncVisitC
         binding.btnSubmit.isEnabled = false
         updatePrescriptionInvestigationVisible(false)
         resetSelectionViews(TAG)
-        if(viewModel.neonateOutCome==MedicalReviewDefinedParams.FreshStillBirth || viewModel.neonateOutCome==MedicalReviewDefinedParams.MaceratedStillBirth){
+
+        if (viewModel.neonatePatientId != null){
+            patientViewModel.getNeonatePatients(viewModel.neonatePatientId!!)
+        }else{
+            neonateBasedFlow()
+        }
+    }
+
+    private fun neonateBasedFlow(){
+        if (viewModel.neonateOutCome == MedicalReviewDefinedParams.FreshStillBirth
+            || viewModel.neonateOutCome == MedicalReviewDefinedParams.MaceratedStillBirth
+            || viewModel.neonateOutCome == MedicalReviewDefinedParams.StillBirth
+            || viewModel.neonateOutCome == MedicalReviewDefinedParams.Miscarriage) {
             motherSubmit()
-           viewModel.saveMotherNeonatePncData()
-        }else {
-        neonateFlow()
+            viewModel.saveMotherNeonatePncData()
+        } else {
+            neonateFlow()
             motherSubmit()
         }
     }
@@ -706,7 +718,7 @@ class MotherNeonatePncActivity : BaseActivity(), View.OnClickListener, AncVisitC
             presentingComplaintsViewModel,
             patientViewModel,
 
-        )
+            )
         setBackMotherData()
     }
 
@@ -725,11 +737,6 @@ class MotherNeonatePncActivity : BaseActivity(), View.OnClickListener, AncVisitC
     }
 
     private fun pncSummary(resource: Resource<PncSubmitResponse>) {
-        binding.bottomNavigationView.gone()
-        binding.tvAliveStatus.gone()
-        binding.systemicExaminationsContainer.gone()
-        binding.clinicalNotesContainer.gone()
-        binding.presentingComplaintsContainer.gone()
         binding.referalBottomView.visible()
         motherNeonatePncSummaryViewModel.motherNeonatePncSummaryRequest.apply {
             id = resource.data?.encounterId
@@ -743,9 +750,16 @@ class MotherNeonatePncActivity : BaseActivity(), View.OnClickListener, AncVisitC
         ) {
             motherNeonatePncSummaryViewModel.motherNeonateAlive = false
         }
+        var isShowNeonate= viewModel.neonateOutCome==MedicalReviewDefinedParams.LiveBirth
         val motherNeonatePncSummaryFragment =
-            MotherNeonatePncSummaryFragment.newInstance()
+            MotherNeonatePncSummaryFragment.newInstance(isShowNeonate)
         addReplaceFragment(R.id.diagnosisFragment, motherNeonatePncSummaryFragment)
+        supportFragmentManager.executePendingTransactions()
+        binding.bottomNavigationView.gone()
+        binding.tvAliveStatus.gone()
+        binding.systemicExaminationsContainer.gone()
+        binding.clinicalNotesContainer.gone()
+        binding.presentingComplaintsContainer.gone()
         viewModel.setAnalyticsData(
             UserDetail.startDateTime,
             eventType = AnalyticsDefinedParams.MotherNeonatePnc,
@@ -835,6 +849,19 @@ class MotherNeonatePncActivity : BaseActivity(), View.OnClickListener, AncVisitC
                 }
             }, onBackPressPopStack = ::onBackPressPopStack)
         }
+        patientViewModel.patientDetailsNeonateLiveData.observe(this) { resource ->
+            handleResourceState(resource, onSuccess = {
+                viewModel.isChildActive = resource.data?.isActive
+                if (resource.data?.isActive == false) {
+                    motherSubmit()
+                    viewModel.saveMotherNeonatePncData()
+                } else {
+                    neonateFlow()
+                    motherSubmit()
+                }
+            }, onBackPressPopStack = ::onBackPressPopStack)
+        }
+
         viewModel.childDetailsLiveData.observe(this) { resource ->
             handleResourceState(resource, onSuccess = {
                 viewModel.childMemberId = resource.data?.memberId
@@ -911,10 +938,10 @@ class MotherNeonatePncActivity : BaseActivity(), View.OnClickListener, AncVisitC
 
     private fun setLabourDeliveryData(labourRequest: String?) {
         if (intent.getBooleanExtra(DefinedParams.DirectPNCFlow,false)) {
-        val gson = Gson()
-        val json = labourRequest
-        viewModel.labourDeliveryDetails = gson.fromJson(json, CreateLabourDeliveryRequest::class.java)
-            viewModel.neonateOutCome = viewModel.labourDeliveryDetails?.neonateDTO?.neonateOutcome
+            val gson = Gson()
+            val json = labourRequest
+            viewModel.labourDeliveryDetails = gson.fromJson(json, CreateLabourDeliveryRequest::class.java)
+            viewModel.neonateOutCome = viewModel.labourDeliveryDetails?.motherDTO?.neonateOutcome
         }
     }
 }
