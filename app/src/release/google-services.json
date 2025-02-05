@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "141742997357",
+    "project_id": "spice-prod-cd346",
+    "storage_bucket": "spice-prod-cd346.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:141742997357:android:d983d6f8f55ef6440ae464",
+        "android_client_info": {
+          "package_name": "com.medtroniclabs.opensource"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "141742997357-12noe0mt05r10qrod2ot39e7ofh4hq8f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6UmtFIHRZIVNARu5IJaXsTQINWhj9yLo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "141742997357-12noe0mt05r10qrod2ot39e7ofh4hq8f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/errorCardMessage"
+        style="@style/CardView_Style"
+        android:layout_marginHorizontal="@dimen/_26sdp"
+        android:layout_marginBottom="@dimen/_26sdp"
+        android:visibility="visible"
+        android:layout_marginTop="@dimen/_32sdp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/ivClose"
+                style="@style/ImageView_Style"
+                android:contentDescription="@string/close"
+                android:padding="@dimen/_8sdp"
+                android:src="@drawable/ic_close_error"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/tvErrorMessage"
+                style="@style/TextStyle_Error_16"
+                android:drawablePadding="@dimen/_8sdp"
+                android:padding="@dimen/_15sdp"
+                android:text="@string/incorrect_username_password"
+                app:drawableStartCompat="@drawable/ic_info_red"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

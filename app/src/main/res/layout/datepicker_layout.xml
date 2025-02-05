@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/_16sdp"
+    android:paddingVertical="@dimen/_12sdp">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        style="@style/Form_Label_Style"
+        android:paddingStart="@dimen/_0dp"
+        android:paddingEnd="@dimen/_10sdp" />
+
+    <LinearLayout
+        android:id="@+id/etUserInputHolder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:background="@drawable/edittext_background"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/etUserInput"
+            style="@style/Form_Input_Style"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"
+            android:paddingHorizontal="@dimen/_12sdp"
+            android:paddingVertical="@dimen/_8sdp" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="@dimen/_50sdp"
+            android:layout_height="match_parent"
+            android:padding="@dimen/_8sdp"
+            android:background="@drawable/blue_rectangle"
+            android:src="@drawable/ic_baseline_calendar_today_24" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvErrorMessage"
+        style="@style/TextStyle_Error_14"
+        android:paddingVertical="@dimen/_8sdp"
+        android:visibility="gone" />
+
+</LinearLayout>

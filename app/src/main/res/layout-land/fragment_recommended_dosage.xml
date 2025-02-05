@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/transparent"
+    app:cardCornerRadius="@dimen/_10sdp"
+    app:cardElevation="@dimen/_2sdp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="300dp">
+
+        <View
+            android:id="@+id/titleView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/card_background"
+            app:layout_constraintBottom_toBottomOf="@id/tvTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvTitle" />
+
+        <TextView
+            android:id="@+id/tvTitle"
+            style="@style/Form_Header_Style"
+            android:layout_width="0dp"
+            android:padding="@dimen/_16sdp"
+            android:textAlignment="textStart"
+            android:textSize="@dimen/_16ssp"
+            app:layout_constraintEnd_toStartOf="@id/ivClose"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/ivClose"
+            style="@style/ImageView_Style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_10sdp"
+            android:padding="@dimen/_15sdp"
+            android:src="@drawable/close_black"
+            app:layout_constraintBottom_toBottomOf="@id/tvTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvTitle"
+            app:tint="@color/black" />
+
+        <View
+            android:id="@+id/divider1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider"
+            app:layout_constraintEnd_toEndOf="@id/titleView"
+            app:layout_constraintStart_toStartOf="@id/titleView"
+            app:layout_constraintTop_toBottomOf="@id/titleView" />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollContainer"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_0dp"
+            app:layout_constraintBottom_toTopOf="@id/bottomDivider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider1">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tvHeader"
+                    style="@style/Form_Header_Style"
+                    android:layout_width="0dp"
+                    android:padding="@dimen/_16sdp"
+                    android:textAlignment="textStart"
+                    android:textSize="@dimen/_16ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvHeaderMessage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/grey_black"
+                    android:paddingHorizontal="@dimen/_16sdp"
+                    android:textAlignment="textStart"
+                    android:textSize="@dimen/_16ssp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvHeader" />
+
+                <TableLayout
+                    android:id="@+id/table_heading_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:stretchColumns="1,2,3"
+                    android:gravity="start"
+                    android:background="@drawable/table_header_background"
+                    android:layout_marginStart="@dimen/_16sdp"
+                    android:layout_marginEnd="@dimen/_16sdp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvHeaderMessage">
+
+                    <TableRow>
+
+                        <TextView
+                            android:id="@+id/tableCol1"
+                            style="@style/table_header"
+                            android:layout_width="0dp"
+                            android:layout_height="@dimen/_60sdp"
+                            android:layout_column="1"
+                            android:layout_weight="1"
+                            android:textStyle="bold"
+                            android:background="@drawable/middle_dosage_table_header"
+                            android:textColor="@color/table_header_text_color"
+                            android:text="@string/day"
+                            android:textAlignment="center" />
+
+                        <TextView
+                            android:id="@+id/tableCol2"
+                            style="@style/table_header"
+                            android:layout_width="0dp"
+                            android:layout_height="@dimen/_60sdp"
+                            android:layout_column="2"
+                            android:layout_weight="1"
+                            android:textStyle="bold"
+                            android:background="@drawable/middle_dosage_table_header"
+                            android:textColor="@color/table_header_text_color"
+                            android:paddingEnd="@dimen/_5sdp"
+                            android:text="@string/morning"
+                            android:textAlignment="center" />
+
+                        <TextView
+                            android:id="@+id/tableCol3"
+                            style="@style/table_header"
+                            android:layout_width="0dp"
+                            android:layout_height="@dimen/_60sdp"
+                            android:layout_column="3"
+                            android:layout_weight="1"
+                            android:textStyle="bold"
+                            android:textColor="@color/table_header_text_color"
+                            android:background="@drawable/middle_dosage_table_header"
+                            android:paddingEnd="@dimen/_5sdp"
+                            android:text="@string/night"
+                            android:textAlignment="center" />
+                    </TableRow>
+
+                </TableLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/tableRecyclerView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    tools:listitem="@layout/table_row_layout"
+                    app:layout_constraintStart_toStartOf="@id/table_heading_layout"
+                    app:layout_constraintEnd_toEndOf="@id/table_heading_layout"
+                    app:layout_constraintTop_toBottomOf="@+id/table_heading_layout" />
+
+                <TextView
+                    android:id="@+id/tvContentHeader"
+                    style="@style/Form_Header_Style"
+                    android:layout_width="0dp"
+                    android:padding="@dimen/_16sdp"
+                    android:textAlignment="textStart"
+                    android:visibility="gone"
+                    android:textSize="@dimen/_16ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tableRecyclerView" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvInfoList"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_16sdp"
+                    android:layout_marginEnd="@dimen/_16sdp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvContentHeader"
+                    tools:listitem="@layout/dosage_instruction_item_list" />
+
+                <TextView
+                    android:id="@+id/tvHeader2"
+                    style="@style/Form_Header_Style"
+                    android:layout_width="0dp"
+                    android:paddingStart="@dimen/_16sdp"
+                    android:paddingBottom="@dimen/_16sdp"
+                    android:textAlignment="textStart"
+                    android:textSize="@dimen/_16ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rvInfoList" />
+
+                <TableLayout
+                    android:id="@+id/tableHeaderLayout2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:stretchColumns="1,2,3"
+                    android:gravity="start"
+                    android:background="@drawable/table_header_background"
+                    android:layout_marginStart="@dimen/_16sdp"
+                    android:layout_marginEnd="@dimen/_16sdp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvHeader2">
+
+                    <TableRow>
+
+                        <TextView
+                            android:id="@+id/table2Col1"
+                            style="@style/table_header"
+                            android:layout_width="0dp"
+                            android:layout_height="@dimen/_60sdp"
+                            android:layout_column="1"
+                            android:layout_weight="1"
+                            android:background="@drawable/middle_dosage_table_header"
+                            android:textStyle="bold"
+                            android:textColor="@color/table_header_text_color"
+                            android:text="@string/day"
+                            android:textAlignment="center"/>
+
+                        <TextView
+                            android:id="@+id/table2Col2"
+                            style="@style/table_header"
+                            android:layout_width="0dp"
+                            android:layout_height="@dimen/_60sdp"
+                            android:layout_column="2"
+                            android:layout_weight="1"
+                            android:textStyle="bold"
+                            android:background="@drawable/middle_dosage_table_header"
+                            android:textColor="@color/table_header_text_color"
+                            android:paddingEnd="@dimen/_5sdp"
+                            android:text="@string/morning"
+                            android:textAlignment="center"/>
+
+                        <TextView
+                            android:id="@+id/table2Col3"
+                            style="@style/table_header"
+                            android:layout_width="0dp"
+                            android:layout_height="@dimen/_60sdp"
+                            android:layout_column="3"
+                            android:layout_weight="1"
+                            android:textStyle="bold"
+                            android:textColor="@color/table_header_text_color"
+                            android:background="@drawable/middle_dosage_table_header"
+                            android:paddingEnd="@dimen/_5sdp"
+                            android:text="@string/night"
+                            android:textAlignment="center"/>
+                    </TableRow>
+
+                </TableLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/tableRecyclerView2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    tools:listitem="@layout/table_row_layout"
+                    app:layout_constraintStart_toStartOf="@id/tableHeaderLayout2"
+                    app:layout_constraintEnd_toEndOf="@id/tableHeaderLayout2"
+                    app:layout_constraintTop_toBottomOf="@+id/tableHeaderLayout2" />
+
+                <TextView
+                    android:id="@+id/tvContentHeader2"
+                    style="@style/Form_Header_Style"
+                    android:layout_width="0dp"
+                    android:padding="@dimen/_16sdp"
+                    android:textAlignment="textStart"
+                    android:textSize="@dimen/_16ssp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tableRecyclerView2" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvInfoList2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_16sdp"
+                    android:layout_marginEnd="@dimen/_16sdp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvContentHeader2"
+                    tools:listitem="@layout/dosage_instruction_item_list" />
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/tableGroup1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:constraint_referenced_ids="tvHeader, table_heading_layout, tableRecyclerView"/>
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/tableGroup2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:constraint_referenced_ids=" tableHeaderLayout2, tableRecyclerView2"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/errorIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="@dimen/_10sdp"
+            android:contentDescription="@string/logo_description"
+            android:src="@drawable/not_found_icon"
+            app:layout_constraintBottom_toTopOf="@id/tvErrorMessage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tvErrorMessage"
+            style="@style/TextStyle_Error_12"
+            android:layout_width="0dp"
+            android:padding="@dimen/_16sdp"
+            android:text="@string/no_recommended_dosages"
+            android:textAlignment="center"
+            android:textSize="@dimen/_16ssp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/errorGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="errorIcon, tvErrorMessage"/>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/bottomDivider"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_1sdp"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:background="@color/edittext_stroke"
+            app:cardElevation="@dimen/_4sdp"
+            app:layout_constraintBottom_toTopOf="@id/btnClose"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/scrollContainer" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnClose"
+            style="@style/Button_Style"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/_16sdp"
+            android:text="@string/close"
+            android:textAllCaps="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bottomDivider" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingVertical="@dimen/_15sdp"
+    android:paddingHorizontal="@dimen/_15sdp">
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/etSearchTerm"
+        style="@style/Form_Input_Style"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/search_bar_background"
+        android:drawableStart="@drawable/ic_search_patient"
+        android:drawablePadding="@dimen/_8sdp"
+        android:hint="@string/search"
+        android:imeOptions="actionDone"
+        android:inputType="textCapWords"
+        android:maxLines="1"
+        android:padding="@dimen/_12sdp"
+        android:singleLine="true"
+        app:layout_constraintBottom_toBottomOf="@id/btnSearch"
+        app:layout_constraintEnd_toStartOf="@+id/btnSearch"
+        app:layout_constraintHorizontal_weight="8"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/btnSearch"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnSearch"
+        style="@style/Button_Style"
+        android:layout_width="50dp"
+        android:background="@drawable/check_button_selector"
+        android:enabled="false"
+        app:layout_constraintBottom_toBottomOf="@id/etSearchTerm"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="2" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

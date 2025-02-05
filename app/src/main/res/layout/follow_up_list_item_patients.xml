@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:backgroundTint="@color/white"
+    android:clickable="false"
+    android:focusable="false">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardPatient"
+        style="@style/CardView_Style"
+        android:layout_width="match_parent"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="false"
+        android:focusable="false"
+        app:cardCornerRadius="@dimen/_16sdp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clPatientRoot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/default_color_bg"
+            android:paddingStart="@dimen/_12sdp"
+            android:paddingTop="@dimen/_12sdp"
+            android:paddingBottom="@dimen/_12sdp"
+            android:paddingEnd="@dimen/_4sdp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPatientName"
+                style="@style/TextStyle_Bold_16_NoBG"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:text="@string/hyphen_symbol"
+                android:textColor="@color/secondary_black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/startGuideline"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.37" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/centreGuideline"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.50" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/endGuideline"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.44" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLabelReason"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/hyphen_symbol"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="@color/charcoal_grey"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvPatientName" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLabelMembersRegistered"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/hyphen_symbol"
+                android:textColor="@color/charcoal_grey"
+                android:visibility="gone"
+                app:layout_constraintEnd_toStartOf="@id/startGuideline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvLabelReason" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvMembersRegisteredSeperator"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/separator_colon"
+                android:textColor="@color/charcoal_grey"
+                android:visibility="gone"
+                app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                app:layout_constraintStart_toEndOf="@id/startGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvLabelMembersRegistered" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPatientStatus"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/hyphen_symbol"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/endGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvLabelMembersRegistered" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLastCallAtLabel"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/called_at"
+                android:textColor="@color/charcoal_grey"
+                android:visibility="gone"
+                app:layout_constraintEnd_toStartOf="@id/startGuideline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvLabelMembersRegistered" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLastCallAtLabelSeperator"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/separator_colon"
+                android:textColor="@color/charcoal_grey"
+                android:visibility="gone"
+                app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                app:layout_constraintStart_toEndOf="@id/startGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvLastCallAtLabel" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLastCallAtValue"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/hyphen_symbol"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/endGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvLastCallAtLabel" />
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/callButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_26sdp"
+                android:background="@drawable/call_button_selector"
+                android:paddingHorizontal="@dimen/_24sdp"
+                android:paddingVertical="@dimen/_8sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/assessmentButton"
+                app:layout_constraintTop_toBottomOf="@id/tvLastCallAtLabel">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvCallBtn"
+                    style="@style/TextStyle_Regular_16_Blue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/call_icon"
+                    android:textColor="@color/secondary_black"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/ivRecentAttemptCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_notification_dot"
+                android:gravity="center"
+                android:padding="@dimen/_4sdp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10ssp"
+                android:textStyle="bold"
+                android:visibility="visible"
+                app:layout_constraintBottom_toTopOf="@+id/callButton"
+                app:layout_constraintEnd_toEndOf="@id/callButton"
+                app:layout_constraintStart_toEndOf="@+id/callButton"
+                app:layout_constraintTop_toTopOf="@id/callButton" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/assessmentButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_16sdp"
+                android:layout_marginEnd="@dimen/_18sdp"
+                android:background="@drawable/purple_bg"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingHorizontal="@dimen/_24sdp"
+                android:paddingVertical="@dimen/_8sdp"
+                android:src="@drawable/ic_follow_up_assessment"
+                app:layout_constraintBottom_toBottomOf="@id/callButton"
+                app:layout_constraintEnd_toStartOf="@id/callButton"
+                app:layout_constraintStart_toStartOf="@id/centreGuideline"
+                app:layout_constraintTop_toBottomOf="@id/tvLastCallAtLabel" />
+
+
+            <TextView
+                android:id="@+id/tvDueInformation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/hyphen_symbol"
+                android:textSize="@dimen/_16ssp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@id/callButton"
+                app:layout_constraintEnd_toEndOf="@id/centreGuideline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvLastCallAtLabel"
+                app:layout_constraintTop_toTopOf="@id/callButton" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

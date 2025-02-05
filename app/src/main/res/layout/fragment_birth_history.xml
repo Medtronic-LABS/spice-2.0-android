@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/CardView_Style"
+        android:layout_width="match_parent"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/_16sdp">
+
+            <View
+                android:id="@+id/viewBirthHistroyCardBG"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_0dp"
+                android:background="@color/card_background"
+                app:layout_constraintBottom_toBottomOf="@id/tvBirthHistoryTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/startGuideLine"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.25" />
+
+            <TextView
+                android:id="@+id/tvBirthHistoryTitle"
+                style="@style/Form_Header_Style"
+                android:layout_width="@dimen/_0dp"
+                android:gravity="center"
+                android:fontFamily="@font/inter_bold"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="@string/birth_history"
+                android:textSize="@dimen/_16ssp"
+                android:textColor="@color/house_hold_title"
+                app:layout_constraintBottom_toBottomOf="@id/viewBirthHistroyCardBG"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/viewBirthHistroyCardBG" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBreathingProblemLbl"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_regular"
+                android:layout_marginVertical="@dimen/_16sdp"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:text="@string/breathing_problem_at_birth"
+                android:textColor="@color/table_title"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toStartOf="@id/startGuideLine"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvBirthHistoryTitle" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBirthHistoryDot"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/separator_colon"
+                android:textColor="@color/table_title"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintStart_toStartOf="@+id/startGuideLine"
+                app:layout_constraintTop_toTopOf="@+id/tvBreathingProblemLbl" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBreathingProblem"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_24sdp"
+                android:textColor="@color/grey_black"
+                android:textSize="@dimen/_16ssp"
+                android:fontFamily="@font/inter_medium"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/startGuideLine"
+                app:layout_constraintTop_toTopOf="@+id/tvBreathingProblemLbl" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvGestationalAgeLbl"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_16sdp"
+                android:layout_marginVertical="@dimen/_16sdp"
+                android:text="@string/gestational_age"
+                android:fontFamily="@font/inter_regular"
+                android:textColor="@color/table_title"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toStartOf="@id/startGuideLine"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvBreathingProblem" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvGestationalAgeDot"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/separator_colon"
+                android:textColor="@color/table_title"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintStart_toStartOf="@+id/startGuideLine"
+                app:layout_constraintTop_toTopOf="@+id/tvGestationalAgeLbl" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvGestationalAge"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_24sdp"
+                android:textColor="@color/grey_black"
+                android:textSize="@dimen/_16ssp"
+                android:fontFamily="@font/inter_medium"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/startGuideLine"
+                app:layout_constraintTop_toTopOf="@+id/tvGestationalAgeDot" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBirthWeightLbl"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_16sdp"
+                android:layout_marginVertical="@dimen/_16sdp"
+                android:text="@string/birth_weight"
+                android:fontFamily="@font/inter_regular"
+                android:textColor="@color/table_title"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toStartOf="@+id/startGuideLine"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvGestationalAge" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBirthWeightDot"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/separator_colon"
+                android:textColor="@color/table_title"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintStart_toStartOf="@+id/startGuideLine"
+                app:layout_constraintTop_toTopOf="@+id/tvBirthWeightLbl" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBirthWeight"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_24sdp"
+                android:fontFamily="@font/inter_medium"
+                android:textColor="@color/grey_black"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/startGuideLine"
+                app:layout_constraintTop_toTopOf="@+id/tvBirthWeightDot" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

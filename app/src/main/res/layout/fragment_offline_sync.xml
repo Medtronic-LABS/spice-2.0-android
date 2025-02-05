@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/_16sdp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_440sdp"
+        android:background="@drawable/bg_white_corner_radius"
+        android:paddingBottom="@dimen/_16sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/llLastSyncedAt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/_16sdp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/divider">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/TextStyle_Regular_14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/last_synced_at"
+                android:textColor="@color/charcoal_grey" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLastSyncedAt"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_4sdp"
+                android:textColor="@color/secondary_black"
+                android:textSize="@dimen/_14ssp"
+                tools:text="13 Jun, 2024 - 10:43 am" />
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tittle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_16sdp"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:text="@string/offline_sync_small"
+            android:textColor="@color/house_hold_title"
+            android:textSize="@dimen/_20ssp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_1sdp"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:background="@color/edittext_stroke"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tittle" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clBeforeSync"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="@dimen/_0dp"
+            android:layout_marginHorizontal="@dimen/_16sdp"
+            android:layout_marginTop="@dimen/_24sdp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/llLastSyncedAt">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvOfflineSync"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/offline_sync_start"
+                android:textColor="@color/house_hold_title"
+                android:textSize="@dimen/_18ssp"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvUnSyncedDetail"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@+id/btnStart"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:scrollbars="horizontal"
+                app:layout_constraintTop_toBottomOf="@+id/tvOfflineSync" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnCancel"
+                style="@style/Button_Style_Border"
+                android:layout_width="0dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="@dimen/_8sdp"
+                android:layout_weight="1"
+                android:text="@string/cancel"
+                android:textAllCaps="true"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/btnStart"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnStart"
+                style="@style/Button_Style"
+                android:layout_width="0dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="@dimen/_8sdp"
+                android:layout_weight="1"
+                android:text="@string/start"
+                android:textAllCaps="true"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/btnCancel" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clSyncInProgress"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="@dimen/_0dp"
+            android:layout_marginHorizontal="@dimen/_16sdp"
+            android:layout_marginTop="@dimen/_24sdp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/llLastSyncedAt">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvOfflineSyncStarted"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/offline_sync_started"
+                android:textColor="@color/house_hold_title"
+                android:textSize="@dimen/_18ssp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvOfflineSyncProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:layout_marginTop="@dimen/_50sdp"
+                android:text="0%"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_18ssp"
+                app:layout_constraintBottom_toTopOf="@+id/progressBar"
+                app:layout_constraintEnd_toEndOf="@+id/progressBar" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvOffline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:layout_marginTop="@dimen/_50sdp"
+                android:text="@string/Offline_data"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_18ssp"
+                app:layout_constraintBottom_toTopOf="@+id/progressBar"
+                app:layout_constraintStart_toStartOf="@+id/progressBar" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:layout_marginTop="@dimen/_16sdp"
+                android:max="100"
+                android:progress="0"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clAfterSync"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="@dimen/_0dp"
+            android:layout_marginHorizontal="@dimen/_16sdp"
+            android:layout_marginTop="@dimen/_24sdp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/llLastSyncedAt">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/statusImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@string/logo_description"
+                android:src="@drawable/success_icon"
+                android:layout_marginBottom="@dimen/_16sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/tvOfflineSyncCompleted" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvOfflineSyncCompleted"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/offline_data_completion"
+                android:textAlignment="center"
+                android:textColor="@color/house_hold_title"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnOkay"
+                style="@style/Button_Style"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/okay"
+                android:textAllCaps="true"
+                android:textSize="@dimen/_16ssp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardCornerRadius="@dimen/_10sdp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvBloodPressureLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/_18sdp"
+            android:text="@string/blood_glucose"
+            android:textColor="@color/house_hold_title"
+            android:textSize="@dimen/_16ssp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/ivClose"
+            style="@style/ImageView_Style"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:contentDescription="@string/close"
+            android:padding="@dimen/_8sdp"
+            android:src="@drawable/ic_close_black"
+            app:layout_constraintBottom_toBottomOf="@+id/tvBloodPressureLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvBloodPressureLabel" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divideTop"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/point_eight_dp"
+            app:dividerColor="@color/btn_disable_grey"
+            app:layout_constraintTop_toBottomOf="@id/tvBloodPressureLabel" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clBody"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_0dp"
+            android:layout_marginHorizontal="@dimen/_15sdp"
+            android:layout_marginVertical="@dimen/_15sdp"
+            android:background="@drawable/card_border"
+            app:layout_constraintBottom_toTopOf="@id/divideBottom"
+            app:layout_constraintTop_toBottomOf="@id/divideTop">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tvAssessmentDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:paddingVertical="@dimen/_16sdp"
+                android:text="@string/assessment_date"
+                android:textColor="@color/house_hold_title"
+                android:textSize="@dimen/_14ssp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@id/tvRbs"
+                app:layout_constraintHorizontal_weight="4"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tvRbs"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:paddingVertical="@dimen/_16sdp"
+                android:text="@string/rbs"
+                android:textColor="@color/house_hold_title"
+                android:textSize="@dimen/_14ssp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@id/tvFbs"
+                app:layout_constraintHorizontal_weight="2"
+                app:layout_constraintStart_toEndOf="@+id/tvAssessmentDate"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tvFbs"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:paddingVertical="@dimen/_16sdp"
+                android:text="@string/fbs"
+                android:textColor="@color/house_hold_title"
+                android:textSize="@dimen/_14ssp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@id/tvHbA1c"
+                app:layout_constraintHorizontal_weight="2"
+                app:layout_constraintStart_toEndOf="@+id/tvRbs"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tvHbA1c"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:paddingVertical="@dimen/_16sdp"
+                android:text="@string/hba1c"
+                android:textColor="@color/house_hold_title"
+                android:textSize="@dimen/_14ssp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="2"
+                app:layout_constraintStart_toEndOf="@id/tvFbs"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/point_eight_dp"
+                app:dividerColor="@color/btn_disable_grey"
+                app:layout_constraintTop_toBottomOf="@id/tvAssessmentDate" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvBpLogList"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divideBottom"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/point_eight_dp"
+            android:layout_marginBottom="@dimen/_12sdp"
+            app:dividerColor="@color/btn_disable_grey"
+            app:layout_constraintBottom_toTopOf="@id/btnAddNewReading" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnAddNewReading"
+            style="@style/Button_Style_Border"
+            android:layout_marginHorizontal="@dimen/_15sdp"
+            android:layout_marginBottom="@dimen/_12sdp"
+            android:fontFamily="@font/inter_regular"
+            android:text="@string/add_new_reading"
+            android:textAllCaps="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

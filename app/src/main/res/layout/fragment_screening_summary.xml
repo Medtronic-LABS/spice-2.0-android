@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fillViewport="true">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_0dp"
+        android:layout_marginBottom="@dimen/_30sdp"
+        app:layout_constraintBottom_toTopOf="@id/btnNext"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/riskResultLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_16sdp"
+                android:background="@drawable/curved_rectangle_background"
+                android:backgroundTint="@color/summary_assessment_color_selector"
+                android:fontFamily="@font/inter_bold"
+                android:gravity="center"
+                android:padding="@dimen/_10sdp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_16ssp"
+                android:visibility="gone" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/llSiteChangeHolder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_16sdp"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/labelSiteChange"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_regular"
+                    android:text="@string/facility_referred_to"
+                    android:textColor="@color/charcoal_grey"
+                    android:textSize="@dimen/_14ssp" />
+
+                <androidx.appcompat.widget.AppCompatSpinner
+                    android:id="@+id/etSiteChange"
+                    style="@style/Form_Spinner_Style"
+                    android:layout_width="match_parent"
+                    android:paddingVertical="@dimen/_14sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_8sdp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <LinearLayout
+                android:id="@+id/llFamilyRoot"
+                android:layout_width="match_parent"
+                android:layout_marginHorizontal="@dimen/_12sdp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnNext"
+        style="@style/Button_Style"
+        android:layout_marginBottom="@dimen/_30sdp"
+        android:background="@drawable/button_selector_cobalt"
+        android:enabled="false"
+        android:minWidth="@dimen/_200sdp"
+        android:text="@string/done"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

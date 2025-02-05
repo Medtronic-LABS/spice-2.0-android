@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tool="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tvAssessmentDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingHorizontal="@dimen/_10sdp"
+        android:paddingVertical="@dimen/_16sdp"
+        android:textColor="@color/house_hold_title"
+        android:textSize="@dimen/_14ssp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/tvRbs"
+        app:layout_constraintHorizontal_weight="4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tool:text="@string/assessment_date" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tvRbs"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingHorizontal="@dimen/_10sdp"
+        android:paddingVertical="@dimen/_16sdp"
+        android:textColor="@color/house_hold_title"
+        android:textSize="@dimen/_14ssp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/tvFbs"
+        app:layout_constraintHorizontal_weight="2"
+        app:layout_constraintStart_toEndOf="@+id/tvAssessmentDate"
+        app:layout_constraintTop_toTopOf="parent"
+        tool:text="@string/rbs" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tvFbs"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingHorizontal="@dimen/_10sdp"
+        android:paddingVertical="@dimen/_16sdp"
+        android:textColor="@color/house_hold_title"
+        android:textSize="@dimen/_14ssp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/tvHbA1c"
+        app:layout_constraintHorizontal_weight="2"
+        app:layout_constraintStart_toEndOf="@+id/tvRbs"
+        app:layout_constraintTop_toTopOf="parent"
+        tool:text="@string/fbs" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tvHbA1c"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingHorizontal="@dimen/_10sdp"
+        android:paddingVertical="@dimen/_16sdp"
+        android:textColor="@color/house_hold_title"
+        android:textSize="@dimen/_14ssp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="2"
+        app:layout_constraintStart_toEndOf="@id/tvFbs"
+        app:layout_constraintTop_toTopOf="parent"
+        tool:text="@string/hba1c" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/point_eight_dp"
+        app:dividerColor="@color/btn_disable_grey"
+        app:layout_constraintTop_toBottomOf="@id/tvAssessmentDate" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

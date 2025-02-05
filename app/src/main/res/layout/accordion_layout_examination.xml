@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="@dimen/_8sdp"
+    android:background="@drawable/edittext_background"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:id="@+id/tvDiseaseNameHolder"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/ivDropDown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/_16sdp"
+            android:src="@drawable/ic_arrow_down"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvDiseaseName"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_medium"
+            android:paddingHorizontal="@dimen/_16sdp"
+            android:paddingVertical="@dimen/_8sdp"
+            android:textColor="@color/house_hold_title"
+            android:textSize="@dimen/_16ssp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/ivDropDown"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Very Severe Disease (PSBI)" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/llFamilyRoot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_marginHorizontal="@dimen/_16sdp"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_1sdp"
+            android:background="@color/grey_line_divider" />
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/questionnairesHolder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical"
+            app:flexWrap="wrap"
+            app:justifyContent="space_between"
+            app:flexDirection="row"
+            android:layout_marginBottom="@dimen/_12sdp"
+            android:paddingVertical="@dimen/_12sdp"
+            app:layout_constraintTop_toBottomOf="@+id/divider"/>
+
+    </LinearLayout>
+
+</LinearLayout>

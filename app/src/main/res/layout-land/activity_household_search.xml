@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context="com.medtroniclabs.opensource.ui.household.HouseholdSearchActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/search_background"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp">
+
+        <include
+            android:id="@+id/llExactSearch"
+            layout="@layout/household_search_layout" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/graph_limit_linecolor"
+        app:layout_constraintTop_toBottomOf="@+id/clHeader" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvHouseHoldCount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:padding="@dimen/_5sdp"
+        android:fontFamily="@font/inter_bold"
+        android:textColor="@color/house_hold_title"
+        android:textSize="@dimen/_18ssp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toStartOf="@id/llFilter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/llFilter"
+        tools:text="@string/households" />
+
+    <include
+        android:id="@+id/llFilter"
+        layout="@layout/filter_btn_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:visibility="visible"
+        android:layout_marginEnd="@dimen/_16sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/view" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/filterBarrier"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="llFilter,tvHouseHoldCount" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvHouseholdList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="visible"
+        android:padding="@dimen/_5sdp"
+        app:layout_constraintBottom_toTopOf="@id/pbLoadMore"
+        app:layout_constraintTop_toBottomOf="@id/filterBarrier" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvNoHouseHoldFound"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_0dp"
+        android:gravity="center"
+        android:paddingHorizontal="@dimen/_15sdp"
+        android:text="@string/household_empty_text"
+        android:textColor="@color/medium_risk_color"
+        android:textSize="@dimen/_16ssp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/pbLoadMore"
+        app:layout_constraintTop_toBottomOf="@id/filterBarrier"
+        />
+
+    <RelativeLayout
+        android:id="@+id/pbLoadMore"
+        android:layout_width="@dimen/_80sdp"
+        android:layout_height="@dimen/_80sdp"
+        android:padding="@dimen/_15sdp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/spin_kit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/loader_spice" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:padding="@dimen/_12sdp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnAddHousehold"
+            style="@style/Button_Style"
+            android:layout_width="match_parent"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/_8sdp"
+            android:text="@string/add_household"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

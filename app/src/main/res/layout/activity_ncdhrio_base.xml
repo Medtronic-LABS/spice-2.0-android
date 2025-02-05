@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/CardView_Style"
+        android:layout_marginVertical="@dimen/_6sdp"
+        app:cardUseCompatPadding="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/card_background">
+
+                <TextView
+                    android:id="@+id/bioDataCardTitle"
+                    style="@style/Form_Header_Style"
+                    android:layout_width="@dimen/_0dp"
+                    android:gravity="center"
+                    android:paddingHorizontal="@dimen/_16sdp"
+                    android:paddingVertical="@dimen/_10sdp"
+                    android:text="@string/patient_details"
+                    android:textSize="@dimen/_16ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
+                android:orientation="vertical"
+                android:padding="@dimen/_16sdp"
+                app:layout_constraintTop_toBottomOf="@+id/divider">
+
+                <LinearLayout
+                    android:id="@+id/llPatientInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include
+                        android:id="@+id/patientName"
+                        layout="@layout/summary_layout" />
+
+                    <include
+                        android:id="@+id/mobileNumber"
+                        layout="@layout/summary_layout" />
+
+
+                    <include
+                        android:id="@+id/mobileCategory"
+                        layout="@layout/summary_layout" />
+
+                    <include
+                        android:id="@+id/landmark"
+                        layout="@layout/summary_layout" />
+
+                    <include
+                        android:id="@+id/occupation"
+                        layout="@layout/summary_layout" />
+
+                    <include
+                        android:id="@+id/healthStatus"
+                        layout="@layout/summary_layout" />
+
+                    <include
+                        android:id="@+id/healthType"
+                        layout="@layout/summary_layout" />
+
+                    <include
+                        android:id="@+id/healthId"
+                        layout="@layout/summary_layout" />
+
+                    <include
+                        android:id="@+id/nextVisit"
+                        layout="@layout/summary_layout" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+
+</LinearLayout>

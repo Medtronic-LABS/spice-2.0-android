@@ -1,0 +1,119 @@
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardCornerRadius="@dimen/_10sdp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvMentalHealthLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/_16sdp"
+            android:textColor="@color/house_hold_title"
+            android:textSize="@dimen/_16ssp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/ivClose"
+            style="@style/ImageView_Style"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:contentDescription="@string/close"
+            android:padding="@dimen/_8sdp"
+            android:src="@drawable/ic_close_black"
+            app:layout_constraintBottom_toBottomOf="@+id/tvMentalHealthLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvMentalHealthLabel" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divideTop"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/point_eight_dp"
+            app:dividerColor="@color/btn_disable_grey"
+            app:layout_constraintTop_toBottomOf="@id/tvMentalHealthLabel" />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/mentalHealthScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_0dp"
+            app:layout_constraintBottom_toTopOf="@id/divideBottom"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divideTop">
+
+            <LinearLayout
+                android:id="@+id/llForm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </androidx.core.widget.NestedScrollView>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divideBottom"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_2sdp"
+            android:layout_marginBottom="@dimen/_12sdp"
+            app:dividerColor="@color/gray_bg_site"
+            app:layout_constraintBottom_toTopOf="@id/btnConfirm" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnConfirm"
+            style="@style/Button_Style_confirm"
+            android:layout_width="wrap_content"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_12sdp"
+            android:background="@drawable/button_selector_cobalt"
+            android:fontFamily="@font/inter_regular"
+            android:paddingHorizontal="@dimen/_35sdp"
+            android:text="@string/submit"
+            android:textAllCaps="true"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnCancel"
+            style="@style/Button_Style_Border"
+            android:layout_width="0dp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_12sdp"
+            android:fontFamily="@font/inter_regular"
+            android:paddingHorizontal="@dimen/_35sdp"
+            android:text="@string/cancel"
+            android:textAllCaps="true"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnConfirm" />
+
+        <RelativeLayout
+            android:id="@+id/loadingProgress"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="@dimen/_0dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/loaderImage"
+                android:layout_width="@dimen/_75sdp"
+                android:layout_height="@dimen/_75sdp"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:contentDescription="@string/loading"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </RelativeLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

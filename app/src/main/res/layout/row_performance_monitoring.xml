@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/clRowPerformanceMonitoringRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <View
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="@dimen/_1sdp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvChwName"
+        style="@style/StylePerformanceMonitorText"
+        android:text="Chw Name"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.1145" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvChwName"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvVillage"
+        style="@style/StylePerformanceMonitorText"
+        android:text="Village"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvChwName"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.0886" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvVillage"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvNoOfHH"
+        style="@style/StylePerformanceMonitorText"
+        android:text="50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvVillage"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.0365" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvNoOfHH"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvNoOfPatient"
+        style="@style/StylePerformanceMonitorText"
+        android:text="50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvNoOfHH"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.0728" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvNoOfPatient"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvICCM"
+        style="@style/StylePerformanceMonitorText"
+        android:text="50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvNoOfPatient"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.0452" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvICCM"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvRMNCH"
+        style="@style/StylePerformanceMonitorText"
+        android:text="50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvICCM"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.054" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvRMNCH"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvOS"
+        style="@style/StylePerformanceMonitorText"
+        android:text="50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvRMNCH"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.0427" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvOS"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvReferrals"
+        style="@style/StylePerformanceMonitorText"
+        android:text="50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvOS"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.0834" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvReferrals"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvTreatmentStarted"
+        style="@style/StylePerformanceMonitorText"
+        android:text="50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvReferrals"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.0878" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvTreatmentStarted"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvFollowUpDueVisit"
+        style="@style/StylePerformanceMonitorText"
+        android:text="50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvTreatmentStarted"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.051" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvFollowUpDueVisit"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvFollowUpDueCalls"
+        style="@style/StylePerformanceMonitorText"
+        android:text="50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvFollowUpDueVisit"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.051" />
+
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvFollowUpDueCalls"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvFollowUpCondVisit"
+        style="@style/StylePerformanceMonitorText"
+        android:text="50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvFollowUpDueCalls"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.051" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvFollowUpCondVisit"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvFollowUpCondCalls"
+        style="@style/StylePerformanceMonitorText"
+        android:text="50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvFollowUpCondVisit"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.051" />
+
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvFollowUpCondCalls"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvRecoveredImproved"
+        style="@style/StylePerformanceMonitorText"
+        android:text="50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvFollowUpCondCalls"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.0878" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvRecoveredImproved"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvWorsened"
+        style="@style/StylePerformanceMonitorText"
+        android:text="50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvRecoveredImproved"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".ui.medicalreview.undertwomonths.fragment.UnderTwoMonthsTreatmentSummaryFragment">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/underTwoMaterialCardView"
+        style="@style/CardView_Style"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardUseCompatPadding="true"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_16sdp">
+
+            <View
+                android:id="@+id/viewPNCVisitSummaryMotherFragment"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="@dimen/_0dp"
+                android:background="@color/card_background"
+                app:layout_constraintBottom_toBottomOf="@id/titlePNCVisitSummaryMotherFragment"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/titlePNCVisitSummaryMotherFragment"
+                style="@style/Form_Header_Style"
+                android:layout_width="@dimen/_0dp"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="@string/treatment"
+                android:textColor="@color/house_hold_title"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@id/viewPNCVisitSummaryMotherFragment"
+                app:layout_constraintStart_toStartOf="@id/viewPNCVisitSummaryMotherFragment"
+                app:layout_constraintTop_toTopOf="@id/viewPNCVisitSummaryMotherFragment" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/startGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.25" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/centerGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.3" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/endGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvDiagnosisLabel"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_24sdp"
+                android:layout_marginTop="@dimen/_16sdp"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/diagnosis"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@+id/startGuideline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/titlePNCVisitSummaryMotherFragment" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSeperatorColon1"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/separator_colon"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@+id/centerGuideline"
+                app:layout_constraintStart_toStartOf="@+id/startGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvDiagnosisLabel" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvDiagnosis"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_24sdp"
+                android:fontFamily="@font/inter_medium"
+                android:text="@string/empty__"
+                android:textColor="@color/a_red_error"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/centerGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvSeperatorColon1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPatientStatusLabel"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_16sdp"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/patient_status"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@+id/startGuideline"
+                app:layout_constraintStart_toStartOf="@+id/tvDiagnosisLabel"
+                app:layout_constraintTop_toBottomOf="@+id/tvDiagnosis" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSeperatorColon2"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/separator_colon"
+                app:layout_constraintEnd_toEndOf="@+id/centerGuideline"
+                app:layout_constraintStart_toStartOf="@+id/startGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvPatientStatusLabel" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/tvPatientStatus"
+                style="@style/Form_Spinner_Style"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_24sdp"
+                android:background="@drawable/edittext_background"
+                android:fontFamily="@font/inter_medium"
+                app:layout_constraintBottom_toBottomOf="@+id/tvPatientStatusLabel"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/centerGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvSeperatorColon2" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPresentingComplaintsLabel"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_12sdp"
+                android:fontFamily="@font/inter_regular"
+                android:textSize="@dimen/_16ssp"
+                android:text="@string/presenting_complaints"
+                app:layout_constraintEnd_toEndOf="@+id/startGuideline"
+                app:layout_constraintStart_toStartOf="@+id/tvPatientStatusLabel"
+                app:layout_constraintTop_toBottomOf="@+id/tvPatientStatus" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSeperatorColon4"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/separator_colon"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@+id/centerGuideline"
+                app:layout_constraintStart_toStartOf="@+id/startGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvPresentingComplaintsLabel" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPresentingComplaints"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_24sdp"
+                android:layout_marginBottom="@dimen/_16sdp"
+                android:fontFamily="@font/inter_medium"
+                android:text="@string/empty__"
+                android:textSize="@dimen/_16ssp"
+                android:textAlignment="textStart"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/centerGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvSeperatorColon4" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvGeneralSystemicExaminationLabel"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_24sdp"
+                android:layout_marginTop="@dimen/_16sdp"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/examination"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@+id/startGuideline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvPresentingComplaints" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSeperatorColon5"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/separator_colon"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@+id/centerGuideline"
+                app:layout_constraintStart_toStartOf="@+id/startGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvGeneralSystemicExaminationLabel" />
+
+            <com.medtroniclabs.opensource.ui.common.FloatingDetectorFrameLayout
+                android:id="@+id/flExaminationContainer"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_24sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/tvClinicalNotesLabel"
+                app:layout_constraintStart_toStartOf="@+id/centerGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvSeperatorColon5">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvExaminationList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/table_title"
+                    android:textSize="@dimen/_16ssp"
+                    android:visibility="visible" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvExaminationEmptyValue"
+                    style="@style/TextStyle_Regular_16"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/_24sdp"
+                    android:text="@string/empty__"
+                    android:textSize="@dimen/_16ssp"
+                    android:visibility="gone" />
+            </com.medtroniclabs.opensource.ui.common.FloatingDetectorFrameLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvClinicalNotesLabel"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_16sdp"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/clinical_notes"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@+id/startGuideline"
+                app:layout_constraintStart_toStartOf="@+id/tvGeneralSystemicExaminationLabel"
+                app:layout_constraintTop_toBottomOf="@+id/flExaminationContainer" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSeperatorColon6"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/separator_colon"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@+id/centerGuideline"
+                app:layout_constraintStart_toStartOf="@+id/startGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvClinicalNotesLabel" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvClinicalNotes"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_24sdp"
+                android:textSize="@dimen/_16ssp"
+                android:fontFamily="@font/inter_medium"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/centerGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvSeperatorColon6" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvInvestigationLabel"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_16sdp"
+                android:fontFamily="@font/inter_regular"
+                android:textSize="@dimen/_16ssp"
+                android:text="@string/investigation"
+                app:layout_constraintEnd_toEndOf="@+id/startGuideline"
+                app:layout_constraintStart_toStartOf="@+id/tvClinicalNotesLabel"
+                app:layout_constraintTop_toBottomOf="@+id/tvClinicalNotes" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSeperatorColon7"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/separator_colon"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@+id/centerGuideline"
+                app:layout_constraintStart_toStartOf="@+id/startGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvInvestigationLabel" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvInvestigation"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_24sdp"
+                android:fontFamily="@font/inter_medium"
+                android:text="@string/separator_double_hyphen"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/centerGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvSeperatorColon7" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPrescriptionLabel"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_16sdp"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/prescription"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@+id/startGuideline"
+                app:layout_constraintStart_toStartOf="@+id/tvInvestigationLabel"
+                app:layout_constraintTop_toBottomOf="@+id/tvInvestigation" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSeperatorColon8"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/separator_colon"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@+id/centerGuideline"
+                app:layout_constraintStart_toStartOf="@+id/startGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvPrescriptionLabel" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPrescription"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_24sdp"
+                android:fontFamily="@font/inter_medium"
+                android:text="@string/empty__"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/centerGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvSeperatorColon8" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNextVisitTimeLabel"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_16sdp"
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/next_visit_date"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@+id/startGuideline"
+                app:layout_constraintStart_toStartOf="@+id/tvPrescriptionLabel"
+                app:layout_constraintTop_toBottomOf="@+id/tvPrescription" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSeperatorColon9"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/separator_colon"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@+id/centerGuideline"
+                app:layout_constraintStart_toStartOf="@+id/startGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvNextVisitTimeLabel" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/etNextVisitDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_24sdp"
+                android:background="@drawable/edittext_background_selector"
+                android:drawableEnd="@drawable/ic_date_picker_calendar"
+                android:gravity="start|center"
+                android:paddingStart="@dimen/_10sdp"
+                android:textColor="@color/grey_black"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvNextVisitTimeLabel"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/centerGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvNextVisitTimeLabel" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNextVisitTimeError"
+                style="@style/TextStyle_Error_14"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:padding="@dimen/_6sdp"
+                android:text="@string/default_user_input_error"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="@+id/centerGuideline"
+                app:layout_constraintTop_toBottomOf="@+id/etNextVisitDate">
+
+            </androidx.appcompat.widget.AppCompatTextView>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvClinicalNameLabel"
+        style="@style/TextStyle_Regular_16"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="@dimen/_30sdp"
+        android:text="@string/clinician_name"
+        android:layout_marginBottom="@dimen/_30sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tvClinicalNameSeparator"
+        app:layout_constraintHorizontal_weight="0.4"
+        app:layout_constraintStart_toStartOf="@id/underTwoMaterialCardView"
+        app:layout_constraintTop_toBottomOf="@id/underTwoMaterialCardView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvClinicalNameSeparator"
+        style="@style/TextStyle_Regular_16"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="@dimen/_0dp"
+        android:gravity="center_horizontal"
+        android:text="@string/separator_colon"
+        app:layout_constraintBottom_toBottomOf="@id/tvClinicalNameLabel"
+        app:layout_constraintEnd_toStartOf="@id/tvClinicalName"
+        app:layout_constraintHorizontal_weight="0.1"
+        app:layout_constraintStart_toEndOf="@id/tvClinicalNameLabel"
+        app:layout_constraintTop_toTopOf="@id/tvClinicalNameLabel" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvClinicalName"
+        style="@style/TextStyle_Regular_16"
+        android:layout_width="@dimen/_0dp"
+        android:fontFamily="@font/inter_medium"
+        android:textColor="@color/grey_black"
+        android:text="@string/seperator_hyphen"
+        app:layout_constraintBottom_toBottomOf="@id/tvClinicalNameLabel"
+        app:layout_constraintEnd_toEndOf="@id/centreGuideline"
+        app:layout_constraintHorizontal_weight="0.5"
+        app:layout_constraintStart_toEndOf="@id/tvClinicalNameSeparator"
+        app:layout_constraintTop_toTopOf="@id/tvClinicalNameLabel" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/centreGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5"  />
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvDateOfReviewLabel"
+        style="@style/TextStyle_Regular_16"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="@dimen/_8sdp"
+        android:text="@string/date_of_review"
+        app:layout_constraintBottom_toBottomOf="@id/tvClinicalNameLabel"
+        app:layout_constraintEnd_toStartOf="@id/tvDateOfReviewSeparator"
+        app:layout_constraintHorizontal_weight="0.4"
+        app:layout_constraintStart_toEndOf="@id/centreGuideline"
+        app:layout_constraintTop_toTopOf="@id/tvClinicalNameLabel" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvDateOfReviewSeparator"
+        style="@style/TextStyle_Regular_16"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="0dp"
+        android:gravity="center_horizontal"
+        android:text="@string/separator_colon"
+        app:layout_constraintBottom_toBottomOf="@id/tvDateOfReviewLabel"
+        app:layout_constraintEnd_toStartOf="@id/tvDateOfReviewValue"
+        app:layout_constraintHorizontal_weight="0.1"
+        app:layout_constraintStart_toEndOf="@id/tvDateOfReviewLabel"
+        app:layout_constraintTop_toTopOf="@id/tvDateOfReviewLabel" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvDateOfReviewValue"
+        style="@style/TextStyle_Regular_16"
+        android:layout_width="@dimen/_0dp"
+        android:layout_marginEnd="@dimen/_30sdp"
+        android:fontFamily="@font/inter_medium"
+        android:textColor="@color/grey_black"
+        android:text="@string/seperator_hyphen"
+        app:layout_constraintBottom_toBottomOf="@id/tvDateOfReviewLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="0.5"
+        app:layout_constraintStart_toEndOf="@id/tvDateOfReviewSeparator"
+        app:layout_constraintTop_toTopOf="@id/tvDateOfReviewLabel" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

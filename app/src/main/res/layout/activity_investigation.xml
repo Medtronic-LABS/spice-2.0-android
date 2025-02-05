@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.medicalreview.investigation.InvestigationActivity">
+
+    <AutoCompleteTextView
+        android:id="@+id/searchView"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_32sdp"
+        android:layout_marginVertical="@dimen/_16sdp"
+        android:background="@drawable/edittext_background"
+        android:drawableStart="@drawable/ic_search_blue"
+        android:drawablePadding="@dimen/_12sdp"
+        android:hint="@string/search_investigation_and_add"
+        android:inputType="text"
+        android:maxLines="1"
+        android:padding="@dimen/_12sdp"
+        android:singleLine="true"
+        android:textColorHint="@color/btn_disable_grey"
+        app:layout_constraintBottom_toTopOf="@id/nestedScrollView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_0dp"
+        android:clipToPadding="true"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@+id/clFooter"
+        app:layout_constraintTop_toBottomOf="@+id/searchView">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white">
+
+            <View
+                android:id="@+id/backgroundView"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="@dimen/_0dp"
+                android:layout_marginTop="@dimen/_64sdp"
+                android:background="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardInvestigationContainer"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="@dimen/_32sdp"
+                android:layout_marginVertical="@dimen/_16sdp"
+                app:cardCornerRadius="@dimen/_8sdp"
+                app:cardElevation="@dimen/_4sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:strokeColor="@color/light_gray"
+                app:strokeWidth="@dimen/_1sdp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="1.0">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="@dimen/_0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.3"
+                            android:fontFamily="@font/inter_regular"
+                            android:gravity="start"
+                            android:padding="@dimen/_12sdp"
+                            android:text="@string/test_name"
+                            android:textColor="@color/table_title"
+                            android:textSize="@dimen/_14ssp" />
+
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="@dimen/_0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.3"
+                            android:fontFamily="@font/inter_regular"
+                            android:gravity="center"
+                            android:padding="@dimen/_12sdp"
+                            android:text="@string/recommended_on"
+                            android:textColor="@color/table_title"
+                            android:textSize="@dimen/_14ssp" />
+
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="@dimen/_0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.2"
+                            android:fontFamily="@font/inter_regular"
+                            android:gravity="center"
+                            android:padding="@dimen/_12sdp"
+                            android:text="@string/recommended_by"
+                            android:textColor="@color/table_title"
+                            android:textSize="@dimen/_14ssp" />
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_1sdp"
+                        android:background="@color/edittext_stroke_50t" />
+
+                    <LinearLayout
+                        android:id="@+id/llInvestigationHolder"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+
+                    <TextView
+                        android:id="@+id/tvNoInvestigationDataFound"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginVertical="@dimen/_32sdp"
+                        android:fontFamily="@font/inter_regular"
+                        android:gravity="center"
+                        android:text="@string/no_investigation_referred"
+                        android:textColor="@color/cobalt_blue"
+                        android:textSize="@dimen/_14ssp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clFooter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:paddingHorizontal="@dimen/_15sdp"
+        android:paddingVertical="@dimen/_10sdp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnSubmit"
+            style="@style/Button_Style"
+            android:background="@drawable/button_selector_cobalt"
+            android:minWidth="@dimen/_200sdp"
+            android:paddingHorizontal="@dimen/_30sdp"
+            android:text="@string/submit"
+            android:textAllCaps="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

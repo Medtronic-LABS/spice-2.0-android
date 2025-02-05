@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.medicalreview.motherneonate.pnc.activity.MotherNeonatePncActivity">
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/refreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_0dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollViewID"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_0dp"
+            android:fillViewport="true"
+            app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/background_ligt_blue">
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/patientDetailFragment"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_25sdp"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:layout="@layout/fragment_patient_info" />
+
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/diagnosisFragment"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/_25sdp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/patientDetailFragment"
+                    tools:layout="@layout/fragment_medical_review_patient_diagnosis" />
+
+                <TextView
+                    android:id="@+id/tvAliveStatus"
+                    android:layout_width="@dimen/_0dp"
+                    android:paddingHorizontal="@dimen/_25sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_10sdp"
+                    android:layout_marginStart="@dimen/_8sdp"
+                    android:text="@string/is_the_mother_alive"
+                    android:textSize="@dimen/_16ssp"
+                    app:layout_constraintEnd_toEndOf="@id/diagnosisFragment"
+                    app:layout_constraintStart_toStartOf="@id/diagnosisFragment"
+                    app:layout_constraintTop_toBottomOf="@id/diagnosisFragment" />
+
+                <LinearLayout
+                    android:id="@+id/btnLayout"
+                    android:layout_width="@dimen/_0dp"
+                    android:paddingHorizontal="@dimen/_25sdp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingVertical="@dimen/_7sdp"
+                    app:layout_constraintEnd_toEndOf="@id/tvAliveStatus"
+                    app:layout_constraintStart_toStartOf="@id/tvAliveStatus"
+                    app:layout_constraintTop_toBottomOf="@id/tvAliveStatus" />
+
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/presentingComplaintsContainer"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:focusable="false"
+                    android:paddingHorizontal="@dimen/_25sdp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btnLayout" />
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/systemicExaminationsContainer"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:paddingHorizontal="@dimen/_25sdp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/presentingComplaintsContainer" />
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/clinicalNotesContainer"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/_16sdp"
+                    android:visibility="gone"
+                    android:paddingHorizontal="@dimen/_25sdp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/systemicExaminationsContainer" />
+<!--                <View-->
+<!--                    android:id="@+id/blurView"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="0dp"-->
+<!--                    android:background="#80FFFFFF"-->
+<!--                    app:layout_constraintTop_toBottomOf="@id/btnLayout"-->
+<!--                    app:layout_constraintBottom_toBottomOf="@id/clinicalNotesContainer"/>-->
+                <LinearLayout
+                    android:id="@+id/blurView"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:background="#80FFFFFF"
+                    android:orientation="horizontal"
+                    app:layout_constraintTop_toBottomOf="@id/btnLayout"
+                    app:layout_constraintBottom_toBottomOf="@id/clinicalNotesContainer"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <LinearLayout
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:padding="@dimen/_12sdp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/refreshLayout">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/ivInvestigation"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/ivInvestigationImgView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@string/investigation"
+                android:src="@drawable/ic_investigation"
+                app:layout_constraintBottom_toTopOf="@+id/tvInvestigation"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/ivIBatchCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_notification_dot"
+                android:gravity="center"
+                android:padding="@dimen/_4sdp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10ssp"
+                android:textStyle="bold"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toTopOf="@+id/ivInvestigationImgView"
+                app:layout_constraintEnd_toEndOf="@id/ivInvestigationImgView"
+                app:layout_constraintStart_toEndOf="@+id/ivInvestigationImgView"
+                app:layout_constraintTop_toTopOf="@id/ivInvestigationImgView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvInvestigation"
+                style="@style/TextStyle_Bold_16_PrimaryMediumBlue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/investigation_caps"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/ivInvestigationMarginOne"
+            android:layout_width="@dimen/_1sdp"
+            android:layout_height="match_parent"
+            android:alpha="0.2"
+            android:background="@color/medium_blue" />
+
+        <View
+            android:id="@+id/ivInvestigationMarginTwo"
+            android:layout_width="@dimen/_1sdp"
+            android:layout_height="match_parent"
+            android:alpha="0.2"
+            android:background="@color/medium_blue" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/ivPrescription"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/ivPrescriptionImgView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@string/prescription"
+                android:src="@drawable/ic_prescription"
+                app:layout_constraintBottom_toTopOf="@+id/tvPrescription"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/ivPBatchCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_notification_dot"
+                android:gravity="center"
+                android:padding="@dimen/_4sdp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10ssp"
+                android:textStyle="bold"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toTopOf="@+id/ivPrescriptionImgView"
+                app:layout_constraintEnd_toEndOf="@id/ivPrescriptionImgView"
+                app:layout_constraintStart_toEndOf="@+id/ivPrescriptionImgView"
+                app:layout_constraintTop_toTopOf="@id/ivPrescriptionImgView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPrescription"
+                style="@style/TextStyle_Bold_16_PrimaryMediumBlue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/prescription_caps"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/viewLine"
+            android:layout_width="@dimen/_1sdp"
+            android:layout_height="match_parent"
+            android:alpha="0.2"
+            android:background="@color/medium_blue" />
+
+        <View
+            android:id="@+id/ivPrescriptionMarginOne"
+            android:layout_width="@dimen/_1sdp"
+            android:layout_height="match_parent"
+            android:alpha="0.2"
+            android:background="@color/medium_blue" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0.4">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnSubmit"
+                style="@style/Button_Style"
+                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginStart="@dimen/_24sdp"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:layout_marginEnd="@dimen/_8sdp"
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:background="@drawable/button_selector_cobalt"
+                android:enabled="false"
+                android:text="@string/submit_caps"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/referalBottomView"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnDone"
+            style="@style/Button_Style_confirm"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:layout_marginEnd="@dimen/_24sdp"
+            android:layout_marginBottom="@dimen/_12sdp"
+            android:background="@drawable/btn_bg_selector"
+            android:enabled="false"
+            android:paddingHorizontal="@dimen/_40sdp"
+            android:paddingVertical="@dimen/_12sdp"
+            android:text="@string/done"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/btnRefer"
+            style="@style/Button_Style_cancel"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/_16sdp"
+            android:paddingHorizontal="@dimen/_40sdp"
+            android:paddingVertical="@dimen/_12sdp"
+            android:text="@string/refer_patient"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/btnDone"
+            app:layout_constraintEnd_toStartOf="@+id/btnDone"
+            app:layout_constraintTop_toTopOf="@+id/btnDone" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

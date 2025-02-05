@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:background="@color/white"
+    tools:context=".ui.household.HouseholdActivity">
+
+
+    <com.medtroniclabs.opensource.ui.common.FloatingDetectorFrameLayout
+        android:id="@+id/fragmentContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+    <LinearLayout
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:padding="@dimen/_12sdp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnCancel"
+            style="@style/Button_Style_Border"
+            android:layout_width="0dp"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/_8sdp"
+            android:layout_weight="1"
+            android:text="@string/cancel"
+            android:textAllCaps="true"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnNext"
+            style="@style/Button_Style"
+            android:layout_width="0dp"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/_8sdp"
+            android:layout_weight="1"
+            android:text="@string/next"
+            android:textAllCaps="true"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

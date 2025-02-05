@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/llRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minWidth="@dimen/_360sdp"
+    android:orientation="vertical"
+    android:paddingVertical="@dimen/_8sdp"
+    android:paddingHorizontal="@dimen/_16sdp">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            style="@style/Form_Label_Style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="@dimen/_240sdp"
+            android:paddingEnd="@dimen/_10sdp"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/tvTitleUnit"
+            style="@style/Form_Label_Style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="@dimen/_120sdp"
+            android:paddingHorizontal="@dimen/_12sdp"
+            tools:ignore="RtlSymmetry" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginVertical="@dimen/_8sdp"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etUserInput"
+            style="@style/Form_Input_Style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_background"
+            android:minWidth="@dimen/_240sdp"
+            android:minHeight="@dimen/_40sdp"
+            android:paddingHorizontal="@dimen/_12sdp" />
+
+        <androidx.appcompat.widget.AppCompatSpinner
+            android:id="@+id/etUserInputSpinner"
+            style="@style/Form_Spinner_Style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_12sdp"
+            android:minWidth="@dimen/_120sdp"
+            android:minHeight="@dimen/_40sdp" />
+
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvErrorMessage"
+        style="@style/TextStyle_Error_14"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+</LinearLayout>

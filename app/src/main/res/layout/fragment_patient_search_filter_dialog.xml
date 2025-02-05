@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/CardView_Style"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/_16sdp"
+    app:cardCornerRadius="@dimen/_12sdp"
+    app:cardElevation="@dimen/_2sdp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/title_refer_patient"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/leftGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="@dimen/_20sdp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/rightGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="@dimen/_20sdp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvEditMember"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_15sdp"
+            android:text="@string/filter"
+            android:textColor="@color/house_hold_title"
+            android:textSize="@dimen/_20ssp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/leftGuideline"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imgClose"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/_200sdp"
+            android:paddingHorizontal="@dimen/_10sdp"
+            android:src="@drawable/ic_close_black"
+            app:layout_constraintBottom_toBottomOf="@id/tvEditMember"
+            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
+            app:layout_constraintTop_toTopOf="@id/tvEditMember" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_1sdp"
+            android:layout_marginTop="@dimen/_15sdp"
+            android:background="@color/edittext_stroke"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvEditMember" />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollContainer"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="@dimen/_0dp"
+            app:layout_constraintBottom_toTopOf="@id/btnLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/clContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/leftInnerGuideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_begin="@dimen/_20sdp" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/rightInnerGuideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_end="@dimen/_20sdp" />
+
+                <!-- NCD Filters - Starts -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvMedicalReviewDate"
+                    style="@style/TextStyle_Medium_16_NoBG"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:text="@string/medical_review_date"
+                    android:textColor="@color/b_w_black"
+                    app:layout_constraintStart_toEndOf="@id/leftInnerGuideline"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/ncdMedicalReviewDateChipGroup"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/_10sdp"
+                    app:layout_constraintEnd_toEndOf="@id/rightInnerGuideline"
+                    app:layout_constraintStart_toStartOf="@id/leftInnerGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvMedicalReviewDate"
+                    app:singleSelection="true" />
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/medicalReviewDateGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:constraint_referenced_ids="tvMedicalReviewDate, ncdMedicalReviewDateChipGroup" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvReferredFor"
+                    style="@style/TextStyle_Medium_16_NoBG"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:text="@string/referred_for"
+                    android:textColor="@color/b_w_black"
+                    app:layout_constraintStart_toEndOf="@id/leftInnerGuideline"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/ncdReferredForChipGroup"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/_10sdp"
+                    app:layout_constraintEnd_toEndOf="@id/rightInnerGuideline"
+                    app:layout_constraintStart_toStartOf="@id/leftInnerGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvReferredFor"
+                    app:singleSelection="true" />
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/referredForGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:constraint_referenced_ids="tvReferredFor, ncdReferredForChipGroup" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvRisk"
+                    style="@style/TextStyle_Medium_16_NoBG"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:text="@string/risk"
+                    android:textColor="@color/b_w_black"
+                    app:layout_constraintStart_toEndOf="@id/leftInnerGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/ncdMedicalReviewDateChipGroup" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/riskChipGroup"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/_10sdp"
+                    app:layout_constraintEnd_toEndOf="@id/rightInnerGuideline"
+                    app:layout_constraintStart_toStartOf="@id/leftInnerGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvRisk"
+                    app:singleSelection="true" />
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/riskGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:constraint_referenced_ids="tvRisk, riskChipGroup" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvRegistration"
+                    style="@style/TextStyle_Medium_16_NoBG"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:text="@string/registration"
+                    android:textColor="@color/b_w_black"
+                    app:layout_constraintStart_toEndOf="@id/leftInnerGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/riskChipGroup" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/registrationChipGroup"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/_10sdp"
+                    app:layout_constraintEnd_toEndOf="@id/rightInnerGuideline"
+                    app:layout_constraintStart_toStartOf="@id/leftInnerGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvRegistration"
+                    app:singleSelection="true" />
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/registrationGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:constraint_referenced_ids="tvRegistration, registrationChipGroup" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvCVD"
+                    style="@style/TextStyle_Medium_16_NoBG"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:text="@string/cvd_risk"
+                    android:textColor="@color/b_w_black"
+                    app:layout_constraintStart_toEndOf="@id/leftInnerGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/registrationChipGroup" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/cvdChipGroup"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/_10sdp"
+                    app:layout_constraintEnd_toEndOf="@id/rightInnerGuideline"
+                    app:layout_constraintStart_toStartOf="@id/leftInnerGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvCVD"
+                    app:singleSelection="true" />
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/cvdGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:constraint_referenced_ids="tvCVD, cvdChipGroup" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvAssessmentDate"
+                    style="@style/TextStyle_Medium_16_NoBG"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:text="@string/assessment_date"
+                    android:textColor="@color/b_w_black"
+                    app:layout_constraintStart_toEndOf="@id/leftInnerGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/cvdChipGroup" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/assessmentDateChipGroup"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/_10sdp"
+                    app:layout_constraintEnd_toEndOf="@id/rightInnerGuideline"
+                    app:layout_constraintStart_toStartOf="@id/leftInnerGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvAssessmentDate"
+                    app:singleSelection="true" />
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/assessmentGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:constraint_referenced_ids="tvAssessmentDate, assessmentDateChipGroup" />
+                <!-- NCD Filters - Ends -->
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvMedicalReviewDue"
+                    style="@style/TextStyle_Medium_16_NoBG"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_10sdp"
+                    android:text="@string/medical_review"
+                    android:textColor="@color/grey_black"
+                    app:layout_constraintStart_toStartOf="@id/leftInnerGuideline"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/medicalReviewDueChipGroup"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/_10sdp"
+                    app:layout_constraintEnd_toEndOf="@id/rightInnerGuideline"
+                    app:layout_constraintStart_toStartOf="@id/leftInnerGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvMedicalReviewDue" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvPatientStatus"
+                    style="@style/TextStyle_Medium_16_NoBG"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_10sdp"
+                    android:text="@string/patient_status"
+                    android:textColor="@color/grey_black"
+                    app:layout_constraintStart_toStartOf="@id/leftInnerGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/medicalReviewDueChipGroup" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/patientStatusChipGroup"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_10sdp"
+                    android:layout_marginBottom="@dimen/_20sdp"
+                    android:paddingVertical="@dimen/_10sdp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/rightInnerGuideline"
+                    app:layout_constraintStart_toStartOf="@id/leftInnerGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvPatientStatus"
+                    app:singleSelection="false" />
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/spiceFilterGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:constraint_referenced_ids="tvMedicalReviewDue, medicalReviewDueChipGroup, tvPatientStatus, patientStatusChipGroup" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <include
+            android:id="@+id/btnLayout"
+            layout="@layout/patient_search_filter_btn_layout"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

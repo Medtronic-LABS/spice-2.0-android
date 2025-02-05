@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/transparent"
+    app:cardCornerRadius="@dimen/_10sdp"
+    app:cardElevation="@dimen/_2sdp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="300dp">
+
+        <View
+            android:id="@+id/titleView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/card_background"
+            app:layout_constraintBottom_toBottomOf="@id/tvTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvTitle" />
+
+        <TextView
+            android:id="@+id/tvTitle"
+            style="@style/Form_Header_Style"
+            android:layout_width="0dp"
+            android:padding="@dimen/_16sdp"
+            android:textAlignment="textStart"
+            android:text="@string/fast_breathing"
+            android:textSize="@dimen/_16ssp"
+            app:layout_constraintEnd_toStartOf="@id/ivClose"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/ivClose"
+            style="@style/ImageView_Style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_10sdp"
+            android:padding="@dimen/_15sdp"
+            android:src="@drawable/close_black"
+            app:layout_constraintBottom_toBottomOf="@id/tvTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvTitle"
+            app:tint="@color/black" />
+
+        <View
+            android:id="@+id/divider1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider"
+            app:layout_constraintEnd_toEndOf="@id/titleView"
+            app:layout_constraintStart_toStartOf="@id/titleView"
+            app:layout_constraintTop_toBottomOf="@id/titleView" />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollContainer"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_0dp"
+            app:layout_constraintBottom_toTopOf="@id/bottomDivider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider1">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tvHeader"
+                    style="@style/Form_Header_Style"
+                    android:layout_width="0dp"
+                    android:padding="@dimen/_16sdp"
+                    android:textAlignment="textStart"
+                    android:textSize="@dimen/_16ssp"
+                    android:textColor="@color/house_hold_title"
+                    android:text="@string/cut_offs_for_fast_breathing"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/midGuideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.5" />
+
+                <TextView
+                    android:id="@+id/tvMonthHeader"
+                    style="@style/Form_Header_Style"
+                    android:layout_width="0dp"
+                    android:layout_marginStart="@dimen/_16sdp"
+                    android:textAlignment="textStart"
+                    android:textSize="@dimen/_16ssp"
+                    android:textColor="@color/grey_black"
+                    android:text="@string/_2_to_11_months"
+                    app:layout_constraintEnd_toStartOf="@id/tvColon1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvHeader" />
+
+                <TextView
+                    android:id="@+id/tvColon1"
+                    style="@style/Form_Header_Style"
+                    android:layout_width="0dp"
+                    android:layout_marginStart="@dimen/_16sdp"
+                    android:textAlignment="textStart"
+                    android:textSize="@dimen/_16ssp"
+                    android:textColor="@color/grey_black"
+                    android:layout_marginEnd="@dimen/_16sdp"
+                    android:text="@string/separator_colon"
+                    app:layout_constraintEnd_toStartOf="@id/midGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvHeader" />
+
+                <TextView
+                    android:id="@+id/tvMonthFBRate"
+                    style="@style/Form_Header_Style"
+                    android:layout_width="0dp"
+                    android:layout_marginEnd="@dimen/_16sdp"
+                    android:textAlignment="textStart"
+                    android:textSize="@dimen/_16ssp"
+                    android:text="@string/_50_or_more"
+                    android:textColor="@color/grey_black"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/midGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvHeader" />
+
+                <TextView
+                    android:id="@+id/tvMonthBPM"
+                    style="@style/Form_Input_Style"
+                    android:layout_width="0dp"
+                    android:layout_marginEnd="@dimen/_16sdp"
+                    android:textAlignment="textStart"
+                    android:textSize="@dimen/_16ssp"
+                    android:textColor="@color/grey_black"
+                    android:text="@string/breaths_per_minute"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/midGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvMonthFBRate" />
+
+                <TextView
+                    android:id="@+id/tvYearHeader"
+                    style="@style/Form_Header_Style"
+                    android:layout_width="0dp"
+                    android:textAlignment="textStart"
+                    android:textSize="@dimen/_16ssp"
+                    android:textColor="@color/grey_black"
+                    android:layout_marginTop="@dimen/_12sdp"
+                    android:layout_marginStart="@dimen/_16sdp"
+                    android:text="@string/_1_to_5_years"
+                    app:layout_constraintEnd_toStartOf="@id/tvColon2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvMonthBPM" />
+
+                <TextView
+                    android:id="@+id/tvColon2"
+                    style="@style/Form_Header_Style"
+                    android:layout_width="0dp"
+                    android:layout_marginStart="@dimen/_16sdp"
+                    android:textAlignment="textStart"
+                    android:textSize="@dimen/_16ssp"
+                    android:textColor="@color/grey_black"
+                    android:layout_marginEnd="@dimen/_16sdp"
+                    android:text="@string/separator_colon"
+                    app:layout_constraintEnd_toStartOf="@id/midGuideline"
+                    app:layout_constraintTop_toTopOf="@id/tvYearHeader" />
+
+                <TextView
+                    android:id="@+id/tvYearFBRate"
+                    style="@style/Form_Header_Style"
+                    android:layout_width="0dp"
+                    android:layout_marginEnd="@dimen/_16sdp"
+                    android:textAlignment="textStart"
+                    android:textSize="@dimen/_16ssp"
+                    android:text="@string/_40_or_more"
+                    android:textColor="@color/grey_black"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/midGuideline"
+                    app:layout_constraintTop_toTopOf="@id/tvYearHeader" />
+
+                <TextView
+                    android:id="@+id/tvYearBPM"
+                    style="@style/Form_Input_Style"
+                    android:layout_width="0dp"
+                    android:layout_marginEnd="@dimen/_16sdp"
+                    android:textAlignment="textStart"
+                    android:textSize="@dimen/_16ssp"
+                    android:text="@string/breaths_per_minute"
+                    android:textColor="@color/grey_black"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/midGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvYearFBRate" />
+
+                <TextView
+                    android:id="@+id/tvInfoListHeader"
+                    style="@style/Form_Header_Style"
+                    android:layout_width="0dp"
+                    android:padding="@dimen/_16sdp"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/house_hold_title"
+                    android:textSize="@dimen/_16ssp"
+                    android:text="@string/instructions_to_calculate_n_breathing_rate"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvYearBPM" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvInfoList"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_16sdp"
+                    android:layout_marginEnd="@dimen/_16sdp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvInfoListHeader"
+                    tools:listitem="@layout/dosage_instruction_item_list" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/bottomDivider"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_1sdp"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:background="@color/edittext_stroke"
+            app:cardElevation="@dimen/_4sdp"
+            app:layout_constraintBottom_toTopOf="@id/btnClose"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/scrollContainer" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnClose"
+            style="@style/Button_Style"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/_16sdp"
+            android:text="@string/close"
+            android:textAllCaps="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bottomDivider" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

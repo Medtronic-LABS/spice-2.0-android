@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/CardView_Style"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardUseCompatPadding="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/title_refer_patient"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/leftGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="@dimen/_20sdp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/rightGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="@dimen/_20sdp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvEditMember"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:text="@string/edit_member"
+            android:textColor="@color/house_hold_title"
+            android:textSize="@dimen/_20sdp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/leftGuideline"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imgClose"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/_200sdp"
+            android:paddingHorizontal="@dimen/_10sdp"
+            android:src="@drawable/ic_close_black"
+            app:layout_constraintBottom_toBottomOf="@id/tvEditMember"
+            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
+            app:layout_constraintTop_toTopOf="@id/tvEditMember" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_1sdp"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:background="@color/edittext_stroke"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvEditMember" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvSelectMember"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_25sdp"
+            android:text="@string/select_member"
+            android:textColor="@color/b_w_black"
+            android:textSize="@dimen/_18ssp"
+            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
+            app:layout_constraintStart_toStartOf="@id/leftGuideline"
+            app:layout_constraintTop_toBottomOf="@+id/divider" />
+
+        <androidx.appcompat.widget.AppCompatSpinner
+            android:id="@+id/etMemberInput"
+            style="@style/Form_Spinner_Style"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/_8sdp"
+            android:minHeight="@dimen/_30sdp"
+            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
+            app:layout_constraintStart_toStartOf="@id/leftGuideline"
+            app:layout_constraintTop_toBottomOf="@+id/tvSelectMember" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/bottomDivider"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_1sdp"
+            android:layout_marginTop="@dimen/_40sdp"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:background="@color/edittext_stroke"
+            app:cardElevation="@dimen/_4sdp"
+            app:layout_constraintBottom_toTopOf="@id/btnOkay"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etMemberInput" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnOkay"
+            style="@style/Button_Style"
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="@dimen/_24sdp"
+            android:layout_marginVertical="@dimen/_16sdp"
+            android:background="@drawable/button_selector_cobalt"
+            android:text="@string/okay"
+            android:textStyle="bold"
+            android:enabled="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
+            app:layout_constraintStart_toStartOf="@id/leftGuideline"
+            app:layout_constraintTop_toBottomOf="@id/bottomDivider" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

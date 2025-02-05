@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/CardView_Style"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardUseCompatPadding="true"
+    tools:context="com.medtroniclabs.opensource.ui.household.summary.HouseholdDetailsFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <View
+            android:id="@+id/viewDetailsBG"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_0dp"
+            android:background="@color/card_background"
+            app:layout_constraintBottom_toBottomOf="@id/tvHouseholdDetailsTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvHouseholdDetailsTitle"
+            style="@style/Form_Header_Style"
+            android:layout_width="@dimen/_0dp"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/_10sdp"
+            android:paddingVertical="@dimen/_10sdp"
+            android:text="@string/household_details"
+            android:textSize="@dimen/_16ssp"
+            app:layout_constraintEnd_toEndOf="@id/viewDetailsBG"
+            app:layout_constraintStart_toStartOf="@id/viewDetailsBG"
+            app:layout_constraintTop_toTopOf="@id/viewDetailsBG" />
+
+        <LinearLayout
+            android:id="@+id/llDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/_10sdp"
+            android:paddingTop="@dimen/_10sdp"
+            android:paddingBottom="@dimen/_0dp"
+            app:layout_constraintTop_toBottomOf="@id/tvHouseholdDetailsTitle" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/startGuideline"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.45" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/endGuideline"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.50" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvLabel"
+            style="@style/TextStyle_Regular_16_Blue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_marginBottom="@dimen/_15sdp"
+            android:paddingStart="@dimen/_15sdp"
+            android:paddingEnd="@dimen/_0dp"
+            android:textColor="@color/charcoal_grey"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/startGuideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/llDetails" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvLblHouseholdNoSeperator"
+            style="@style/TextStyle_Regular_16_Blue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/separator_colon"
+            android:textColor="@color/charcoal_grey"
+            app:layout_constraintEnd_toStartOf="@id/endGuideline"
+            app:layout_constraintStart_toEndOf="@id/startGuideline"
+            app:layout_constraintTop_toTopOf="@+id/tvLabel" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvValue"
+            style="@style/TextStyle_Regular_16_Blue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/_0dp"
+            android:paddingEnd="@dimen/_8sdp"
+            android:textColor="@color/secondary_black"
+            app:layout_constraintBottom_toBottomOf="@id/tvLblHouseholdNoSeperator"
+            app:layout_constraintEnd_toStartOf="@id/ivMemberRegCount"
+            app:layout_constraintHorizontal_weight="3"
+            app:layout_constraintStart_toEndOf="@id/endGuideline"
+            app:layout_constraintTop_toTopOf="@+id/tvLabel" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/ivMemberRegCount"
+            android:layout_width="@dimen/_12sdp"
+            android:layout_height="@dimen/_12sdp"
+            android:background="@drawable/ic_notification_dot"
+            android:gravity="center"
+            android:padding="@dimen/_4sdp"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_10ssp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/tvValue"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toEndOf="@id/tvValue"
+            app:layout_constraintTop_toTopOf="@id/tvLabel" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

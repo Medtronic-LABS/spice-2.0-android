@@ -1,0 +1,35 @@
+package com.medtroniclabs.opensource.ui
+
+object MenuConstants {
+    const val HOUSEHOLD_MENU_ID = "HOUSEHOLDS"
+    const val MY_PATIENTS_MENU_ID = "MY PATIENTS"
+    const val ICCM_MENU_ID = "iccm"
+    const val RMNCH_MENU_ID = "rmnch"
+    const val SCREENER_MENU_ID = "general screener"
+    const val CBS_MENU_ID = "cbs"
+    const val TB_MENU_ID = "TB"
+    const val NCD_MENU_ID = "ncd"
+    const val WorkFlowName = "workflowName"
+    const val DialogResult = "DialogResult"
+    const val OTHER_SYMPTOMS = "other_symptoms"
+    const val GENERAL_ID = "ABOVE 5Y(GENERAL)"
+    const val MOTHER_AND_NEONATE_ID = "MOTHER & NEONATE"
+    const val UNDER_AGE_FIVE_TO_TWO_MONTHS_ID = "UNDER 5Y AGE < 2M"
+    const val UNDER_AGE_ABOVE_FIVE_YEAR_ID = "UNDER 5Y (2M TO 5Y)"
+    const val EPI_ID = "EPI"
+    const val PerformanceMonitoring_ID = "PERFORMANCE MONITORING"
+
+    const val SCREENING = "SCREENING"
+    const val REGISTRATION = "REGISTRATION"
+    const val ASSESSMENT = "ASSESSMENT"
+    const val DASHBOARD = "DASHBOARD"
+    const val MATERNAL_HEALTH = "maternalHealth"
+    const val MENTAL_HEALTH = "mentalHealth"
+    const val DISPENSE = "DISPENSE"
+    const val FOLLOW_UP = "FOLLOW UP"
+    const val Other_Reason = "Other Reason"
+    const val LIFESTYLE = "LIFESTYLE"
+    const val PSYCHOLOGICAL = "PSYCHOLOGICAL"
+
+    const val INVESTIGATION = "INVESTIGATION"
+}

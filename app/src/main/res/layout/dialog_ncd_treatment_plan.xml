@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardCornerRadius="@dimen/_10sdp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvReviewTreatmentPlanLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/_18sdp"
+            android:text="@string/review_treatment_plan"
+            android:textColor="@color/house_hold_title"
+            android:textSize="@dimen/_16ssp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/ivClose"
+            style="@style/ImageView_Style"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:contentDescription="@string/close"
+            android:padding="@dimen/_8sdp"
+            android:src="@drawable/ic_close_black"
+            app:layout_constraintBottom_toBottomOf="@+id/tvReviewTreatmentPlanLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvReviewTreatmentPlanLabel" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divideTop"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/point_eight_dp"
+            app:dividerColor="@color/btn_disable_grey"
+            app:layout_constraintTop_toBottomOf="@id/tvReviewTreatmentPlanLabel" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clBody"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_0dp"
+            android:padding="@dimen/_15sdp"
+            app:layout_constraintBottom_toTopOf="@id/divideBottom"
+            app:layout_constraintTop_toBottomOf="@id/divideTop">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvMedicalReviewFrequencyLbl"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:fontFamily="@font/inter_regular"
+                android:paddingVertical="@dimen/_12sdp"
+                android:text="@string/medical_review_frequency"
+                android:textColor="@color/table_title"
+                android:textSize="@dimen/_14ssp"
+                app:layout_constraintEnd_toStartOf="@id/tvBPCheckFrequencyLbl"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/etMedicalReviewFrequency"
+                style="@style/Form_Spinner_Style"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/_50sdp"
+                app:layout_constraintEnd_toEndOf="@+id/tvMedicalReviewFrequencyLbl"
+                app:layout_constraintStart_toStartOf="@+id/tvMedicalReviewFrequencyLbl"
+                app:layout_constraintTop_toBottomOf="@id/tvMedicalReviewFrequencyLbl" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBPCheckFrequencyLbl"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:fontFamily="@font/inter_regular"
+                android:paddingVertical="@dimen/_12sdp"
+                android:text="@string/blood_pressure_check_frequency"
+                android:textColor="@color/table_title"
+                android:textSize="@dimen/_14ssp"
+                app:layout_constraintEnd_toStartOf="@id/tvBGCheckFrequencyLbl"
+                app:layout_constraintStart_toEndOf="@id/tvMedicalReviewFrequencyLbl"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/etBPCheckFrequency"
+                style="@style/Form_Spinner_Style"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/_50sdp"
+                app:layout_constraintEnd_toEndOf="@+id/tvBPCheckFrequencyLbl"
+                app:layout_constraintStart_toStartOf="@+id/tvBPCheckFrequencyLbl"
+                app:layout_constraintTop_toBottomOf="@id/tvBPCheckFrequencyLbl" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBGCheckFrequencyLbl"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_regular"
+                android:paddingVertical="@dimen/_12sdp"
+                android:text="@string/blood_glucose_check_frequency"
+                android:textColor="@color/table_title"
+                android:textSize="@dimen/_14ssp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/tvBPCheckFrequencyLbl"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/etBGCheckFrequency"
+                style="@style/Form_Spinner_Style"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/_50sdp"
+                app:layout_constraintEnd_toEndOf="@+id/tvBGCheckFrequencyLbl"
+                app:layout_constraintStart_toStartOf="@+id/tvBGCheckFrequencyLbl"
+                app:layout_constraintTop_toBottomOf="@id/tvBGCheckFrequencyLbl" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvHbA1cFrequencyLbl"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:fontFamily="@font/inter_regular"
+                android:paddingVertical="@dimen/_12sdp"
+                android:text="@string/hba1c_frequency"
+                android:textColor="@color/table_title"
+                android:textSize="@dimen/_14ssp"
+                app:layout_constraintEnd_toEndOf="@+id/tvMedicalReviewFrequencyLbl"
+                app:layout_constraintStart_toStartOf="@+id/tvMedicalReviewFrequencyLbl"
+                app:layout_constraintTop_toBottomOf="@id/etMedicalReviewFrequency" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/etHbA1cFrequency"
+                style="@style/Form_Spinner_Style"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/_50sdp"
+                app:layout_constraintEnd_toEndOf="@+id/tvMedicalReviewFrequencyLbl"
+                app:layout_constraintStart_toStartOf="@+id/tvMedicalReviewFrequencyLbl"
+                app:layout_constraintTop_toBottomOf="@id/tvHbA1cFrequencyLbl" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCHOCheckFrequencyLbl"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:fontFamily="@font/inter_regular"
+                android:paddingVertical="@dimen/_12sdp"
+                android:text="@string/cho_check_frequency"
+                android:textColor="@color/table_title"
+                android:textSize="@dimen/_14ssp"
+                app:layout_constraintEnd_toEndOf="@+id/tvBPCheckFrequencyLbl"
+                app:layout_constraintStart_toStartOf="@+id/tvBPCheckFrequencyLbl"
+                app:layout_constraintTop_toBottomOf="@id/etBPCheckFrequency" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/etCHOCheckFrequency"
+                style="@style/Form_Spinner_Style"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/_50sdp"
+                app:layout_constraintEnd_toEndOf="@+id/tvBPCheckFrequencyLbl"
+                app:layout_constraintStart_toStartOf="@+id/tvBPCheckFrequencyLbl"
+                app:layout_constraintTop_toBottomOf="@id/tvCHOCheckFrequencyLbl" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/choGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids="tvCHOCheckFrequencyLbl, etCHOCheckFrequency" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divideBottom"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/point_eight_dp"
+            android:layout_marginBottom="@dimen/_12sdp"
+            app:dividerColor="@color/btn_disable_grey"
+            app:layout_constraintBottom_toTopOf="@id/btnSubmit" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnCancel"
+            style="@style/Button_Style_Border"
+            android:layout_width="0dp"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/_8sdp"
+            android:layout_weight="1"
+            android:text="@string/cancel"
+            android:textAllCaps="true"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@id/btnSubmit"
+            app:layout_constraintEnd_toStartOf="@id/btnSubmit"
+            app:layout_constraintTop_toTopOf="@id/btnSubmit" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnSubmit"
+            style="@style/Button_Style"
+            android:layout_width="0dp"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="@dimen/_15sdp"
+            android:layout_marginBottom="@dimen/_12sdp"
+            android:background="@drawable/button_selector_cobalt"
+            android:enabled="false"
+            android:text="@string/submit"
+            android:textAllCaps="true"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <RelativeLayout
+            android:id="@+id/loadingProgress"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="@dimen/_0dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/loaderImage"
+                android:layout_width="@dimen/_75sdp"
+                android:layout_height="@dimen/_75sdp"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:contentDescription="@string/loading"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </RelativeLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

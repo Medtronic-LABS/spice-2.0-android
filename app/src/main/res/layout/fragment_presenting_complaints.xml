@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.medtroniclabs.opensource.ui.common.FloatingDetectorFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.medicalreview.PresentingComplaintsFragment">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardChiefComplaints"
+        style="@style/CardView_Style"
+        android:layout_width="match_parent"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:id="@+id/viewPresentingComplaintsCardBG"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_0dp"
+                android:background="@color/card_background"
+                app:layout_constraintBottom_toBottomOf="@id/tvPresentingComplaintsTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvPresentingComplaintsTitle"
+                style="@style/Form_Header_Style"
+                android:layout_width="@dimen/_0dp"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="@string/presenting_complaints"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@id/viewPresentingComplaintsCardBG"
+                app:layout_constraintStart_toStartOf="@id/viewPresentingComplaintsCardBG"
+                app:layout_constraintTop_toTopOf="@id/viewPresentingComplaintsCardBG" />
+
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/tagViewPresentingComplaints"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/_16sdp"
+                android:paddingVertical="@dimen/_12sdp"
+                app:layout_constraintTop_toBottomOf="@+id/tvPresentingComplaintsTitle" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/etPresentingComplaintsComments"
+                style="@style/Form_Input_Style_BG"
+                android:layout_height="@dimen/_112sdp"
+                android:layout_marginEnd="@dimen/_16sdp"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:layout_marginBottom="@dimen/_16sdp"
+                android:gravity="start|top"
+                android:inputType="textCapWords|textMultiLine"
+                android:hint="@string/type_notes"
+                android:padding="@dimen/_8sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tagViewPresentingComplaints" />
+
+            <TextView
+                android:id="@+id/tvErrorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_regular"
+                android:textColor="@color/a_red_error"
+                android:textSize="@dimen/_12ssp"
+                android:text="@string/default_user_input_error"
+                android:visibility="gone"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:layout_marginStart="@dimen/_24sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/etPresentingComplaintsComments"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</com.medtroniclabs.opensource.ui.common.FloatingDetectorFrameLayout>

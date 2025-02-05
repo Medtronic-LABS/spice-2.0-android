@@ -1,0 +1,246 @@
+[
+  {
+    "familyOrder": 0,
+    "id": "bioData",
+    "title": "Bio Data",
+    "viewType": "CardView"
+  },
+  {
+    "errorMessage": "Name is required and must be length of 1 to 100",
+    "family": "bioData",
+    "fieldName": "Name",
+    "hint": "Enter Name",
+    "id": "name",
+    "onlyAlphabets": true,
+    "inputType": 96,
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isNotDefault": false,
+    "isSummary": true,
+    "maxLength": 100,
+    "minLength": 1,
+    "orderId": 1,
+    "title": "Name",
+    "viewType": "EditText",
+    "visibility": "visible"
+  },
+  {
+    "condition": [
+      {
+        "eq": "Other Family Member (specify)",
+        "targetId": "otherFamilyMember",
+        "visibility": "visible"
+      }
+    ],
+    "defaultValue": null,
+    "errorMessage": "Please select an relationship",
+    "family": "bioData",
+    "fieldName": "Relationship to Household",
+    "id": "household_head_relationship",
+    "isEditable": true,
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "optionsList": [
+      {
+        "id": "HouseholdHead",
+        "name": "Household Head"
+      },
+      {
+        "id": "Spouse / Partner",
+        "name": "Spouse / Partner"
+      },
+      {
+        "id": "Son / Daughter",
+        "name": "Son / Daughter"
+      },
+      {
+        "id": "Father / Mother",
+        "name": "Father / Mother"
+      },
+      {
+        "id": "Brother / Sister",
+        "name": "Brother / Sister"
+      },
+      {
+        "id": "Grandchild",
+        "name": "Grandchild"
+      },
+      {
+        "id": "Grandparent",
+        "name": "Grandparent"
+      },
+      {
+        "id": "Other Family Member (specify)",
+        "name": "Other Family Member (specify)"
+      }
+    ],
+    "title": "Relationship to Household",
+    "viewType": "Spinner",
+    "orderId": 2,
+    "visibility": "visible"
+  },
+  {
+    "errorMessage": "Please enter a relationship",
+    "family": "bioData",
+    "fieldName": "Specify Other Relationship",
+    "hint": "Enter Other Relationship",
+    "id": "otherFamilyMember",
+    "inputType": 96,
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isNotDefault": false,
+    "orderId": 5,
+    "isSummary": false,
+    "title": "Specify Other Relationship",
+    "viewType": "EditText",
+    "visibility": "gone"
+  },
+  {
+    "condition": [],
+    "defaultValue": null,
+    "errorMessage": "Please select a village",
+    "family": "bioData",
+    "fieldName": "Village Name",
+    "id": "village_id",
+    "isEditable": true,
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "optionsList": [],
+    "title": "Village Name",
+    "viewType": "Spinner",
+    "localDataCache": "village_id",
+    "visibility": "gone"
+  },
+  {
+    "errorMessage": "Mobile Number is required and must be of length 1 to 8",
+    "family": "bioData",
+    "fieldName": "Mobile Number",
+    "hint": "Enter Mobile Number",
+    "id": "phone_number",
+    "inputType": 3,
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isNotDefault": false,
+    "isSummary": true,
+    "maxLength": 8,
+    "minLength": 1,
+    "orderId": 3,
+    "title": "Mobile Number",
+    "viewType": "EditText",
+    "visibility": "visible",
+    "contentLength": 8,
+    "startsWith": [
+      "2",
+      "3",
+      "7",
+      "8",
+      "9"
+    ]
+  },
+  {
+    "condition": [],
+    "defaultValue": null,
+    "errorMessage": "Please select a Mobile number category",
+    "family": "bioData",
+    "fieldName": "Mobile Number Category",
+    "id": "phone_number_category",
+    "isEditable": true,
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "optionsList": [
+      {
+        "id": "Personal",
+        "name": "Personal"
+      },
+      {
+        "id": "Family Member",
+        "name": "Family Member"
+      },
+      {
+        "id": "Friend",
+        "name": "Friend"
+      }
+    ],
+    "title": "Mobile Number Category",
+    "orderId": 4,
+    "viewType": "Spinner",
+    "visibility": "visible"
+  },
+  {
+    "disableFutureDate": true,
+    "family": "bioData",
+    "fieldName": "Age",
+    "id": "date_of_birth",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "title": "Age",
+    "viewType": "Age",
+    "orderId": 5,
+    "visibility": "visible"
+  },
+  {
+    "errorMessage": "Please select a valid option",
+    "condition": [
+      {
+        "eq": "Female",
+        "targetId": "isPregnant",
+        "visibility": "visible"
+      }
+    ],
+    "family": "bioData",
+    "fieldName": "Gender",
+    "id": "gender",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isNotDefault": false,
+    "isSummary": true,
+    "orderId": 6,
+    "optionsList": [
+      {
+        "name": "Male",
+        "id": "male"
+      },
+      {
+        "name": "Female",
+        "id": "female"
+      }
+    ],
+    "title": "Gender",
+    "viewType": "SingleSelectionView",
+    "visibility": "visible"
+  },
+  {
+    "errorMessage": "Please select a valid option",
+    "family": "bioData",
+    "fieldName": "Are you pregnant?",
+    "id": "isPregnant",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isNotDefault": false,
+    "isSummary": true,
+    "orderId": 7,
+    "optionsList": [
+      {
+        "name": "Yes",
+        "id": "yes"
+      },
+      {
+        "name": "No",
+        "id": "no"
+      }
+    ],
+    "title": "Are you pregnant?",
+    "viewType": "SingleSelectionView",
+    "visibility": "gone"
+  }
+]

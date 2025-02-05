@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:backgroundTint="@color/white"
+    android:clickable="false"
+    android:focusable="false">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardPatient"
+        style="@style/CardView_Style"
+        android:layout_width="match_parent"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="false"
+        android:focusable="false"
+        app:cardCornerRadius="@dimen/_16sdp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clPatientRoot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/default_color_bg"
+            android:padding="@dimen/_20sdp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/patientNameAgeGender"
+                style="@style/TextStyle_Bold_16_NoBG"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:text="Serena Kamara - 38 - F"
+                android:textColor="@color/secondary_black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/startGuideline"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.37" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/centreGuideline"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.50" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/endGuideline"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.44" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLabelReason"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/household_location"
+                android:textColor="@color/charcoal_grey"
+                app:layout_constraintEnd_toStartOf="@id/startGuideline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/patientNameAgeGender" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLabelReasonSeperator"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/separator_colon"
+                android:textColor="@color/charcoal_grey"
+                app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                app:layout_constraintStart_toEndOf="@id/startGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvLabelReason" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/patientVillage"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingStart="@dimen/_0dp"
+                android:paddingEnd="@dimen/_8sdp"
+                android:text="ANC Visit 3"
+                android:textColor="@color/secondary_black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="5"
+                app:layout_constraintStart_toEndOf="@id/endGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvLabelReason" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLabelMembersRegistered"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="Mobile No"
+                android:textColor="@color/charcoal_grey"
+                app:layout_constraintEnd_toStartOf="@id/startGuideline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvLabelReason" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvMembersRegisteredSeperator"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/separator_colon"
+                android:textColor="@color/charcoal_grey"
+                app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                app:layout_constraintStart_toEndOf="@id/startGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvLabelMembersRegistered" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/patientMobile"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="On Treatment"
+                android:textColor="@color/secondary_black"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/endGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvLabelMembersRegistered" />
+
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/callPatientBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_16sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:background="@drawable/call_button_selector"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingHorizontal="@dimen/_24sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                android:src="@drawable/ic_call"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/linkPatientBtn"
+                app:layout_constraintTop_toBottomOf="@id/tvLabelMembersRegistered" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/linkPatientBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_16sdp"
+                android:layout_marginEnd="@dimen/_18sdp"
+                android:background="@drawable/purple_bg"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/inter_bold"
+                android:paddingHorizontal="@dimen/_24sdp"
+                android:paddingVertical="@dimen/_8sdp"
+                android:text="@string/link_patient"
+                android:textAllCaps="true"
+                android:textAlignment="center"
+                android:textColor="@color/blue"
+                app:layout_constraintBottom_toBottomOf="@id/callPatientBtn"
+                app:layout_constraintEnd_toStartOf="@id/callPatientBtn"
+                app:layout_constraintStart_toStartOf="@+id/tvLabelMembersRegistered"
+                app:layout_constraintTop_toBottomOf="@id/tvLabelMembersRegistered" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/linkCallDetailsBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_16sdp"
+                android:layout_marginEnd="@dimen/_12sdp"
+                android:background="@drawable/purple_bg"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingHorizontal="@dimen/_24sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                android:src="@drawable/ic_callbtnicon"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/tvLabelMembersRegistered"
+                app:layout_constraintTop_toBottomOf="@id/tvLabelMembersRegistered" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

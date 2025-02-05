@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:elevation="@dimen/_10sdp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="@dimen/_14sdp"
+    app:cardElevation="@dimen/_10sdp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            style="@style/Form_Header_Style"
+            android:layout_width="0dp"
+            android:gravity="start"
+            android:paddingHorizontal="@dimen/_24sdp"
+            android:paddingVertical="@dimen/_16sdp"
+            android:text="@string/reason_for_quantity"
+            android:textColor="@color/house_hold_title"
+            android:textSize="@dimen/_20ssp"
+            app:layout_constraintEnd_toStartOf="@+id/ivClose"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivClose"
+            style="@style/ImageView_Style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_10sdp"
+            android:padding="@dimen/_15sdp"
+            android:src="@drawable/ic_close"
+            app:layout_constraintBottom_toBottomOf="@id/tvTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvTitle"
+            app:tint="@color/black" />
+
+        <View
+            android:id="@+id/divider1"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/divider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/mcTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_24sdp"
+            android:layout_marginVertical="@dimen/_32sdp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="@dimen/_8sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/divider1"
+            app:strokeColor="@color/mild_gray"
+            app:strokeWidth="@dimen/point_five_dp">
+
+            <LinearLayout
+                android:id="@+id/llList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_15sdp"
+                    android:layout_marginRight="@dimen/_15sdp"
+                    android:orientation="horizontal"
+                    android:paddingVertical="@dimen/_12sdp"
+                    android:weightSum="5">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvMedicationName"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/inter_regular"
+                        android:gravity="start"
+                        android:paddingHorizontal="@dimen/_4sdp"
+                        android:text="@string/medication_name"
+                        android:textColor="@color/b_w_black"
+                        android:textSize="@dimen/_16ssp" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvPrescribedDays"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:paddingHorizontal="@dimen/_4sdp"
+                        android:text="@string/prescribed_days"
+                        android:textColor="@color/b_w_black"
+                        android:textSize="@dimen/_16ssp" />
+
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvFilledDays"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:paddingHorizontal="@dimen/_4sdp"
+                        android:text="@string/filled_qty"
+                        android:textColor="@color/b_w_black"
+                        android:textSize="@dimen/_16ssp" />
+
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvReason"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="2"
+                        android:gravity="start"
+                        android:paddingHorizontal="@dimen/_4sdp"
+                        android:text="@string/reason"
+                        android:textColor="@color/b_w_black"
+                        android:textSize="@dimen/_16ssp" />
+
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/divider2"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_1sdp"
+                    android:background="@color/edittext_stroke" />
+
+                <LinearLayout
+                    android:id="@+id/rvDifferenceList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <include
+            android:id="@+id/bottomView"
+            layout="@layout/pharmacist_bottomview"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_80sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mcTitle" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
+

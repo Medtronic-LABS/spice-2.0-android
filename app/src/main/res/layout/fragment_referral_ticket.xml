@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/CardView_Style"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardUseCompatPadding="true"
+    tools:context=".ui.referralhistory.fragment.ReferralTicketFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:id="@+id/viewReferralTicketCardBG"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_0dp"
+            android:background="@color/card_background"
+            app:layout_constraintBottom_toBottomOf="@id/tvReferralTicketTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvReferralTicketTitle"
+            style="@style/Form_Header_Style"
+            android:layout_width="@dimen/_0dp"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/_10sdp"
+            android:paddingVertical="@dimen/_10sdp"
+            android:text="@string/referral_ticket"
+            android:textSize="@dimen/_16ssp"
+            app:layout_constraintEnd_toEndOf="@id/viewReferralTicketCardBG"
+            app:layout_constraintStart_toStartOf="@id/viewReferralTicketCardBG"
+            app:layout_constraintTop_toTopOf="@id/viewReferralTicketCardBG" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvHistory"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/_32sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_24sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/llHistoryAction"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvReferralTicketTitle" />
+
+        <include
+            android:id="@+id/llHistoryAction"
+            layout="@layout/reload_layout"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvReferralTicketTitle" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/centerGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/groupHistoryList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            app:constraint_referenced_ids="rvHistory,llHistoryAction" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clLoaderProgress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:padding="@dimen/_40sdp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvReferralTicketTitle">
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/loaderProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/_0dp"
+                android:indeterminate="true"
+                android:visibility="visible"
+                app:indicatorSize="@dimen/_35sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvErrorLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/something_went_wrong"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_16ssp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@id/retry_button_bp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/loaderProgress" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/retry_button_bp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/retry"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:visibility="gone"
+                app:cornerRadius="18dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvErrorLabel" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvNoHistory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/_20sdp"
+            android:text="@string/no_referral_history"
+            android:textColor="@color/medium_risk_color"
+            android:textSize="@dimen/_16ssp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvReferralTicketTitle" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

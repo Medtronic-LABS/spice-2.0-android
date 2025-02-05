@@ -1,0 +1,13 @@
+CHW:
+    1. Automatic Sync 
+    2. Updated consent form
+    3. Bed nets count question changes
+    4. Removal of child taken to clinic or not question integration for ICCM
+    5. The malnutrition field should be as an optional field before 6 months of age and can be a mandatory field after 6 months of age.
+    6. Pregnant validation 10 to 49 years
+CHO:
+    1. Add completed as a status in the Immunization Status drop-down (Under 5 - upto 2 years)
+    2. Allow 0 to 2 values in the APGAR Score.
+    3. Add “ear” and “skin” in systematic examination
+    4. Add “none” under “state of the perineum”
+Bug Fixes

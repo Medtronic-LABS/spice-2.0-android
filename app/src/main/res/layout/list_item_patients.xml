@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tool="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="false"
+    android:focusable="false">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardPatient"
+        style="@style/CardView_Style"
+        android:layout_width="match_parent"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardCornerRadius="@dimen/_16sdp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clPatientRoot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/default_color_bg"
+            android:padding="@dimen/_20sdp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCardPatientName"
+                style="@style/TextStyle_Bold_16_NoBG"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:textColor="@color/secondary_black"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLeftLbl"
+                style="@style/TextStyle_Regular_12"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:textColor="@color/charcoal_grey"
+                app:layout_constraintEnd_toStartOf="@id/tvRightLbl"
+                app:layout_constraintHorizontal_weight="5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvCardPatientName"
+                tool:text="@string/patient_id" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvRightLbl"
+                style="@style/TextStyle_Regular_12"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/household_location"
+                android:textColor="@color/charcoal_grey"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="5"
+                app:layout_constraintStart_toEndOf="@+id/tvLeftLbl"
+                app:layout_constraintTop_toBottomOf="@+id/tvCardPatientName" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLeftValue"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/_0dp"
+                android:paddingEnd="@dimen/_8sdp"
+                android:textColor="@color/secondary_black"
+                app:layout_constraintEnd_toStartOf="@+id/tvRightValue"
+                app:layout_constraintHorizontal_weight="5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvLeftLbl" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvRightValue"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/secondary_black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="5"
+                app:layout_constraintStart_toEndOf="@+id/tvLeftValue"
+                app:layout_constraintTop_toBottomOf="@+id/tvRightLbl" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/patientIdGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                app:constraint_referenced_ids="tvLeftLbl, tvRightLbl, tvLeftValue, tvRightValue" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

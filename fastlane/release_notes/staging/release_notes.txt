@@ -1,0 +1,12 @@
+Modules
+
+CHW:
+1.Follow-up
+2.Schedule Sync (once every hour)
+
+Medical Review:
+1.Under 5 Years (0-2 Months)
+2.Under 2 to 5 Years
+3.Add new Members.
+
+Also bugs with deployed status in the respective bug sheet. Let us know if any clarifications are needed.

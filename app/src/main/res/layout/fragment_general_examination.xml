@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.medicalreview.SystemicExaminationsFragment">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardSystemicExaminations"
+        style="@style/CardView_Style"
+        android:layout_width="match_parent"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/systemicExamContainer">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_marginBottom="@dimen/_14sdp"
+            android:layout_height="wrap_content">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/startGuideLine"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.15" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/separatorEndGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.18" />
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/centerGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/endGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.65" />
+            <View
+                android:id="@+id/viewSystemicExaminationCardBG"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_0dp"
+                android:background="@color/card_background"
+                app:layout_constraintBottom_toBottomOf="@id/tvSystemicExaminationTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvSystemicExaminationTitle"
+                style="@style/Form_Header_Style"
+                android:layout_width="@dimen/_0dp"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="@string/general_systemic_examinations"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@id/viewSystemicExaminationCardBG"
+                app:layout_constraintStart_toStartOf="@id/viewSystemicExaminationCardBG"
+                app:layout_constraintTop_toTopOf="@id/viewSystemicExaminationCardBG" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/tagPhysicalExamination"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/_16sdp"
+                android:paddingVertical="@dimen/_12sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvSystemicExaminationTitle" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/etPhysicalExaminationComments"
+                style="@style/Form_Input_Style_BG"
+                android:layout_height="@dimen/_112sdp"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginEnd="@dimen/_16sdp"
+                android:layout_marginBottom="@dimen/_16sdp"
+                android:gravity="start|top"
+                android:hint="@string/type_notes"
+                android:inputType="textCapWords|textMultiLine"
+                android:padding="@dimen/_8sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tagPhysicalExamination"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <TextView
+                android:id="@+id/tvErrorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_24sdp"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/default_user_input_error"
+                android:textColor="@color/a_red_error"
+                android:textSize="@dimen/_12ssp"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/etPhysicalExaminationComments" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBreastConditionLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:layout_marginTop="@dimen/_23sdp"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/breast_condition"
+                android:textSize="@dimen/_16ssp"
+                android:textColor="@color/b_w_black"
+                app:layout_constraintEnd_toStartOf="@+id/tvBreastConditionSeparator"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvErrorMessage" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBreastConditionSeparator"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:gravity="center_horizontal"
+                android:text="@string/separator_colon"
+                android:textColor="@color/b_w_black"
+                app:layout_constraintBottom_toBottomOf="@+id/tvBreastConditionLabel"
+                app:layout_constraintHorizontal_weight="0.1"
+                app:layout_constraintStart_toEndOf="@id/startGuideLine"
+                app:layout_constraintTop_toTopOf="@id/tvBreastConditionLabel" />
+
+            <LinearLayout
+                android:id="@+id/breastConditionSelector"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:orientation="horizontal"
+                android:textAlignment="center"
+                android:textColor="@color/grey_black"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvBreastConditionSeparator"
+                app:layout_constraintEnd_toEndOf="@+id/endGuideline"
+                app:layout_constraintStart_toEndOf="@+id/separatorEndGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvBreastConditionSeparator" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/specifyConditionGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids="tvCondition, tvConditionSeparator, conditionSelector" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCondition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:layout_marginTop="@dimen/_28sdp"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/specify_your_ncondition"
+                android:textAlignment="textStart"
+                android:textColor="@color/b_w_black"
+                app:layout_constraintEnd_toStartOf="@id/tvConditionSeparator"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/breastConditionSelector" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvConditionSeparator"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:gravity="center_horizontal"
+                android:text="@string/separator_colon"
+                android:textColor="@color/b_w_black"
+                app:layout_constraintBottom_toBottomOf="@+id/tvCondition"
+                app:layout_constraintHorizontal_weight="0.1"
+                app:layout_constraintStart_toEndOf="@id/startGuideLine"
+                app:layout_constraintTop_toTopOf="@id/tvCondition" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/conditionSelector"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:background="@drawable/edittext_background"
+                android:fontFamily="@font/inter_medium"
+                android:gravity="start|top"
+                android:hint="@string/type_notes"
+                android:orientation="horizontal"
+                android:padding="@dimen/_8sdp"
+                style="@style/Form_Input_Style_BG"
+                android:singleLine="true"
+                android:inputType="textCapWords|textMultiLine"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvConditionSeparator"
+                app:layout_constraintEnd_toEndOf="@+id/breastConditionSelector"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/separatorEndGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvConditionSeparator" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvUterusLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:layout_marginTop="@dimen/_32sdp"
+                android:layout_marginBottom="@dimen/_20sdp"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/involutions_of_the_nuterus"
+                android:textColor="@color/b_w_black"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/tvUterusSeparator"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/conditionSelector"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvUterusSeparator"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:gravity="center_horizontal"
+                android:text="@string/separator_colon"
+                android:textColor="@color/b_w_black"
+                app:layout_constraintBottom_toBottomOf="@+id/tvUterusLabel"
+                app:layout_constraintHorizontal_weight="0.1"
+                app:layout_constraintStart_toStartOf="@+id/startGuideLine"
+                app:layout_constraintTop_toTopOf="@+id/tvUterusLabel" />
+
+            <LinearLayout
+                android:id="@+id/uterusSelector"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:orientation="horizontal"
+                android:textAlignment="center"
+                android:textColor="@color/grey_black"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvUterusSeparator"
+                app:layout_constraintEnd_toEndOf="@+id/endGuideline"
+                app:layout_constraintStart_toEndOf="@+id/separatorEndGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvUterusSeparator" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvConditionUterus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:layout_marginTop="@dimen/_32sdp"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/specify_your_ncondition"
+                android:textAlignment="textStart"
+                android:textColor="@color/b_w_black"
+                app:layout_constraintEnd_toStartOf="@id/tvConditionSeparator"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/uterusSelector" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvConditionSeparatorUterus"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:gravity="center_horizontal"
+                android:text="@string/separator_colon"
+                android:textColor="@color/b_w_black"
+                app:layout_constraintBottom_toBottomOf="@+id/tvConditionUterus"
+                app:layout_constraintHorizontal_weight="0.1"
+                app:layout_constraintStart_toEndOf="@id/startGuideLine"
+                app:layout_constraintTop_toTopOf="@id/tvConditionUterus" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/conditionSelectorUterus"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:background="@drawable/edittext_background"
+                android:fontFamily="@font/inter_medium"
+                android:gravity="start|top"
+                android:hint="@string/type_notes"
+                android:orientation="horizontal"
+                android:padding="@dimen/_8sdp"
+                android:singleLine="true"
+                style="@style/Form_Input_Style_BG"
+                android:inputType="textCapWords|textMultiLine"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvConditionSeparatorUterus"
+                app:layout_constraintEnd_toEndOf="@+id/uterusSelector"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/separatorEndGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvConditionSeparatorUterus" />
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/specifyConditionGroupUterus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids="tvConditionUterus, tvConditionSeparatorUterus, conditionSelectorUterus" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</FrameLayout>

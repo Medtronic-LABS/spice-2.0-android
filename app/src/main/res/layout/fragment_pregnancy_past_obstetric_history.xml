@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="@dimen/_5sdp"
+    android:background="@color/fragment_bg"
+    tools:context=".ui.medicalreview.motherneonate.anc.fragment.PregnancyPastObstetricHistoryFragment">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardChiefComplaints"
+        style="@style/CardView_Style"
+        android:layout_width="match_parent"
+        app:strokeWidth="@dimen/_0dp"
+        app:cardCornerRadius="@dimen/_10sdp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:id="@+id/viewPresentingComplaintsCardBG"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_0dp"
+                android:background="@color/card_background"
+                app:layout_constraintBottom_toBottomOf="@id/tvPresentingComplaintsTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvPresentingComplaintsTitle"
+                style="@style/Form_Header_Style"
+                android:layout_width="@dimen/_0dp"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="@string/pregnancy_history_past_obstetric_history"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@id/viewPresentingComplaintsCardBG"
+                app:layout_constraintStart_toStartOf="@id/viewPresentingComplaintsCardBG"
+                app:layout_constraintTop_toTopOf="@id/viewPresentingComplaintsCardBG" />
+
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/tagViewPresentingComplaints"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/_16sdp"
+                android:paddingVertical="@dimen/_12sdp"
+                app:layout_constraintTop_toBottomOf="@+id/tvPresentingComplaintsTitle" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/etPregnancyHistory"
+                style="@style/Form_Input_Style_BG"
+                android:layout_height="@dimen/_112sdp"
+                android:layout_margin="@dimen/_16sdp"
+                android:layout_marginVertical="@dimen/_8sdp"
+                android:layout_marginEnd="@dimen/_8sdp"
+                android:gravity="start|top"
+                android:inputType="textCapWords|textMultiLine"
+                android:hint="@string/type_notes"
+                android:padding="@dimen/_8sdp"
+                app:layout_constraintTop_toBottomOf="@id/tagViewPresentingComplaints"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvDeliveryKit"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/_10sdp"
+        android:fontFamily="@font/inter_regular"
+        android:layout_marginStart="@dimen/_8sdp"
+        android:textColor="@color/table_title"
+        android:text="@string/does_mother_have_a_delivery_kit"
+        android:textSize="@dimen/_16ssp"
+        app:layout_constraintEnd_toEndOf="@id/cardChiefComplaints"
+        app:layout_constraintStart_toStartOf="@id/cardChiefComplaints"
+        app:layout_constraintTop_toBottomOf="@id/cardChiefComplaints" />
+
+    <LinearLayout
+        android:id="@+id/btnLayout"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingVertical="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_6sdp"
+        app:layout_constraintEnd_toEndOf="@id/tvDeliveryKit"
+        app:layout_constraintStart_toStartOf="@id/tvDeliveryKit"
+        app:layout_constraintTop_toBottomOf="@id/tvDeliveryKit" />
+</androidx.constraintlayout.widget.ConstraintLayout>
