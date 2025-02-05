@@ -43,9 +43,9 @@ android {
                 if (buildType.name == "release") {
                     when (productFlavors[0].name) {
                         "africa" -> {
-                            buildConfigField("String", "API_BASE_URL", "\"https://spice-dev-backend.os.labsplatform.com/\"")
-                            buildConfigField("String", "ADMIN_BASE_URL", "\"https://spice-dev.os.labsplatform.com/\"")
-                            buildConfigField("String", "SALT", "\"spice_uat\"")
+                            buildConfigField("String", "API_BASE_URL", "\"http://localhost:8762/\"")
+                            buildConfigField("String", "ADMIN_BASE_URL", "\"http://localhost/\"")
+                            buildConfigField("String", "SALT", "\"spice_opensource\"")
                             buildConfigField("String", "DB_PASSWORD", "\"OpenSource\"")
                             resValue("string", "spice_app_name", "SPICE")
                         }
@@ -61,9 +61,9 @@ android {
                 if (buildType.name == "debug") {
                     when (productFlavors[0].name) {
                         "africa" -> {
-                            buildConfigField("String", "API_BASE_URL", "\"https://spice-dev-backend.os.labsplatform.com/\"")
-                            buildConfigField("String", "ADMIN_BASE_URL", "\"https://spice-dev.os.labsplatform.com/\"")
-                            buildConfigField("String", "SALT", "\"spice_uat\"")
+                            buildConfigField("String", "API_BASE_URL", "\"http://localhost:8762/\"")
+                            buildConfigField("String", "ADMIN_BASE_URL", "\"http://localhost/\"")
+                            buildConfigField("String", "SALT", "\"spice_opensource\"")
                             buildConfigField("String", "DB_PASSWORD", "\"OpenSource\"")
                             resValue("string", "spice_app_name", "SPICE DEV")
                         }

@@ -7,7 +7,7 @@
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Medtronic-LABS_spice-android&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=Medtronic-LABS_spice-android)
 
 ## Prerequisite
-- To bring up the Spice backend server, there are a few prerequisites that need to be completed. Please follow the instructions provided in this [link](https://github.com/Medtronic-LABS/spice-server.git). Once you have completed the steps, you will get a ***SERVER URL*** to use in our Application.
+- To bring up the Spice backend server, there are a few prerequisites that need to be completed. Please follow the instructions provided in this [link](https://github.com/Medtronic-LABS/spice-2.0-server.git). Once you have completed the steps, you will get a ***SERVER URL*** to use in our Application.
 
 ## Tools used
 
@@ -20,7 +20,7 @@ Android Studio IDE
 Kotlin-1.9.0
 Java-18
 Android MVVM Design Pattern
-Gradle-7.3.1
+Gradle-8.2
 ```
 
 ## Installation Steps
@@ -33,18 +33,18 @@ Gradle-7.3.1
   $ java –version
   ```
   If Java 18 is not installed, you can follow these steps:
-    * Visit the JDK downloads page using this [link](https://www.oracle.com/java/technologies/javase/jdk18-archive-downloads.html).
-    * Install Java 18 according to the provided instructions.
-      </br>
+  * Visit the JDK downloads page using this [link](https://www.oracle.com/java/technologies/javase/jdk18-archive-downloads.html).
+  * Install Java 18 according to the provided instructions.
+    </br>
 
 - To change the Java version in Android Studio,
-    * Open your Android Studio project.
-    * Click on "File" in the top menu.
-    * Select "Project Structure" from the dropdown menu.
-    * In the left panel, select "SDK Location".
-    * Under the "JDK Location" section, click on the dropdown menu next to "JDK location" and select the path to the desired Java version.
-    * Click "Apply" and then "OK" to save the changes.
-    * You may need to re-build your project by selecting "Build" -> "Rebuild Project".</br>
+  * Open your Android Studio project.
+  * Click on "File" in the top menu.
+  * Select "Project Structure" from the dropdown menu.
+  * In the left panel, select "SDK Location".
+  * Under the "JDK Location" section, click on the dropdown menu next to "JDK location" and select the path to the desired Java version.
+  * Click "Apply" and then "OK" to save the changes.
+  * You may need to re-build your project by selecting "Build" -> "Rebuild Project".</br>
 
 #### Download and Install Git.
 To check the Git version, you can run the following command in your terminal:
@@ -66,7 +66,7 @@ For Windows, you can visit the [Git Official site](https://git-scm.com/download/
 Once you have Git installed, you can clone the Spice open source repository by running the following command in your terminal:
 
 ```sh
-git clone https://github.com/Medtronic-LABS/spice-android.git
+git clone https://github.com/Medtronic-LABS/spice-2.0-android.git
 ```
 </br>
 After cloning the repository, you can open the folder in Android Studio.
@@ -82,226 +82,237 @@ This file allows you to define your desired values for specific properties.
 ### Configure Server URL
 Use the server URL obtained from the prerequisites mentioned above. Or, you may also follow the steps as mentioned in the [link](https://github.com/Medtronic-LABS/spice-server.git).
 ```server
-    server = [debug: "http://localhost:8762/", release: "http://localhost:8762/"]
+    buildConfigField("String", "API_BASE_URL", "\"http://localhost:8762/\"")
 ````
 Substitute ***http://localhost:8762/*** with the server URL obtained.
 
 ### Configure Salt key
 To enhance security, you may need to provide the salt key used in the backend for user authentication. The salt key is a randomly generated string that adds an extra layer of security when hashing passwords.
 ```Salt key
-    salt = [debug: "spice_opensource", release: "spice_opensource"]
+    buildConfigField("String", "SALT", "\"spice_opensource\"")
 ````
 
 By default, the Salt key is set as spice_opensource, but you can modify it if necessary. Please note that the Salt key must match the key used in the backend.
-### Signing APK/Bundle
-`SigningConfigs`  configuration in the app's build.gradle file is used to specify the signing information for your Android application. It allows you to configure the necessary details for signing your app with a digital certificate, such as the keystore file, key alias, and key passwords.
-```
-    signingConfigs {
-        development {
-            keyAlias '<Specify the alias used during the generation of the signed APK/Bundle>'
-            keyPassword '<Specify the key password used during the generation of the signed APK/Bundle>'
-            storeFile file('<Specify the key store path used during the generation of the signed APK/Bundle'>)
-            storePassword '<Specify the store password used during the generation of the signed APK/Bundle>'
-        }
-    }
-```
 ### Complete build.gradle look like this:
 ```properties
 plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-    id 'kotlin-kapt'
-    id 'dagger.hilt.android.plugin'
-    id 'kotlin-parcelize'
-    id "org.sonarqube" version "3.4.0.2513"
-    id 'org.jetbrains.kotlin.android'
+    id("com.android.application")
+    id("kotlin-android")
+    id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
+    id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
+    id("kotlin-parcelize")
 }
 
 android {
-    compileSdk 33
+    namespace = "com.medtroniclabs.opensource"
+    compileSdk = 34
 
     defaultConfig {
-        applicationId "com.medtroniclabs.opensource"
-        minSdk 23
-        targetSdk 33
-        versionCode 1
-        versionName "1.0.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        applicationId = "com.medtroniclabs.opensource"
+        minSdk = 23
+        targetSdk = 34
+        versionCode = 6
+        versionName = "2.0.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    signingConfigs {
-        development {
-            keyAlias '<Specify the alias used during the generation of the signed APK/Bundle>'
-            keyPassword '<Specify the key password used during the generation of the signed APK/Bundle>'
-            storeFile file('<Specify the key store path used during the generation of the signed APK/Bundle'>)
-            storePassword '<Specify the store password used during the generation of the signed APK/Bundle>'
-        }
-        release {
-            keyAlias '<Specify the alias used during the generation of the signed APK/Bundle>'
-            keyPassword '<Specify the key password used during the generation of the signed APK/Bundle>'
-            storeFile file('<Specify the key store path used during the generation of the signed APK/Bundle'>)
-            storePassword '<Specify the store password used during the generation of the signed APK/Bundle>'
+    flavorDimensions += "version"
+    productFlavors {
+        create("africa") {
+            dimension = "version"
+            versionName = "2.0.0"
+            versionCode = 1
         }
     }
 
     buildTypes {
+
         release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            applicationVariants.all {
+                if (buildType.name == "release") {
+                    when (productFlavors[0].name) {
+                        "africa" -> {
+                            buildConfigField("String", "API_BASE_URL", "\"http://localhost:8762/\"")
+                            buildConfigField("String", "ADMIN_BASE_URL", "\"{ADMIN_URL}\"")
+                            buildConfigField("String", "SALT", "\"spice_opensource\"")
+                            buildConfigField("String", "DB_PASSWORD", "\"OpenSource\"")
+                            resValue("string", "spice_app_name", "SPICE")
+                        }
+                    }
+                }
+            }
+        }
+
+        debug {
+            isDebuggable = true
+            applicationIdSuffix = ".dev"
+            applicationVariants.all {
+                if (buildType.name == "debug") {
+                    when (productFlavors[0].name) {
+                        "africa" -> {
+                            buildConfigField("String", "API_BASE_URL", "\"http://localhost:8762/\"")
+                            buildConfigField("String", "ADMIN_BASE_URL", "\"{ADMIN_URL}\"")
+                            buildConfigField("String", "SALT", "\"spice_opensource\"")
+                            buildConfigField("String", "DB_PASSWORD", "\"OpenSource\"")
+                            resValue("string", "spice_app_name", "SPICE DEV")
+                        }
+                    }
+                }
+            }
         }
     }
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = "1.8"
     }
 
     buildFeatures {
-        viewBinding true
+        viewBinding = true
+        buildConfig = true
     }
 
-    lintOptions {
-        checkReleaseBuilds false
+    buildFeatures {
+        viewBinding = true
+        compose = true
     }
 
-    packagingOptions {
-        exclude 'META-INF/DEPENDENCIES'
-    }
-
-    flavorDimensions "version"
-
-    productFlavors {
-
-        development {
-            dimension "version"
-            applicationIdSuffix ".dev"
-            ext {
-                server = [debug: "http://localhost:8762/", release: "http://localhost:8762/"]
-                admin = [debug: "{ADMIN.URL}",release: "{ADMIN.URL}"]
-                salt = [debug: "salt_opensource", release: "salt_opensource"]
-            }
-            signingConfig signingConfigs.development
-        }
-        production {
-            dimension "version"
-            ext {
-                server = [debug: "http://localhost:8762/", release: "http://localhost:8762/"]
-                admin = [debug: "{ADMIN.URL}",release: "{ADMIN.URL}"]
-                salt = [debug: "salt_opensource", release: "salt_opensource"]
-            }
-            signingConfig signingConfigs.release
-        }
-    }
-
-    applicationVariants.all { variant ->
-        def flavor = variant.productFlavors[0]
-        println "Setting up server URL ${flavor.ext.server[variant.buildType.name]} for variant [${variant.name}]"
-        variant.buildConfigField "String", "SERVER_URL", "\"${flavor.ext.server[variant.buildType.name]}\""
-        variant.buildConfigField "String", "ADMIN_URL", "\"${flavor.ext.admin[variant.buildType.name]}\""
-        variant.buildConfigField "String", "SALT", "\"${flavor.ext.salt[variant.buildType.name]}\""
-        variant.outputs.each {
-            output ->
-                def formattedDate = new Date().format('yyyy-MM-dd-HH-mm')
-                def name = "SPICE_${flavor.name}_${variant.buildType.name}_${formattedDate}.apk"
-                output.outputFileName = name
-        }
-    }
-    bundle{
-        language{
-            enableSplit = false
-        }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.6"
     }
 }
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.8.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation(project(":analytics"))
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.hilt:hilt-common:1.2.0")
+    implementation("androidx.hilt:hilt-work:1.2.0")
+    implementation("androidx.activity:activity:1.9.3")
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 
-    // Retrofit
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.10.0'
+    //Dagger-Hilt
+    implementation("com.google.dagger:hilt-android:2.50")
+    kapt("com.google.dagger:hilt-compiler:2.50")
+    kapt("androidx.hilt:hilt-compiler:1.2.0")
 
-    implementation 'com.jakewharton.timber:timber:4.7.1'
+    //Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 
-    implementation "com.google.dagger:hilt-android:$hilt_version"
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.preference:preference-ktx:1.2.0'
-    implementation 'androidx.core:core-ktx:1.9.0'
-    kapt "com.google.dagger:hilt-compiler:$hilt_version"
-
-    def room_version = '2.5.0'
-
-    implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
+    //Room database
+    implementation("androidx.room:room-runtime:2.6.1")
+    annotationProcessor("androidx.room:room-compiler:2.6.1")
     // To use Kotlin annotation processing tool (kapt)
-    kapt "androidx.room:room-compiler:$room_version"
-    implementation "androidx.room:room-ktx:$room_version"
+    kapt("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
 
-    // Kotlin coroutine dependencies
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.0'
+    //Kotlin coroutine dependencies
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
 
-    implementation 'androidx.activity:activity-ktx:1.6.1'
-    implementation 'androidx.fragment:fragment-ktx:1.5.5'
+    implementation("androidx.activity:activity-ktx:1.9.2")
+    implementation("androidx.fragment:fragment-ktx:1.8.4")
 
     //Glide
-    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 
-    implementation 'androidx.security:security-crypto:1.1.0-alpha05'
+    //Flexbox Layout
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
 
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    //Lottie
+    implementation("com.airbnb.android:lottie:6.5.0")
 
-    // loading progress
-    implementation 'com.github.ybq:Android-SpinKit:1.4.0'
+    implementation("com.jakewharton.timber:timber:5.0.1")
 
-    implementation 'com.robertlevonyan.view:MaterialChipView:2.2.6'
+    implementation("joda-time:joda-time:2.12.5")
 
-    implementation 'com.google.android.gms:play-services-location:21.0.1'
+    implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-crashlytics")
+    //Swipe Refresh Layout
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
-    implementation 'androidx.security:security-crypto:1.0.0'
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
-    def lottieVersion = '4.2.2'
-    implementation "com.airbnb.android:lottie:$lottieVersion"
+    // Security hashing
+    implementation("androidx.security:security-crypto-ktx:1.1.0-alpha06")
 
+    //Workmanager
+    implementation("androidx.work:work-runtime:2.9.1")
 
-    implementation 'net.zetetic:android-database-sqlcipher:4.5.2'
-    implementation 'androidx.sqlite:sqlite-ktx:2.3.0'
-    implementation 'com.github.jeffreyliu8:FlexBoxRadioGroup:0.0.8'
-    implementation 'androidx.paging:paging-runtime-ktx:3.1.1'
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
-    implementation 'com.google.android.play:integrity:1.1.0'
-    implementation 'com.google.apis:google-api-services-playintegrity:v1-rev20220928-2.0.0'
-    implementation 'org.bitbucket.b_c:jose4j:0.9.1'
+    //Local date
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.2")
+
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
+
+    // Pagination
+    implementation("androidx.paging:paging-runtime-ktx:3.3.2")
+
+    implementation("net.zetetic:sqlcipher-android:4.6.0@aar")
+    implementation("androidx.sqlite:sqlite-ktx:2.4.0")
 
     //in-app update
-    implementation 'com.google.android.play:app-update:2.0.1'
-    implementation 'com.google.android.play:app-update-ktx:2.0.1'
+    implementation("com.google.android.play:app-update:2.1.0")
+    implementation("com.google.android.play:app-update-ktx:2.1.0")
+
+    // NCD
+    implementation("com.github.jeffreyliu8:FlexBoxRadioGroup:0.0.8") {
+        exclude(group = "com.google.android", module = "flexbox")
+    }
+
+    // Graph
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+    // loading progress
+    implementation("com.github.ybq:Android-SpinKit:1.4.0")
+
+    //compose
+    val composeBom = platform("androidx.compose:compose-bom:2024.10.01")
+    implementation(composeBom)
+    testImplementation(composeBom)
+    androidTestImplementation(composeBom)
+    implementation("androidx.compose.foundation:foundation")
+
+    // Core Compose libraries
+    implementation("androidx.compose.foundation:foundation")
+    implementation("androidx.activity:activity-compose")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose")
+    implementation("androidx.compose.runtime:runtime-livedata")
+    implementation("com.google.accompanist:accompanist-themeadapter-material3:0.28.0")
+
+    // Debug dependencies
+    debugImplementation("androidx.compose.ui:ui-tooling")
+
+    // Testing dependencies
+    testImplementation("androidx.compose.ui:ui-test-junit4")
+    androidTestImplementation("androidx.compose.ui:ui-test")
+
 }
 ```
 <font color = "#BA1016">`Synchronize the Gradle files by selecting File > Sync project. After that, you can click on the "Run" button.`</font>
-
-
-### Localization
-
-Currently, our application supports English and Bangla languages for most user roles. However, the following user roles are not included in this language support.
-
-- PROVIDER
-- PHYSICIAN_PRESCRIBER
-- LAB_TECHNICIAN
-- PHARMACIST
-- NUTRITIONIST
-
-To modify the language settings, you can easily do so by accessing the side menu on the home page and selecting the option labeled **Language Preference**. This action will trigger a dialog box to appear, allowing you to select either English or Bangla as your preferred language. Once you have made your selection, simply log in again to observe the changes. Please note that the default language is English.
 
 ## Optional
 #### [Emulator Set up](https://developer.android.com/studio/run/managing-avds)
@@ -326,11 +337,5 @@ You can install an Android emulator in Android Studio by following these steps:
 
 After starting the emulator, you can install your app on it by running your project in Android Studio and selecting the emulator as the deployment target.
 If you want to run apps on a hardware device,[follow the instructions.](https://developer.android.com/studio/run/device)
-
-### Future Enhancement
-- Provide Bangla Language support for all user roles.
-
-This is the client-side application for SPICE, designed to help track hypertensive and diabetic patients across a population.
-This repository contains the full android setup for the application. Please refer the SPICE webpage using the following URL:
 
 [SPICE DOCUMENTATION](https://app.gitbook.com/o/RnePNEThd1XTpW5Hf3HB/s/7inBQ0zjo0nwpqK5625P/~/changes/16/deploy/deployment-guide/android)
