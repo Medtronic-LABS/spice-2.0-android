@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.medtroniclabs.opensource.ui.common.FloatingDetectorFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.medicalreview.SystemicExaminationsFragment">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardSystemicExaminations"
+        style="@style/CardView_Style"
+        android:layout_width="match_parent"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/systemicExamContainer">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:id="@+id/viewSystemicExaminationCardBG"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_0dp"
+                android:background="@color/card_background"
+                app:layout_constraintBottom_toBottomOf="@id/tvSystemicExaminationTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvSystemicExaminationTitle"
+                style="@style/Form_Header_Style"
+                android:layout_width="@dimen/_0dp"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="@string/physical_examinations"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@id/viewSystemicExaminationCardBG"
+                app:layout_constraintStart_toStartOf="@id/viewSystemicExaminationCardBG"
+                app:layout_constraintTop_toTopOf="@id/viewSystemicExaminationCardBG" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/tagPhysicalExamination"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/_16sdp"
+                android:paddingVertical="@dimen/_12sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvSystemicExaminationTitle" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/centerGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/obstetricGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids="tvFundalHeightError,tvFundalHeight,tvFetalHeartRateError, tvFetalHeartReate,etFetalHeartRate,etFundalHeight" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvFundalHeight"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_16sdp"
+                android:layout_marginVertical="@dimen/_10sdp"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/fundal_height"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toStartOf="@id/centerGuideline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tagPhysicalExamination" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/etFundalHeight"
+                style="@style/Form_MH_Style_with_padding"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_16sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:inputType="number"
+                android:maxLength="2"
+                android:textAlignment="textStart"
+                app:layout_constraintEnd_toEndOf="@id/centerGuideline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvFundalHeight" />
+
+            <TextView
+                android:id="@+id/tvFundalHeightError"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/default_user_input_error"
+                android:textColor="@color/a_red_error"
+                android:textSize="@dimen/_12ssp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@id/etFundalHeight"
+                app:layout_constraintStart_toStartOf="@id/etFundalHeight"
+                app:layout_constraintTop_toBottomOf="@id/etFundalHeight" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvFetalHeartReate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_16sdp"
+                android:layout_marginVertical="@dimen/_10sdp"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/fetal_heart_rate_bpm"
+                android:textAlignment="textStart"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintStart_toStartOf="@id/centerGuideline"
+                app:layout_constraintTop_toBottomOf="@id/tagPhysicalExamination" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/etFetalHeartRate"
+                style="@style/Form_MH_Style_with_padding"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_16sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:inputType="number"
+                android:maxLength="3"
+                android:textAlignment="textStart"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/centerGuideline"
+                app:layout_constraintTop_toBottomOf="@+id/tvFetalHeartReate" />
+
+            <TextView
+                android:id="@+id/tvFetalHeartRateError"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/default_user_input_error"
+                android:textColor="@color/a_red_error"
+                android:textSize="@dimen/_12ssp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@id/etFetalHeartRate"
+                app:layout_constraintStart_toStartOf="@id/etFetalHeartRate"
+                app:layout_constraintTop_toBottomOf="@id/etFundalHeight" />
+
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="tvFetalHeartRateError, tvFundalHeightError" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCommentsTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_16sdp"
+                android:fontFamily="@font/inter_regular"
+                android:textAlignment="textStart"
+                android:textSize="@dimen/_14ssp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/barrier" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/etPhysicalExaminationComments"
+                style="@style/Form_Input_Style_BG"
+                android:layout_height="@dimen/_112sdp"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginEnd="@dimen/_16sdp"
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:gravity="start|top"
+                android:hint="@string/type_notes"
+                android:inputType="textCapWords|textMultiLine"
+                android:padding="@dimen/_8sdp"
+                app:layout_constraintBottom_toTopOf="@id/tvErrorMessage"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvCommentsTitle" />
+
+            <TextView
+                android:id="@+id/tvErrorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_24sdp"
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/default_user_input_error"
+                android:textColor="@color/a_red_error"
+                android:textSize="@dimen/_12ssp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/etPhysicalExaminationComments" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</com.medtroniclabs.opensource.ui.common.FloatingDetectorFrameLayout>

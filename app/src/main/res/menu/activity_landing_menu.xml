@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:id="@+id/nav_main_menu">
+        <item
+            android:id="@+id/home"
+            android:icon="@drawable/ic_home_img"
+            android:title="@string/home" />
+        <item
+            android:id="@+id/profile"
+            android:icon="@drawable/ic_menu_profile"
+            android:title="@string/profile"
+            />
+
+        <item
+            android:id="@+id/changeFacility"
+            android:icon="@drawable/ic_change_facility"
+            android:title="@string/change_facility" />
+
+        <item
+            android:id="@+id/switch_language"
+            android:icon="@drawable/ic_translate"
+            android:title="@string/language_preference" />
+
+        <item
+            android:id="@+id/offline_sync"
+            android:icon="@drawable/ic_offline_sync_image"
+            android:title="@string/offline_sync"
+            />
+
+        <item
+            android:id="@+id/privacy_policy"
+            android:icon="@drawable/ic_menu_privacy_policy"
+            android:title="@string/privacy_policy"
+            />
+        <item
+            android:id="@+id/logout"
+            android:icon="@drawable/ic_logout"
+            android:title="@string/logout" />
+
+    </group>
+
+</menu>

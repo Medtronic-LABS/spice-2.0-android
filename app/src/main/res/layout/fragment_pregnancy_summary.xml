@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/CardView_Style"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="@dimen/_10sdp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeWidth="@dimen/_0dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white">
+
+            <View
+                android:id="@+id/viewPregnancySummaryFragment"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_0dp"
+                android:background="@color/card_background"
+                app:layout_constraintBottom_toBottomOf="@id/titlePregnancySummaryFragment"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/titlePregnancySummaryFragment"
+                style="@style/Form_Header_Style"
+                android:layout_width="@dimen/_0dp"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="@string/title_pregnancy_summary"
+                android:textColor="@color/house_hold_title"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@id/viewPregnancySummaryFragment"
+                app:layout_constraintStart_toStartOf="@id/viewPregnancySummaryFragment"
+                app:layout_constraintTop_toTopOf="@id/viewPregnancySummaryFragment" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBmiLabel"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_marginStart="@dimen/_12sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/bmi"
+                app:layout_constraintEnd_toStartOf="@id/tvBmiSeparator"
+                app:layout_constraintHorizontal_weight="0.2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/titlePregnancySummaryFragment" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBmiSeparator"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="0dp"
+                android:gravity="center_horizontal"
+                android:text="@string/separator_colon"
+                app:layout_constraintBottom_toBottomOf="@id/tvBmiLabel"
+                app:layout_constraintEnd_toStartOf="@id/tvBmiValue"
+                app:layout_constraintHorizontal_weight="0.05"
+                app:layout_constraintStart_toEndOf="@id/tvBmiLabel"
+                app:layout_constraintTop_toTopOf="@id/tvBmiLabel" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBmiValue"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:fontFamily="@font/inter_regular"
+                android:textColor="@color/grey_black"
+                app:layout_constraintEnd_toStartOf="@id/centreGuideline"
+                app:layout_constraintHorizontal_weight="0.25"
+                app:layout_constraintStart_toEndOf="@id/tvBmiSeparator"
+                app:layout_constraintTop_toTopOf="@id/tvBmiLabel"
+                tools:text="35.2" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/centreGuideline"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.50" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvGravidaLabel"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/gravida"
+                app:layout_constraintEnd_toStartOf="@id/tvGravidaSeparator"
+                app:layout_constraintHorizontal_weight="0.2"
+                app:layout_constraintStart_toEndOf="@id/centreGuideline"
+                app:layout_constraintTop_toBottomOf="@id/titlePregnancySummaryFragment" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvGravidaSeparator"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="0dp"
+                android:gravity="center_horizontal"
+                android:text="@string/separator_colon"
+                app:layout_constraintBottom_toBottomOf="@id/tvGravidaLabel"
+                app:layout_constraintEnd_toStartOf="@id/tvGravidaValue"
+                app:layout_constraintHorizontal_weight="0.05"
+                app:layout_constraintStart_toEndOf="@id/tvGravidaLabel"
+                app:layout_constraintTop_toTopOf="@id/tvGravidaLabel" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvGravidaValue"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:fontFamily="@font/inter_regular"
+                android:textColor="@color/grey_black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="0.25"
+                app:layout_constraintStart_toEndOf="@id/tvGravidaSeparator"
+                app:layout_constraintTop_toTopOf="@id/tvGravidaLabel"
+                tools:text="1" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrierOne"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="tvBmiLabel, tvBmiSeparator, tvBmiValue, tvGravidaLabel, tvGravidaSeparator, tvGravidaValue" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLastMenstrualPeriodLabel"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_marginStart="@dimen/_12sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/last_menstrual_period"
+                app:layout_constraintEnd_toStartOf="@id/tvLastMenstrualSeparator"
+                app:layout_constraintHorizontal_weight="0.2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/barrierOne" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLastMenstrualSeparator"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="0dp"
+                android:gravity="center_horizontal"
+                android:text="@string/separator_colon"
+                app:layout_constraintBottom_toBottomOf="@id/tvLastMenstrualPeriodLabel"
+                app:layout_constraintEnd_toStartOf="@id/tvLastMenstrualValue"
+                app:layout_constraintHorizontal_weight="0.05"
+                app:layout_constraintStart_toEndOf="@id/tvLastMenstrualPeriodLabel"
+                app:layout_constraintTop_toTopOf="@id/tvLastMenstrualPeriodLabel" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLastMenstrualValue"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:fontFamily="@font/inter_regular"
+                android:textColor="@color/grey_black"
+                app:layout_constraintEnd_toStartOf="@id/centreGuideline"
+                app:layout_constraintHorizontal_weight="0.25"
+                app:layout_constraintStart_toEndOf="@id/tvLastMenstrualSeparator"
+                app:layout_constraintTop_toTopOf="@id/tvLastMenstrualPeriodLabel"
+                tools:text="22/04/2023" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvParityLabel"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/parity"
+                app:layout_constraintEnd_toStartOf="@id/tvParitySeparator"
+                app:layout_constraintHorizontal_weight="0.2"
+                app:layout_constraintStart_toEndOf="@id/centreGuideline"
+                app:layout_constraintTop_toBottomOf="@id/barrierOne" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvParitySeparator"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="0dp"
+                android:gravity="center_horizontal"
+                android:text="@string/separator_colon"
+                app:layout_constraintBottom_toBottomOf="@id/tvParityLabel"
+                app:layout_constraintEnd_toStartOf="@id/tvParityValue"
+                app:layout_constraintHorizontal_weight="0.05"
+                app:layout_constraintStart_toEndOf="@id/tvParityLabel"
+                app:layout_constraintTop_toTopOf="@id/tvParityLabel" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvParityValue"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:fontFamily="@font/inter_regular"
+                android:textColor="@color/grey_black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="0.25"
+                app:layout_constraintStart_toEndOf="@id/tvParitySeparator"
+                app:layout_constraintTop_toTopOf="@id/tvParityLabel"
+                tools:text="1" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrierTwo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="tvLastMenstrualPeriodLabel, tvLastMenstrualSeparator, tvLastMenstrualValue, tvParityLabel, tvParitySeparator, tvParityValue" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvEstimatedDeliveryDateLabel"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_marginStart="@dimen/_12sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/estimated_delivery_date"
+                app:layout_constraintEnd_toStartOf="@id/tvEstimatedDeliveryDateSeparator"
+                app:layout_constraintHorizontal_weight="0.2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/barrierTwo" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvEstimatedDeliveryDateSeparator"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="0dp"
+                android:gravity="center_horizontal"
+                android:text="@string/separator_colon"
+                app:layout_constraintBottom_toBottomOf="@id/tvEstimatedDeliveryDateLabel"
+                app:layout_constraintEnd_toStartOf="@id/tvEstimatedDeliveryDateValue"
+                app:layout_constraintHorizontal_weight="0.05"
+                app:layout_constraintStart_toEndOf="@id/tvEstimatedDeliveryDateLabel"
+                app:layout_constraintTop_toTopOf="@id/tvEstimatedDeliveryDateLabel" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvEstimatedDeliveryDateValue"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:fontFamily="@font/inter_regular"
+                android:textColor="@color/grey_black"
+                app:layout_constraintEnd_toStartOf="@id/centreGuideline"
+                app:layout_constraintHorizontal_weight="0.25"
+                app:layout_constraintStart_toEndOf="@id/tvEstimatedDeliveryDateSeparator"
+                app:layout_constraintTop_toTopOf="@id/tvEstimatedDeliveryDateLabel"
+                tools:text="23/04/2024" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBloodGroupLabel"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/patient_blood_group"
+                app:layout_constraintEnd_toStartOf="@id/tvBloodGroupSeparator"
+                app:layout_constraintHorizontal_weight="0.2"
+                app:layout_constraintStart_toEndOf="@id/centreGuideline"
+                app:layout_constraintTop_toBottomOf="@id/barrierTwo" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBloodGroupSeparator"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="0dp"
+                android:gravity="center_horizontal"
+                android:text="@string/separator_colon"
+                app:layout_constraintBottom_toBottomOf="@id/tvBloodGroupLabel"
+                app:layout_constraintEnd_toStartOf="@id/tvBloodGroupValue"
+                app:layout_constraintHorizontal_weight="0.05"
+                app:layout_constraintStart_toEndOf="@id/tvBloodGroupLabel"
+                app:layout_constraintTop_toTopOf="@id/tvBloodGroupLabel" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBloodGroupValue"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:fontFamily="@font/inter_regular"
+                android:textColor="@color/grey_black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="0.25"
+                app:layout_constraintStart_toEndOf="@id/tvBloodGroupSeparator"
+                app:layout_constraintTop_toTopOf="@id/tvBloodGroupLabel"
+                tools:text="A+" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrierThree"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="tvBloodGroupLabel, tvBloodGroupSeparator, tvBloodGroupValue, tvEstimatedDeliveryDateLabel, tvEstimatedDeliveryDateSeparator, tvEstimatedDeliveryDateValue" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvGestationalAgeLabel"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_marginStart="@dimen/_12sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/gestational_age"
+                app:layout_constraintEnd_toStartOf="@id/tvGestationalAgeSeparator"
+                app:layout_constraintHorizontal_weight="0.2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/barrierThree" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvGestationalAgeSeparator"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="0dp"
+                android:gravity="center_horizontal"
+                android:text="@string/separator_colon"
+                app:layout_constraintBottom_toBottomOf="@id/tvGestationalAgeLabel"
+                app:layout_constraintEnd_toStartOf="@id/tvGestationalAgeValue"
+                app:layout_constraintHorizontal_weight="0.05"
+                app:layout_constraintStart_toEndOf="@id/tvGestationalAgeLabel"
+                app:layout_constraintTop_toTopOf="@id/tvGestationalAgeLabel" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvGestationalAgeValue"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:fontFamily="@font/inter_regular"
+                android:textColor="@color/grey_black"
+                app:layout_constraintEnd_toStartOf="@id/centreGuideline"
+                app:layout_constraintHorizontal_weight="0.25"
+                app:layout_constraintStart_toEndOf="@id/tvGestationalAgeSeparator"
+                app:layout_constraintTop_toTopOf="@id/tvGestationalAgeLabel"
+                tools:text="1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPregnancyHistoryLabel"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/pregnancy_history"
+                app:layout_constraintEnd_toStartOf="@id/tvPregnancyHistorySeparator"
+                app:layout_constraintHorizontal_weight="0.2"
+                app:layout_constraintStart_toEndOf="@id/centreGuideline"
+                app:layout_constraintTop_toBottomOf="@id/barrierThree" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPregnancyHistorySeparator"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="0dp"
+                android:gravity="center_horizontal"
+                android:text="@string/separator_colon"
+                app:layout_constraintBottom_toBottomOf="@id/tvPregnancyHistoryLabel"
+                app:layout_constraintEnd_toStartOf="@id/tvPregnancyHistoryValue"
+                app:layout_constraintHorizontal_weight="0.05"
+                app:layout_constraintStart_toEndOf="@id/tvPregnancyHistoryLabel"
+                app:layout_constraintTop_toTopOf="@id/tvPregnancyHistoryLabel" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPregnancyHistoryValue"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:fontFamily="@font/inter_regular"
+                android:textColor="@color/grey_black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="0.25"
+                app:layout_constraintStart_toEndOf="@id/tvPregnancyHistorySeparator"
+                app:layout_constraintTop_toTopOf="@id/tvPregnancyHistoryLabel"
+                tools:text="normal" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrierFour"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="tvGestationalAgeLabel, tvGestationalAgeSeparator, tvGestationalAgeValue" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNoofFetusLabel"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_marginStart="@dimen/_12sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginBottom="@dimen/_10sdp"
+                android:text="@string/no_of_fetus"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tvNoofFetusSeparator"
+                app:layout_constraintHorizontal_weight="0.2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/barrierFour" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNoofFetusSeparator"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="0dp"
+                android:gravity="center_horizontal"
+                android:text="@string/separator_colon"
+                app:layout_constraintBottom_toBottomOf="@id/tvNoofFetusLabel"
+                app:layout_constraintEnd_toStartOf="@id/tvNoofFetusValue"
+                app:layout_constraintHorizontal_weight="0.05"
+                app:layout_constraintStart_toEndOf="@id/tvNoofFetusLabel"
+                app:layout_constraintTop_toTopOf="@id/tvNoofFetusLabel" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNoofFetusValue"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_marginBottom="@dimen/_10sdp"
+                android:fontFamily="@font/inter_regular"
+                android:textColor="@color/grey_black"
+                app:layout_constraintEnd_toStartOf="@id/centreGuideline"
+                app:layout_constraintHorizontal_weight="0.25"
+                app:layout_constraintStart_toEndOf="@id/tvNoofFetusSeparator"
+                app:layout_constraintTop_toTopOf="@id/tvNoofFetusLabel"
+                tools:text="3" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
+

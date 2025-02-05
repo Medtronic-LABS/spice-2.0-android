@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center">
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/CardView_Style"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_15sdp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <View
+                android:id="@+id/viewReferralTicketCardBG"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_0dp"
+                android:background="@color/card_background"
+                app:layout_constraintBottom_toBottomOf="@id/tvTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvTitle"
+                style="@style/Form_Header_Style"
+                android:layout_width="@dimen/_0dp"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="@string/referral_ticket"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@id/viewReferralTicketCardBG"
+                app:layout_constraintStart_toStartOf="@id/viewReferralTicketCardBG"
+                app:layout_constraintTop_toTopOf="@id/viewReferralTicketCardBG" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivClose"
+                style="@style/ImageView_Style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/close"
+                android:padding="@dimen/_15sdp"
+                android:src="@drawable/ic_close"
+                app:layout_constraintBottom_toBottomOf="@+id/tvTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvTitle"
+                app:tint="@color/secondary_black" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSubTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_medium"
+                android:paddingHorizontal="@dimen/_12sdp"
+                android:paddingVertical="@dimen/_8sdp"
+                android:textColor="@color/navy_blue"
+                android:textSize="@dimen/_16ssp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toTopOf="@id/rvDetails"
+                app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvDetails"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_350sdp"
+                android:layout_weight="7"
+                android:scrollbarSize="@dimen/_4sdp"
+                android:scrollbarThumbVertical="@color/blue"
+                android:scrollbars="vertical"
+                app:layout_constraintBottom_toTopOf="@id/btnOkay"
+                app:layout_constraintTop_toBottomOf="@id/tvSubTitle" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btnOkay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginVertical="@dimen/_16sdp"
+                android:layout_weight="1"
+                android:background="@drawable/button_cobalt_bg"
+                android:fontFamily="@font/inter_regular"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_32sdp"
+                android:paddingVertical="@dimen/_8sdp"
+                android:text="@string/close"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rvDetails" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

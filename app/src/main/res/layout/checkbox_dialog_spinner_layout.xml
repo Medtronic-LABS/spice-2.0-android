@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/parentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minWidth="@dimen/_480sdp"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/_16sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            style="@style/Form_Label_Style"
+            android:paddingStart="@dimen/_0dp"
+            android:paddingEnd="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/etUserInput"
+            style="@style/Form_Input_Style_BG"
+            android:layout_marginVertical="@dimen/_8sdp"
+            android:drawableEnd="@drawable/ic_spinner_arrow_down"
+            android:hint="@string/select"
+            android:padding="@dimen/_8sdp" />
+
+        <TextView
+            android:id="@+id/tvErrorMessage"
+            style="@style/TextStyle_Error_14"
+            android:paddingVertical="@dimen/_8sdp"
+            android:visibility="gone" />
+
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

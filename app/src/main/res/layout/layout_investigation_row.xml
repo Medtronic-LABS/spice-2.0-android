@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="@dimen/_8sdp"
+        android:weightSum="1.0">
+
+        <LinearLayout
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ivDropDown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/_16sdp"
+                android:src="@drawable/ic_arrow_down" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvTestName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_medium"
+                android:gravity="start"
+                android:padding="@dimen/_12sdp"
+                android:textColor="@color/table_title"
+                android:textSize="@dimen/_14ssp" />
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvRecommendedOn"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:fontFamily="@font/inter_medium"
+            android:gravity="center"
+            android:padding="@dimen/_12sdp"
+            android:textColor="@color/table_title"
+            android:textSize="@dimen/_14ssp" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvRecommendedBy"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:fontFamily="@font/inter_medium"
+            android:gravity="center"
+            android:padding="@dimen/_12sdp"
+            android:textColor="@color/table_title"
+            android:textSize="@dimen/_14ssp" />
+
+        <LinearLayout
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="0.2"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ivRemoveMedication"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/_38sdp"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:contentDescription="@string/remove_medication"
+                android:src="@drawable/icon_remove_blue" />
+
+            <ImageView
+                android:id="@+id/ivEditMedication"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/_38sdp"
+                android:contentDescription="@string/edit"
+                android:src="@drawable/icon_edit_blue"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_1sdp"
+        android:background="@color/edittext_stroke_50t" />
+
+    <LinearLayout
+        android:id="@+id/resultContainerHolder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bg_grey"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/resultContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:flexDirection="row"
+            android:visibility="gone"
+            app:flexWrap="wrap"
+            app:justifyContent="flex_start" />
+
+        <LinearLayout
+            android:id="@+id/resultViewContainer"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:paddingHorizontal="@dimen/_8sdp"
+                android:paddingVertical="@dimen/_8sdp"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/tested_result"
+                    android:fontFamily="@font/inter_bold"
+                    android:textColor="@color/navy_blue"
+                    android:textSize="@dimen/_16ssp" />
+
+
+                <LinearLayout
+                    android:layout_width="@dimen/_0dp"
+                    android:orientation="horizontal"
+                    android:layout_weight="2"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tvValue"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/tested_value"
+                        android:fontFamily="@font/inter_bold"
+                        android:textColor="@color/navy_blue"
+                        android:textSize="@dimen/_16ssp" />
+
+                    <TextView
+                        android:id="@+id/tvValueRange"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/display_range"
+                        android:fontFamily="@font/inter_bold"
+                        android:textColor="@color/navy_blue"
+                        android:textSize="@dimen/_16ssp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvErrorMessage"
+            style="@style/TextStyle_Error_14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="@dimen/_16sdp"
+            android:paddingVertical="@dimen/_8sdp"
+            android:visibility="gone" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clMarkAsReviewed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="@dimen/_15sdp"
+            android:visibility="gone">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvTestComments"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_regular"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="@string/test_comments"
+                android:textColor="@color/b_w_black"
+                android:textSize="@dimen/_15ssp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/etTestComments"
+                style="@style/Form_Input_Style_BG"
+                android:layout_width="match_parent"
+                android:gravity="top"
+                android:minHeight="@dimen/_80sdp"
+                android:padding="@dimen/_12sdp"
+                app:layout_constraintTop_toBottomOf="@id/tvTestComments" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnMarkAsReviewed"
+                style="@style/Button_Style_Border"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:text="@string/mark_as_reviewed"
+                android:textAllCaps="true"
+                android:textSize="@dimen/_12ssp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/etTestComments" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+
+
+</LinearLayout>

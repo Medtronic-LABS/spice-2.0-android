@@ -1,0 +1,189 @@
+[
+  {
+    "familyOrder": 0,
+    "id": "pncMother",
+    "orderId": 1,
+    "title": "PNC Visit - Mother",
+    "viewType": "CardView"
+  },
+  {
+    "id": "dateOfDelivery",
+    "family": "pncMother",
+    "fieldName": "dateOfDelivery",
+    "orderId": 2,
+    "title": "Date of Delivery",
+    "viewType": "DatePicker",
+    "isMandatory": true,
+    "disableFutureDate": true,
+    "hint": "Select Date",
+    "minDays": 15,
+    "errorMessage": "Please select a valid option",
+    "visibility": "visible"
+  },
+  {
+    "family": "pncMother",
+    "fieldName": "noOfNeonates",
+    "id": "noOfNeonates",
+    "viewType": "EditText",
+    "orderId": 6,
+    "inputType": 3,
+    "hint": "Enter number",
+    "titleSummary": "No of Neonate",
+    "isEnabled": true,
+    "isMandatory": false,
+    "title": "No of Neonate",
+    "errorMessage": "Please enter a valid option"
+  },
+  {
+    "id": "pncMotherSigns",
+    "family": "pncMother",
+    "fieldName": "pncMotherSigns",
+    "orderId": 2,
+    "title": "Is the expectant mother experiencing any of these danger signs?",
+    "viewType": "DialogCheckbox",
+    "isMandatory": false,
+    "isSummary": true,
+    "titleSummary": "Danger Signs in mother",
+    "hint": "Select Symptoms",
+    "localDataCache": "pncMotherSigns",
+    "errorMessage": "Please select a valid option",
+    "visibility": "visible",
+    "condition": [
+      {
+        "eq": "Other",
+        "targetId": "otherPncMotherSigns",
+        "visibility": "visible"
+      }
+    ]
+  },
+  {
+    "errorMessage": "Please enter a valid sign",
+    "family": "pncMother",
+    "fieldName": "Other Signs",
+    "hint": "Enter Other Sign",
+    "id": "otherPncMotherSigns",
+    "inputType": 96,
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isNotDefault": false,
+    "orderId": 5,
+    "isSummary": false,
+    "title": "Other Signs",
+    "viewType": "EditText",
+    "isInfo": "gone",
+    "visibility": "gone"
+  },
+  {
+    "family": "pncMother",
+    "fieldName": "fatherPresent",
+    "id": "fatherPresent",
+    "condition": [],
+    "orderId": 4,
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "isBooleanAnswer": true,
+    "optionsList": [
+      {
+        "id": true,
+        "name": "Yes"
+      },
+      {
+        "id": false,
+        "name": "No"
+      }
+    ],
+    "optionType": "boolean",
+    "readOnly": true,
+    "viewType": "SingleSelectionView",
+    "title": "Father present?",
+    "visibility": "visible"
+  },
+  {
+    "family": "pncMother",
+    "fieldName": "exclusivelyBreastfeeding",
+    "id": "exclusivelyBreastfeeding",
+    "condition": [],
+    "orderId": 4,
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "isBooleanAnswer": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "optionsList": [
+      {
+        "id": true,
+        "name": "Yes"
+      },
+      {
+        "id": false,
+        "name": "No"
+      }
+    ],
+    "optionType": "boolean",
+    "readOnly": true,
+    "viewType": "SingleSelectionView",
+    "title": "Exclusively breastfeeding?",
+    "visibility": "visible"
+  },
+  {
+    "family": "pncMother",
+    "fieldName": "sleepsUnderBedNet",
+    "id": "sleepsUnderBedNet",
+    "condition": [],
+    "orderId": 4,
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isBooleanAnswer": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "optionsList": [
+      {
+        "id": true,
+        "name": "Yes"
+      },
+      {
+        "id": false,
+        "name": "No"
+      }
+    ],
+    "optionType": "boolean",
+    "readOnly": true,
+    "viewType": "SingleSelectionView",
+    "title": "Sleeps under Bednet",
+    "visibility": "visible"
+  },
+  {
+    "family": "pncMother",
+    "fieldName": "chlorhexidine",
+    "id": "chlorhexidine",
+    "condition": [],
+    "orderId": 4,
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isBooleanAnswer": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "optionsList": [
+      {
+        "id": true,
+        "name": "Yes"
+      },
+      {
+        "id": false,
+        "name": "No"
+      }
+    ],
+    "optionType": "boolean",
+    "readOnly": true,
+    "viewType": "SingleSelectionView",
+    "title": "Chlorhexidine",
+    "visibility": "visible"
+  }
+]

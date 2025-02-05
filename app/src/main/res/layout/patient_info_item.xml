@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/_10sdp"
+    android:background="@color/fragment_bg">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/centreOneGuideline"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.35" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/centreTwoGuideline"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.40" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvLabel"
+        style="@style/TextStyle_Regular_16"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/centreOneGuideline"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvSeparator"
+        style="@style/TextStyle_Regular_16"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/separator_colon"
+        app:layout_constraintBottom_toBottomOf="@id/tvLabel"
+        app:layout_constraintEnd_toStartOf="@id/centreTwoGuideline"
+        app:layout_constraintHorizontal_weight="0.1"
+        app:layout_constraintStart_toEndOf="@id/centreOneGuideline"
+        app:layout_constraintTop_toTopOf="@id/tvLabel" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvValue"
+        style="@style/TextStyle_Regular_16"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter_regular"
+        android:textColor="@color/grey_black"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@id/tvLabel"
+        app:layout_constraintEnd_toStartOf="@id/smHighRisk"
+        app:layout_constraintStart_toStartOf="@id/centreTwoGuideline"
+        app:layout_constraintTop_toTopOf="@id/tvLabel" />
+
+
+    <com.medtroniclabs.opensource.toggle.LabeledSwitch
+        android:id="@+id/smHighRisk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginBottom="@dimen/_8sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
+        app:layout_constraintBottom_toBottomOf="@id/tvSeparator"
+        app:layout_constraintEnd_toStartOf="@id/tvHighRiskPregnancyCriteria"
+        app:layout_constraintStart_toEndOf="@id/tvValue"
+        app:layout_constraintTop_toTopOf="@id/tvSeparator" />
+
+    <View
+        android:id="@+id/viewToggle"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="@dimen/_0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/smHighRisk"
+        app:layout_constraintEnd_toEndOf="@id/smHighRisk"
+        app:layout_constraintStart_toStartOf="@id/smHighRisk"
+        app:layout_constraintTop_toTopOf="@id/smHighRisk" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvHighRiskPregnancyCriteria"
+        style="@style/TextStyle_Regular_16"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/pregnancy_risk_criteria"
+        android:textColor="@color/cobalt_blue"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/smHighRisk"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/smHighRisk"
+        app:layout_constraintTop_toTopOf="@id/smHighRisk" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/dummyGuideLone"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.50" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvMentalHealth"
+        style="@style/TextStyle_Regular_16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/edit_assessment"
+        android:textColor="@color/cobalt_blue"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/dummyGuideLone"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

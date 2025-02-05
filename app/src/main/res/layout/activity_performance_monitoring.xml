@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:padding="@dimen/_16sdp"
+    tools:context=".ui.peersupervisor.PerformanceMonitoringActivity">
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvPerformanceMonitoring"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter_bold"
+        android:paddingHorizontal="@dimen/_16sdp"
+        android:text="@string/performance_monitoring"
+        android:textColor="@color/house_hold_title"
+        android:textSize="@dimen/_24ssp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/flLockButton"
+        android:layout_width="@dimen/_52sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_gravity="center"
+        android:layout_marginEnd="@dimen/_16sdp"
+        android:background="@drawable/button_white_background"
+        android:paddingHorizontal="@dimen/_10sdp"
+        android:paddingVertical="@dimen/_10sdp"
+        android:tint="@color/cobalt_blue"
+        app:layout_constraintBottom_toBottomOf="@+id/tvPerformanceMonitoring"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvPerformanceMonitoring"
+        app:srcCompat="@drawable/ic_white_lock" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivRefreshPage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/_16sdp"
+        android:background="@drawable/button_white_background"
+        android:paddingHorizontal="@dimen/_16sdp"
+        android:paddingVertical="@dimen/_12sdp"
+        android:tint="@color/cobalt_blue"
+        app:layout_constraintBottom_toBottomOf="@+id/flLockButton"
+        app:layout_constraintEnd_toStartOf="@+id/flLockButton"
+        app:layout_constraintTop_toTopOf="@+id/flLockButton"
+        app:srcCompat="@drawable/ic_refresh" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivFilter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/_16sdp"
+        android:background="@drawable/button_white_background"
+        android:paddingHorizontal="@dimen/_16sdp"
+        android:paddingVertical="@dimen/_12sdp"
+        app:layout_constraintBottom_toBottomOf="@+id/ivRefreshPage"
+        app:layout_constraintEnd_toStartOf="@+id/ivRefreshPage"
+        app:layout_constraintTop_toTopOf="@+id/ivRefreshPage"
+        app:srcCompat="@drawable/ic_filter_icon" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clFilterView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvPerformanceMonitoring">
+
+        <LinearLayout
+            android:id="@+id/titlePerformanceMonitoring"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:paddingVertical="@dimen/_8sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:layout_weight="1"
+                android:fontFamily="@font/inter_medium"
+                android:text="@string/year_colon"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_14ssp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:layout_weight="1"
+                android:fontFamily="@font/inter_medium"
+                android:text="@string/month_colon"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_14ssp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvRoleTitle"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:layout_weight="1"
+                android:fontFamily="@font/inter_medium"
+                android:text="@string/chw_colon"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_14ssp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:layout_weight="1"
+                android:fontFamily="@font/inter_medium"
+                android:text="@string/village_colon"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_14ssp" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:layout_weight="1"
+                android:fontFamily="@font/inter_medium"
+                android:text="@string/from_date_colon"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_14ssp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:layout_weight="1"
+                android:fontFamily="@font/inter_medium"
+                android:text="@string/toDate_colon"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_14ssp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llFilterSection"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/_8sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/titlePerformanceMonitoring">
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/yearSpinner"
+                style="@style/Form_Spinner_Style"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:layout_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/monthSpinner"
+                style="@style/Form_Spinner_Style"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:layout_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/chwSpinner"
+                style="@style/Form_Spinner_Style"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:layout_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/villageSpinner"
+                style="@style/Form_Spinner_Style"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:layout_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/etFromDate"
+                style="@style/Form_Input_Style"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:layout_weight="1"
+                android:background="@drawable/edittext_background"
+                android:padding="@dimen/_8sdp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/etEndDate"
+                style="@style/Form_Input_Style"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:layout_weight="1"
+                android:background="@drawable/edittext_background"
+                android:padding="@dimen/_8sdp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/bottomView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="bottom"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:paddingTop="@dimen/_8sdp"
+            android:layoutDirection="rtl"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/llFilterSection">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnApply"
+                style="@style/Button_Style"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/_8sdp"
+                android:background="@drawable/button_selector_cobalt"
+                android:text="@string/apply"
+                android:textAllCaps="true"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnCancel"
+                style="@style/Button_Style_Border"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/_8sdp"
+                android:text="@string/reset"
+                android:textAllCaps="true"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvInvalidFilterInputs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_16sdp"
+            android:text="Please select valid inputs in all fields"
+            android:textColor="@color/a_red_error"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/bottomView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/bottomView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ProgressBar
+        android:id="@+id/paginationLoader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="@dimen/_0dp"
+        android:layout_marginHorizontal="@dimen/_16sdp"
+        android:layout_marginTop="@dimen/_16sdp"
+        app:cardElevation="@dimen/_4sdp"
+        app:layout_constraintBottom_toTopOf="@+id/paginationLoader"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/clFilterView">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/lHealder"
+                layout="@layout/performance_monitoring_list_view_header"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_120sdp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPerformanceList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/row_performance_monitoring" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNoRecords"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/no_records_found"
+                android:textColor="@color/medium_risk_color"
+                android:textSize="@dimen/_16ssp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

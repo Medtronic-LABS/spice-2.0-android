@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rect_gray_left_right_bottom_border">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvIndicatorName"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rect_gray_right_border"
+        android:paddingStart="@dimen/_32sdp"
+        android:paddingVertical="8dp"
+        style="@style/TextStyle_Medium"
+        android:textSize="@dimen/_16ssp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/tvOneMinute"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvOneMinute"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rect_gray_right_border"
+        android:gravity="center"
+        android:paddingVertical="8dp"
+        style="@style/TextStyle_Medium"
+        android:textSize="@dimen/_16ssp"
+        android:foreground="?attr/selectableItemBackground"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/tvFiveMinute"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@+id/tvIndicatorName"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvFiveMinute"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rect_gray_right_border"
+        android:gravity="center"
+        android:foreground="?attr/selectableItemBackground"
+        android:paddingVertical="8dp"
+        style="@style/TextStyle_Medium"
+        android:textSize="@dimen/_16ssp"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tvTenMinute"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@+id/tvOneMinute"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvTenMinute"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rect_gray_right_border"
+        android:foreground="?attr/selectableItemBackground"
+        android:paddingVertical="8dp"
+        style="@style/TextStyle_Medium"
+        android:textSize="@dimen/_16ssp"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@+id/tvFiveMinute"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

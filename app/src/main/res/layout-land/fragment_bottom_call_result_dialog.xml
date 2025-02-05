@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottomsheet">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvCallResult"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/call_result"
+        android:textColor="@color/secondary_black"
+        android:textSize="@dimen/_14ssp"
+        android:paddingHorizontal="@dimen/_16sdp"
+        android:layout_marginTop="@dimen/_16sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/selectionCallResult"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/_8sdp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/_16sdp"
+        app:layout_constraintBottom_toTopOf="@id/tvPatientStatus"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvCallResult" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvPatientStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/_16sdp"
+        android:layout_marginTop="@dimen/_16sdp"
+        android:text="@string/patient_status"
+        android:textColor="@color/secondary_black"
+        android:paddingHorizontal="@dimen/_16sdp"
+        android:textSize="@dimen/_14ssp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/selectionCallResult" />
+
+    <LinearLayout
+        android:id="@+id/selectionPatientStatus"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/_8sdp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:paddingHorizontal="@dimen/_16sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvPatientStatus" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvReason"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/_16sdp"
+        android:layout_marginTop="@dimen/_16sdp"
+        android:text="@string/reason"
+        android:textColor="@color/secondary_black"
+        android:textSize="@dimen/_14ssp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/selectionPatientStatus" />
+
+    <LinearLayout
+        android:id="@+id/selectionReason"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/_8sdp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:paddingHorizontal="@dimen/_16sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvReason" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/bottomDivider"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_1sdp"
+        android:layout_marginBottom="@dimen/_5sdp"
+        android:layout_marginTop="@dimen/_16sdp"
+        android:background="@color/edittext_stroke"
+        app:cardElevation="@dimen/_4sdp"
+        app:layout_constraintBottom_toTopOf="@id/btnDone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/selectionReason" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnDone"
+        style="@style/Button_Style"
+        android:layout_width="0dp"
+        android:layout_gravity="center"
+        android:background="@drawable/button_selector_cobalt"
+        android:enabled="false"
+        android:layout_margin="@dimen/_16sdp"
+        android:textStyle="bold"
+        android:text="@string/done"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bottomDivider"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

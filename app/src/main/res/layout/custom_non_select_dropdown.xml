@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <!--<CheckBox
+        android:id="@+id/spinnerCheckbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>-->
+
+    <TextView
+        android:id="@+id/spin_txt"
+        style="?android:attr/spinnerItemStyle"
+        android:singleLine="true"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_42sdp"
+        android:ellipsize="marquee"
+        android:textColor="@color/black"
+        android:textSize="@dimen/_16ssp"
+        android:textAlignment="inherit"
+        android:gravity="center_vertical"
+        android:background="@drawable/edittext_background"
+        app:drawableEndCompat="@drawable/ic_arrow_down"
+        android:layout_gravity="center_vertical" />
+</LinearLayout>

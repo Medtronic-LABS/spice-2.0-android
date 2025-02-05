@@ -1,0 +1,273 @@
+[
+  {
+    "familyOrder": 0,
+    "id": "pncChild",
+    "orderId": 1,
+    "title": "Child Details",
+    "viewType": "CardView"
+  },
+  {
+    "id": "childhoodVisitSigns",
+    "fieldName": "childhoodVisitSigns",
+    "family": "pncChild",
+    "orderId": 2,
+    "viewType": "DialogCheckbox",
+    "localDataCache": "childhoodVisitSigns",
+    "isMandatory": false,
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "title": "Is the newborn baby experiencing any of these danger signs?",
+    "visibility": "visible",
+    "isSummary": true,
+    "condition": [
+      {
+        "eq": "Other",
+        "targetId": "otherChildhoodVisitSigns",
+        "visibility": "visible"
+      }
+    ]
+  },{
+  "errorMessage": "Please enter a valid sign",
+  "family": "pncChild",
+  "fieldName": "Other Signs",
+  "hint": "Enter Other Sign",
+  "id": "otherChildhoodVisitSigns",
+  "inputType": 96,
+  "isEnabled": true,
+  "isMandatory": true,
+  "isNeededDefault": true,
+  "isNotDefault": false,
+  "orderId": 5,
+  "isSummary": false,
+  "title": "Other Signs",
+  "viewType": "EditText",
+  "isInfo": "gone",
+  "visibility": "gone"
+},
+  {
+    "family": "pncChild",
+    "fieldName": "fatherPresent",
+    "id": "fatherPresent",
+    "condition": [],
+    "orderId": 3,
+    "isBooleanAnswer": true,
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "optionsList": [
+      {
+        "id": true,
+        "name": "Yes"
+      },
+      {
+        "id": false,
+        "name": "No"
+      }
+    ],
+    "optionType": "boolean",
+    "readOnly": true,
+    "viewType": "SingleSelectionView",
+    "title": "Father present?",
+    "visibility": "visible"
+  },
+  {
+    "family": "pncChild",
+    "fieldName": "exclusivelyBreastfeeding",
+    "id": "exclusivelyBreastfeeding",
+    "condition": [],
+    "orderId": 4,
+    "isBooleanAnswer": true,
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "optionsList": [
+      {
+        "id": true,
+        "name": "Yes"
+      },
+      {
+        "id": false,
+        "name": "No"
+      }
+    ],
+    "optionType": "boolean",
+    "readOnly": true,
+    "viewType": "SingleSelectionView",
+    "title": "Exclusively breastfeeding?",
+    "visibility": "visible"
+  },
+  {
+    "family": "pncChild",
+    "fieldName": "sleepsUnderBedNet",
+    "id": "sleepsUnderBedNet",
+    "condition": [],
+    "isBooleanAnswer": true,
+    "orderId": 5,
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "optionsList": [
+      {
+        "id": true,
+        "name": "Yes"
+      },
+      {
+        "id": false,
+        "name": "No"
+      }
+    ],
+    "optionType": "boolean",
+    "viewType": "SingleSelectionView",
+    "title": "Sleeps under Bednet",
+    "visibility": "visible"
+  },
+  {
+    "family": "pncChild",
+    "fieldName": "muac",
+    "id": "muac",
+    "viewType": "Spinner",
+    "orderId": 6,
+    "isSummary": true,
+    "isEnabled": true,
+    "isMandatory": true,
+    "title": "MUAC",
+    "isInfo": "visible",
+    "optionsList": [
+      {
+        "id": "Green",
+        "name": "Green"
+      },
+      {
+        "id": "Yellow",
+        "name": "Yellow"
+      },
+      {
+        "id": "Red",
+        "name": "Red"
+      }
+    ],
+    "errorMessage": "Please select a valid option"
+  },
+  {
+    "family": "pncChild",
+    "id": "muacStatus",
+    "title": "MUAC",
+    "backgroundColor": "#FDF4F0",
+    "visibility": "visible",
+    "viewType": "InformationLabel"
+  },
+  {
+    "family": "pncChild",
+    "fieldName": "takingMinimumMealsPerDay",
+    "id": "takingMinimumMealsPerDay",
+    "condition": [],
+    "isBooleanAnswer": true,
+    "orderId": 7,
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "optionsList": [
+      {
+        "id": true,
+        "name": "Yes"
+      },
+      {
+        "id": false,
+        "name": "No"
+      }
+    ],
+    "optionType": "boolean",
+    "viewType": "SingleSelectionView",
+    "title": "Taking minimum meals per day",
+    "visibility": "visible"
+  },
+  {
+    "family": "pncChild",
+    "fieldName": "fedFrom4FoodGroups",
+    "id": "fedFrom4FoodGroups",
+    "condition": [],
+    "isBooleanAnswer": true,
+    "orderId": 9,
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "optionsList": [
+      {
+        "id": true,
+        "name": "Yes"
+      },
+      {
+        "id": false,
+        "name": "No"
+      }
+    ],
+    "optionType": "boolean",
+    "viewType": "SingleSelectionView",
+    "title": "Fed from 4 food groups",
+    "visibility": "visible"
+  },
+  {
+    "family": "pncChild",
+    "fieldName": "motherOrPartnerUsingFamilyPlanning",
+    "id": "motherOrPartnerUsingFamilyPlanning",
+    "condition": [],
+    "orderId": 10,
+    "isBooleanAnswer": true,
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "optionsList": [
+      {
+        "id": true,
+        "name": "Yes"
+      },
+      {
+        "id": false,
+        "name": "No"
+      }
+    ],
+    "optionType": "boolean",
+    "viewType": "SingleSelectionView",
+    "title": "Mother / Partner using family planning",
+    "visibility": "visible"
+  },
+  {
+    "family": "pncChild",
+    "fieldName": "deathOfBaby",
+    "id": "deathOfBaby",
+    "condition": [],
+    "orderId": 11,
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "isBooleanAnswer": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "optionsList": [
+      {
+        "id": true,
+        "name": "Yes"
+      },
+      {
+        "id": false,
+        "name": "No"
+      }
+    ],
+    "optionType": "boolean",
+    "viewType": "SingleSelectionView",
+    "title": "Death of baby",
+    "visibility": "visible"
+  }
+]

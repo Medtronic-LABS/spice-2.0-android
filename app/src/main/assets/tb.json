@@ -1,0 +1,162 @@
+[
+  {
+    "familyOrder": 0,
+    "id": "tbScreening",
+    "title": "TB Screening",
+    "viewType": "CardView"
+  },
+  {
+    "family": "tbScreening",
+    "fieldName": "Cough",
+    "id": "has_cough",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isNotDefault": false,
+    "isSummary": true,
+    "orderId": 1,
+    "optionsList": [
+      {
+        "name": "Yes",
+        "id": "yes"
+      },
+      {
+        "name": "No",
+        "id": "no"
+      }
+    ],
+    "title": "Cough",
+    "viewType": "SingleSelectionView",
+    "visibility": "visible",
+    "condition": [
+      {
+        "eq": "Yes",
+        "targetId": "had_tb_before",
+        "visibility": "visible"
+      },
+      {
+        "eq": "Yes",
+        "targetId": "has_night_sweats",
+        "visibility": "visible"
+      },
+      {
+        "eq": "Yes",
+        "targetId": "has_fever",
+        "visibility": "visible"
+      },
+      {
+        "eq": "Yes",
+        "targetId": "has_weight_loss",
+        "visibility": "visible"
+      }
+    ]
+  },
+  {
+    "family": "tbScreening",
+    "fieldName": "Has the cough lasted longer than 2 weeks?",
+    "id": "had_tb_before",
+    "condition": [],
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "optionsList": [
+      {
+        "id": "Yes",
+        "name": "Yes"
+      },
+      {
+        "id": "No",
+        "name": "No"
+      }
+    ],
+    "optionType": "boolean",
+    "orderId": 2,
+    "readOnly": true,
+    "viewType": "SingleSelectionView",
+    "title": "Has the cough lasted longer than 2 weeks?",
+    "visibility": "gone"
+  },
+  {
+    "family": "tbScreening",
+    "fieldName": "Drenching night sweats?",
+    "id": "has_night_sweats",
+    "condition": [],
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "optionsList": [
+      {
+        "id": "Yes",
+        "name": "Yes"
+      },
+      {
+        "id": "No",
+        "name": "No"
+      }
+    ],
+    "optionType": "boolean",
+    "orderId": 3,
+    "readOnly": true,
+    "viewType": "SingleSelectionView",
+    "title": "Drenching night sweats?",
+    "visibility": "gone"
+  },
+  {
+    "family": "tbScreening",
+    "fieldName": "Fever?",
+    "id": "has_fever",
+    "condition": [],
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "optionsList": [
+      {
+        "id": "Yes",
+        "name": "Yes"
+      },
+      {
+        "id": "No",
+        "name": "No"
+      }
+    ],
+    "optionType": "boolean",
+    "orderId": 4,
+    "readOnly": true,
+    "viewType": "SingleSelectionView",
+    "title": "Fever?",
+    "visibility": "gone"
+  },
+  {
+    "family": "tbScreening",
+    "fieldName": "Unexplained weight loss of greater than 1.5 kg over the month?",
+    "id": "has_weight_loss",
+    "condition": [],
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "optionsList": [
+      {
+        "id": "Yes",
+        "name": "Yes"
+      },
+      {
+        "id": "No",
+        "name": "No"
+      }
+    ],
+    "optionType": "boolean",
+    "orderId": 5,
+    "readOnly": true,
+    "viewType": "SingleSelectionView",
+    "title": "Unexplained weight loss of greater than 1.5 kg over the month?",
+    "visibility": "gone"
+  }
+]

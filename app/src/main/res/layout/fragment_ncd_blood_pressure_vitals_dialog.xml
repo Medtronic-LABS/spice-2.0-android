@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/_20sdp"
+    android:background="@android:color/transparent"
+    app:cardCornerRadius="@dimen/_12sdp"
+    app:cardElevation="@dimen/_2sdp"
+    app:cardUseCompatPadding="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvTitle"
+                style="@style/Form_Header_Style"
+                android:layout_width="0dp"
+                android:background="@color/grey_bg"
+                android:gravity="start"
+                android:padding="@dimen/_16sdp"
+                android:text="@string/add_blood_pressure"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivClose"
+                style="@style/ImageView_Style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_10sdp"
+                android:contentDescription="@string/close"
+                android:padding="@dimen/_15sdp"
+                android:src="@drawable/close_black"
+                app:layout_constraintBottom_toBottomOf="@id/tvTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tvTitle"
+                app:tint="@color/black" />
+
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/divider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/_72sdp">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvHeight"
+                    style="@style/Form_Label_Style"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_12sdp"
+                    android:paddingHorizontal="@dimen/_24sdp"
+                    android:text="@string/height_in_cm"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etHeight"
+                    style="@style/TextStyle_Regular_16_Rectangle_Bg"
+                    android:layout_width="match_parent"
+                    android:layout_marginStart="@dimen/_24sdp"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:layout_marginEnd="@dimen/_20sdp"
+                    android:hint="@string/enter_height"
+                    android:inputType="numberDecimal"
+                    android:padding="@dimen/_8sdp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvHeight"
+                    tools:ignore="TouchTargetSizeCheck" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvHeightErrorMessage"
+                    style="@style/TextStyle_Error_14"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/_20sdp"
+                    android:text="@string/validation_error"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/etHeight" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvWeight"
+                    style="@style/Form_Label_Style"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_12sdp"
+                    android:paddingHorizontal="@dimen/_24sdp"
+                    android:text="@string/weight_in_kgs"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvHeightErrorMessage" />
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etWeight"
+                    style="@style/TextStyle_Regular_16_Rectangle_Bg"
+                    android:layout_marginStart="@dimen/_24sdp"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:layout_marginEnd="@dimen/_20sdp"
+                    android:hint="@string/enter_weight"
+                    android:inputType="numberDecimal"
+                    android:padding="@dimen/_8sdp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvWeight"
+                    tools:ignore="TouchTargetSizeCheck" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvWeightErrorMessage"
+                    style="@style/TextStyle_Error_14"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/_20sdp"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/etWeight" />
+
+                <include
+                    android:id="@+id/bmiView"
+                    layout="@layout/layout_information_label"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_12sdp"
+                    android:visibility="visible"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvWeightErrorMessage" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvAssessmentDate"
+                    style="@style/Form_Label_Style"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_12sdp"
+                    android:paddingHorizontal="@dimen/_24sdp"
+                    android:text="@string/assessment_date"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/bmiView" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/etAssessmentDate"
+                    style="@style/TextStyle_Regular_16_Rectangle_Bg"
+                    android:layout_marginStart="@dimen/_24sdp"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:layout_marginEnd="@dimen/_20sdp"
+                    android:drawableEnd="@drawable/ic_baseline_calendar_today_24"
+                    android:hint="@string/dd_mm_yyyy"
+                    android:minWidth="@dimen/_300sdp"
+                    android:padding="@dimen/_8sdp"
+                    android:textColor="@color/black"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvAssessmentDate" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvAssessmentDateErrorMessage"
+                    style="@style/TextStyle_Error_14"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/_20sdp"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/etAssessmentDate" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/clBPReading"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    app:layout_constraintTop_toBottomOf="@id/tvAssessmentDateErrorMessage">
+
+                    <include
+                        android:id="@+id/llBpReading"
+                        layout="@layout/bp_reading_layout" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvBpLogErrorMessage"
+                        style="@style/TextStyle_Error_14"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="@dimen/_20sdp"
+                        android:text="@string/default_user_input_error"
+                        android:visibility="gone"
+                        app:layout_constraintTop_toBottomOf="@id/llBpReading" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvSmokingLbl"
+                    style="@style/Form_Label_Style"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_12sdp"
+                    android:text="@string/tobacoo_question"
+                    app:layout_constraintEnd_toEndOf="@id/etAssessmentDate"
+                    app:layout_constraintStart_toStartOf="@id/etAssessmentDate"
+                    app:layout_constraintTop_toBottomOf="@id/clBPReading" />
+
+                <RadioGroup
+                    android:id="@+id/rgSmoking"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="@id/tvSmokingLbl"
+                    app:layout_constraintStart_toStartOf="@id/tvSmokingLbl"
+                    app:layout_constraintTop_toBottomOf="@id/tvSmokingLbl">
+
+                    <RadioButton
+                        android:id="@+id/btnYes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/yes" />
+
+                    <RadioButton
+                        android:id="@+id/btnNo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/no" />
+
+                </RadioGroup>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvSmokingErr"
+                    style="@style/TextStyle_Error_14"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/_3sdp"
+                    android:paddingBottom="@dimen/_8sdp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="@id/tvSmokingLbl"
+                    app:layout_constraintStart_toStartOf="@id/tvSmokingLbl"
+                    app:layout_constraintTop_toBottomOf="@id/rgSmoking" />
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/smokingGrp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:constraint_referenced_ids="tvSmokingLbl, rgSmoking" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:id="@+id/divider2"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_1sdp"
+                android:background="@color/edittext_stroke"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btnCancel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/_15sdp"
+                android:layout_marginStart="@dimen/_20sdp"
+                android:background="@drawable/button_white_background"
+                android:drawablePadding="@dimen/_8sdp"
+                android:fontFamily="@font/inter_medium"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_16sdp"
+                android:paddingVertical="@dimen/_12sdp"
+                android:text="@string/cancel"
+                android:textColor="@color/cobalt_blue"
+                android:textSize="@dimen/_15ssp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btnAddReading"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/btnAddReading"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:background="@drawable/button_cobalt_bg"
+                android:drawablePadding="@dimen/_8sdp"
+                android:fontFamily="@font/inter_medium"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_50sdp"
+                android:paddingVertical="@dimen/_12sdp"
+                android:text="@string/submit"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_15ssp"
+                app:layout_constraintBottom_toBottomOf="@id/btnCancel"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btnCancel"
+                app:layout_constraintTop_toTopOf="@id/btnCancel" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/loadingProgress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <ImageView
+            android:id="@+id/loaderImage"
+            android:layout_width="@dimen/_75sdp"
+            android:layout_height="@dimen/_75sdp"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </RelativeLayout>
+
+</com.google.android.material.card.MaterialCardView>

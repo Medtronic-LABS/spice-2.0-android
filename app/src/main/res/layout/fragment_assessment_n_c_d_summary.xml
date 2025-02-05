@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="top"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/btnDone"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/riskResultLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/_16sdp"
+                    android:background="@drawable/curved_rectangle_background"
+                    android:backgroundTint="@color/summary_assessment_color_selector"
+                    android:fontFamily="@font/inter_bold"
+                    android:gravity="center"
+                    android:padding="@dimen/_10sdp"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_16ssp"
+                    android:visibility="gone" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/clRedRisk"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_20sdp"
+                    android:layout_marginTop="@dimen/_16sdp"
+                    android:background="@drawable/red_risk_color_bg"
+                    android:padding="@dimen/_12sdp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/ivRedRisk"
+                        android:layout_width="@dimen/_30sdp"
+                        android:layout_height="@dimen/_30sdp"
+                        android:layout_marginHorizontal="@dimen/_10sdp"
+                        android:contentDescription="@string/red_risk"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvRedRiskStatus"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="@dimen/_10sdp"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_16ssp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/ivRedRisk"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/CardView_Style"
+                    android:layout_marginHorizontal="@dimen/_16sdp"
+                    android:layout_marginVertical="@dimen/_6sdp"
+                    app:cardUseCompatPadding="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/divider"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/card_background">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/bioDataCardTitle"
+                                style="@style/Form_Header_Style"
+                                android:layout_width="@dimen/_0dp"
+                                android:gravity="center"
+                                android:paddingHorizontal="@dimen/_16sdp"
+                                android:paddingVertical="@dimen/_10sdp"
+                                android:text="@string/bio_data"
+                                android:textSize="@dimen/_16ssp"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <LinearLayout
+                            android:id="@+id/llPatientInfo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:animateLayoutChanges="true"
+                            android:orientation="vertical"
+                            android:paddingVertical="@dimen/_12sdp"
+                            app:layout_constraintTop_toBottomOf="@+id/divider">
+
+                            <include
+                                android:id="@+id/patientName"
+                                layout="@layout/summary_layout" />
+
+                            <include
+                                android:id="@+id/nationalId"
+                                layout="@layout/summary_layout" />
+
+                            <include
+                                android:id="@+id/gender"
+                                layout="@layout/summary_layout" />
+
+                            <include
+                                android:id="@+id/dobAge"
+                                layout="@layout/summary_layout" />
+
+                            <include
+                                android:id="@+id/programId"
+                                layout="@layout/summary_layout"
+                                android:visibility="gone" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <LinearLayout
+                    android:id="@+id/llFamilyRoot"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_16sdp"
+                    android:orientation="vertical" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnDone"
+        style="@style/Button_Style"
+        android:layout_marginVertical="@dimen/_30sdp"
+        android:enabled="true"
+        android:minWidth="@dimen/_200sdp"
+        android:text="@string/done"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,386 @@
+[
+  {
+    "diseaseName": "General Danger Signs",
+    "questionnaires": [
+      {
+        "viewType": "SingleSelectionView",
+        "id": "UnableToDrinkOrBreastfeed",
+        "title": "Unable to drink or breastfeed",
+        "family": "General Danger Signs",
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes"
+          },
+          {
+            "id": "No",
+            "name": "No"
+          }
+        ]
+      },
+      {
+        "viewType": "SingleSelectionView",
+        "id": "VomitingEverything",
+        "title": "Vomiting everything",
+        "family": "General Danger Signs",
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes"
+          },
+          {
+            "id": "No",
+            "name": "No"
+          }
+        ]
+      },
+      {
+        "viewType": "SingleSelectionView",
+        "id": "HistoryOfConvulsion",
+        "title": "History of convulsion",
+        "family": "General Danger Signs",
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes"
+          },
+          {
+            "id": "No",
+            "name": "No"
+          }
+        ]
+      },
+      {
+        "viewType": "SingleSelectionView",
+        "id": "ConvulsingNow",
+        "title": "Convulsing now",
+        "family": "General Danger Signs",
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes"
+          },
+          {
+            "id": "No",
+            "name": "No"
+          }
+        ]
+      },
+      {
+        "viewType": "SingleSelectionView",
+        "id": "LethargicOrUnconscious",
+        "title": "Lethargic or unconscious ",
+        "family": "General Danger Signs",
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes"
+          },
+          {
+            "id": "No",
+            "name": "No"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "diseaseName": "Cough / Difficult Breathing",
+    "questionnaires": [
+      {
+        "viewType": "SingleSelectionView",
+        "id": "CoughOrDifficultBreathing",
+        "title": "Cough or difficult breathing",
+        "family": "Cough / Difficult Breathing",
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes"
+          },
+          {
+            "id": "No",
+            "name": "No"
+          }
+        ]
+      },
+      {
+        "viewType": "EditText",
+        "id": "NumberOfDaysOfCough",
+        "title": "Number of days of cough",
+        "family": "Cough / Difficult Breathing",
+        "hint": "Number"
+      },
+      {
+        "viewType": "SingleSelectionView",
+        "id": "ChestIndrawing",
+        "title": "Chest indrawing",
+        "family": "Cough / Difficult Breathing",
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes"
+          },
+          {
+            "id": "No",
+            "name": "No"
+          }
+        ]
+      },
+      {
+        "viewType": "SingleSelectionView",
+        "id": "Stridor",
+        "title": "Stridor",
+        "family": "Cough / Difficult Breathing",
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes"
+          },
+          {
+            "id": "No",
+            "name": "No"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "diseaseName": "Diarrhoea",
+    "questionnaires": [
+      {
+        "viewType": "SingleSelectionView",
+        "id": "Diarrhoea",
+        "title": "Diarrhoea",
+        "family": "Diarrhoea",
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes"
+          },
+          {
+            "id": "No",
+            "name": "No"
+          }
+        ]
+      },
+      {
+        "viewType": "EditText",
+        "id": "NumberOfDays",
+        "title": "Number of days",
+        "family": "Diarrhoea",
+        "hint": "Number"
+      },
+      {
+        "viewType": "SingleSelectionView",
+        "id": "BloodyDiarrhoea",
+        "title": "Bloody Diarrhoea",
+        "family": "Diarrhoea",
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes"
+          },
+          {
+            "id": "No",
+            "name": "No"
+          }
+        ]
+      },
+      {
+        "viewType": "DialogCheckbox",
+        "id": "diarrhoeaSigns",
+        "title": "Signs",
+        "family": "Diarrhoea",
+        "hint": "Select Signs"
+      }
+    ]
+  },
+  {
+    "diseaseName": "Fever",
+    "questionnaires": [
+      {
+        "viewType": "SingleSelectionView",
+        "id": "Fever",
+        "title": "Fever",
+        "family": "Fever",
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes"
+          },
+          {
+            "id": "No",
+            "name": "No"
+          }
+        ]
+      },
+      {
+        "viewType": "EditText",
+        "id": "NumberOfDays",
+        "title": "Number of days",
+        "family": "Fever",
+        "hint": "Number"
+      },
+      {
+        "viewType": "SingleSelectionView",
+        "id": "Mother",
+        "title": "Mother",
+        "family": "Fever",
+        "optionsList": [
+          {
+            "id": "-ve",
+            "name": "-ve"
+          },
+          {
+            "id": "+ve",
+            "name": "+ve"
+          },
+          {
+            "id": "NA",
+            "name": "NA"
+          }
+        ]
+      },
+      {
+        "viewType": "SingleSelectionView",
+        "id": " Microscopy",
+        "title": " Microscopy",
+        "family": "Fever",
+        "optionsList": [
+          {
+            "id": "-ve",
+            "name": "-ve"
+          },
+          {
+            "id": "+ve",
+            "name": "+ve"
+          }
+        ]
+      },
+      {
+        "viewType": "DialogCheckbox",
+        "id": "feverSigns",
+        "title": "Signs",
+        "family": "Fever",
+        "hint": "Select Signs"
+      }
+    ]
+  },
+  {
+    "diseaseName": "Ear Problem",
+    "questionnaires": [
+      {
+        "viewType": "SingleSelectionView",
+        "id": "earPain",
+        "title": "Ear Pain",
+        "family": "Ear Problem",
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes"
+          },
+          {
+            "id": "No",
+            "name": "No"
+          }
+        ]
+      },
+      {
+        "viewType": "EditText",
+        "id": "NumberOfDays",
+        "title": "Number of days",
+        "family": "Ear Problem",
+        "hint": "Number"
+      },
+      {
+        "viewType": "SingleSelectionView",
+        "id": "earDischarge",
+        "title": "Ear discharge",
+        "family": "Ear Problem",
+        "optionsList": [
+          {
+            "id": "+ve",
+            "name": "+ve"
+          },
+          {
+            "id": "-ve",
+            "name": "-ve"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "diseaseName": "Malnutrition / Anaemia",
+    "questionnaires": [
+      {
+        "viewType": "SingleSelectionView",
+        "id": "Appetite test",
+        "title": "Appetite test",
+        "family": "Malnutrition / Anaemia",
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes"
+          },
+          {
+            "id": "No",
+            "name": "No"
+          }
+        ]
+      },
+      {
+        "viewType": "DialogCheckbox",
+        "id": "maSigns",
+        "title": "Signs",
+        "family": "Malnutrition / Anaemia",
+        "hint": "Select Signs"
+      }
+    ]
+  },
+  {
+    "diseaseName": "HIV / AIDS  RDT",
+    "questionnaires": [
+      {
+        "viewType": "SingleSelectionView",
+        "id": "Mother",
+        "title": "Mother",
+        "family": "HIV / AIDS  RDT",
+        "optionsList": [
+          {
+            "id": "-ve",
+            "name": "-ve"
+          },
+          {
+            "id": "+ve",
+            "name": "+ve"
+          },
+          {
+            "id": "Unknown",
+            "name": "Unknown"
+          }
+        ]
+      },
+      {
+        "viewType": "SingleSelectionView",
+        "id": "Child",
+        "title": "Child",
+        "family": "HIV / AIDS  RDT",
+        "optionsList": [
+          {
+            "id": "-ve",
+            "name": "-ve"
+          },
+          {
+            "id": "+ve",
+            "name": "+ve"
+          },
+          {
+            "id": "Unknown",
+            "name": "Unknown"
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.medtroniclabs.opensource.ui.common.FloatingDetectorFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardCurrentMedicationDetailsHolder"
+        style="@style/CardView_Style"
+        android:layout_width="match_parent"
+        android:layout_marginVertical="@dimen/_6sdp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardMentalHealthHolder">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_6sdp">
+
+            <View
+                android:id="@+id/viewCurrentMedicationDetailsBG"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_0dp"
+                android:background="@color/card_background"
+                app:layout_constraintBottom_toBottomOf="@id/tvCurrentMedicationDetailsTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCurrentMedicationDetailsTitle"
+                style="@style/Form_Header_Style"
+                android:layout_width="@dimen/_0dp"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="@string/current_medication_details"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@id/viewCurrentMedicationDetailsBG"
+                app:layout_constraintStart_toStartOf="@id/viewCurrentMedicationDetailsBG"
+                app:layout_constraintTop_toTopOf="@id/viewCurrentMedicationDetailsBG" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/currentMedicationTags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="@dimen/_8sdp"
+                android:layout_marginStart="@dimen/_18sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/viewCurrentMedicationDetailsBG" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/etOtherCurrentMedication"
+                style="@style/Form_Input_Style_BG"
+                android:layout_height="@dimen/_112sdp"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:layout_marginVertical="@dimen/_8sdp"
+                android:layout_marginEnd="@dimen/_8sdp"
+                android:layout_marginStart="@dimen/_24sdp"
+                android:gravity="start|top"
+                android:hint="@string/other_medication"
+                android:inputType="textCapWords|textMultiLine"
+                android:padding="@dimen/_8sdp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/currentMedicationTags" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvErrorOtherCurrentMedications"
+                style="@style/TextStyle_Error_14"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:layout_marginVertical="@dimen/_8sdp"
+                android:layout_marginEnd="@dimen/_8sdp"
+                android:layout_marginStart="@dimen/_24sdp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/etOtherCurrentMedication" />
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/llCurrentMedications"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/_16sdp"
+                android:layout_marginStart="@dimen/_24sdp"
+                android:layout_marginBottom="@dimen/_16sdp"
+                android:orientation="vertical"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvErrorOtherCurrentMedications"
+                app:layout_constraintWidth_percent="0.45">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvCurrentMedicationsTitle"
+                    style="@style/Form_Label_Style"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="@dimen/_10sdp"
+                    android:text="@string/adhering_to_current_medications"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <RadioGroup
+                    android:id="@+id/rgCurrentMedications"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvCurrentMedicationsTitle">
+
+                    <RadioButton
+                        android:id="@+id/rbCurrentMedicationYes"
+                        style="@style/RadioButton_General"
+                        android:fontFamily="@font/inter_regular"
+                        android:text="@string/yes"
+                        android:textColor="@color/enabled_disbled_color"
+                        android:textSize="@dimen/_14ssp" />
+
+                    <RadioButton
+                        android:id="@+id/rbCurrentMedicationNo"
+                        style="@style/RadioButton_General"
+                        android:layout_marginStart="@dimen/_20sdp"
+                        android:fontFamily="@font/inter_regular"
+                        android:text="@string/no"
+                        android:textColor="@color/enabled_disbled_color"
+                        android:textSize="@dimen/_14ssp" />
+
+                </RadioGroup>
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etCommentCurrentMedication"
+                    style="@style/Form_Input_Style_BG"
+                    android:layout_height="@dimen/_112sdp"
+                    android:layout_marginVertical="@dimen/_8sdp"
+                    android:layout_marginStart="@dimen/_0dp"
+                    android:layout_marginEnd="@dimen/_8sdp"
+                    android:gravity="start|top"
+                    android:hint="@string/comment_current_medication"
+                    android:inputType="textCapWords|textMultiLine"
+                    android:padding="@dimen/_8sdp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/rgCurrentMedications" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvErrorCurrentMedications"
+                    style="@style/TextStyle_Error_14"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_8sdp"
+                    android:layout_marginStart="@dimen/_0dp"
+                    android:layout_marginEnd="@dimen/_8sdp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/etCommentCurrentMedication" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/llAllergiesToDrugs"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/_16sdp"
+                android:layout_marginStart="@dimen/_24sdp"
+                android:orientation="vertical"
+                app:layout_constraintStart_toEndOf="@id/llCurrentMedications"
+                app:layout_constraintTop_toBottomOf="@+id/tvErrorOtherCurrentMedications"
+                app:layout_constraintWidth_percent="0.45">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvAllergiesToDrugsTitle"
+                    style="@style/Form_Label_Style"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="@dimen/_10sdp"
+                    android:text="@string/allergies_to_drugs"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <RadioGroup
+                    android:id="@+id/rgAllergiesToDrugs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvAllergiesToDrugsTitle">
+
+                    <RadioButton
+                        android:id="@+id/rbAllergiesToDrugsYes"
+                        style="@style/RadioButton_General"
+                        android:fontFamily="@font/inter_regular"
+                        android:text="@string/yes"
+                        android:textColor="@color/enabled_disbled_color"
+                        android:textSize="@dimen/_14ssp" />
+
+                    <RadioButton
+                        android:id="@+id/rbAllergiesToDrugsNo"
+                        style="@style/RadioButton_General"
+                        android:layout_marginStart="@dimen/_20sdp"
+                        android:fontFamily="@font/inter_regular"
+                        android:text="@string/no"
+                        android:textColor="@color/enabled_disbled_color"
+                        android:textSize="@dimen/_14ssp" />
+
+                </RadioGroup>
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etCommentAllergies"
+                    style="@style/Form_Input_Style_BG"
+                    android:layout_height="@dimen/_112sdp"
+                    android:layout_marginHorizontal="@dimen/_8sdp"
+                    android:layout_marginVertical="@dimen/_8sdp"
+                    android:layout_marginEnd="@dimen/_8sdp"
+                    android:gravity="start|top"
+                    android:hint="@string/other_allergies"
+                    android:inputType="textCapWords|textMultiLine"
+                    android:padding="@dimen/_8sdp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/rgAllergiesToDrugs" />
+
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvErrorAllergiesToDrugs"
+                    style="@style/TextStyle_Error_14"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:layout_marginVertical="@dimen/_8sdp"
+                    android:layout_marginStart="@dimen/_0dp"
+                    android:layout_marginEnd="@dimen/_8sdp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/etCommentAllergies" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+</com.medtroniclabs.opensource.ui.common.FloatingDetectorFrameLayout>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "791794371431",
+    "project_id": "spice-sl-4025b",
+    "storage_bucket": "spice-sl-4025b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:791794371431:android:aabac04cb743a1ac247dc2",
+        "android_client_info": {
+          "package_name": "com.medtroniclabs.opensource.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBC673emo8LJ1W02uein-0y4ZB9A4gi7W9"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

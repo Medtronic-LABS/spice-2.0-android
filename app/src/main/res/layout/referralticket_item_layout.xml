@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="@dimen/_8sdp">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/centreOneGuideline"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.35" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/centreTwoGuideline"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.40" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvLabel"
+        style="@style/TextStyle_Regular_16"
+        android:layout_height="wrap_content"
+        android:layout_width="@dimen/_0dp"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintEnd_toStartOf="@id/centreOneGuideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvSeparator"
+        style="@style/TextStyle_Regular_16"
+        android:layout_height="wrap_content"
+        android:layout_width="@dimen/_0dp"
+        android:gravity="center_horizontal"
+        android:text="@string/separator_colon"
+        app:layout_constraintEnd_toStartOf="@id/centreTwoGuideline"
+        app:layout_constraintHorizontal_weight="0.1"
+        app:layout_constraintStart_toEndOf="@id/centreOneGuideline"
+        app:layout_constraintTop_toTopOf="@id/tvLabel" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvValue"
+        style="@style/TextStyle_Regular_16_Bold"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="@dimen/_12sdp"
+        android:fontFamily="@font/inter_regular"
+        android:textColor="@color/grey_black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="0.5"
+        app:layout_constraintStart_toEndOf="@id/centreTwoGuideline"
+        app:layout_constraintTop_toTopOf="@id/tvLabel" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

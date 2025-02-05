@@ -1,0 +1,394 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_32sdp"
+        android:background="@color/white"
+        android:elevation="@dimen/_10sdp"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="@dimen/_10sdp"
+        app:cardElevation="@dimen/_10sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tvName"
+                style="@style/Form_Header_Style"
+                android:layout_width="0dp"
+                android:background="@color/white"
+                android:gravity="start"
+                android:paddingHorizontal="@dimen/_16ssp"
+                android:paddingVertical="@dimen/_20sdp"
+                android:textSize="@dimen/_18ssp"
+                app:layout_constraintBottom_toTopOf="@id/divider1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Mary Jane" />
+
+            <ImageView
+                android:id="@+id/ivClose"
+                style="@style/ImageView_Style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_10sdp"
+                android:layout_marginEnd="@dimen/_0dp"
+                android:contentDescription="@string/close"
+                android:padding="@dimen/_15sdp"
+                android:src="@drawable/ic_close"
+                app:layout_constraintBottom_toBottomOf="@id/tvName"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tvName"
+                app:tint="@color/secondary_black" />
+
+            <View
+                android:id="@+id/divider1"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/divider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvName" />
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/nestedScrollView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider1">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingBottom="@dimen/_16ssp">
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/startGuideline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_begin="@dimen/_16sdp" />
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/endGuideline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_end="@dimen/_16sdp" />
+
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvRoleLabel"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:text="@string/role"
+                        app:layout_constraintEnd_toStartOf="@id/tvRoleSeparator"
+                        app:layout_constraintHorizontal_weight="0.3"
+                        app:layout_constraintStart_toEndOf="@id/startGuideline"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvRoleSeparator"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:text="@string/separator_colon"
+                        app:layout_constraintEnd_toStartOf="@id/tvRoleText"
+                        app:layout_constraintHorizontal_weight="0.05"
+                        app:layout_constraintStart_toEndOf="@id/tvRoleLabel"
+                        app:layout_constraintTop_toTopOf="@id/tvRoleLabel" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvRoleText"
+                        style="@style/TextStyle"
+                        android:layout_width="@dimen/_0dp"
+                        android:textColor="@color/secondary_black"
+                        android:textSize="@dimen/_16ssp"
+                        app:layout_constraintEnd_toEndOf="@id/endGuideline"
+                        app:layout_constraintHorizontal_weight="0.6"
+                        app:layout_constraintStart_toEndOf="@id/tvRoleSeparator"
+                        app:layout_constraintTop_toTopOf="@id/tvRoleLabel"
+                        tools:text="Community Health Worker" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvGenderLabel"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_marginTop="@dimen/_16sdp"
+                        android:text="@string/gender"
+                        app:layout_constraintEnd_toStartOf="@id/tvGenderSeparator"
+                        app:layout_constraintHorizontal_weight="0.3"
+                        app:layout_constraintStart_toEndOf="@id/startGuideline"
+                        app:layout_constraintTop_toBottomOf="@id/tvRoleText" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvGenderSeparator"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:text="@string/separator_colon"
+                        app:layout_constraintEnd_toStartOf="@id/tvGenderText"
+                        app:layout_constraintHorizontal_weight="0.05"
+                        app:layout_constraintStart_toEndOf="@id/tvGenderLabel"
+                        app:layout_constraintTop_toTopOf="@id/tvGenderLabel" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvGenderText"
+                        style="@style/TextStyle"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/secondary_black"
+                        android:textSize="@dimen/_16ssp"
+                        app:layout_constraintEnd_toEndOf="@id/endGuideline"
+                        app:layout_constraintHorizontal_weight="0.6"
+                        app:layout_constraintStart_toEndOf="@id/tvGenderSeparator"
+                        app:layout_constraintTop_toTopOf="@id/tvGenderLabel"
+                        tools:text="Female" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvDesignationLabel"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_marginTop="@dimen/_16sdp"
+                        android:text="@string/designation"
+                        app:layout_constraintEnd_toStartOf="@id/tvDesignationSeparator"
+                        app:layout_constraintHorizontal_weight="0.3"
+                        app:layout_constraintStart_toEndOf="@id/startGuideline"
+                        app:layout_constraintTop_toBottomOf="@id/tvGenderText" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvDesignationSeparator"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:text="@string/separator_colon"
+                        app:layout_constraintEnd_toStartOf="@id/tvDesignationText"
+                        app:layout_constraintHorizontal_weight="0.05"
+                        app:layout_constraintStart_toEndOf="@id/tvDesignationLabel"
+                        app:layout_constraintTop_toTopOf="@id/tvDesignationLabel" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvDesignationText"
+                        style="@style/TextStyle"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/secondary_black"
+                        android:textSize="@dimen/_16ssp"
+                        app:layout_constraintEnd_toEndOf="@id/endGuideline"
+                        app:layout_constraintHorizontal_weight="0.6"
+                        app:layout_constraintStart_toEndOf="@id/tvDesignationSeparator"
+                        app:layout_constraintTop_toTopOf="@id/tvDesignationLabel"
+                        tools:text="Medical Officer" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvEmailLabel"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_marginTop="@dimen/_16sdp"
+                        android:text="@string/email_cap"
+                        app:layout_constraintEnd_toStartOf="@id/tvEmailSeparator"
+                        app:layout_constraintHorizontal_weight="0.3"
+                        app:layout_constraintStart_toEndOf="@id/startGuideline"
+                        app:layout_constraintTop_toBottomOf="@id/tvDesignationText" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvEmailSeparator"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:text="@string/separator_colon"
+                        app:layout_constraintEnd_toStartOf="@id/tvEmailText"
+                        app:layout_constraintHorizontal_weight="0.05"
+                        app:layout_constraintStart_toEndOf="@id/tvEmailLabel"
+                        app:layout_constraintTop_toTopOf="@id/tvEmailLabel" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvEmailText"
+                        style="@style/TextStyle"
+                        android:layout_width="@dimen/_0dp"
+                        android:textColor="@color/secondary_black"
+                        android:textSize="@dimen/_16ssp"
+                        app:layout_constraintEnd_toEndOf="@id/endGuideline"
+                        app:layout_constraintHorizontal_weight="0.6"
+                        app:layout_constraintStart_toEndOf="@id/tvEmailSeparator"
+                        app:layout_constraintTop_toTopOf="@id/tvEmailLabel"
+                        tools:text="mary@gmail.com" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvPhoneNumberLabel"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_marginTop="@dimen/_16sdp"
+                        android:text="@string/phone_no"
+                        app:layout_constraintEnd_toStartOf="@id/tvPhoneNumberSeparator"
+                        app:layout_constraintHorizontal_weight="0.3"
+                        app:layout_constraintStart_toEndOf="@id/startGuideline"
+                        app:layout_constraintTop_toBottomOf="@id/tvEmailText" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvPhoneNumberSeparator"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:text="@string/separator_colon"
+                        app:layout_constraintEnd_toStartOf="@id/tvPhoneNumberText"
+                        app:layout_constraintHorizontal_weight="0.05"
+                        app:layout_constraintStart_toEndOf="@id/tvPhoneNumberLabel"
+                        app:layout_constraintTop_toTopOf="@id/tvPhoneNumberLabel" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvPhoneNumberText"
+                        style="@style/TextStyle"
+                        android:layout_width="@dimen/_0dp"
+                        android:textColor="@color/secondary_black"
+                        android:textSize="@dimen/_16ssp"
+                        app:layout_constraintEnd_toEndOf="@id/endGuideline"
+                        app:layout_constraintHorizontal_weight="0.6"
+                        app:layout_constraintStart_toEndOf="@id/tvPhoneNumberSeparator"
+                        app:layout_constraintTop_toTopOf="@id/tvPhoneNumberLabel"
+                        tools:text="+254 790400948" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvVillageLabel"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_marginTop="@dimen/_16sdp"
+                        android:text="@string/village"
+                        app:layout_constraintEnd_toStartOf="@id/tvVillageSeparator"
+                        app:layout_constraintHorizontal_weight="0.3"
+                        app:layout_constraintStart_toEndOf="@id/startGuideline"
+                        app:layout_constraintTop_toBottomOf="@id/tvPhoneNumberText" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvVillageSeparator"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:text="@string/separator_colon"
+                        app:layout_constraintEnd_toStartOf="@id/tvVillageText"
+                        app:layout_constraintHorizontal_weight="0.05"
+                        app:layout_constraintStart_toEndOf="@id/tvVillageLabel"
+                        app:layout_constraintTop_toTopOf="@id/tvVillageLabel" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvVillageText"
+                        style="@style/TextStyle"
+                        android:layout_width="@dimen/_0dp"
+                        android:textColor="@color/secondary_black"
+                        android:textSize="@dimen/_16ssp"
+                        app:layout_constraintEnd_toEndOf="@id/endGuideline"
+                        app:layout_constraintHorizontal_weight="0.6"
+                        app:layout_constraintStart_toEndOf="@id/tvVillageSeparator"
+                        app:layout_constraintTop_toTopOf="@id/tvVillageLabel"
+                        tools:text="Gbinti" />
+
+                    <androidx.constraintlayout.widget.Group
+                        android:id="@+id/villageGroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:constraint_referenced_ids="tvVillageLabel, tvVillageSeparator, tvVillageText" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvAssignedHealthFacilityLabel"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_marginTop="@dimen/_16sdp"
+                        android:text="@string/assigned_health_facility"
+                        app:layout_constraintEnd_toStartOf="@id/tvAssignedHealthFacilitySeparator"
+                        app:layout_constraintHorizontal_weight="0.3"
+                        app:layout_constraintStart_toEndOf="@id/startGuideline"
+                        app:layout_constraintTop_toBottomOf="@id/tvVillageText" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvAssignedHealthFacilitySeparator"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:text="@string/separator_colon"
+                        app:layout_constraintEnd_toStartOf="@id/tvAssignedHealthFacilityText"
+                        app:layout_constraintHorizontal_weight="0.05"
+                        app:layout_constraintStart_toEndOf="@id/tvAssignedHealthFacilityLabel"
+                        app:layout_constraintTop_toTopOf="@id/tvAssignedHealthFacilityLabel" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvAssignedHealthFacilityText"
+                        style="@style/TextStyle"
+                        android:layout_width="@dimen/_0dp"
+                        android:textColor="@color/secondary_black"
+                        android:textSize="@dimen/_16ssp"
+                        app:layout_constraintEnd_toEndOf="@id/endGuideline"
+                        app:layout_constraintHorizontal_weight="0.6"
+                        app:layout_constraintStart_toEndOf="@id/tvAssignedHealthFacilitySeparator"
+                        app:layout_constraintTop_toTopOf="@id/tvAssignedHealthFacilityLabel"
+                        tools:text="Kalangba Health Community Centre" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvSuiteAccessLabel"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_marginTop="@dimen/_16sdp"
+                        android:text="@string/suite_access"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toStartOf="@id/tvSuiteAccessSeparator"
+                        app:layout_constraintHorizontal_weight="0.3"
+                        app:layout_constraintStart_toEndOf="@id/startGuideline"
+                        app:layout_constraintTop_toBottomOf="@id/tvAssignedHealthFacilityLabel" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvSuiteAccessSeparator"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:gravity="center_horizontal"
+                        android:text="@string/separator_colon"
+                        app:layout_constraintEnd_toStartOf="@id/tvSuiteAccessText"
+                        app:layout_constraintHorizontal_weight="0.05"
+                        app:layout_constraintStart_toEndOf="@id/tvSuiteAccessLabel"
+                        app:layout_constraintTop_toTopOf="@id/tvSuiteAccessLabel" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvSuiteAccessText"
+                        style="@style/TextStyle"
+                        android:layout_width="@dimen/_0dp"
+                        android:textColor="@color/secondary_black"
+                        android:textSize="@dimen/_16ssp"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="@id/endGuideline"
+                        app:layout_constraintHorizontal_weight="0.6"
+                        app:layout_constraintStart_toEndOf="@id/tvSuiteAccessSeparator"
+                        app:layout_constraintTop_toTopOf="@id/tvSuiteAccessLabel"
+                        tools:text="- -" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

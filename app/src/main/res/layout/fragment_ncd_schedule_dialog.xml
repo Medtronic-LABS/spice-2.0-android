@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/CardView_Style"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/_6sdp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.medtroniclabs.opensource.ui.DialogTitleFrameLayout
+                android:id="@+id/titleCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@color/edittext_stroke"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_1sdp"
+                app:layout_constraintTop_toBottomOf="@id/titleCard" />
+
+            <TextView
+                android:id="@+id/tvNextMedicalReview"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_15sdp"
+                android:fontFamily="@font/inter_regular"
+                android:gravity="start"
+                android:text="@string/next_medical_review"
+                android:textColor="@color/b_w_black"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintBottom_toBottomOf="@id/tvNextMedicalReviewDate"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tvNextMedicalReviewDate"
+                app:layout_constraintWidth_percent="0.3" />
+
+            <TextView
+                android:id="@+id/tvNextMedicalReviewSeparator"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/separator_colon"
+                android:textColor="@color/b_w_black"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintBottom_toBottomOf="@id/tvNextMedicalReview"
+                app:layout_constraintStart_toEndOf="@id/tvNextMedicalReview"
+                app:layout_constraintTop_toTopOf="@id/tvNextMedicalReview" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNextMedicalReviewDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_8sdp"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:background="@drawable/edittext_background"
+                android:drawableEnd="@drawable/ic_date_picker_calendar"
+                android:gravity="start|center"
+                android:hint="@string/dd_mm_yyyy"
+                android:drawablePadding="@dimen/_5sdp"
+                android:paddingStart="@dimen/_10sdp"
+                android:paddingEnd="@dimen/_0dp"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintHorizontal_weight="0.7"
+                app:layout_constraintStart_toEndOf="@id/tvNextMedicalReviewSeparator"
+                app:layout_constraintTop_toBottomOf="@id/divider" />
+
+            <TextView
+                android:id="@+id/tvErrorMessage"
+                style="@style/TextStyle_Error_14"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_3sdp"
+                android:text="@string/date_validation"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="@id/tvNextMedicalReview"
+                app:layout_constraintTop_toBottomOf="@id/tvNextMedicalReviewDate" />
+
+            <View
+                android:id="@+id/bottomDivider"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_1sdp"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:background="@color/edittext_stroke"
+                app:layout_constraintTop_toBottomOf="@id/tvErrorMessage" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnDone"
+                style="@style/Button_Style"
+                android:layout_marginVertical="@dimen/_10sdp"
+                android:layout_marginEnd="@dimen/_24sdp"
+                android:text="@string/submit"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/bottomDivider" />
+
+            <RelativeLayout
+                android:id="@+id/loadingProgress"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@color/loading_transparent_variant"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/loaderImage"
+                    android:layout_width="@dimen/_75sdp"
+                    android:layout_height="@dimen/_75sdp"
+                    android:contentDescription="@string/loading"
+                    android:layout_centerInParent="true"
+                    android:layout_gravity="center"/>
+
+            </RelativeLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,133 @@
+[
+  {
+    "familyOrder": 0,
+    "id": "pncNeonatal",
+    "orderId": 1,
+    "title": "PNC Visit - Neonate",
+    "viewType": "CardView"
+  },
+  {
+    "id": "pncNeonateSigns",
+    "family": "pncNeonatal",
+    "fieldName": "pncNeonateSigns",
+    "orderId": 2,
+    "title": "Is the newborn baby experiencing any of these danger signs?",
+    "viewType": "DialogCheckbox",
+    "isMandatory": false,
+    "isSummary": true,
+    "titleSummary": "Danger Signs in newborn baby",
+    "hint": "Select Symptoms",
+    "localDataCache": "pncNeonateSigns",
+    "errorMessage": "Please select a valid option",
+    "visibility": "visible",
+    "condition": [
+      {
+        "eq": "Other",
+        "targetId": "otherPncNeonateSigns",
+        "visibility": "visible"
+      }
+    ]
+  },
+  {
+    "errorMessage": "Please enter a valid sign",
+    "family": "pncNeonatal",
+    "fieldName": "Other Signs",
+    "hint": "Enter Other Sign",
+    "id": "otherPncNeonateSigns",
+    "inputType": 96,
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isNotDefault": false,
+    "orderId": 5,
+    "isSummary": false,
+    "title": "Other Signs",
+    "viewType": "EditText",
+    "isInfo": "gone",
+    "visibility": "gone"
+  },
+  {
+    "family": "pncNeonatal",
+    "fieldName": "newbornReferredToSBCU",
+    "id": "newbornReferredToSBCU",
+    "condition": [],
+    "orderId": 4,
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "isBooleanAnswer": true,
+    "optionsList": [
+      {
+        "id": true,
+        "name": "Yes"
+      },
+      {
+        "id": false,
+        "name": "No"
+      }
+    ],
+    "optionType": "boolean",
+    "readOnly": true,
+    "viewType": "SingleSelectionView",
+    "title": "Newborn referred to SBCU",
+    "visibility": "visible"
+  },
+  {
+    "family": "pncNeonatal",
+    "fieldName": "lowBirthWeight",
+    "id": "lowBirthWeight",
+    "condition": [],
+    "orderId": 4,
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "isBooleanAnswer": true,
+    "optionsList": [
+      {
+        "id": true,
+        "name": "Yes"
+      },
+      {
+        "id": false,
+        "name": "No"
+      }
+    ],
+    "optionType": "boolean",
+    "readOnly": true,
+    "viewType": "SingleSelectionView",
+    "title": "Low birth weight",
+    "visibility": "visible"
+  },
+  {
+    "family": "pncNeonatal",
+    "fieldName": "deathOfNewborn",
+    "id": "deathOfNewborn",
+    "condition": [],
+    "orderId": 4,
+    "errorMessage": "Please select a valid option",
+    "isEnabled": true,
+    "isMandatory": true,
+    "isNeededDefault": true,
+    "isSummary": true,
+    "isBooleanAnswer": true,
+    "optionsList": [
+      {
+        "id": true,
+        "name": "Yes"
+      },
+      {
+        "id": false,
+        "name": "No"
+      }
+    ],
+    "optionType": "boolean",
+    "readOnly": true,
+    "viewType": "SingleSelectionView",
+    "title": "Death of newborn",
+    "visibility": "visible"
+  }
+]

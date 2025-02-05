@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/CardView_Style"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="@dimen/_6sdp"
+    app:cardUseCompatPadding="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:id="@+id/viewTranslation"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_0dp"
+            android:background="@color/card_background"
+            app:layout_constraintBottom_toBottomOf="@id/labelHeader"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.medtroniclabs.opensource.ui.DialogTitleFrameLayout
+            android:id="@+id/labelHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:dialogTitle="@string/offline_data"
+            app:layout_constraintEnd_toEndOf="@+id/viewTranslation"
+            app:layout_constraintStart_toStartOf="@+id/viewTranslation"
+            app:layout_constraintTop_toTopOf="@+id/viewTranslation" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/screeningTitle"
+            style="@style/TextStyle_Bold_18"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:text="@string/screening"
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/viewTranslation" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvMessage"
+            style="@style/TextStyle_Regular_18"
+            android:layout_width="0dp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_marginEnd="@dimen/_15sdp"
+            android:textColor="@color/TextColor1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/screeningTitle"
+            app:layout_constraintTop_toBottomOf="@id/screeningTitle"
+            app:layout_goneMarginStart="@dimen/_20sdp"
+            app:layout_goneMarginTop="@dimen/_15sdp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/assessmentTitle"
+            style="@style/TextStyle_Bold_18"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:text="@string/assessment_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvMessage" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvAssessmentMessage"
+            style="@style/TextStyle_Regular_18"
+            android:layout_width="0dp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_marginEnd="@dimen/_15sdp"
+            android:textColor="@color/TextColor1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/assessmentTitle"
+            app:layout_constraintTop_toBottomOf="@id/assessmentTitle" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/followUpTitle"
+            style="@style/TextStyle_Bold_18"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:text="@string/follow_up"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvAssessmentMessage" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvFollowUpMessage"
+            style="@style/TextStyle_Regular_18"
+            android:layout_width="0dp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_marginEnd="@dimen/_15sdp"
+            android:textColor="@color/TextColor1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/followUpTitle"
+            app:layout_constraintTop_toBottomOf="@id/followUpTitle" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/followUpGroup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="followUpTitle,tvFollowUpMessage" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/assessmentGroup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            app:constraint_referenced_ids="assessmentTitle,tvAssessmentMessage" />
+
+        <View
+            android:id="@+id/bottomDivider"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_1sdp"
+            android:layout_marginTop="@dimen/_15sdp"
+            android:background="@color/edittext_stroke"
+            app:layout_constraintTop_toBottomOf="@+id/tvFollowUpMessage" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnCancel"
+            style="@style/Button_Style_cancel"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_15sdp"
+            android:minWidth="@dimen/_100sdp"
+            android:text="@string/cancel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnOkay"
+            app:layout_constraintTop_toBottomOf="@id/bottomDivider" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnOkay"
+            style="@style/Button_Style"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_15sdp"
+            android:minWidth="@dimen/_100sdp"
+            android:text="@string/ok"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnUpload"
+            app:layout_constraintTop_toBottomOf="@id/bottomDivider" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnUpload"
+            style="@style/Button_Style"
+            android:layout_marginVertical="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_15sdp"
+            android:minWidth="@dimen/_100sdp"
+            android:text="@string/upload"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bottomDivider" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

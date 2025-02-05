@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    app:cardCornerRadius="@dimen/_12sdp"
+    app:cardElevation="@dimen/_2sdp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clParent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.medtroniclabs.opensource.ui.DialogTitleFrameLayout
+            android:id="@+id/labelHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:dialogTitle="@string/filter"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_1sdp"
+            android:background="@color/edittext_stroke"
+            app:layout_constraintTop_toBottomOf="@id/labelHeader" />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nvScroll"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider"
+            app:layout_constraintBottom_toTopOf="@id/dividerOne">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_begin="15dp" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/endGuideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_end="20dp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvDateRange"
+                    style="@style/TextStyle_Medium_16_NoBG"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/_10sdp"
+                    android:text="@string/due_at"
+                    android:textColor="@color/b_w_black"
+                    app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintStart_toEndOf="@id/guideline"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/dataRangeChipGroup"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                    app:layout_constraintStart_toEndOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvDateRange"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/data_range_daily_chip"
+                        style="@style/ChipStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/daily" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/data_range_weekly_chip"
+                        style="@style/ChipStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/this_week" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/data_range_monthly_chip"
+                        style="@style/ChipStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/this_month" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/data_range_customize_chip"
+                        style="@style/ChipStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/customize" />
+
+                </com.google.android.material.chip.ChipGroup>
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/clFromToDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:constraint_referenced_ids="tvFrom, tvTo, tvFromDate, tvToDate" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvFrom"
+                    style="@style/TextStyle_Medium_16_NoBG"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/_10sdp"
+                    android:paddingBottom="@dimen/_5sdp"
+                    android:text="@string/from"
+                    android:textColor="@color/b_w_black"
+                    app:layout_constraintEnd_toStartOf="@id/tvTo"
+                    app:layout_constraintStart_toEndOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/dataRangeChipGroup" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvTo"
+                    style="@style/TextStyle_Medium_16_NoBG"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_10sdp"
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:paddingTop="@dimen/_10sdp"
+                    android:paddingBottom="@dimen/_5sdp"
+                    android:text="@string/to"
+                    android:textColor="@color/b_w_black"
+                    app:layout_constraintBottom_toBottomOf="@id/tvFrom"
+                    app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                    app:layout_constraintStart_toEndOf="@id/tvFrom"
+                    app:layout_constraintTop_toTopOf="@id/tvFrom" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvFromDate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:layout_marginEnd="@dimen/_15sdp"
+                    android:background="@drawable/edittext_background"
+                    android:drawableEnd="@drawable/ic_date_picker_calendar"
+                    android:gravity="start|center"
+                    android:hint="@string/dd_mm_yyyy"
+                    android:paddingStart="@dimen/_12sdp"
+                    android:paddingEnd="0dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_16ssp"
+                    app:layout_constraintEnd_toStartOf="@id/tvToDate"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvFrom" />
+
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvToDate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:background="@drawable/edittext_background"
+                    android:drawableEnd="@drawable/ic_date_picker_calendar"
+                    android:gravity="start|center"
+                    android:hint="@string/dd_mm_yyyy"
+                    android:paddingStart="@dimen/_12sdp"
+                    android:paddingEnd="@dimen/_0dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_16ssp"
+                    app:layout_constraintBottom_toBottomOf="@id/tvFromDate"
+                    app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                    app:layout_constraintStart_toEndOf="@id/tvFromDate"
+                    app:layout_constraintTop_toTopOf="@id/tvFromDate" />
+
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvRetryAttempt"
+                    style="@style/TextStyle_Medium_16_NoBG"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/_10sdp"
+                    android:text="@string/retry_attempts"
+                    android:textColor="@color/b_w_black"
+                    app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintStart_toEndOf="@id/guideline"
+                    app:layout_constraintTop_toBottomOf="@id/tvFromDate" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/cgRetryAttempts"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/_10sdp"
+                    app:layout_constraintStart_toEndOf="@id/guideline"
+                    app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                    app:layout_constraintTop_toBottomOf="@+id/tvRetryAttempt" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <View
+            android:id="@+id/dividerOne"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_1sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
+            android:background="@color/edittext_stroke"
+            app:layout_constraintBottom_toTopOf="@id/btnReset"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnReset"
+            style="@style/Button_Style_cancel"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/_15sdp"
+            android:background="@drawable/btn_reset_selector"
+            android:enabled="false"
+            android:minWidth="@dimen/_100sdp"
+            android:text="@string/reset"
+            android:textColor="@color/reset_btn_selector"
+            app:layout_constraintEnd_toStartOf="@+id/btnDone"
+            app:layout_constraintTop_toTopOf="@id/btnDone" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnDone"
+            style="@style/Button_Style"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_15sdp"
+            android:layout_marginEnd="@dimen/_20sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
+            android:background="@drawable/button_selector_cobalt"
+            android:enabled="false"
+            android:minWidth="@dimen/_100sdp"
+            android:text="@string/done"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</com.google.android.material.card.MaterialCardView>

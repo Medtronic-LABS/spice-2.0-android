@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/refreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_0dp"
+        app:layout_constraintBottom_toTopOf="@id/btnLayout"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollViewID"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_0dp"
+            android:fillViewport="true"
+            app:layout_constraintBottom_toTopOf="@+id/btnLayout"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/background_ligt_blue"
+                android:paddingHorizontal="@dimen/_20sdp">
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/patientDetailFragment"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <LinearLayout
+                    android:id="@+id/graphHolder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:visibility="visible"
+                    android:weightSum="1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/patientDetailFragment">
+
+                    <androidx.fragment.app.FragmentContainerView
+                        android:id="@+id/patientBPHistory"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:visibility="gone" />
+
+                    <androidx.fragment.app.FragmentContainerView
+                        android:id="@+id/patientBGHistory"
+                        android:layout_width="@dimen/_0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/medicalReviewHistory"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/graphHolder" />
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/prescriptionHistory"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/medicalReviewHistory" />
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/investigationHistory"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/prescriptionHistory" />
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/lifestyleStatusHistory"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/investigationHistory" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_200sdp"
+                    app:layout_constraintTop_toBottomOf="@id/lifestyleStatusHistory" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/btnMedicalReview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/_10sdp"
+        android:contentDescription="@string/patient_medical_review"
+        android:src="@drawable/ic_btn_start_treatment"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@id/btnLayout"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <include
+        android:id="@+id/btnLayout"
+        layout="@layout/ncd_medical_review_bottom_card_layout"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/refreshLayout" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

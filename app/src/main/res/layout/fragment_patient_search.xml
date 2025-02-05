@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/refreshLayout"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <include
+                android:id="@+id/llExactSearch"
+                layout="@layout/patient_search_layout"
+                app:layout_constraintBottom_toTopOf="@id/view"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/view"
+                android:layout_width="0dp"
+                android:layout_height="3dp"
+                android:background="@color/graph_limit_linecolor"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/llExactSearch" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPatientCount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/_5sdp"
+                android:paddingStart="@dimen/_16sdp"
+                android:textColor="@color/navy_blue"
+                android:textSize="@dimen/_18ssp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                app:layout_constraintEnd_toStartOf="@id/llSortFilter"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/llSortFilter"
+                tools:text="@string/patients_found" />
+
+            <include
+                android:id="@+id/llSortFilter"
+                layout="@layout/filter_btn_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginEnd="@dimen/_16sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPatientsList"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:layout_marginBottom="@dimen/_2sdp"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toTopOf="@id/pageProgress"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/llSortFilter"
+                app:spanCount="2"
+                tools:listitem="@layout/list_item_patients" />
+
+            <ProgressBar
+                android:id="@+id/pageProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@+id/bottomCardView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rvPatientsList" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/centerGuideline"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.50" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNoPatientsFound"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/_15sdp"
+                android:text="@string/no_patients_found"
+                android:textColor="@color/medium_risk_color"
+                android:textSize="@dimen/_16ssp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@id/centerGuideline"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnRegister"
+                style="@style/Button_Style"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/button_selector_cobalt"
+                android:text="@string/register"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/centerGuideline" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnScreening"
+                style="@style/Button_Style"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/button_selector_cobalt"
+                android:text="@string/start_screening"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/centerGuideline" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/bottomCardView"
+                android:layout_width="0dp"
+                android:layout_height="0.25dp"
+                app:cardElevation="@dimen/_2sdp"
+                app:layout_constraintBottom_toTopOf="@id/btnAddNewMember"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pageProgress" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnAddNewMember"
+                style="@style/Button_Style_Border"
+                android:layout_width="0dp"
+                android:layout_marginTop="@dimen/_16sdp"
+                android:layout_marginEnd="@dimen/_16sdp"
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:fontFamily="@font/inter_regular"
+                android:paddingStart="@dimen/_40sdp"
+                android:paddingEnd="@dimen/_40sdp"
+                android:text="@string/add_new_member"
+                android:textAllCaps="true"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/bottomCardView" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <RelativeLayout
+        android:id="@+id/loadingProgress"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/loading_transparent_variant"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/loaderImage"
+            android:layout_width="@dimen/_75sdp"
+            android:layout_height="@dimen/_75sdp"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:contentDescription="@string/loading"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

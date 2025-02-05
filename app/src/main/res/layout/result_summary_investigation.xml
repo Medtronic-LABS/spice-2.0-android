@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="@dimen/_8sdp"
+    android:paddingVertical="@dimen/_8sdp">
+
+    <TextView
+        android:id="@+id/tvKey"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter_regular"
+        android:textColor="@color/charcoal_grey"
+        android:textSize="@dimen/_14ssp"
+        app:layout_constraintEnd_toStartOf="@+id/tvValueHolder"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+  <!--  <TextView
+        android:id="@+id/tvRowSeparator"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter_regular"
+        android:gravity="center"
+        android:text="@string/separator_colon"
+        android:textColor="@color/charcoal_grey"
+        android:textSize="@dimen/_14ssp"
+        app:layout_constraintEnd_toStartOf="@+id/tvValueHolder"
+        app:layout_constraintHorizontal_weight="0.3"
+        app:layout_constraintStart_toEndOf="@id/tvKey"
+        app:layout_constraintTop_toTopOf="@id/tvKey" />-->
+
+
+    <LinearLayout
+        android:id="@+id/tvValueHolder"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="2"
+        app:layout_constraintStart_toEndOf="@+id/tvKey"
+        app:layout_constraintTop_toTopOf="@id/tvKey">
+
+        <TextView
+            android:id="@+id/tvValue"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/inter_regular"
+            android:textColor="@color/navy_blue"
+            android:textSize="@dimen/_16ssp" />
+
+        <TextView
+            android:id="@+id/tvValueRange"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/hyphen_symbol"
+            android:fontFamily="@font/inter_regular"
+            android:textColor="@color/navy_blue"
+            android:textSize="@dimen/_16ssp" />
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

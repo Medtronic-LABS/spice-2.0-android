@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="@dimen/_12sdp"
+    android:paddingBottom="@dimen/_2sdp">
+
+    <TextView
+        android:id="@+id/tvDateOfBirth"
+        style="@style/Form_Label_Style"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:layout_marginEnd="@dimen/_16sdp"
+        android:text="@string/dateofbirth"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="RtlSymmetry" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/etDateOfBirth"
+        style="@style/Form_Input_Style_BG"
+        android:layout_width="0dp"
+        android:layout_marginVertical="@dimen/_8sdp"
+        android:hint="@string/dd_mm_yyyy"
+        android:paddingHorizontal="@dimen/_12sdp"
+        android:paddingVertical="@dimen/_10sdp"
+        app:layout_constraintEnd_toEndOf="@id/tvDateOfBirth"
+        app:layout_constraintStart_toStartOf="@id/tvDateOfBirth"
+        app:layout_constraintTop_toBottomOf="@id/tvDateOfBirth" />
+
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/startGuideLine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.33" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/endGuideLine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.66" />
+
+    <TextView
+        android:id="@+id/tvYear"
+        style="@style/Form_Label_Style"
+        android:layout_marginStart="@dimen/_16sdp"
+        android:paddingTop="@dimen/_12sdp"
+        android:paddingEnd="@dimen/_10sdp"
+        android:text="@string/years"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etDateOfBirth"
+        tools:ignore="RtlSymmetry" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/etYears"
+        style="@style/Form_Input_Style_BG"
+        android:layout_width="0dp"
+        android:layout_marginVertical="@dimen/_8sdp"
+        android:layout_marginEnd="@dimen/_12sdp"
+        android:hint="@string/years"
+        android:inputType="number"
+        android:maxLength="3"
+        android:paddingHorizontal="@dimen/_12sdp"
+        android:paddingVertical="@dimen/_10sdp"
+        app:layout_constraintEnd_toStartOf="@id/startGuideLine"
+        app:layout_constraintStart_toStartOf="@id/tvYear"
+        app:layout_constraintTop_toBottomOf="@id/tvYear" />
+
+    <TextView
+        android:id="@+id/tvMonths"
+        style="@style/Form_Label_Style"
+        android:layout_width="0dp"
+        android:paddingTop="@dimen/_12sdp"
+        android:paddingEnd="@dimen/_10sdp"
+        android:text="@string/months"
+        app:layout_constraintEnd_toStartOf="@id/endGuideLine"
+        app:layout_constraintStart_toEndOf="@id/startGuideLine"
+        app:layout_constraintTop_toBottomOf="@id/etDateOfBirth"
+        tools:ignore="RtlSymmetry" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/etMonths"
+        style="@style/Form_Input_Style_BG"
+        android:layout_width="0dp"
+        android:layout_marginVertical="@dimen/_8sdp"
+        android:layout_marginEnd="@dimen/_12sdp"
+        android:hint="@string/months"
+        android:inputType="number"
+        android:maxLength="2"
+        android:paddingHorizontal="@dimen/_12sdp"
+        android:paddingVertical="@dimen/_10sdp"
+        app:layout_constraintEnd_toStartOf="@id/endGuideLine"
+        app:layout_constraintStart_toEndOf="@id/startGuideLine"
+        app:layout_constraintStart_toStartOf="@id/tvMonths"
+        app:layout_constraintTop_toBottomOf="@id/tvMonths" />
+
+    <TextView
+        android:id="@+id/tvWeeks"
+        style="@style/Form_Label_Style"
+        android:layout_width="0dp"
+        android:layout_marginEnd="@dimen/_16sdp"
+        android:paddingTop="@dimen/_12sdp"
+        android:paddingEnd="@dimen/_10sdp"
+        android:text="@string/weeks"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/endGuideLine"
+        app:layout_constraintTop_toBottomOf="@id/etDateOfBirth"
+        tools:ignore="RtlSymmetry" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/etWeeks"
+        style="@style/Form_Input_Style_BG"
+        android:layout_width="0dp"
+        android:layout_marginVertical="@dimen/_8sdp"
+        android:hint="@string/weeks"
+        android:inputType="number"
+        android:maxLength="2"
+        android:paddingHorizontal="@dimen/_12sdp"
+        android:paddingVertical="@dimen/_10sdp"
+        app:layout_constraintEnd_toEndOf="@id/tvWeeks"
+        app:layout_constraintStart_toEndOf="@id/endGuideLine"
+        app:layout_constraintStart_toStartOf="@id/tvWeeks"
+        app:layout_constraintTop_toBottomOf="@id/tvWeeks" />
+
+    <TextView
+        android:id="@+id/tvErrorMessage"
+        style="@style/TextStyle_Error_14"
+        android:visibility="gone"
+        android:paddingHorizontal="@dimen/_16sdp"
+        android:paddingVertical="@dimen/_8sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etYears" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/llBase"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_12sdp"
+        android:background="@color/Background_Color1"
+        android:paddingHorizontal="@dimen/_16sdp"
+        android:paddingVertical="@dimen/_8sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvErrorMessage">
+
+        <TextView
+            android:id="@+id/tvKey"
+            style="@style/Form_Input_Style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/_20sdp"
+            android:text="@string/age"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/tvRowSeparator"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvRowSeparator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_regular"
+            android:gravity="center"
+            android:text="@string/separator_colon"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_14ssp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/ageValue"
+            app:layout_constraintStart_toEndOf="@id/tvKey"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/ageValue"
+            style="@style/Form_Input_Style"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:text=""
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tvRowSeparator"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

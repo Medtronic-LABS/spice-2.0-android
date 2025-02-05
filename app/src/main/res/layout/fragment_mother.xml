@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/CardView_Style"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardUseCompatPadding="true"
+    tools:context=".ui.medicalreview.motherneonate.labourdelivery.fragment.MotherFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/_16sdp">
+
+        <View
+            android:id="@+id/viewMotherFragment"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_0dp"
+            android:background="@color/card_background"
+            app:layout_constraintBottom_toBottomOf="@id/titleMotherFragment"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/titleMotherFragment"
+            style="@style/Form_Header_Style"
+            android:layout_width="@dimen/_0dp"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/_10sdp"
+            android:paddingVertical="@dimen/_10sdp"
+            android:text="@string/title_mother"
+            android:textColor="@color/house_hold_title"
+            android:textSize="@dimen/_16ssp"
+            app:layout_constraintEnd_toEndOf="@id/viewMotherFragment"
+            app:layout_constraintStart_toStartOf="@id/viewMotherFragment"
+            app:layout_constraintTop_toTopOf="@id/viewMotherFragment" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/leftGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.2" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/rightGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.25" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/endGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.7" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/tearEndGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.97" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvSignsSymptomsObservedLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart= "@dimen/_16sdp"
+            android:layout_marginTop="@dimen/_32sdp"
+            android:text="@string/signs_Symptoms_observed"
+            android:textColor="@color/table_title"
+            android:textSize="@dimen/_16ssp"
+            app:fontFamily="@font/inter_regular"
+            app:layout_constraintEnd_toEndOf="@+id/leftGuideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/titleMotherFragment" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/seperatorColon1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/separator_colon"
+            app:layout_constraintEnd_toStartOf="@+id/rightGuideline"
+            app:layout_constraintStart_toEndOf="@+id/leftGuideline"
+            app:layout_constraintTop_toTopOf="@+id/tvSignsSymptomsObservedLabel" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/cgSignsSymptomsObserved"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/_16sdp"
+            app:layout_constraintBottom_toBottomOf="@+id/tvSignsSymptomsObservedLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/seperatorColon1"
+            app:layout_constraintTop_toTopOf="@+id/tvSignsSymptomsObservedLabel"
+            app:singleSelection="false" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/cgSignsSymptomsObservedError"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_regular"
+            android:text="@string/error_label"
+            android:textColor="@color/a_red_error"
+            android:textSize="@dimen/_12ssp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@+id/cgSignsSymptomsObserved"
+            app:layout_constraintStart_toStartOf="@+id/cgSignsSymptomsObserved"
+            app:layout_constraintTop_toBottomOf="@+id/cgSignsSymptomsObserved" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvGeneralConditionOfMotherLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_16sdp"
+            android:paddingTop="@dimen/_8sdp"
+            android:text="@string/general_condition_of_mother"
+            android:textColor="@color/table_title"
+            android:textSize="@dimen/_16ssp"
+            app:fontFamily="@font/inter_regular"
+            app:layout_constraintEnd_toEndOf="@id/leftGuideline"
+            app:layout_constraintStart_toStartOf="@+id/tvSignsSymptomsObservedLabel"
+            app:layout_constraintTop_toBottomOf="@+id/cgSignsSymptomsObservedError" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/seperatorColon2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="@dimen/_8sdp"
+            android:text="@string/separator_colon"
+            app:layout_constraintEnd_toStartOf="@+id/rightGuideline"
+            app:layout_constraintStart_toEndOf="@+id/leftGuideline"
+            app:layout_constraintTop_toTopOf="@+id/tvGeneralConditionOfMotherLabel" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/cgGeneralConditionOfMother"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/_16sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/seperatorColon2"
+            app:layout_constraintTop_toTopOf="@+id/tvGeneralConditionOfMotherLabel"
+            app:singleSelection="true" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/cgGeneralConditionOfMotherError"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_regular"
+            android:text="@string/error_label"
+            android:textColor="@color/a_red_error"
+            android:textSize="@dimen/_12ssp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@+id/cgGeneralConditionOfMother"
+            app:layout_constraintStart_toStartOf="@+id/cgGeneralConditionOfMother"
+            app:layout_constraintTop_toBottomOf="@+id/cgGeneralConditionOfMother" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvRiskFactorLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_16sdp"
+            android:paddingTop="@dimen/_8sdp"
+            android:text="@string/risk_factor"
+            android:textColor="@color/table_title"
+            android:textSize="@dimen/_16ssp"
+            app:fontFamily="@font/inter_regular"
+            app:layout_constraintEnd_toEndOf="@+id/leftGuideline"
+            app:layout_constraintStart_toStartOf="@+id/tvGeneralConditionOfMotherLabel"
+            app:layout_constraintTop_toBottomOf="@+id/cgGeneralConditionOfMotherError" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/seperatorColon3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="@dimen/_8sdp"
+            android:text="@string/separator_colon"
+            app:layout_constraintEnd_toStartOf="@+id/rightGuideline"
+            app:layout_constraintStart_toEndOf="@+id/leftGuideline"
+            app:layout_constraintTop_toTopOf="@+id/tvRiskFactorLabel" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/cgRiskFactors"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/_16sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/seperatorColon3"
+            app:layout_constraintTop_toTopOf="@+id/tvRiskFactorLabel"
+             />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/cgRiskFactorsError"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_regular"
+            android:text="@string/error_label"
+            android:textColor="@color/a_red_error"
+            android:textSize="@dimen/_12ssp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/cgRiskFactors"
+            app:layout_constraintStart_toStartOf="@id/cgRiskFactors"
+            app:layout_constraintTop_toBottomOf="@id/cgRiskFactors" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvStateOfThePerineumLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_24sdp"
+            android:text="@string/state_of_the_perineum"
+            android:textColor="@color/table_title"
+            android:textSize="@dimen/_16ssp"
+            app:fontFamily="@font/inter_regular"
+            app:layout_constraintEnd_toEndOf="@id/leftGuideline"
+            app:layout_constraintStart_toStartOf="@+id/tvRiskFactorLabel"
+            app:layout_constraintTop_toBottomOf="@+id/cgRiskFactorsError" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/seperatorColon4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/separator_colon"
+            app:layout_constraintEnd_toStartOf="@+id/rightGuideline"
+            app:layout_constraintStart_toEndOf="@+id/leftGuideline"
+            app:layout_constraintTop_toTopOf="@+id/tvStateOfThePerineumLabel"
+            app:layout_constraintBottom_toBottomOf="@+id/tvStateOfThePerineumLabel"/>
+
+        <LinearLayout
+            android:id="@+id/selectionGroup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="@+id/endGuideline"
+            app:layout_constraintStart_toEndOf="@+id/rightGuideline"
+            app:layout_constraintTop_toTopOf="@+id/tvStateOfThePerineumLabel"
+            app:layout_constraintBottom_toBottomOf="@+id/tvStateOfThePerineumLabel"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvStateOfThePerineumLabelError"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_regular"
+            android:paddingTop="@dimen/_5sdp"
+            android:paddingBottom="@dimen/_8sdp"
+            android:text="@string/error_label"
+            android:textColor="@color/a_red_error"
+            android:textSize="@dimen/_12ssp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/endGuideline"
+            app:layout_constraintStart_toStartOf="@id/selectionGroup"
+            app:layout_constraintTop_toBottomOf="@id/selectionGroup" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/groupTear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="tvTearLabel, seperatorColon7, tearlayout" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTearLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_32sdp"
+            android:text="@string/tear"
+            android:textColor="@color/table_title"
+            android:textSize="@dimen/_16ssp"
+            app:layout_constraintEnd_toStartOf="@+id/leftGuideline"
+            app:layout_constraintStart_toStartOf="@+id/tvStateOfThePerineumLabel"
+            app:layout_constraintTop_toBottomOf="@+id/tvStateOfThePerineumLabelError" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/seperatorColon7"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/separator_colon"
+            app:layout_constraintEnd_toStartOf="@+id/rightGuideline"
+            app:layout_constraintStart_toEndOf="@+id/leftGuideline"
+            app:layout_constraintTop_toTopOf="@+id/tvTearLabel" />
+
+        <LinearLayout
+            android:id="@+id/tearlayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="@+id/tvTearLabel"
+            app:layout_constraintEnd_toStartOf="@+id/tearEndGuideline"
+            app:layout_constraintStart_toStartOf="@+id/rightGuideline"
+            app:layout_constraintTop_toTopOf="@+id/tvTearLabel" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTearLabelError"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_regular"
+            android:paddingTop="@dimen/_5sdp"
+            android:text="@string/error_label"
+            android:textColor="@color/a_red_error"
+            android:textSize="@dimen/_12ssp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/tearlayout"
+            app:layout_constraintStart_toStartOf="@id/tearlayout"
+            app:layout_constraintTop_toBottomOf="@id/tearlayout" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTTDoesTakenLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_32sdp"
+            android:text="@string/TT_does_taken_so_far"
+            android:textColor="@color/table_title"
+            android:textSize="@dimen/_16ssp"
+            app:fontFamily="@font/inter_regular"
+            app:layout_constraintEnd_toStartOf="@+id/leftGuideline"
+            app:layout_constraintStart_toStartOf="@+id/tvStateOfThePerineumLabel"
+            app:layout_constraintTop_toBottomOf="@+id/tvTearLabelError" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/seperatorColon5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/separator_colon"
+            app:layout_constraintEnd_toStartOf="@+id/rightGuideline"
+            app:layout_constraintStart_toEndOf="@+id/leftGuideline"
+            app:layout_constraintTop_toTopOf="@+id/tvTTDoesTakenLabel" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/tvNumber"
+            style="@style/Form_MH_Style_with_padding"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_background"
+            android:hint="@string/number"
+            android:maxLength="2"
+            android:inputType="number"
+            android:paddingStart="@dimen/_10sdp"
+            android:textAlignment="textStart"
+            android:textSize="@dimen/_16ssp"
+            android:fontFamily="@font/inter_medium"
+            app:layout_constraintBottom_toBottomOf="@+id/tvTTDoesTakenLabel"
+            app:layout_constraintEnd_toStartOf="@+id/endGuideline"
+            app:layout_constraintStart_toStartOf="@+id/rightGuideline"
+            app:layout_constraintTop_toTopOf="@+id/tvTTDoesTakenLabel" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvTTDoesTakenSoFarError"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_regular"
+            android:paddingTop="@dimen/_5sdp"
+            android:text="@string/error_label"
+            android:textColor="@color/a_red_error"
+            android:textSize="@dimen/_12ssp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/tvNumber"
+            app:layout_constraintStart_toStartOf="@id/tvNumber"
+            app:layout_constraintTop_toBottomOf="@id/tvNumber" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvStatusLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_32sdp"
+            android:layout_marginBottom="@dimen/_16sdp"
+            android:text="@string/status"
+            android:textColor="@color/table_title"
+            android:textSize="@dimen/_16ssp"
+            app:fontFamily="@font/inter_regular"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/leftGuideline"
+            app:layout_constraintStart_toStartOf="@+id/tvTTDoesTakenLabel"
+            app:layout_constraintTop_toBottomOf="@+id/tvTTDoesTakenSoFarError"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/seperatorColon6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/separator_colon"
+            app:layout_constraintEnd_toStartOf="@+id/rightGuideline"
+            app:layout_constraintStart_toEndOf="@+id/leftGuideline"
+            app:layout_constraintTop_toTopOf="@+id/tvStatusLabel" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/cgStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/_16sdp"
+            android:layout_marginTop="@dimen/_19sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/rightGuideline"
+            app:layout_constraintTop_toBottomOf="@+id/tvNumber" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/cgStatusError"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_regular"
+            android:text="@string/error_label"
+            android:textColor="@color/a_red_error"
+            android:textSize="@dimen/_12ssp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/cgStatus"
+            app:layout_constraintStart_toStartOf="@id/cgStatus"
+            app:layout_constraintTop_toBottomOf="@id/cgStatus" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

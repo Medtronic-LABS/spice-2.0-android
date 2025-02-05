@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/_120sdp"
+    android:background="@drawable/gradiant_background">
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvLabelChwName"
+        style="@style/StylePerformanceMonitorHeaderText"
+        android:text="@string/chw_name"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.1145" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelChwName"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvLabelVillage"
+        style="@style/StylePerformanceMonitorHeaderText"
+        android:text="@string/household_location"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelChwName"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.0886" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelVillage"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvLabelNoOfHH"
+        style="@style/StylePerformanceMonitorHeaderText"
+        android:text="@string/no_of_hh"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelVillage"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.0365" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelNoOfHH"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvLabelNoOfPatient"
+        style="@style/StylePerformanceMonitorHeaderText"
+        android:text="@string/no_of_member"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelNoOfHH"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.0728" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelNoOfPatient"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvLabelICCM"
+        style="@style/StylePerformanceMonitorHeaderText"
+        android:text="@string/iccm"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelNoOfPatient"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.0452" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelICCM"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvLabelRMNCH"
+        style="@style/StylePerformanceMonitorHeaderText"
+        android:text="@string/rmnch"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelICCM"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.054" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelRMNCH"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvLabelOS"
+        style="@style/StylePerformanceMonitorHeaderText"
+        android:text="@string/os"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelRMNCH"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.0427" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelOS"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvLabelReferrals"
+        style="@style/StylePerformanceMonitorHeaderText"
+        android:text="@string/referrals"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelOS"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.0834" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelReferrals"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvLabelTreatmentStarted"
+        style="@style/StylePerformanceMonitorHeaderText"
+        android:text="@string/treatment_started"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelReferrals"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.0878" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelTreatmentStarted"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clFollowUpDue"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="@dimen/_0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelTreatmentStarted"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.1020">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvLabelFollowUpDue"
+            style="@style/StylePerformanceMonitorHeaderText"
+            android:text="@string/follow_up_due"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_percent="0.6"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="@dimen/_1sdp"
+            android:background="@color/btn_disable_grey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvLabelFollowUpDue" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clFollowUpDueDetails"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="@dimen/_0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_percent="0.4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvLabelFollowUpDue">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLabelFollowUpCondVisit"
+                style="@style/StylePerformanceMonitorHeaderText"
+                android:text="@string/visit"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.5" />
+
+            <View
+                android:layout_width="@dimen/_1sdp"
+                android:layout_height="@dimen/_0dp"
+                android:background="@color/btn_disable_grey"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/tvLabelFollowUpCondVisit"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLabelFollowUpCondCall"
+                style="@style/StylePerformanceMonitorHeaderText"
+                android:text="@string/call"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/tvLabelFollowUpCondVisit"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.5" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/clFollowUpDue"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clFollowUpConducted"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="@dimen/_0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/clFollowUpDue"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.1020">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvLabelFollowUpConducted"
+            style="@style/StylePerformanceMonitorHeaderText"
+            android:text="@string/follow_up_conducted"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_percent="0.6"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="@dimen/_1sdp"
+            android:background="@color/btn_disable_grey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvLabelFollowUpConducted" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clFollowUpCondDetails"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="@dimen/_0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_percent="0.4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvLabelFollowUpConducted">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLabelFollowUpDueVisit"
+                style="@style/StylePerformanceMonitorHeaderText"
+                android:text="@string/visit"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.5" />
+
+            <View
+                android:layout_width="@dimen/_1sdp"
+                android:layout_height="@dimen/_0dp"
+                android:background="@color/btn_disable_grey"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/tvLabelFollowUpDueVisit"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLabelFollowUpDueCall"
+                style="@style/StylePerformanceMonitorHeaderText"
+                android:text="@string/call"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/tvLabelFollowUpDueVisit"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.5" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/clFollowUpConducted"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvLabelRecoveredImproved"
+        style="@style/StylePerformanceMonitorHeaderText"
+        android:text="@string/recovered_improved"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/clFollowUpConducted"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.0878" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelRecoveredImproved"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvLabelWorsened"
+        style="@style/StylePerformanceMonitorHeaderText"
+        android:text="@string/worsened"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelRecoveredImproved"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="@dimen/_1sdp"
+        android:layout_height="@dimen/_0dp"
+        android:background="@color/btn_disable_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvLabelTreatmentStarted"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.assessment.AssessmentActivity">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:animateLayoutChanges="true"
+        android:contentDescription="@string/scroll_view"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/riskResultLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_16sdp"
+                android:background="@drawable/curved_rectangle_background"
+                android:fontFamily="@font/inter_bold"
+                android:padding="@dimen/_10sdp"
+                android:text="@string/referred_for_further_assessment"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/resultCardView"
+                style="@style/CardView_Style"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_6sdp"
+                android:layout_marginVertical="@dimen/_6sdp"
+                app:cardUseCompatPadding="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/riskResultLayout">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvTitle"
+                        style="@style/Form_Header_Style"
+                        android:layout_width="match_parent"
+                        android:layout_weight="1"
+                        android:background="@color/grey_bg"
+                        android:gravity="center"
+                        android:padding="@dimen/_10sdp"
+                        android:text="@string/result"
+                        android:textSize="@dimen/_16ssp" />
+
+                    <TextView
+                        android:id="@+id/emptyErrorMessage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:paddingVertical="@dimen/_32sdp"
+                        android:text="@string/patient_s_summary_could_not_be_fetched"
+                        android:textColor="@color/red_risk"
+                        android:textSize="@dimen/_16ssp"
+                        android:visibility="visible" />
+
+                    <LinearLayout
+                        android:id="@+id/parentLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="@dimen/_8sdp"
+                        android:paddingVertical="@dimen/_10sdp"
+                        android:visibility="visible" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/tvLabel"
+                style="@style/TextStyle_16_NavyBlue"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_12sdp"
+                android:layout_marginTop="@dimen/_16sdp"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/notes"
+                android:textColor="@color/charcoal_grey"
+                android:textSize="@dimen/_14ssp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/resultCardView" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/etNotes"
+                style="@style/Form_Input_Style_BG"
+                android:layout_width="@dimen/_0dp"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:hint="@string/write_your_observation"
+                android:maxLines="1"
+                android:paddingHorizontal="@dimen/_12sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                app:layout_constraintEnd_toEndOf="@id/tvLabel"
+                app:layout_constraintStart_toStartOf="@id/tvLabel"
+                app:layout_constraintTop_toBottomOf="@id/tvLabel" />
+
+            <TextView
+                android:id="@+id/tvLabelError"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_regular"
+                android:padding="@dimen/_5sdp"
+                android:text="@string/default_user_input_error"
+                android:textColor="@color/a_red_error"
+                android:textSize="@dimen/_12ssp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@id/tvLabel"
+                app:layout_constraintStart_toStartOf="@id/tvLabel"
+                app:layout_constraintTop_toBottomOf="@id/etNotes" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/labelPhuReferred"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/phu_referred_to"
+                android:fontFamily="@font/inter_regular"
+                android:textColor="@color/charcoal_grey"
+                android:paddingHorizontal="@dimen/_16sdp"
+                android:textSize="@dimen/_14ssp"
+                android:layout_marginTop="@dimen/_16sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvLabelError"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/etPhuChange"
+                style="@style/Form_Spinner_Style"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/_8sdp"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:minHeight="@dimen/_40sdp"
+                android:paddingHorizontal="@dimen/_16sdp"
+                app:layout_constraintTop_toBottomOf="@id/labelPhuReferred"
+                app:layout_constraintStart_toStartOf="@id/labelPhuReferred"
+                app:layout_constraintEnd_toEndOf="@id/labelPhuReferred"/>
+
+            <TextView
+                android:id="@+id/tvSiteErrorMessage"
+                style="@style/TextStyle_Error_12"
+                android:layout_width="0dp"
+                android:padding="@dimen/_16sdp"
+                android:text="@string/please_select_a_site"
+                android:textSize="@dimen/_16ssp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/etPhuChange"
+                app:layout_constraintStart_toStartOf="@id/etPhuChange"
+                app:layout_constraintEnd_toEndOf="@id/etPhuChange"/>
+
+            <TextView
+                android:id="@+id/tvNextFollowupDateTitle"
+                style="@style/Form_Label_Style"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingEnd="@dimen/_10sdp"
+                android:paddingHorizontal="@dimen/_16sdp"
+                android:layout_marginTop="@dimen/_16sdp"
+                android:text="@string/next_follow_up_date"
+                app:layout_constraintTop_toBottomOf="@id/tvSiteErrorMessage"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:ignore="RtlSymmetry" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/etNextFollowUpDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="date"
+                style="@style/Form_Input_Style"
+                android:background="@drawable/edittext_background"
+                android:drawableEnd="@drawable/referral_calendar_icon"
+                android:gravity="start|center"
+                android:layout_marginVertical="@dimen/_8sdp"
+                android:layout_marginHorizontal="@dimen/_16sdp"
+                android:textColor="@color/black"
+                android:hint="@string/dd_mm_yyyy"
+                android:textSize="@dimen/_16ssp"
+                android:paddingStart="@dimen/_10sdp"
+                app:layout_constraintStart_toStartOf="@id/tvNextFollowupDateTitle"
+                app:layout_constraintTop_toBottomOf="@id/tvNextFollowupDateTitle"
+                app:layout_constraintEnd_toEndOf="@id/tvNextFollowupDateTitle"/>
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/phuReferredGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids=" labelPhuReferred, etPhuChange" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/coughMalariaGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids=" tvNextFollowupDateTitle, etNextFollowUpDate" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/notesGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids=" tvLabel, etNotes" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:padding="@dimen/_8sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnDone"
+            style="@style/Button_Style"
+            android:layout_width="match_parent"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/_8sdp"
+            android:text="@string/done"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

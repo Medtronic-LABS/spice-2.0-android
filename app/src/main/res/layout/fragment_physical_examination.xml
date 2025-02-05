@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.medtroniclabs.opensource.ui.common.FloatingDetectorFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.medicalreview.PhysicalExaminationFragment">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardPhysicalExaminations"
+        style="@style/CardView_Style"
+        android:layout_width="match_parent"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/systemicExamContainer">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/_16sdp">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/startGuideLine"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.13" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/separatorEndGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.16" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/endGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.65" />
+
+
+            <View
+                android:id="@+id/viewPhysicalExaminationCardBG"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_0dp"
+                android:background="@color/card_background"
+                app:layout_constraintBottom_toBottomOf="@id/tvPhysicalExaminationTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvPhysicalExaminationTitle"
+                style="@style/Form_Header_Style"
+                android:layout_width="@dimen/_0dp"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="@string/physical_examinations"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="@id/viewPhysicalExaminationCardBG"
+                app:layout_constraintStart_toStartOf="@id/viewPhysicalExaminationCardBG"
+                app:layout_constraintTop_toTopOf="@id/viewPhysicalExaminationCardBG" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/tagPhysicalExamination"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/_16sdp"
+                android:paddingVertical="@dimen/_12sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvPhysicalExaminationTitle" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/centerGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5" />
+
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/breastConditionGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="tvCongenitalDetect, tvCongenitalDetectSeparator, congenitalDetectSelector,tvCordExamination,tvCordExaminationSeparator,cordExaminationSelector" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCongenitalDetect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:layout_marginTop="@dimen/_32sdp"
+                android:text="@string/congenital_detect"
+                android:textColor="@color/b_w_black"
+                android:fontFamily="@font/inter_regular"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tagPhysicalExamination" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCongenitalDetectSeparator"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:gravity="center_horizontal"
+                android:text="@string/separator_colon"
+                android:textColor="@color/b_w_black"
+                app:layout_constraintBottom_toBottomOf="@+id/tvCongenitalDetect"
+                app:layout_constraintHorizontal_weight="0.1"
+                app:layout_constraintStart_toEndOf="@id/startGuideLine"
+                app:layout_constraintTop_toTopOf="@id/tvCongenitalDetect" />
+
+            <LinearLayout
+                android:id="@+id/congenitalDetectSelector"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:orientation="horizontal"
+                android:textAlignment="center"
+                android:textColor="@color/grey_black"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvCongenitalDetectSeparator"
+                app:layout_constraintEnd_toEndOf="@+id/endGuideline"
+                app:layout_constraintStart_toEndOf="@+id/separatorEndGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvCongenitalDetectSeparator" />
+
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/CordExaminationGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                app:constraint_referenced_ids="tvCordExamination, tvCordExaminationSeparator, cordExaminationSelector " />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/BreastFeedingGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids="tvExclusiveBreastFeeding,exclusiveBreastFeedingSelector " />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCordExamination"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:layout_marginTop="@dimen/_32sdp"
+                android:text="@string/cord_examination"
+                android:textColor="@color/b_w_black"
+                android:fontFamily="@font/inter_regular"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/congenitalDetectSelector" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCordExaminationSeparator"
+                style="@style/TextStyle_Regular_16"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:gravity="center_horizontal"
+                android:text="@string/separator_colon"
+                android:textColor="@color/b_w_black"
+                app:layout_constraintBottom_toBottomOf="@+id/tvCordExamination"
+                app:layout_constraintHorizontal_weight="0.1"
+                app:layout_constraintStart_toEndOf="@id/startGuideLine"
+                app:layout_constraintTop_toTopOf="@id/tvCordExamination" />
+
+            <LinearLayout
+                android:id="@+id/cordExaminationSelector"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:layout_marginEnd="@dimen/_16sdp"
+                android:orientation="horizontal"
+                android:textAlignment="center"
+                android:textColor="@color/grey_black"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvCordExaminationSeparator"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/separatorEndGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvCordExaminationSeparator" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBreastFeeding"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:layout_marginTop="@dimen/_32sdp"
+                android:text="@string/breast_feeding"
+                android:textColor="@color/b_w_black"
+                android:fontFamily="@font/inter_regular"
+                android:textSize="@dimen/_14ssp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cordExaminationSelector" />
+
+            <LinearLayout
+                android:id="@+id/breastFeedingSelector"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_16sdp"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/_8sdp"
+                android:textAlignment="center"
+                android:textColor="@color/grey_black"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toStartOf="@+id/centerGuideline"
+                app:layout_constraintStart_toStartOf="@+id/tvBreastFeeding"
+                app:layout_constraintTop_toBottomOf="@+id/tvBreastFeeding" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvExclusiveBreastFeeding"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:layout_marginTop="@dimen/_32sdp"
+                android:text="@string/exclusive_breast_feeding"
+                android:textColor="@color/b_w_black"
+                app:fontFamily="@font/inter_regular"
+                android:textSize="@dimen/_14ssp"
+                app:layout_constraintStart_toEndOf="@+id/centerGuideline"
+                app:layout_constraintTop_toBottomOf="@+id/cordExaminationSelector" />
+
+            <LinearLayout
+                android:id="@+id/exclusiveBreastFeedingSelector"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:layout_marginEnd="@dimen/_16sdp"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/_8sdp"
+                android:textAlignment="center"
+                android:textColor="@color/grey_black"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/centerGuideline"
+                app:layout_constraintTop_toBottomOf="@+id/tvExclusiveBreastFeeding" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</com.medtroniclabs.opensource.ui.common.FloatingDetectorFrameLayout>
