@@ -1,11 +1,5 @@
 # SPICE-Android
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Medtronic-LABS_spice-android&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Medtronic-LABS_spice-android)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Medtronic-LABS_spice-android&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=Medtronic-LABS_spice-android)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Medtronic-LABS_spice-android&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Medtronic-LABS_spice-android)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Medtronic-LABS_spice-android&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=Medtronic-LABS_spice-android)
-[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Medtronic-LABS_spice-android&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=Medtronic-LABS_spice-android)
-
 ## Prerequisite
 - To bring up the Spice backend server, there are a few prerequisites that need to be completed. Please follow the instructions provided in this [link](https://github.com/Medtronic-LABS/spice-2.0-server.git). Once you have completed the steps, you will get a ***SERVER URL*** to use in our Application.
 
@@ -338,4 +332,4 @@ You can install an Android emulator in Android Studio by following these steps:
 After starting the emulator, you can install your app on it by running your project in Android Studio and selecting the emulator as the deployment target.
 If you want to run apps on a hardware device,[follow the instructions.](https://developer.android.com/studio/run/device)
 
-[SPICE DOCUMENTATION](https://app.gitbook.com/o/RnePNEThd1XTpW5Hf3HB/s/7inBQ0zjo0nwpqK5625P/~/changes/16/deploy/deployment-guide/android)
+[SPICE DOCUMENTATION](https://spice.docs.medtroniclabs.org/deploy/deployment-guide/android)
