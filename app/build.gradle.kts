@@ -43,7 +43,7 @@ android {
                 if (buildType.name == "release") {
                     when (productFlavors[0].name) {
                         "africa" -> {
-                            buildConfigField("String", "API_BASE_URL", "\"http://localhost:8762/\"")
+                            buildConfigField("String", "API_BASE_URL", "\"http://localhost/\"")
                             buildConfigField("String", "ADMIN_BASE_URL", "\"http://localhost/\"")
                             buildConfigField("String", "SALT", "\"spice_opensource\"")
                             buildConfigField("String", "DB_PASSWORD", "\"OpenSource\"")
@@ -61,7 +61,7 @@ android {
                 if (buildType.name == "debug") {
                     when (productFlavors[0].name) {
                         "africa" -> {
-                            buildConfigField("String", "API_BASE_URL", "\"http://localhost:8762/\"")
+                            buildConfigField("String", "API_BASE_URL", "\"http://localhost/\"")
                             buildConfigField("String", "ADMIN_BASE_URL", "\"http://localhost/\"")
                             buildConfigField("String", "SALT", "\"spice_opensource\"")
                             buildConfigField("String", "DB_PASSWORD", "\"OpenSource\"")

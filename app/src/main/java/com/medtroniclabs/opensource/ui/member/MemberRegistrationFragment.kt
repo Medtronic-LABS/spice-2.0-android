@@ -435,7 +435,6 @@ class MemberRegistrationFragment : Fragment(), FormEventListener, View.OnClickLi
             val view = formGenerator.getViewByTag(headPhoneNumberCategory) as AppCompatSpinner
             val index = (view.adapter as CustomSpinnerAdapter).getIndexOfItemById(it)
             view.setSelection(index, true)
-            view.isEnabled = false
         }
     }
 

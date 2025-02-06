@@ -17,7 +17,7 @@ Android Studio IDE
 ## Tech stack used
 
 ```sh
-Kotlin-1.9.0
+Kotlin-1.9.21
 Java-18
 Android MVVM Design Pattern
 Gradle-8.2
@@ -80,11 +80,11 @@ build.gradle[App-level]
 This file allows you to define your desired values for specific properties.
 
 ### Configure Server URL
-Use the server URL obtained from the prerequisites mentioned above. Or, you may also follow the steps as mentioned in the [link](https://github.com/Medtronic-LABS/spice-server.git).
+Use the server URL obtained from the prerequisites mentioned above. Or, you may also follow the steps as mentioned in the [link](https://github.com/Medtronic-LABS/spice-2.0-server.git).
 ```server
-    buildConfigField("String", "API_BASE_URL", "\"http://localhost:8762/\"")
+    buildConfigField("String", "API_BASE_URL", "\"http://localhost/\"")
 ````
-Substitute ***http://localhost:8762/*** with the server URL obtained.
+Substitute ***http://localhost/*** with the server URL obtained.
 
 ### Configure Salt key
 To enhance security, you may need to provide the salt key used in the backend for user authentication. The salt key is a randomly generated string that adds an extra layer of security when hashing passwords.
@@ -140,7 +140,7 @@ android {
                 if (buildType.name == "release") {
                     when (productFlavors[0].name) {
                         "africa" -> {
-                            buildConfigField("String", "API_BASE_URL", "\"http://localhost:8762/\"")
+                            buildConfigField("String", "API_BASE_URL", "\"http://localhost/\"")
                             buildConfigField("String", "ADMIN_BASE_URL", "\"{ADMIN_URL}\"")
                             buildConfigField("String", "SALT", "\"spice_opensource\"")
                             buildConfigField("String", "DB_PASSWORD", "\"OpenSource\"")
@@ -158,7 +158,7 @@ android {
                 if (buildType.name == "debug") {
                     when (productFlavors[0].name) {
                         "africa" -> {
-                            buildConfigField("String", "API_BASE_URL", "\"http://localhost:8762/\"")
+                            buildConfigField("String", "API_BASE_URL", "\"http://localhost/\"")
                             buildConfigField("String", "ADMIN_BASE_URL", "\"{ADMIN_URL}\"")
                             buildConfigField("String", "SALT", "\"spice_opensource\"")
                             buildConfigField("String", "DB_PASSWORD", "\"OpenSource\"")
