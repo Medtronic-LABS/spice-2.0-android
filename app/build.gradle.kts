@@ -107,6 +107,10 @@ dependencies {
     implementation("androidx.hilt:hilt-common:1.2.0")
     implementation("androidx.hilt:hilt-work:1.2.0")
     implementation("androidx.activity:activity:1.9.3")
+    
+    // Voice input dependencies
+    implementation("androidx.speech:speech-recognition:1.0.0")
+    
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")

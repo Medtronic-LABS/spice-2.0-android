@@ -93,11 +93,16 @@ import com.medtroniclabs.opensource.ui.patientDelete.viewModel.NCDPatientDeleteV
 import com.medtroniclabs.opensource.ui.patientEdit.NCDPatientEditActivity
 import com.medtroniclabs.opensource.ui.patientTransfer.dialog.NCDTransferArchiveDialog
 import com.medtroniclabs.opensource.ui.patientTransfer.viewModel.NCDPatientTransferViewModel
+import com.medtroniclabs.opensource.voice.*
 import dagger.hilt.android.AndroidEntryPoint
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 @AndroidEntryPoint
 class NCDMedicalReviewActivity : BaseActivity(), View.OnClickListener, AncVisitCallBack,
-    NCDDialogDismissListener, NCDMRAlertDialog.DialogCallback, OnDialogDismissListener {
+    NCDDialogDismissListener, NCDMRAlertDialog.DialogCallback, OnDialogDismissListener, VoiceCommandListener {
 
     private val viewModel: NCDMedicalReviewViewModel by viewModels()
     private val patientDetailViewModel: PatientDetailViewModel by viewModels()
@@ -114,6 +119,15 @@ class NCDMedicalReviewActivity : BaseActivity(), View.OnClickListener, AncVisitC
     private val patientTransferViewModel: NCDPatientTransferViewModel by viewModels()
     private val mentalHealthViewModel: NCDMentalHealthViewModel by viewModels()
     private lateinit var binding: ActivityNcdMrBaseBinding
+    
+    private lateinit var voiceInputManager: VoiceInputManager
+    private lateinit var voiceCommandProcessor: VoiceCommandProcessor
+    private lateinit var voiceFeedbackManager: VoiceFeedbackManager
+    private lateinit var microphoneStatusView: MicrophoneStatusView
+    
+    companion object {
+        private const val MICROPHONE_PERMISSION_REQUEST_CODE = 1002
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
@@ -136,6 +150,7 @@ class NCDMedicalReviewActivity : BaseActivity(), View.OnClickListener, AncVisitC
         binding.refreshLayout.setOnRefreshListener {
             swipeRefresh()
         }
+        checkMicrophonePermission()
     }
 
     private fun showHideVerticalIcon(visibility: Boolean) {
@@ -459,6 +474,134 @@ class NCDMedicalReviewActivity : BaseActivity(), View.OnClickListener, AncVisitC
             ivIBatchCount.setVisible(it.nonReviewedTestCount > 0)
             ivPBatchCount.setVisible(it.prescriptionDaysCompletedCount > 0)
             ivPsycBadgeCount.setVisible(it.psychologicalCount > 0)
+        }
+    }
+    
+    private fun checkMicrophonePermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) 
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.RECORD_AUDIO),
+                MICROPHONE_PERMISSION_REQUEST_CODE
+            )
+        } else {
+            initializeVoiceInput()
+        }
+    }
+    
+    private fun initializeVoiceInput() {
+        voiceInputManager = VoiceInputManager(this)
+        voiceCommandProcessor = VoiceCommandProcessor()
+        voiceFeedbackManager = VoiceFeedbackManager(this)
+        
+        microphoneStatusView = MicrophoneStatusView(this)
+        addViewToToolbar(microphoneStatusView)
+        
+        voiceInputManager.voiceResult.observe(this) { result ->
+            processVoiceCommand(result)
+        }
+        
+        voiceInputManager.isListening.observe(this) { isListening ->
+            microphoneStatusView.setListeningStatus(isListening)
+        }
+        
+        voiceInputManager.error.observe(this) { error ->
+            voiceFeedbackManager.announceError(error)
+        }
+        
+        microphoneStatusView.setOnMicrophoneClickListener {
+            if (voiceInputManager.isListening.value == true) {
+                voiceInputManager.stopListening()
+            } else {
+                voiceInputManager.startListening()
+            }
+        }
+    }
+    
+    private fun processVoiceCommand(spokenText: String) {
+        val command = voiceCommandProcessor.processCommand(spokenText)
+        onVoiceCommand(command)
+    }
+    
+    override fun onVoiceCommand(command: VoiceCommand) {
+        when (command) {
+            is VoiceCommand.Symptoms -> {
+                voiceFeedbackManager.confirmAction("Adding symptom: ${command.symptom}")
+                processSymptomCommand(command.symptom)
+            }
+            is VoiceCommand.VitalSigns -> {
+                voiceFeedbackManager.confirmAction("Recording ${command.type}: ${command.value}")
+                processVitalSignsCommand(command.type, command.value)
+            }
+            is VoiceCommand.Diagnosis -> {
+                voiceFeedbackManager.confirmAction("Setting diagnosis: ${command.diagnosis}")
+            }
+            is VoiceCommand.Prescription -> {
+                voiceFeedbackManager.confirmAction("Adding prescription: ${command.medication}")
+            }
+            is VoiceCommand.LabTest -> {
+                voiceFeedbackManager.confirmAction("Ordering lab test: ${command.testName}")
+            }
+            is VoiceCommand.Confirmation -> {
+                voiceFeedbackManager.confirmAction("Confirming action")
+            }
+            is VoiceCommand.Unknown -> {
+                voiceFeedbackManager.announceError("Command not recognized: ${command.text}")
+            }
+            else -> {
+                voiceFeedbackManager.announceError("Command not supported")
+            }
+        }
+    }
+    
+    private fun processSymptomCommand(symptom: String) {
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
+        if (currentFragment is NCDChiefComplaintsFragment) {
+            currentFragment.processVoiceSymptom(symptom)
+        }
+    }
+    
+    private fun processVitalSignsCommand(type: String, value: String) {
+        when (type) {
+            "blood_pressure" -> {
+                val bpParts = value.split("/")
+                if (bpParts.size == 2) {
+                    val systolic = bpParts[0].toIntOrNull()
+                    val diastolic = bpParts[1].toIntOrNull()
+                    if (systolic != null && diastolic != null) {
+                        val currentFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
+                        if (currentFragment is NCDBpAndBgFragment) {
+                            currentFragment.setBloodPressureFromVoice(systolic, diastolic)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == MICROPHONE_PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                initializeVoiceInput()
+            } else {
+                showErrorDialog(getString(R.string.error), "Microphone permission required for voice input")
+            }
+        }
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        if (::voiceInputManager.isInitialized) {
+            voiceInputManager.destroy()
+        }
+        if (::voiceFeedbackManager.isInitialized) {
+            voiceFeedbackManager.destroy()
         }
     }
 

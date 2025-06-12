@@ -115,4 +115,32 @@ class NCDChiefComplaintsFragment : BaseFragment() {
             ), binding.etPhysicalExaminationComments
         )
     }
+    
+    fun processVoiceSymptom(symptom: String) {
+        val matchingChip = findMatchingChip(symptom)
+        matchingChip?.let { chip ->
+            if (!viewModel.chips.contains(chip)) {
+                tagView.selectChip(chip)
+                viewModel.chips.add(chip)
+            }
+        } ?: run {
+            binding.etPhysicalExaminationComments.setText(symptom)
+            viewModel.comments = symptom
+        }
+    }
+    
+    private fun findMatchingChip(symptom: String): ChipViewItemModel? {
+        return viewModel.getChipItems.value?.find { chip ->
+            chip.name.contains(symptom, ignoreCase = true) ||
+            chip.displayValue?.contains(symptom, ignoreCase = true) == true
+        }?.let { entity ->
+            ChipViewItemModel(
+                id = entity.id,
+                name = entity.name,
+                cultureValue = entity.displayValue,
+                type = entity.type,
+                value = entity.value
+            )
+        }
+    }
 }
