@@ -38,6 +38,8 @@ interface HouseholdDAO {
             val entityToInsert = existingEntity?.let { entity.copy(id = it.id) } ?: entity
             entityToInsert.sync_status = existingEntity?.sync_status ?: OfflineSyncStatus.Success
             entityToInsert.fhirId = entity.fhirId
+            entityToInsert.createdAt = entity.createdAt
+            entityToInsert.updatedAt = entity.updatedAt
             return insertHouseHold(entityToInsert)
         } else {
             return existingEntity.id
@@ -143,11 +145,10 @@ interface HouseholdDAO {
     )
     fun getHouseholdCardDetailLiveData(id: Long): LiveData<HouseholdCardDetail>
 
-    @Query("UPDATE HouseHold SET sync_status =:syncStatus, updated_at =:updatedAt WHERE id IN (:householdIds)")
+    @Query("UPDATE HouseHold SET sync_status =:syncStatus WHERE id IN (:householdIds)")
     suspend fun updateInProgress(
         householdIds: List<String>,
         syncStatus: String,
-        updatedAt: Long = System.currentTimeMillis(),
     )
 
     @Query("SELECT hh.*, ve.name as villageName FROM HouseHold as hh INNER JOIN VillageEntity AS ve ON hh.village_id = ve.id INNER JOIN HouseholdMember as hhm ON hh.id = hhm.household_id WHERE hh.fhir_id IS NULL AND hhm.id = :hhmId AND hh.sync_status IN (:status)")

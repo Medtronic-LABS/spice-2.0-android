@@ -335,6 +335,19 @@ class RoomHelperImpl @Inject constructor(
                 }
             }
 
+            EntitiesName.HOUSEHOLD_MEMBER,
+            EntitiesName.HOUSEHOLD,
+            -> {
+                val query =
+                    "UPDATE $tableName SET fhir_id = ?, sync_status = CASE WHEN sync_status = 'InProgress' THEN ? WHEN sync_status = 'NetworkError' THEN ? ELSE sync_status END WHERE id = ?"
+                householdDAO.updateFhirId(
+                    SimpleSQLiteQuery(
+                        query,
+                        arrayOf(fhirId, status, status, id),
+                    ),
+                )
+            }
+
             else -> {
                 val updatedAt = System.currentTimeMillis()
                 val query =
@@ -342,7 +355,7 @@ class RoomHelperImpl @Inject constructor(
                 householdDAO.updateFhirId(
                     SimpleSQLiteQuery(
                         query,
-                        arrayOf(fhirId, updatedAt, status, status, id),
+                        arrayOf<Any?>(fhirId, updatedAt, status, status, id),
                     ),
                 )
             }

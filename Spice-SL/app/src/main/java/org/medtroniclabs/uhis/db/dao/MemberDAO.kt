@@ -149,11 +149,15 @@ interface MemberDAO {
         if (!entity.isActive && entity.fhirId != null) {
             deleteRxBuddyOnDeceased(entity.fhirId!!)
         }
-        val existingEntity = entity.fhirId?.let { getByUniqueField(it) }
+        val existingEntity = entity.fhirId?.let {
+            getByUniqueField(it)
+        }
         if (existingEntity?.sync_status != OfflineSyncStatus.NotSynced) {
             val entityToInsert = existingEntity?.let { entity.copy(id = it.id) } ?: entity
             entityToInsert.sync_status = existingEntity?.sync_status ?: OfflineSyncStatus.Success
             entityToInsert.fhirId = entity.fhirId
+            entityToInsert.createdAt = entity.createdAt
+            entityToInsert.updatedAt = entity.updatedAt
             return insertMember(entityToInsert)
         } else {
             return existingEntity.id
@@ -163,11 +167,10 @@ interface MemberDAO {
     @Query("DELETE FROM RxBuddyDetails WHERE patientMemberId = :memberId")
     suspend fun deleteRxBuddyOnDeceased(memberId: String)
 
-    @Query("UPDATE HouseholdMember SET sync_status =:syncStatus, updated_at =:updatedAt WHERE id IN (:memberIds)")
+    @Query("UPDATE HouseholdMember SET sync_status =:syncStatus WHERE id IN (:memberIds)")
     suspend fun updateInProgress(
         memberIds: List<String>,
         syncStatus: String,
-        updatedAt: Long = System.currentTimeMillis(),
     )
 
     @Query("UPDATE HouseholdMember SET sync_status =:syncStatus WHERE id = :id")
@@ -176,11 +179,12 @@ interface MemberDAO {
         syncStatus: OfflineSyncStatus = OfflineSyncStatus.NotSynced,
     )
 
-    @Query("UPDATE HouseholdMember SET isActive = :status, sync_status =:syncStatus  WHERE id = :id")
+    @Query("UPDATE HouseholdMember SET isActive = :status, sync_status =:syncStatus, updated_at =:updatedAt  WHERE id = :id")
     suspend fun updateMemberDeceasedStatus(
         id: Long,
         status: Boolean,
         syncStatus: OfflineSyncStatus,
+        updatedAt: Long = System.currentTimeMillis(),
     )
 
     @Query("UPDATE HouseholdMember SET isActive = :status, sync_status =:syncStatus , deceasedReason=:deceasedReason ,updated_at =:updatedAt WHERE id = :id")

@@ -8,7 +8,6 @@ import org.medtroniclabs.uhis.common.ConsentFormType
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.StringConverter
 import org.medtroniclabs.uhis.data.LocalSpinnerResponse
-import org.medtroniclabs.uhis.data.offlinesync.model.HouseHoldMember
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberWithTb
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineSyncStatus
 import org.medtroniclabs.uhis.db.dao.HouseholdSortOrder
@@ -227,22 +226,6 @@ class HouseHoldRepository @Inject constructor(
     suspend fun getMemberCountPerHouseHold(householdId: Long): Int = roomHelper.getMemberCountPerHouseHold(householdId)
 
     suspend fun getDisabilityMembersCountPerHousehold(householdId: Long): Int = roomHelper.getDisabilityMembersCountForHousehold(householdId)
-
-    private suspend fun insertHouseholdMembers(
-        householdMembers: List<HouseHoldMember>?,
-        hhIdMap: Map<String, Long>,
-    ) {
-        householdMembers?.forEach { member ->
-            hhIdMap[member.householdId]?.let {
-                roomHelper.registerMember(
-                    member.toHouseholdMemberEntity(
-                        it,
-                        OfflineSyncStatus.Success,
-                    ),
-                )
-            }
-        }
-    }
 
     suspend fun getUnSyncedHouseholdCount(): Int = roomHelper.getUnSyncedHouseholdCount()
 

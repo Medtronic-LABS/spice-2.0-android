@@ -2,6 +2,7 @@ package org.medtroniclabs.uhis.common
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.gson.Gson
@@ -396,9 +397,19 @@ object SecuredPreference {
      */
     fun remove(key: String) {
         val prefs = preferences
-        val editor = prefs.edit()
-        editor.remove(key)
-        editor.apply()
+        prefs.edit {
+            remove(key)
+        }
+    }
+
+    /**
+     * Removes a preference value.
+     *
+     * @param key The name of the preference to remove.
+     * @see android.content.SharedPreferences.Editor.remove
+     */
+    fun remove(key: EnvironmentKey) {
+        remove(key.name)
     }
 
     /**
