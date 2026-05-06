@@ -13,7 +13,6 @@ import org.medtroniclabs.uhis.data.offlinesync.model.HouseHoldMember
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberStatus
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberWithTb
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineSyncStatus
-import org.medtroniclabs.uhis.db.entity.AssessmentEntity
 import org.medtroniclabs.uhis.db.entity.HouseholdEntity
 import org.medtroniclabs.uhis.db.entity.HouseholdMemberEntity
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
@@ -289,7 +288,7 @@ interface MemberDAO {
      * **observedEntities** ensures Room re-delivers LiveData whenever any of the
      * three underlying tables change.
      */
-    @RawQuery(observedEntities = [HouseholdEntity::class, HouseholdMemberEntity::class, AssessmentEntity::class])
+    @RawQuery(observedEntities = [HouseholdEntity::class, HouseholdMemberEntity::class, MemberAssessmentHistoryEntity::class])
     fun getServiceMembersRaw(query: SimpleSQLiteQuery): LiveData<List<HouseholdMemberWithTb>>
 
     /**
@@ -409,6 +408,26 @@ interface MemberDAO {
             "INNER JOIN SubVillageEntity AS sv ON sv.id = hh.sub_village_id"
         }
 
+        val latestPregnancyEddExpr =
+            """
+            (
+                SELECT substr(lp.estimatedDeliveryDate, 1, 10)
+                FROM (${ServiceFilterConditions.LATEST_PREGNANCY_SUBQUERY}) AS lp
+            )
+            """.trimIndent()
+
+        val orderByClause = when (staticFilter) {
+            ServiceStaticFilter.EXPECTED_DELIVERIES -> {
+                "ORDER BY $latestPregnancyEddExpr ASC, hhm.id DESC"
+            }
+            ServiceStaticFilter.PENDING_DELIVERIES -> {
+                "ORDER BY $latestPregnancyEddExpr DESC, hhm.id DESC"
+            }
+            else -> {
+                "ORDER BY COALESCE(mahAgg.recent_service_date, hhm.created_at) DESC, hhm.id DESC"
+            }
+        }
+
         val query =
             """
             SELECT
@@ -448,7 +467,7 @@ interface MemberDAO {
             ON mahAgg.memberId = hhm.id
 
             $whereClause
-            ORDER BY hhm.id DESC
+            $orderByClause
             """.trimIndent()
         return getServiceMembersRaw(SimpleSQLiteQuery(query, args.toTypedArray()))
     }
@@ -458,7 +477,7 @@ interface MemberDAO {
      *
      * The query should project all aliases required by [ServiceMemberCounts].
      */
-    @RawQuery
+    @RawQuery(observedEntities = [HouseholdEntity::class, HouseholdMemberEntity::class, MemberAssessmentHistoryEntity::class])
     suspend fun getAllServiceMemberCountsRaw(query: SimpleSQLiteQuery): ServiceMemberCounts
 
     /**

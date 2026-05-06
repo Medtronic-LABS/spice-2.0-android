@@ -12,7 +12,7 @@ object ServiceFilterConditions {
      * Subquery to get the latest pregnancy record for a member.
      * Used by [PREGNANT_WOMEN], [HIGH_RISK_PREGNANT_WOMEN], and related conditions.
      */
-    private const val LATEST_PREGNANCY_SUBQUERY = """
+    internal const val LATEST_PREGNANCY_SUBQUERY = """
         SELECT pd.id, pd.dateOfDelivery, pd.lastMenstrualPeriod, pd.estimatedDeliveryDate, pd.highRiskPregnantWoman, pd.typeOfAbortion, pd.endAt
         FROM PregnancyDetail AS pd
         WHERE pd.householdMemberLocalId = hhm.id
