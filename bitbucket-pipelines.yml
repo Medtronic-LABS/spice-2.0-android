@@ -15,6 +15,7 @@ pipelines:
               - dev
               - qa
               - staging
+              - bracStaging
               - production
           - name: BUILD_TYPE
             default: debug
