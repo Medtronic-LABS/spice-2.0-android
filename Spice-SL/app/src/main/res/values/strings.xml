@@ -438,6 +438,7 @@
     <string name="Select_Date">please select from date</string>
     <string name="medical_review">Medical Review Visit</string>
     <string name="hh_visit">HH Visit</string>
+    <string name="scheduled_visit">Scheduled Visit</string>
     <string name="no_patient_found">No Patient found.</string>
     <string name="patient_count">%1$d Patients</string>
     <string name="reason">Reason</string>

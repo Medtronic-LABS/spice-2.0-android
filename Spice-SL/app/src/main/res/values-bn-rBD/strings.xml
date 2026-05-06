@@ -434,6 +434,7 @@
     <string name="Select_Date">অনুগ্রহ করে তারিখ থেকে নির্বাচন করুন</string>
     <string name="medical_review">চিকিৎসা পর্যালোচনা সাক্ষাৎ</string>
     <string name="hh_visit">খানা ভিজিট</string>
+    <string name="scheduled_visit">নির্ধারিত পরিদর্শন</string>
     <string name="no_patient_found">কোন রোগী পাওয়া যায়নি।</string>
     <string name="patient_count">%1$d জন রোগী</string>
     <string name="reason">কারণ</string>

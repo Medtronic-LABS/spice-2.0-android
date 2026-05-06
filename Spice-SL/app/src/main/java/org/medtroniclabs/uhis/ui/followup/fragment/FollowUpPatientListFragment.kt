@@ -3,12 +3,12 @@ package org.medtroniclabs.uhis.ui.followup.fragment
 import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
@@ -108,7 +108,7 @@ class FollowUpPatientListFragment : BaseFragment(), FollowUpDialogFragment.Follo
         viewModel.selectedFollowUpDetail?.let { data ->
             data.phoneNumber?.let { phoneNumber ->
                 val dialIntent = Intent(Intent.ACTION_DIAL)
-                dialIntent.data = Uri.parse("tel:$phoneNumber")
+                dialIntent.data = "tel:$phoneNumber".toUri()
                 dialerLauncher.launch(dialIntent)
                 viewModel.setUserJourney(callButtonClicked)
             }

@@ -191,9 +191,8 @@ class FollowUpMyPatientActivity : BaseActivity() {
         binding.viewPager.adapter = FollowUpPatientListAdapter(supportFragmentManager, lifecycle)
         TabLayoutMediator(binding.llExactSearch.tabLayout, binding.viewPager) { tab, position ->
             when (position) {
-                0 -> tab.text = getString(R.string.hh_visit)
+                0 -> tab.text = getString(R.string.scheduled_visit)
                 1 -> tab.text = getString(R.string.referred)
-                2 -> tab.text = getString(R.string.tab_counter_referral)
             }
         }.attach()
 
