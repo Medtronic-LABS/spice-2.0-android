@@ -184,7 +184,7 @@
     <string name="registration_status">নিবন্ধন অবস্থা</string>
     <string name="pending">বিচারাধীন</string>
     <string name="finished">সম্পন্ন</string>
-    <string name="apply">প্রয়োগ করুন</string>
+    <string name="apply">সাবমিট</string>
     <string name="filter_count">ফিল্টার (%1$s)</string>
     <string name="sort_count">সর্ট বাই (%1$s)</string>
     <string name="villages">গ্রাম</string>
@@ -1593,7 +1593,7 @@
     <string name="gaps_in_anc">এএনসি সেবায় ঘাটতি</string>
     <string name="gaps_in_pnc">পিএনসি সময়ে / প্রসবের পর মায়ের জন্য প্রয়োজনীয় সেবায় ঘাটতি</string>
     <string name="counseling_education"><![CDATA[পরামর্শ]]></string>
-    <string name="service_recipient_list"><![CDATA[সেবা গ্রহণকারীর তালিকা]]></string>
+    <string name="service_recipient_list"><![CDATA[সেবা গ্রহীতার তালিকা]]></string>
     <string name="no_members_found"><![CDATA[কোনো সদস্য পাওয়া যায়নি]]></string>
     <plurals name="plural_member">
         <item quantity="zero">%1$s জন সদস্য</item>
