@@ -68,7 +68,15 @@ interface MemberAssessmentHistoryDao {
             0 AS householdRegisteredCount,
             0 AS pwIdentifiedFirst4MonthsWithAncCount,
             0 AS anc3PlusCount,
-            0 AS highRiskPregnantWomenCount
+            SUM(
+                CASE
+                    WHEN LOWER(h.serviceProvided) IN ('anc')
+                        AND h.customStatus IS NOT NULL
+                        AND INSTR(h.customStatus, 'HIGH_RISK_PW') > 0
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS highRiskPregnantWomenCount
         FROM memberassessmenthistory AS h
         LEFT JOIN householdmember AS hm ON hm.id = h.memberId
         LEFT JOIN household AS hh ON hh.id = hm.household_id
@@ -147,12 +155,7 @@ interface MemberAssessmentHistoryDao {
                     THEN 1 ELSE 0
                 END
             ) AS anc3PlusCount,
-            SUM(
-                CASE
-                    WHEN (lp.highRiskPregnantWoman IS NOT NULL AND lp.highRiskPregnantWoman != '')
-                    THEN 1 ELSE 0
-                END
-            ) AS highRiskPregnantWomenCount
+            0 AS highRiskPregnantWomenCount
         FROM latest_pregnancy AS lp
         INNER JOIN filtered_members AS fm ON fm.memberId = lp.householdMemberLocalId
         WHERE (lp.dateOfDelivery IS NULL OR lp.dateOfDelivery = '')

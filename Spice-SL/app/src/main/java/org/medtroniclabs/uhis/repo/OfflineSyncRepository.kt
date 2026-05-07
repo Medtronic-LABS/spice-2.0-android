@@ -46,7 +46,6 @@ import org.medtroniclabs.uhis.data.offlinesync.model.RxBuddyFollowUp
 import org.medtroniclabs.uhis.data.offlinesync.model.RxBuddyMember
 import org.medtroniclabs.uhis.data.offlinesync.model.RxBuddyRegister
 import org.medtroniclabs.uhis.data.offlinesync.model.RxBuddyRegisterDetail
-import org.medtroniclabs.uhis.data.offlinesync.model.SyncEntityList
 import org.medtroniclabs.uhis.data.offlinesync.model.SyncResponse
 import org.medtroniclabs.uhis.data.offlinesync.model.TreatmentDetails
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineConstant
@@ -483,27 +482,6 @@ class OfflineSyncRepository @Inject constructor(
         roomHelper.deleteDisableRxBuddies(disableIds)
     }
 
-    private suspend fun fetchUnSyncedData(): Boolean {
-        val villageNameId = mutableMapOf<String, Long>()
-        roomHelper.getAllVillageEntity().forEach {
-            villageNameId[it.name] = it.id
-        }
-        val unSyncedResponse = getUnSyncedEntities()
-        if (unSyncedResponse.isSuccessful) {
-            // Insert UnSynced Entities
-            val householdList =
-                unSyncedResponse.body()?.entityList?.filter { it.type == EntitiesName.HOUSEHOLD }
-            val hhMap = insertFailedHouseholds(householdList, villageNameId)
-
-            val householdMemberList =
-                unSyncedResponse.body()?.entityList?.filter { it.type == EntitiesName.HOUSEHOLD_MEMBER }
-            insertFailedHouseholdMembers(householdMemberList, hhMap)
-            return true
-        } else {
-            return false
-        }
-    }
-
     private suspend fun insertHouseholds(households: List<HouseHold>?): Map<String, Long> {
         // fhir id, local id
         val hhMap = mutableMapOf<String, Long>()
@@ -548,87 +526,6 @@ class OfflineSyncRepository @Inject constructor(
                             OfflineSyncStatus.Success,
                         ),
                     )
-                }
-            }
-        }
-    }
-
-    private suspend fun insertFailedHouseholds(
-        households: List<SyncEntityList>?,
-        villageNameId: Map<String, Long>,
-    ): Map<String, HouseHold> {
-        // Response apiReferenceId, Household
-        val hhMap = mutableMapOf<String, HouseHold>()
-        households?.forEach { entity ->
-            Gson().fromJson(entity.data, HouseHold::class.java)?.let { houseHold ->
-                val apiRefId = houseHold.referenceId
-                var dbHHId: Long?
-                if (houseHold.id != null) { // Fhir id is not null - Success
-                    dbHHId = roomHelper.getHouseholdIdByFhirId(houseHold.id)
-                    if (dbHHId != null) { // Update Flow
-                        roomHelper.updateHousehold(
-                            houseHold.toHouseholdEntity(
-                                OfflineSyncStatus.Success,
-                                dbHHId,
-                            ),
-                        )
-                    } else { // Insert Flow
-                        dbHHId = roomHelper.saveHouseHoldEntry(
-                            houseHold.toHouseholdEntity(
-                                OfflineSyncStatus.Success,
-                            ),
-                        )
-                    }
-                } else { // Fhir id is null - Failed
-                    dbHHId = roomHelper.saveHouseHoldEntry(
-                        houseHold.toHouseholdEntity(
-                            OfflineSyncStatus.Failed,
-                        ),
-                    )
-                }
-
-                houseHold.referenceId = dbHHId.toString()
-                hhMap[apiRefId!!] = houseHold
-            }
-        }
-        return hhMap
-    }
-
-    private suspend fun insertFailedHouseholdMembers(
-        householdMemberList: List<SyncEntityList>?,
-        hhMap: Map<String, HouseHold>,
-    ) {
-        householdMemberList?.forEach { entity ->
-            Gson().fromJson(entity.data, HouseHoldMember::class.java)?.let { member ->
-                val dbHHId = roomHelper.getHouseholdIdByFhirId(member.householdId)
-                    ?: hhMap[member.householdReferenceId]?.referenceId?.toLong()
-                if (dbHHId != null) { // HouseholdId found in local
-                    if (member.id != null) { //  Fhir id is not null - Success
-                        val dbHHMId = roomHelper.getHouseholdMemberIdByFhirId(member.id)
-                        if (dbHHMId != null) { // Update Flow
-                            roomHelper.registerMember(
-                                member.toHouseholdMemberEntity(
-                                    dbHHId,
-                                    OfflineSyncStatus.Success,
-                                    dbHHMId,
-                                ),
-                            )
-                        } else { // Insert Flow
-                            roomHelper.registerMember(
-                                member.toHouseholdMemberEntity(
-                                    dbHHId,
-                                    OfflineSyncStatus.Success,
-                                ),
-                            )
-                        }
-                    } else { // Fhir id is null - Failed
-                        roomHelper.registerMember(
-                            member.toHouseholdMemberEntity(
-                                dbHHId,
-                                OfflineSyncStatus.Failed,
-                            ),
-                        )
-                    }
                 }
             }
         }

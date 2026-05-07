@@ -190,7 +190,7 @@
     <string name="registration_status">Registration Status</string>
     <string name="pending">Pending</string>
     <string name="finished">Finished</string>
-    <string name="apply">Apply</string>\
+    <string name="apply">Apply</string>
     <string name="filter_count">Filter (%1$s)</string>
     <string name="sort_count">Sort (%1$s)</string>
     <string name="villages">Villages</string>

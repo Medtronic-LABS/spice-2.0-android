@@ -40,6 +40,9 @@ android {
         getByName("androidTest") {
             assets.srcDir("$projectDir/schemas")
         }
+        maybeCreate("bracStaging").apply {
+            res.srcDir("src/staging/res")
+        }
     }
 
     lint {
@@ -86,6 +89,7 @@ android {
     flavorDimensions += "version"
     productFlavors {
         create("dev") {
+            isDefault = true
             dimension = "version"
             applicationIdSuffix = ".dev"
             resValue("string", "app_name", "UHIS Dev")
@@ -104,6 +108,13 @@ android {
             resValue("string", "app_name", "UHIS Training")
             resValue("color", "toolbar_color", "#f1b192")
         }
+        create("bracStaging") {
+            dimension = "version"
+            applicationIdSuffix = ".staging"
+            signingConfig = signingConfigs.getByName("staging")
+            resValue("string", "app_name", "UHIS Training")
+            resValue("color", "toolbar_color", "#f1b192")
+        }
         create("production") {
             dimension = "version"
             signingConfig = signingConfigs.getByName("production")
@@ -116,14 +127,14 @@ android {
             if (variantBuilder.productFlavors.any { it.second == "production" }) {
                 variantBuilder.enable = false
             }
-            if (variantBuilder.productFlavors.any { it.second == "staging" }) {
-                variantBuilder.enable = false
-            }
         }
     }
 
     buildTypes {
         debug {
+            // This helps to use the signingConfig added for different variants
+            // instead of using default android debug keystore
+            signingConfig = null
             isDebuggable = true
             applicationVariants.all {
                 when (productFlavors[0].name) {
@@ -167,6 +178,12 @@ android {
                         buildConfigField("String", "ADMIN_BASE_URL", "\"${envProperties["UHIS_STAGE_ADMIN_BASE_URL"]}\"")
                         buildConfigField("String", "SALT", "\"${envProperties["UHIS_STAGE_SALT_KEY"]}\"")
                         buildConfigField("String", "ROOM_DB_ENCRYPTION_KEY", "\"${envProperties["UHIS_STAGE_DB_ENCRYPTION_KEY"]}\"")
+                    }
+                    "bracStaging" -> {
+                        buildConfigField("String", "API_BASE_URL", "\"${envProperties["UHIS_BRAC_STAGE_API_BASE_URL"]}\"")
+                        buildConfigField("String", "ADMIN_BASE_URL", "\"${envProperties["UHIS_BRAC_STAGE_ADMIN_BASE_URL"]}\"")
+                        buildConfigField("String", "SALT", "\"${envProperties["UHIS_BRAC_STAGE_SALT_KEY"]}\"")
+                        buildConfigField("String", "ROOM_DB_ENCRYPTION_KEY", "\"${envProperties["UHIS_BRAC_STAGE_DB_ENCRYPTION_KEY"]}\"")
                     }
                     "production" -> {
                         buildConfigField("String", "API_BASE_URL", "\"${envProperties["UHIS_PROD_API_BASE_URL"]}\"")
