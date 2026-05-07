@@ -1,5 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <baseline version="1.0">
+    <file name="build.gradle.kts">
+        <error line="147" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="170" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="176" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="182" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="188" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="232" column="1" source="standard:kdoc" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/common/CVDRiskCalculator.kt">
+        <error line="90" column="37" source="standard:when-entry-bracing" />
+        <error line="91" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="91" column="37" source="standard:when-entry-bracing" />
+        <error line="92" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="92" column="36" source="standard:when-entry-bracing" />
+        <error line="93" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="93" column="36" source="standard:when-entry-bracing" />
+        <error line="94" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="98" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="98" column="21" source="standard:when-entry-bracing" />
+        <error line="106" column="36" source="standard:when-entry-bracing" />
+        <error line="107" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="107" column="37" source="standard:when-entry-bracing" />
+        <error line="108" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="112" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="112" column="21" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/common/CommonUtils.kt">
+        <error line="127" column="24" source="standard:when-entry-bracing" />
+        <error line="128" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="145" column="26" source="standard:when-entry-bracing" />
+        <error line="146" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="251" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="661" column="26" source="standard:when-entry-bracing" />
+        <error line="662" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="670" column="27" source="standard:when-entry-bracing" />
+        <error line="671" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="671" column="21" source="standard:when-entry-bracing" />
+        <error line="672" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="672" column="21" source="standard:when-entry-bracing" />
+        <error line="1208" column="21" source="standard:when-entry-bracing" />
+        <error line="1316" column="88" source="standard:blank-line-between-when-conditions" />
+        <error line="1317" column="55" source="standard:blank-line-between-when-conditions" />
+        <error line="1319" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="1320" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="2155" column="17" source="standard:when-entry-bracing" />
+        <error line="2158" column="17" source="standard:when-entry-bracing" />
+        <error line="2161" column="17" source="standard:when-entry-bracing" />
+        <error line="2163" column="21" source="standard:when-entry-bracing" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/common/DateUtils.kt">
         <error line="43" column="15" source="standard:property-naming" />
         <error line="44" column="15" source="standard:property-naming" />
@@ -255,6 +304,18 @@
         <error line="4" column="15" source="standard:property-naming" />
         <error line="5" column="15" source="standard:property-naming" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/common/StringConverter.kt">
+        <error line="83" column="21" source="standard:when-entry-bracing" />
+        <error line="111" column="21" source="standard:when-entry-bracing" />
+        <error line="193" column="21" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/common/Validator.kt">
+        <error line="103" column="17" source="standard:when-entry-bracing" />
+        <error line="110" column="17" source="standard:when-entry-bracing" />
+        <error line="139" column="60" source="standard:when-entry-bracing" />
+        <error line="145" column="17" source="standard:when-entry-bracing" />
+        <error line="151" column="17" source="standard:when-entry-bracing" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/data/DispenseUpdateRequest.kt">
         <error line="3" column="160" source="standard:max-line-length" />
     </file>
@@ -276,8 +337,67 @@
         <error line="101" column="161" source="standard:max-line-length" />
         <error line="169" column="21" source="standard:property-naming" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/db/dao/MemberDAO.kt">
+        <error line="358" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="361" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="364" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="367" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="370" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="373" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="376" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="379" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="383" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="423" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="426" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/db/entity/BaseEntity.kt">
         <error line="14" column="9" source="standard:property-naming" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/formgeneration/ExaminationGenerator.kt">
+        <error line="218" column="25" source="standard:when-entry-bracing" />
+        <error line="222" column="25" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/formgeneration/FormGenerator.kt">
+        <error line="473" column="25" source="standard:when-entry-bracing" />
+        <error line="477" column="25" source="standard:when-entry-bracing" />
+        <error line="481" column="25" source="standard:when-entry-bracing" />
+        <error line="1504" column="29" source="standard:kdoc" />
+        <error line="1536" column="29" source="standard:kdoc" />
+        <error line="2438" column="21" source="standard:when-entry-bracing" />
+        <error line="2443" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="2444" column="21" source="standard:when-entry-bracing" />
+        <error line="2449" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="2450" column="21" source="standard:when-entry-bracing" />
+        <error line="3275" column="20" source="standard:when-entry-bracing" />
+        <error line="3279" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="3279" column="39" source="standard:when-entry-bracing" />
+        <error line="3280" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="3280" column="43" source="standard:when-entry-bracing" />
+        <error line="3281" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="3281" column="46" source="standard:when-entry-bracing" />
+        <error line="3282" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="3282" column="46" source="standard:when-entry-bracing" />
+        <error line="3283" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="3286" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="3286" column="47" source="standard:when-entry-bracing" />
+        <error line="3287" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="3341" column="24" source="standard:when-entry-bracing" />
+        <error line="3345" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="3345" column="51" source="standard:when-entry-bracing" />
+        <error line="3346" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="3346" column="60" source="standard:when-entry-bracing" />
+        <error line="3347" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="3347" column="47" source="standard:when-entry-bracing" />
+        <error line="3348" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="3348" column="50" source="standard:when-entry-bracing" />
+        <error line="3349" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="3863" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/formgeneration/FormSummaryReporter.kt">
+        <error line="216" column="30" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/formgeneration/SingleSelectionMHView.kt">
+        <error line="138" column="1" source="standard:blank-line-between-when-conditions" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/formgeneration/config/DefinedParams.kt">
         <error line="11" column="15" source="standard:property-naming" />
@@ -300,9 +420,67 @@
     <file name="src/main/java/org/medtroniclabs/uhis/formgeneration/extension/SafePopupMenuClickListener.kt">
         <error line="6" column="160" source="standard:max-line-length" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/formgeneration/extension/ViewExtension.kt">
+        <error line="73" column="13" source="standard:kdoc" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/formgeneration/ui/FormResultComposer.kt">
+        <error line="28" column="56" source="standard:when-entry-bracing" />
+        <error line="29" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="167" column="34" source="standard:when-entry-bracing" />
+        <error line="168" column="1" source="standard:blank-line-between-when-conditions" />
         <error line="168" column="161" source="standard:max-line-length" />
+        <error line="168" column="213" source="standard:when-entry-bracing" />
+        <error line="169" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="169" column="116" source="standard:when-entry-bracing" />
+        <error line="170" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="170" column="91" source="standard:when-entry-bracing" />
+        <error line="171" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="171" column="68" source="standard:when-entry-bracing" />
+        <error line="172" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="172" column="161" source="standard:when-entry-bracing" />
         <error line="172" column="161" source="standard:max-line-length" />
+        <error line="173" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="173" column="38" source="standard:when-entry-bracing" />
+        <error line="174" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="174" column="50" source="standard:when-entry-bracing" />
+        <error line="175" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="175" column="39" source="standard:when-entry-bracing" />
+        <error line="176" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/formgeneration/ui/SingleSelectionCustomView.kt">
+        <error line="110" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/formgeneration/utility/CheckboxDialogAdapter.kt">
+        <error line="95" column="26" source="standard:paren-spacing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/formgeneration/utility/InformationLayoutFragment.kt">
+        <error line="100" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="108" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="109" column="21" source="standard:when-entry-bracing" />
+        <error line="110" column="35" source="standard:when-entry-bracing" />
+        <error line="111" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="111" column="40" source="standard:when-entry-bracing" />
+        <error line="112" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="112" column="35" source="standard:when-entry-bracing" />
+        <error line="113" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="116" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="119" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="122" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="125" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="125" column="25" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/formgeneration/utility/InformationUtils.kt">
+        <error line="339" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="401" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/log/CrashReportingTree.kt">
+        <error line="14" column="28" source="standard:when-entry-bracing" />
+        <error line="15" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="15" column="26" source="standard:when-entry-bracing" />
+        <error line="16" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="19" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="22" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="22" column="21" source="standard:when-entry-bracing" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/mappingkey/CommunityDetails.kt">
         <error line="4" column="15" source="standard:property-naming" />
@@ -337,6 +515,9 @@
         <error line="34" column="15" source="standard:property-naming" />
         <error line="35" column="15" source="standard:property-naming" />
         <error line="36" column="15" source="standard:property-naming" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/mappingkey/MemberRegistration.kt">
+        <error line="126" column="1" source="standard:blank-line-between-when-conditions" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/mappingkey/RxBuddy.kt">
         <error line="4" column="15" source="standard:property-naming" />
@@ -607,15 +788,39 @@
         <error line="70" column="19" source="standard:property-naming" />
         <error line="71" column="19" source="standard:property-naming" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/assessment/dialog/BPLogListDialog.kt">
+        <error line="64" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/assessment/dialog/GlucoseLogListDialog.kt">
+        <error line="62" column="35" source="standard:when-entry-bracing" />
+        <error line="63" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/counseling/activity/NCDCounselingActivity.kt">
+        <error line="207" column="34" source="standard:when-entry-bracing" />
+        <error line="224" column="47" source="standard:when-entry-bracing" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ncd/counseling/activity/NCDCounselingDialog.kt">
         <error line="40" column="19" source="standard:property-naming" />
         <error line="41" column="19" source="standard:property-naming" />
         <error line="42" column="19" source="standard:property-naming" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/counseling/activity/NCDCounselorActivity.kt">
+        <error line="321" column="34" source="standard:when-entry-bracing" />
+        <error line="323" column="35" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/counseling/activity/NCDLifestyleActivity.kt">
+        <error line="258" column="47" source="standard:when-entry-bracing" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ncd/counseling/activity/NCDLifestyleDialog.kt">
         <error line="44" column="19" source="standard:property-naming" />
         <error line="45" column="19" source="standard:property-naming" />
         <error line="46" column="19" source="standard:property-naming" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/counseling/activity/NCDNutritionistActivity.kt">
+        <error line="210" column="25" source="standard:when-entry-bracing" />
+        <error line="214" column="25" source="standard:when-entry-bracing" />
+        <error line="218" column="25" source="standard:when-entry-bracing" />
+        <error line="373" column="35" source="standard:when-entry-bracing" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ncd/data/ValidatePatientModel.kt">
         <error line="1" column="1" source="standard:no-empty-file" />
@@ -634,14 +839,49 @@
         <error line="37" column="15" source="standard:property-naming" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ncd/followup/fragment/NCDCallResultBottomDialog.kt">
+        <error line="130" column="35" source="standard:when-entry-bracing" />
+        <error line="131" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="143" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="143" column="29" source="standard:when-entry-bracing" />
+        <error line="234" column="61" source="standard:square-brackets-spacing" />
+        <error line="487" column="43" source="standard:when-entry-bracing" />
+        <error line="488" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="500" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="500" column="37" source="standard:when-entry-bracing" />
         <error line="569" column="160" source="standard:max-line-length" />
         <error line="569" column="163" source="standard:property-wrapping" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/followup/fragment/NCDFollowUpFilterDialog.kt">
+        <error line="400" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="404" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="408" column="1" source="standard:blank-line-between-when-conditions" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ncd/followup/repo/NCDFollowUpRepo.kt">
         <error line="111" column="9" source="standard:no-consecutive-comments" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/followup/viewmodel/NCDFollowUpViewModel.kt">
+        <error line="249" column="43" source="standard:when-entry-bracing" />
+        <error line="250" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="250" column="52" source="standard:when-entry-bracing" />
+        <error line="265" column="25" source="standard:when-entry-bracing" />
+        <error line="280" column="42" source="standard:when-entry-bracing" />
+        <error line="281" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="281" column="49" source="standard:when-entry-bracing" />
+        <error line="282" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="282" column="49" source="standard:when-entry-bracing" />
+        <error line="283" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="296" column="21" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/landing/dialog/LanguagePreferenceDialog.kt">
+        <error line="106" column="42" source="standard:when-entry-bracing" />
+        <error line="107" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="125" column="40" source="standard:when-entry-bracing" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ncd/landing/dialog/NCDSupportDialogFragment.kt">
         <error line="25" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/LifeStyleCustomView.kt">
+        <error line="95" column="1" source="standard:blank-line-between-when-conditions" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/NCDMRUtil.kt">
         <error line="23" column="15" source="standard:property-naming" />
@@ -708,14 +948,49 @@
         <error line="117" column="15" source="standard:property-naming" />
         <error line="118" column="15" source="standard:property-naming" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/NCDMedicalReviewActivity.kt">
+        <error line="819" column="49" source="standard:when-entry-bracing" />
+        <error line="826" column="48" source="standard:when-entry-bracing" />
+        <error line="1136" column="142" source="standard:when-entry-bracing" />
+        <error line="1137" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="1137" column="101" source="standard:when-entry-bracing" />
+        <error line="1141" column="101" source="standard:when-entry-bracing" />
+        <error line="1321" column="67" source="standard:when-entry-bracing" />
+        <error line="1322" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="1327" column="68" source="standard:when-entry-bracing" />
+        <error line="1328" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="1328" column="52" source="standard:when-entry-bracing" />
+        <error line="1329" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="1329" column="129" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/NCDMedicalReviewCMRActivity.kt">
+        <error line="480" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="480" column="49" source="standard:when-entry-bracing" />
+        <error line="487" column="48" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/dialog/NCDBloodGlucoseReadingDialog.kt">
+        <error line="159" column="44" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/dialog/NCDBloodPressureVitalsDialog.kt">
+        <error line="429" column="44" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/dialog/NCDDiagnosisDialogFragment.kt">
+        <error line="311" column="57" source="standard:when-entry-bracing" />
+        <error line="312" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/dialog/NCDMentalHealthFragment.kt">
         <error line="609" column="19" source="standard:property-naming" />
         <error line="610" column="19" source="standard:property-naming" />
         <error line="613" column="19" source="standard:property-naming" />
         <error line="614" column="19" source="standard:property-naming" />
+        <error line="765" column="1" source="standard:blank-line-between-when-conditions" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/dialog/NCDMentalHealthQuestionDialog.kt">
         <error line="301" column="19" source="standard:property-naming" />
+        <error line="446" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="457" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="496" column="57" source="standard:when-entry-bracing" />
+        <error line="497" column="1" source="standard:blank-line-between-when-conditions" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/dialog/NCDPatientHistoryDialog.kt">
         <error line="91" column="19" source="standard:property-naming" />
@@ -723,6 +998,87 @@
         <error line="94" column="19" source="standard:property-naming" />
         <error line="95" column="19" source="standard:property-naming" />
         <error line="96" column="19" source="standard:property-naming" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/dialog/NCDPregnancyDialog.kt">
+        <error line="874" column="53" source="standard:when-entry-bracing" />
+        <error line="876" column="43" source="standard:when-entry-bracing" />
+        <error line="878" column="42" source="standard:when-entry-bracing" />
+        <error line="880" column="57" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/dialog/SortDialogFragment.kt">
+        <error line="146" column="47" source="standard:when-entry-bracing" />
+        <error line="147" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="147" column="36" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/fragment/NCDAssessmentHistoryGraphFragment.kt">
+        <error line="141" column="9" source="standard:kdoc" />
+        <error line="150" column="9" source="standard:kdoc" />
+        <error line="278" column="19" source="standard:when-entry-bracing" />
+        <error line="279" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="279" column="19" source="standard:when-entry-bracing" />
+        <error line="280" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="645" column="9" source="standard:kdoc" />
+        <error line="651" column="9" source="standard:kdoc" />
+        <error line="657" column="9" source="standard:kdoc" />
+        <error line="663" column="9" source="standard:kdoc" />
+        <error line="674" column="9" source="standard:kdoc" />
+        <error line="684" column="9" source="standard:kdoc" />
+        <error line="694" column="9" source="standard:kdoc" />
+        <error line="791" column="9" source="standard:kdoc" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/fragment/NCDAssessmentMarkerView.kt">
+        <error line="51" column="33" source="standard:when-entry-bracing" />
+        <error line="52" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="52" column="33" source="standard:when-entry-bracing" />
+        <error line="53" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="76" column="33" source="standard:when-entry-bracing" />
+        <error line="77" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="77" column="33" source="standard:when-entry-bracing" />
+        <error line="78" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="99" column="33" source="standard:when-entry-bracing" />
+        <error line="100" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="100" column="33" source="standard:when-entry-bracing" />
+        <error line="101" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="134" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="139" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/fragment/NCDLifeStyleStatusFragment.kt">
+        <error line="240" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="242" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/fragment/NCDMedicalReviewSummaryFragment.kt">
+        <error line="237" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="242" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="291" column="25" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/fragment/NCDScheduleDialog.kt">
+        <error line="93" column="42" source="standard:when-entry-bracing" />
+        <error line="94" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="94" column="40" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/prescription/activity/NCDPrescriptionActivity.kt">
+        <error line="122" column="21" source="standard:kdoc" />
+        <error line="133" column="21" source="standard:kdoc" />
+        <error line="206" column="40" source="standard:when-entry-bracing" />
+        <error line="207" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="207" column="42" source="standard:when-entry-bracing" />
+        <error line="231" column="40" source="standard:when-entry-bracing" />
+        <error line="232" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="232" column="42" source="standard:when-entry-bracing" />
+        <error line="233" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="622" column="21" source="standard:kdoc" />
+        <error line="657" column="25" source="standard:kdoc" />
+        <error line="694" column="21" source="standard:kdoc" />
+        <error line="1070" column="21" source="standard:kdoc" />
+        <error line="1357" column="9" source="standard:kdoc" />
+        <error line="1366" column="9" source="standard:kdoc" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/prescription/dialog/CommentsAlertDialog.kt">
+        <error line="140" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="157" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/prescription/dialog/NCDInstructionExpansionDialog.kt">
+        <error line="100" column="1" source="standard:blank-line-between-when-conditions" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/prescription/dialog/PrescriptionResultDialogFragment.kt">
         <error line="111" column="9" source="standard:function-naming" />
@@ -737,6 +1093,61 @@
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ncd/medicalreview/prescription/viewmodel/NCDPrescriptionViewModel.kt">
         <error line="54" column="9" source="standard:property-naming" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/screening/fragment/GeneralDetailsFragment.kt">
+        <error line="84" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="84" column="21" source="standard:when-entry-bracing" />
+        <error line="91" column="26" source="standard:when-entry-bracing" />
+        <error line="92" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="92" column="27" source="standard:when-entry-bracing" />
+        <error line="93" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="93" column="26" source="standard:when-entry-bracing" />
+        <error line="94" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="94" column="25" source="standard:when-entry-bracing" />
+        <error line="95" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="100" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="100" column="27" source="standard:when-entry-bracing" />
+        <error line="101" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="101" column="21" source="standard:when-entry-bracing" />
+        <error line="102" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="233" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="284" column="32" source="standard:when-entry-bracing" />
+        <error line="285" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="285" column="32" source="standard:when-entry-bracing" />
+        <error line="286" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="286" column="32" source="standard:when-entry-bracing" />
+        <error line="287" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="287" column="32" source="standard:when-entry-bracing" />
+        <error line="288" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="293" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="293" column="32" source="standard:when-entry-bracing" />
+        <error line="294" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="294" column="32" source="standard:when-entry-bracing" />
+        <error line="295" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/screening/fragment/ScreeningFormBuilderFragment.kt">
+        <error line="142" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="145" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="344" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="582" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="586" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="590" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="594" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/screening/ui/ESignatureDialog.kt">
+        <error line="102" column="40" source="standard:when-entry-bracing" />
+        <error line="103" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="103" column="37" source="standard:when-entry-bracing" />
+        <error line="104" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="104" column="47" source="standard:when-entry-bracing" />
+        <error line="105" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ncd/screening/ui/ScreeningActivity.kt">
+        <error line="79" column="71" source="standard:when-entry-bracing" />
+        <error line="80" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="88" column="46" source="standard:when-entry-bracing" />
+        <error line="89" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="89" column="48" source="standard:when-entry-bracing" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ncd/screening/utils/ReferredReason.kt">
         <error line="4" column="15" source="standard:property-naming" />
@@ -756,12 +1167,47 @@
     <file name="src/main/java/org/medtroniclabs/uhis/offlinesync/ScheduledSyncWork.kt">
         <error line="155" column="13" source="standard:no-consecutive-comments" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/repo/FollowUpRepository.kt">
+        <error line="225" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/repo/HouseHoldRepository.kt">
+        <error line="60" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="66" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="72" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/repo/OfflineSyncRepository.kt">
+        <error line="980" column="64" source="standard:mixed-condition-operators" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/signature/view/SignatureView.kt">
         <error line="58" column="17" source="standard:property-naming" />
         <error line="59" column="17" source="standard:property-naming" />
         <error line="60" column="17" source="standard:property-naming" />
         <error line="61" column="17" source="standard:property-naming" />
         <error line="62" column="17" source="standard:property-naming" />
+        <error line="176" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="181" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="186" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="186" column="21" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/BaseActivity.kt">
+        <error line="655" column="21" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/BaseFragment.kt">
+        <error line="233" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="233" column="21" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/DeleteReasonDialog.kt">
+        <error line="148" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="164" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/TagListCustomView.kt">
+        <error line="405" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="405" column="21" source="standard:when-entry-bracing" />
+        <error line="413" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="413" column="21" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/AssessmentActivity.kt">
+        <error line="216" column="21" source="standard:when-entry-bracing" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/AssessmentDefinedParams.kt">
         <error line="6" column="15" source="standard:property-naming" />
@@ -939,11 +1385,234 @@
     <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/ComplianceChooseDialog.kt">
         <error line="1" column="1" source="standard:filename" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/dialog/DangerSignsDialog.kt">
+        <error line="64" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="67" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="70" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="87" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/AssessmentICCMFragment.kt">
+        <error line="173" column="13" source="standard:kdoc" />
+        <error line="201" column="13" source="standard:kdoc" />
+        <error line="357" column="25" source="standard:when-entry-bracing" />
+        <error line="358" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="358" column="36" source="standard:when-entry-bracing" />
+        <error line="359" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="359" column="31" source="standard:when-entry-bracing" />
+        <error line="360" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="360" column="32" source="standard:when-entry-bracing" />
+        <error line="361" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="361" column="40" source="standard:when-entry-bracing" />
+        <error line="362" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="362" column="27" source="standard:when-entry-bracing" />
+        <error line="363" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="363" column="29" source="standard:when-entry-bracing" />
+        <error line="364" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="364" column="24" source="standard:when-entry-bracing" />
+        <error line="365" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="568" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="574" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="579" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="623" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="626" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="636" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="639" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="642" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="652" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="655" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="658" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/AssessmentICCMSummaryFragment.kt">
+        <error line="334" column="21" source="standard:kdoc" />
+        <error line="367" column="29" source="standard:mixed-condition-operators" />
+        <error line="803" column="44" source="standard:when-entry-bracing" />
+        <error line="804" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="804" column="39" source="standard:when-entry-bracing" />
+        <error line="805" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="805" column="52" source="standard:when-entry-bracing" />
+        <error line="806" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="806" column="41" source="standard:when-entry-bracing" />
+        <error line="807" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="991" column="45" source="standard:when-entry-bracing" />
+        <error line="992" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="992" column="48" source="standard:when-entry-bracing" />
+        <error line="993" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="993" column="46" source="standard:when-entry-bracing" />
+        <error line="994" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/AssessmentNCDFragment.kt">
+        <error line="164" column="21" source="standard:kdoc" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/AssessmentNCDSummaryFragment.kt">
+        <error line="671" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="676" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/AssessmentOtherSymptomSummaryFragment.kt">
+        <error line="163" column="21" source="standard:kdoc" />
+        <error line="248" column="45" source="standard:when-entry-bracing" />
+        <error line="249" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="249" column="48" source="standard:when-entry-bracing" />
+        <error line="250" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="250" column="46" source="standard:when-entry-bracing" />
+        <error line="251" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/AssessmentOtherSymptomsFragment.kt">
+        <error line="214" column="9" source="standard:kdoc" />
+        <error line="241" column="49" source="standard:when-entry-bracing" />
+        <error line="242" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="242" column="60" source="standard:when-entry-bracing" />
+        <error line="243" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="243" column="55" source="standard:when-entry-bracing" />
+        <error line="244" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="244" column="48" source="standard:when-entry-bracing" />
+        <error line="245" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/AssessmentPregnancyOutcomeFragment.kt">
+        <error line="741" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="747" column="1" source="standard:blank-line-between-when-conditions" />
         <error line="780" column="13" source="standard:if-else-wrapping" />
         <error line="788" column="13" source="standard:if-else-wrapping" />
+        <error line="830" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="830" column="26" source="standard:when-entry-bracing" />
+        <error line="831" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="831" column="21" source="standard:when-entry-bracing" />
         <error line="863" column="13" source="standard:if-else-wrapping" />
         <error line="870" column="13" source="standard:if-else-wrapping" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/AssessmentPregnancyOutcomeSummaryFragment.kt">
+        <error line="348" column="34" source="standard:when-entry-bracing" />
+        <error line="349" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="349" column="29" source="standard:when-entry-bracing" />
+        <error line="618" column="26" source="standard:when-entry-bracing" />
+        <error line="619" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="624" column="21" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/AssessmentRMNCHFragment.kt">
+        <error line="170" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="631" column="34" source="standard:when-entry-bracing" />
+        <error line="632" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="632" column="34" source="standard:when-entry-bracing" />
+        <error line="633" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="785" column="21" source="standard:when-entry-bracing" />
+        <error line="786" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="1302" column="21" source="standard:when-entry-bracing" />
+        <error line="1459" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="1513" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="1517" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="1521" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/AssessmentRMNCHSummaryFragment.kt">
+        <error line="708" column="21" source="standard:kdoc" />
+        <error line="954" column="45" source="standard:when-entry-bracing" />
+        <error line="955" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="955" column="48" source="standard:when-entry-bracing" />
+        <error line="956" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="956" column="46" source="standard:when-entry-bracing" />
+        <error line="957" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/AssessmentSLNCDFragment.kt">
+        <error line="86" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="92" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/AssessmentSLNCDSummaryFragment.kt">
+        <error line="182" column="21" source="standard:kdoc" />
+        <error line="294" column="45" source="standard:when-entry-bracing" />
+        <error line="295" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="295" column="48" source="standard:when-entry-bracing" />
+        <error line="296" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="296" column="46" source="standard:when-entry-bracing" />
+        <error line="297" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/AssessmentTBFragment.kt">
+        <error line="171" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="187" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/AssessmentTBSummaryFragment.kt">
+        <error line="138" column="38" source="standard:when-entry-bracing" />
+        <error line="140" column="41" source="standard:when-entry-bracing" />
+        <error line="144" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="144" column="42" source="standard:when-entry-bracing" />
+        <error line="145" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="145" column="61" source="standard:when-entry-bracing" />
+        <error line="146" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="147" column="29" source="standard:when-entry-bracing" />
+        <error line="148" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="173" column="37" source="standard:when-entry-bracing" />
+        <error line="174" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="175" column="29" source="standard:when-entry-bracing" />
+        <error line="176" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="249" column="45" source="standard:when-entry-bracing" />
+        <error line="250" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="250" column="48" source="standard:when-entry-bracing" />
+        <error line="251" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="251" column="46" source="standard:when-entry-bracing" />
+        <error line="252" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="283" column="21" source="standard:kdoc" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/BDCataractAssessmentFragment.kt">
+        <error line="99" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="105" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/BDCataractAssessmentSummaryFragment.kt">
+        <error line="128" column="45" source="standard:when-entry-bracing" />
+        <error line="129" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="129" column="48" source="standard:when-entry-bracing" />
+        <error line="130" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="130" column="46" source="standard:when-entry-bracing" />
+        <error line="131" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="191" column="31" source="standard:when-entry-bracing" />
+        <error line="312" column="21" source="standard:kdoc" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/BDEyeCareAssessmentFragment.kt">
+        <error line="95" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="101" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/BDEyeCareAssessmentSummaryFragment.kt">
+        <error line="106" column="45" source="standard:when-entry-bracing" />
+        <error line="107" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="107" column="48" source="standard:when-entry-bracing" />
+        <error line="108" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="108" column="46" source="standard:when-entry-bracing" />
+        <error line="109" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="213" column="21" source="standard:kdoc" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/BDNCDAssessmentFragment.kt">
+        <error line="106" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="112" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/BDNCDAssessmentSummaryFragment.kt">
+        <error line="125" column="45" source="standard:when-entry-bracing" />
+        <error line="126" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="126" column="48" source="standard:when-entry-bracing" />
+        <error line="127" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="127" column="46" source="standard:when-entry-bracing" />
+        <error line="128" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="206" column="31" source="standard:when-entry-bracing" />
+        <error line="253" column="21" source="standard:when-entry-bracing" />
+        <error line="283" column="21" source="standard:kdoc" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/RxBuddySummaryFragment.kt">
+        <error line="149" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="152" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="218" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="219" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="223" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="224" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="227" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="228" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/referrallogic/ANCAssessmentEvaluator.kt">
+        <error line="251" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="257" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="257" column="25" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/referrallogic/PNCAssessmentEvaluator.kt">
+        <error line="293" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="296" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/referrallogic/ReferralResultGenerator.kt">
+        <error line="223" column="13" source="standard:mixed-condition-operators" />
+        <error line="260" column="42" source="standard:mixed-condition-operators" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/referrallogic/model/ReferralDefinedParams.kt">
         <error line="4" column="15" source="standard:property-naming" />
@@ -1004,14 +1673,104 @@
         <error line="86" column="15" source="standard:property-naming" />
         <error line="88" column="15" source="standard:property-naming" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/utils/AssessmentUtil.kt">
+        <error line="169" column="21" source="standard:when-entry-bracing" />
+        <error line="195" column="21" source="standard:when-entry-bracing" />
+        <error line="274" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="277" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="280" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="312" column="65" source="standard:when-entry-bracing" />
+        <error line="313" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="313" column="38" source="standard:when-entry-bracing" />
+        <error line="314" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="314" column="53" source="standard:when-entry-bracing" />
+        <error line="315" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="315" column="45" source="standard:when-entry-bracing" />
+        <error line="316" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="316" column="60" source="standard:when-entry-bracing" />
+        <error line="317" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="317" column="50" source="standard:when-entry-bracing" />
+        <error line="318" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/viewmodel/AssessmentViewModel.kt">
+        <error line="474" column="26" source="standard:when-entry-bracing" />
+        <error line="475" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="480" column="21" source="standard:when-entry-bracing" />
+        <error line="1665" column="48" source="standard:when-entry-bracing" />
+        <error line="1666" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/boarding/MenuTypeEnums.kt">
         <error line="4" column="5" source="standard:enum-entry-name-case" />
         <error line="5" column="5" source="standard:enum-entry-name-case" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/boarding/ResourceLoadingScreen.kt">
+        <error line="62" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="66" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="103" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/cbs/fragment/CbsCallResultFragment.kt">
+        <error line="85" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="91" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="175" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/cbs/fragment/CbsFragment.kt">
+        <error line="269" column="58" source="standard:when-entry-bracing" />
+        <error line="272" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="272" column="61" source="standard:when-entry-bracing" />
+        <error line="275" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="275" column="47" source="standard:when-entry-bracing" />
+        <error line="276" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="276" column="75" source="standard:when-entry-bracing" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/common/composeui/DialogComposeUtils.kt">
         <error line="29" column="9" source="standard:function-naming" />
         <error line="49" column="9" source="standard:function-naming" />
         <error line="88" column="9" source="standard:function-naming" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/communityprofile/adapter/CommunitySummaryAdapter.kt">
+        <error line="157" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/communityprofile/fragments/CommunityProfileSummaryFragment.kt">
+        <error line="203" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="210" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="252" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="259" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="270" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="283" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="311" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="317" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/communityprofile/fragments/EditCommunityProfileFragment.kt">
+        <error line="300" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="410" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="788" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="791" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="799" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/dashboard/ncd/DashboardFilterBottomSheetDialogFragment.kt">
+        <error line="76" column="42" source="standard:when-entry-bracing" />
+        <error line="77" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="99" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="99" column="40" source="standard:when-entry-bracing" />
+        <error line="132" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/dashboard/ncd/repository/DashboardLocalRepository.kt">
+        <error line="55" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="60" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="65" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="65" column="21" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/dialog/MedicalReviewSuccessDialogFragment.kt">
+        <error line="79" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/externalmember/ExternalMemberRegistrationFragment.kt">
+        <error line="206" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="223" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="261" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="324" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="515" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="531" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="534" column="1" source="standard:blank-line-between-when-conditions" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/followup/FollowUpDefinedParams.kt">
         <error line="4" column="15" source="standard:property-naming" />
@@ -1031,12 +1790,132 @@
         <error line="30" column="15" source="standard:property-naming" />
         <error line="31" column="15" source="standard:property-naming" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/home/HomeScreenFragment.kt">
+        <error line="219" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/home/adapter/DashboardMenuItemsAdapter.kt">
+        <error line="90" column="54" source="standard:when-entry-bracing" />
+        <error line="95" column="54" source="standard:when-entry-bracing" />
+        <error line="100" column="48" source="standard:when-entry-bracing" />
+        <error line="105" column="83" source="standard:when-entry-bracing" />
+        <error line="110" column="47" source="standard:when-entry-bracing" />
+        <error line="123" column="53" source="standard:when-entry-bracing" />
+        <error line="128" column="41" source="standard:when-entry-bracing" />
+        <error line="132" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="132" column="42" source="standard:when-entry-bracing" />
+        <error line="137" column="47" source="standard:when-entry-bracing" />
+        <error line="142" column="47" source="standard:when-entry-bracing" />
+        <error line="147" column="48" source="standard:when-entry-bracing" />
+        <error line="153" column="17" source="standard:when-entry-bracing" />
+        <error line="189" column="45" source="standard:when-entry-bracing" />
+        <error line="194" column="41" source="standard:when-entry-bracing" />
+        <error line="199" column="52" source="standard:when-entry-bracing" />
+        <error line="204" column="62" source="standard:when-entry-bracing" />
+        <error line="209" column="59" source="standard:when-entry-bracing" />
+        <error line="214" column="37" source="standard:when-entry-bracing" />
+        <error line="218" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="218" column="56" source="standard:when-entry-bracing" />
+        <error line="223" column="40" source="standard:when-entry-bracing" />
+        <error line="228" column="43" source="standard:when-entry-bracing" />
+        <error line="233" column="41" source="standard:when-entry-bracing" />
+        <error line="238" column="40" source="standard:when-entry-bracing" />
+        <error line="243" column="40" source="standard:when-entry-bracing" />
+        <error line="248" column="44" source="standard:when-entry-bracing" />
+        <error line="253" column="44" source="standard:when-entry-bracing" />
+        <error line="258" column="39" source="standard:when-entry-bracing" />
+        <error line="263" column="40" source="standard:when-entry-bracing" />
+        <error line="268" column="44" source="standard:when-entry-bracing" />
+        <error line="273" column="48" source="standard:when-entry-bracing" />
+        <error line="278" column="41" source="standard:when-entry-bracing" />
+        <error line="283" column="41" source="standard:when-entry-bracing" />
+        <error line="288" column="34" source="standard:when-entry-bracing" />
+        <error line="293" column="21" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/household/HouseholdSearchActivity.kt">
+        <error line="195" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/household/SortDialogFragment.kt">
+        <error line="90" column="25" source="standard:when-entry-bracing" />
+        <error line="147" column="47" source="standard:when-entry-bracing" />
+        <error line="148" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="148" column="36" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/household/fragment/HouseHoldRegistrationFragment.kt">
+        <error line="136" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="171" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="216" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="366" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="389" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="392" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="404" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/household/summary/MemberDeceasedDialogFragment.kt">
+        <error line="151" column="21" source="standard:kdoc" />
+        <error line="194" column="60" source="standard:when-entry-bracing" />
+        <error line="196" column="63" source="standard:when-entry-bracing" />
+        <error line="198" column="61" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/household/summary/MemberEditDialogFragment.kt">
+        <error line="108" column="21" source="standard:kdoc" />
+        <error line="132" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/landing/LandingActivity.kt">
+        <error line="179" column="46" source="standard:mixed-condition-operators" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/landing/viewmodel/OfflineSyncViewModel.kt">
         <error line="3" column="1" source="standard:import-ordering" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/GeneralExaminationFragment.kt">
+        <error line="149" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="149" column="21" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/SignatureDialogFragment.kt">
+        <error line="72" column="40" source="standard:when-entry-bracing" />
+        <error line="73" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="73" column="37" source="standard:when-entry-bracing" />
+        <error line="74" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="74" column="47" source="standard:when-entry-bracing" />
+        <error line="75" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/SystemicExaminationsFragment.kt">
+        <error line="168" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="168" column="88" source="standard:when-entry-bracing" />
+        <error line="169" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="169" column="61" source="standard:when-entry-bracing" />
+        <error line="174" column="61" source="standard:when-entry-bracing" />
+        <error line="178" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="183" column="21" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/abovefiveyears/AboveFiveYearsBaseActivity.kt">
+        <error line="445" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="453" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="454" column="17" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/abovefiveyears/AboveFiveYearsTreatmentSummaryFragment.kt">
+        <error line="245" column="21" source="standard:kdoc" />
+        <error line="309" column="21" source="standard:kdoc" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/diagnosis/DiagnosisDialogFragment.kt">
+        <error line="146" column="33" source="standard:kdoc" />
         <error line="481" column="161" source="standard:max-line-length" />
+        <error line="497" column="1" source="standard:blank-line-between-when-conditions" />
         <error line="497" column="161" source="standard:max-line-length" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/epi/ImmunizationActivity.kt">
+        <error line="167" column="42" source="standard:when-entry-bracing" />
+        <error line="168" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="175" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="184" column="42" source="standard:when-entry-bracing" />
+        <error line="185" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="192" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/epi/fragment/EpiCatchUpPolicyDialogFragment.kt">
+        <error line="67" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/epi/fragment/ImmunisationSummaryFragment.kt">
+        <error line="143" column="42" source="standard:when-entry-bracing" />
+        <error line="144" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="150" column="1" source="standard:blank-line-between-when-conditions" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/epi/view/VaccinationStatusNudge.kt">
         <error line="24" column="19" source="standard:property-naming" />
@@ -1044,22 +1923,85 @@
         <error line="26" column="19" source="standard:property-naming" />
         <error line="27" column="19" source="standard:property-naming" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/familyplan/activity/FamilyPlanMedicalReviewActivity.kt">
+        <error line="353" column="42" source="standard:when-entry-bracing" />
+        <error line="354" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="354" column="43" source="standard:when-entry-bracing" />
+        <error line="355" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="359" column="36" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/familyplan/fragment/ContraceptivesFragment.kt">
+        <error line="366" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/familyplan/viewmodel/ContraceptivesViewModel.kt">
+        <error line="46" column="46" source="standard:square-brackets-spacing" />
+        <error line="47" column="43" source="standard:square-brackets-spacing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/hiv/activity/HivImrAndCmrActivity.kt">
+        <error line="454" column="42" source="standard:when-entry-bracing" />
+        <error line="458" column="43" source="standard:when-entry-bracing" />
+        <error line="463" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="463" column="37" source="standard:when-entry-bracing" />
+        <error line="464" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="464" column="35" source="standard:when-entry-bracing" />
+        <error line="465" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="465" column="36" source="standard:when-entry-bracing" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/hiv/fragment/ARTRegimenFragment.kt">
         <error line="127" column="9" source="standard:function-naming" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/hiv/fragment/EligibilityFragment.kt">
+        <error line="180" column="21" source="standard:kdoc" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/hiv/fragment/HIVStatusFragment.kt">
+        <error line="455" column="21" source="standard:kdoc" />
+        <error line="567" column="25" source="standard:kdoc" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/hiv/fragment/HivImrCmrSummaryFragment.kt">
+        <error line="123" column="60" source="standard:then-spacing" />
+        <error line="123" column="101" source="standard:then-spacing" />
+        <error line="332" column="21" source="standard:kdoc" />
+        <error line="385" column="21" source="standard:kdoc" />
+        <error line="433" column="21" source="standard:kdoc" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/hiv/fragment/HivMedicalReviewDiagnosesFragment.kt">
+        <error line="251" column="42" source="standard:when-entry-bracing" />
+        <error line="264" column="40" source="standard:when-entry-bracing" />
+        <error line="313" column="40" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/hiv/fragment/HivSummaryFragment.kt">
+        <error line="387" column="21" source="standard:kdoc" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/hiv/fragment/HivTestFragment.kt">
+        <error line="205" column="21" source="standard:kdoc" />
         <error line="261" column="17" source="standard:property-naming" />
         <error line="267" column="17" source="standard:property-naming" />
         <error line="273" column="17" source="standard:property-naming" />
         <error line="292" column="17" source="standard:property-naming" />
         <error line="310" column="17" source="standard:property-naming" />
+        <error line="429" column="102" source="standard:then-spacing" />
+        <error line="430" column="98" source="standard:then-spacing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/hiv/fragment/OpportunisticInfectionsTreatmentFragment.kt">
+        <error line="110" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/hiv/fragment/RecommendedInvestigationsDialog.kt">
+        <error line="103" column="1" source="standard:blank-line-between-when-conditions" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/hiv/fragment/ViralLoadFragment.kt">
         <error line="145" column="9" source="standard:function-naming" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/hiv/fragment/WhoClinicalStageFragment.kt">
+        <error line="176" column="35" source="standard:when-entry-bracing" />
+        <error line="177" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/investigation/InvestigationGenerator.kt">
         <error line="73" column="17" source="standard:property-naming" />
         <error line="210" column="161" source="standard:max-line-length" />
+        <error line="410" column="25" source="standard:kdoc" />
+        <error line="464" column="25" source="standard:kdoc" />
+        <error line="520" column="25" source="standard:when-entry-bracing" />
+        <error line="524" column="25" source="standard:when-entry-bracing" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/investigation/dialog/HBA1CNudgesDialog.kt">
         <error line="81" column="17" source="standard:function-naming" />
@@ -1085,21 +2027,147 @@
         <error line="456" column="17" source="standard:function-naming" />
         <error line="475" column="9" source="standard:function-naming" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/investigation/dialog/MarkAsReviewedConfirmationDialog.kt">
+        <error line="78" column="45" source="standard:when-entry-bracing" />
+        <error line="79" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/motherneonate/anc/MotherNeonateUtil.kt">
         <error line="21" column="15" source="standard:property-naming" />
+        <error line="245" column="58" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/motherneonate/anc/activity/MotherNeonateANCActivity.kt">
+        <error line="481" column="45" source="standard:when-entry-bracing" />
+        <error line="482" column="42" source="standard:when-entry-bracing" />
+        <error line="483" column="43" source="standard:when-entry-bracing" />
+        <error line="484" column="37" source="standard:when-entry-bracing" />
+        <error line="485" column="35" source="standard:when-entry-bracing" />
+        <error line="486" column="36" source="standard:when-entry-bracing" />
+        <error line="894" column="48" source="standard:when-entry-bracing" />
+        <error line="895" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="903" column="61" source="standard:when-entry-bracing" />
+        <error line="904" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/motherneonate/anc/fragment/AddBpDialog.kt">
+        <error line="264" column="35" source="standard:when-entry-bracing" />
+        <error line="265" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/motherneonate/anc/fragment/MotherNeonateAncSummary.kt">
+        <error line="334" column="21" source="standard:kdoc" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/motherneonate/anc/fragment/PregnancyDetailsFragment.kt">
+        <error line="394" column="21" source="standard:kdoc" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/motherneonate/anc/fragment/SelectFlowDialog.kt">
+        <error line="252" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="263" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="292" column="1" source="standard:blank-line-between-when-conditions" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/motherneonate/anc/viewmodel/MotherNeonateAncSummaryViewModel.kt">
         <error line="1" column="1" source="standard:filename" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/motherneonate/emtct/activity/MotherNeonateEMTCTActivity.kt">
+        <error line="116" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="550" column="42" source="standard:when-entry-bracing" />
+        <error line="554" column="43" source="standard:when-entry-bracing" />
+        <error line="559" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="559" column="37" source="standard:when-entry-bracing" />
+        <error line="560" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="560" column="35" source="standard:when-entry-bracing" />
+        <error line="561" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="561" column="36" source="standard:when-entry-bracing" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/motherneonate/labourdelivery/fragment/LabourOrDeliveryFragment.kt">
         <error line="279" column="160" source="standard:max-line-length" />
         <error line="279" column="163" source="standard:property-wrapping" />
+        <error line="684" column="14" source="standard:mixed-condition-operators" />
+        <error line="688" column="17" source="standard:mixed-condition-operators" />
+        <error line="758" column="21" source="standard:mixed-condition-operators" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/motherneonate/labourdelivery/fragment/NeonateFragment.kt">
+        <error line="107" column="1" source="standard:blank-line-between-when-conditions" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/motherneonate/labourdelivery/viewmodel/LabourDeliveryViewModel.kt">
         <error line="92" column="17" source="standard:backing-property-naming" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/motherneonate/pnc/fragment/MotherNeonatePncSummaryFragment.kt">
+        <error line="364" column="21" source="standard:kdoc" />
+        <error line="385" column="38" source="standard:when-entry-bracing" />
+        <error line="386" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/pharmacist/activity/NCDPharmacistActivity.kt">
+        <error line="65" column="42" source="standard:when-entry-bracing" />
+        <error line="66" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="84" column="42" source="standard:when-entry-bracing" />
+        <error line="85" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="85" column="40" source="standard:when-entry-bracing" />
+        <error line="86" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/pharmacist/fragment/NCDQuantityDifferenceDialogueFragment.kt">
+        <error line="138" column="25" source="standard:kdoc" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/prescription/ReasonForChangeDialogFragment.kt">
+        <error line="110" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/tb/activity/TBMedicalReviewActivity.kt">
+        <error line="328" column="42" source="standard:when-entry-bracing" />
+        <error line="331" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="331" column="43" source="standard:when-entry-bracing" />
+        <error line="334" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="335" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="335" column="37" source="standard:when-entry-bracing" />
+        <error line="336" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="336" column="35" source="standard:when-entry-bracing" />
+        <error line="337" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="337" column="36" source="standard:when-entry-bracing" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/tb/fragment/AddBMIDialog.kt">
+        <error line="253" column="35" source="standard:when-entry-bracing" />
+        <error line="254" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/tb/fragment/PatientTypeFragment.kt">
+        <error line="151" column="35" source="standard:when-entry-bracing" />
+        <error line="152" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/tb/fragment/TbSummaryFragment.kt">
+        <error line="325" column="21" source="standard:kdoc" />
+        <error line="361" column="21" source="standard:kdoc" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/underfiveyears/ClinicalSummaryUnderFiveYearsFragment.kt">
+        <error line="157" column="21" source="standard:kdoc" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/underfiveyears/UnderFiveYearsBaseActivity.kt">
+        <error line="454" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/underfiveyears/UnderFiveYearsClinicalSummarryViewModel.kt">
         <error line="1" column="1" source="standard:filename" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/underfiveyears/UnderFiveYearsTreatmentSummaryFragment.kt">
+        <error line="305" column="21" source="standard:kdoc" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/undertwomonths/activity/UnderTwoMonthsBaseActivity.kt">
+        <error line="335" column="31" source="standard:when-entry-bracing" />
+        <error line="336" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="336" column="29" source="standard:when-entry-bracing" />
+        <error line="337" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="337" column="42" source="standard:when-entry-bracing" />
+        <error line="338" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="338" column="30" source="standard:when-entry-bracing" />
+        <error line="339" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="495" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="495" column="22" source="standard:when-entry-bracing" />
+        <error line="530" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="534" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/undertwomonths/fragment/BirthHistoryFragment.kt">
+        <error line="79" column="65" source="standard:when-entry-bracing" />
+        <error line="80" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/undertwomonths/fragment/ClinicalSummaryFragment.kt">
+        <error line="310" column="21" source="standard:kdoc" />
+        <error line="321" column="9" source="standard:mixed-condition-operators" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/undertwomonths/fragment/UnderTwoMonthsTreatmentSummaryFragment.kt">
+        <error line="311" column="21" source="standard:kdoc" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/medicalreview/utils/MedicalReviewDefinedParams.kt">
         <error line="9" column="15" source="standard:property-naming" />
@@ -1191,13 +2259,74 @@
     <file name="src/main/java/org/medtroniclabs/uhis/ui/mypatients/fragment/AddPresumptiveTBNoDialog.kt">
         <error line="38" column="19" source="standard:property-naming" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/mypatients/fragment/MedicalReviewPatientDiagnosisFragment.kt">
+        <error line="203" column="42" source="standard:when-entry-bracing" />
+        <error line="213" column="40" source="standard:when-entry-bracing" />
+        <error line="233" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="923" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="937" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/mypatients/fragment/PatientInfoFragment.kt">
         <error line="527" column="17" source="standard:no-consecutive-comments" />
         <error line="601" column="17" source="standard:no-consecutive-comments" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/mypatients/fragment/PatientMenuFragment.kt">
+        <error line="114" column="61" source="standard:when-entry-bracing" />
+        <error line="115" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="132" column="52" source="standard:when-entry-bracing" />
+        <error line="134" column="33" source="standard:when-entry-bracing" />
+        <error line="138" column="45" source="standard:when-entry-bracing" />
+        <error line="139" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="140" column="21" source="standard:when-entry-bracing" />
+        <error line="144" column="21" source="standard:when-entry-bracing" />
+        <error line="147" column="41" source="standard:when-entry-bracing" />
+        <error line="148" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="148" column="45" source="standard:when-entry-bracing" />
+        <error line="149" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="150" column="21" source="standard:when-entry-bracing" />
+        <error line="350" column="37" source="standard:blank-line-between-when-conditions" />
+        <error line="361" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="375" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="377" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="379" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/mypatients/fragment/PatientSearchFilterDialog.kt">
+        <error line="186" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/mypatients/fragment/PatientSearchFragment.kt">
+        <error line="226" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="227" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="228" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="229" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="236" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="329" column="55" source="standard:when-entry-bracing" />
+        <error line="330" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="330" column="53" source="standard:when-entry-bracing" />
+        <error line="331" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="354" column="21" source="standard:when-entry-bracing" />
+        <error line="373" column="13" source="standard:kdoc" />
+        <error line="384" column="13" source="standard:kdoc" />
+        <error line="442" column="63" source="standard:when-entry-bracing" />
+        <error line="443" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="443" column="61" source="standard:when-entry-bracing" />
+        <error line="444" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="469" column="29" source="standard:when-entry-bracing" />
+        <error line="503" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="507" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="513" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/mypatients/fragment/ReferPatientFragment.kt">
+        <error line="304" column="57" source="standard:when-entry-bracing" />
+        <error line="305" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="316" column="153" source="standard:when-entry-bracing" />
         <error line="316" column="161" source="standard:max-line-length" />
+        <error line="317" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="317" column="154" source="standard:when-entry-bracing" />
         <error line="317" column="161" source="standard:max-line-length" />
+        <error line="318" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="321" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="324" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="327" column="1" source="standard:blank-line-between-when-conditions" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/mypatients/repo/NCDMedicalReviewRepo.kt">
         <error line="1" column="1" source="standard:no-empty-file" />
@@ -1205,7 +2334,32 @@
     <file name="src/main/java/org/medtroniclabs/uhis/ui/mypatients/viewmodel/ReferralTicketViewModel.kt">
         <error line="1" column="1" source="standard:no-empty-file" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/patientEdit/fragment/NCDPatientEditFragment.kt">
+        <error line="174" column="9" source="standard:kdoc" />
+        <error line="183" column="9" source="standard:kdoc" />
+        <error line="194" column="9" source="standard:kdoc" />
+        <error line="200" column="9" source="standard:kdoc" />
+        <error line="206" column="9" source="standard:kdoc" />
+        <error line="216" column="9" source="standard:kdoc" />
+        <error line="222" column="9" source="standard:kdoc" />
+        <error line="254" column="9" source="standard:kdoc" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/peersupervisor/PerformanceMonitoringViewModel.kt">
         <error line="64" column="17" source="standard:backing-property-naming" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/phuwalkins/fragment/PhuLinkedHouseHoldListFragment.kt">
+        <error line="161" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/referralhistory/fragment/MedicalReviewHistoryFragment.kt">
+        <error line="1126" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="1171" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="1208" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/referralhistory/fragment/ReferralTicketFragment.kt">
+        <error line="330" column="1" source="standard:blank-line-between-when-conditions" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/services/ServicesActivity.kt">
+        <error line="267" column="1" source="standard:blank-line-between-when-conditions" />
+        <error line="271" column="1" source="standard:blank-line-between-when-conditions" />
     </file>
 </baseline>

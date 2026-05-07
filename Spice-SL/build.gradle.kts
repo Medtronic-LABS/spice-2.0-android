@@ -11,14 +11,19 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
 }
 
-ktlint {
-    version = "1.8.0"
-    android = true
-    ignoreFailures = false
+allprojects {
+    plugins.withId("org.jlleitschuh.gradle.ktlint") {
+        configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+            version = "1.8.0"
+            android = true
+            ignoreFailures = false
+            relative = true
 
-    reporters {
-        reporter(ReporterType.PLAIN)
-        reporter(ReporterType.HTML)
+            reporters {
+                reporter(ReporterType.PLAIN)
+                reporter(ReporterType.HTML)
+            }
+        }
     }
 }
 
