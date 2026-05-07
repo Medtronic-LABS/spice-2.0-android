@@ -1311,7 +1311,6 @@ class RoomHelperImpl @Inject constructor(
             householdRegisteredCount = hhCount,
             pwIdentifiedFirst4MonthsWithAncCount = maternal?.pwIdentifiedFirst4MonthsWithAncCount ?: 0,
             anc3PlusCount = maternal?.anc3PlusCount ?: 0,
-            highRiskPregnantWomenCount = maternal?.highRiskPregnantWomenCount ?: 0,
         ) ?: DashboardCountsRow(
             screened = 0,
             referred = 0,
@@ -1334,7 +1333,7 @@ class RoomHelperImpl @Inject constructor(
             householdRegisteredCount = hhCount,
             pwIdentifiedFirst4MonthsWithAncCount = maternal?.pwIdentifiedFirst4MonthsWithAncCount ?: 0,
             anc3PlusCount = maternal?.anc3PlusCount ?: 0,
-            highRiskPregnantWomenCount = maternal?.highRiskPregnantWomenCount ?: 0,
+            highRiskPregnantWomenCount = 0,
         )
     }
 

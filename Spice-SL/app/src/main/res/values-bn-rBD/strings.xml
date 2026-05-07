@@ -427,8 +427,8 @@
     <string name="on_treatment">চিকিৎসাধীন</string>
     <string name="recovered">সুস্থ</string>
     <string name="data_range">তারিখ পরিসীমা</string>
-    <string name="from">থেকে</string>
-    <string name="to">প্রতি</string>
+    <string name="from">হতে</string>
+    <string name="to">পর্যন্ত</string>
     <string name="un_reachable">পৌঁছানো যায় না</string>
     <string name="wrong_number">ভুল নম্বর</string>
     <string name="Select_Date">অনুগ্রহ করে তারিখ থেকে নির্বাচন করুন</string>
