@@ -102,7 +102,7 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentNCDEntity
         SubVillageEntity::class, ShasthyaShebikaEntity::class, ShasthyaShebikaLinkedVillageEntity::class,
         MemberAssessmentHistoryEntity::class,
     ],
-    version = 3,
+    version = 4,
     autoMigrations = [
         AutoMigration(1, 2),
         AutoMigration(2, 3),
@@ -176,11 +176,12 @@ abstract class SpiceDataBase : RoomDatabase() {
         private fun buildDatabase(context: Context): SpiceDataBase {
             System.loadLibrary("sqlcipher")
             val factory = SupportOpenHelperFactory(BuildConfig.ROOM_DB_ENCRYPTION_KEY.toByteArray(Charsets.UTF_8))
-            val db = Room.databaseBuilder(
-                context.applicationContext,
-                SpiceDataBase::class.java,
-                DATABASE_NAME,
-            )
+            val db = Room
+                .databaseBuilder(
+                    context.applicationContext,
+                    SpiceDataBase::class.java,
+                    DATABASE_NAME,
+                ).addMigrations(SpiceDatabaseMigration.MIGRATION_3_4)
             if (!BuildConfig.DEBUG) {
                 db.openHelperFactory(factory)
             }

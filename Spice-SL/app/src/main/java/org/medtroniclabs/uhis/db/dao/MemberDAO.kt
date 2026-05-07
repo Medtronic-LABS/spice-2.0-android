@@ -13,7 +13,6 @@ import org.medtroniclabs.uhis.data.offlinesync.model.HouseHoldMember
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberStatus
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberWithTb
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineSyncStatus
-import org.medtroniclabs.uhis.db.entity.AssessmentEntity
 import org.medtroniclabs.uhis.db.entity.HouseholdEntity
 import org.medtroniclabs.uhis.db.entity.HouseholdMemberEntity
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
@@ -149,11 +148,15 @@ interface MemberDAO {
         if (!entity.isActive && entity.fhirId != null) {
             deleteRxBuddyOnDeceased(entity.fhirId!!)
         }
-        val existingEntity = entity.fhirId?.let { getByUniqueField(it) }
+        val existingEntity = entity.fhirId?.let {
+            getByUniqueField(it)
+        }
         if (existingEntity?.sync_status != OfflineSyncStatus.NotSynced) {
             val entityToInsert = existingEntity?.let { entity.copy(id = it.id) } ?: entity
             entityToInsert.sync_status = existingEntity?.sync_status ?: OfflineSyncStatus.Success
             entityToInsert.fhirId = entity.fhirId
+            entityToInsert.createdAt = entity.createdAt
+            entityToInsert.updatedAt = entity.updatedAt
             return insertMember(entityToInsert)
         } else {
             return existingEntity.id
@@ -163,11 +166,10 @@ interface MemberDAO {
     @Query("DELETE FROM RxBuddyDetails WHERE patientMemberId = :memberId")
     suspend fun deleteRxBuddyOnDeceased(memberId: String)
 
-    @Query("UPDATE HouseholdMember SET sync_status =:syncStatus, updated_at =:updatedAt WHERE id IN (:memberIds)")
+    @Query("UPDATE HouseholdMember SET sync_status =:syncStatus WHERE id IN (:memberIds)")
     suspend fun updateInProgress(
         memberIds: List<String>,
         syncStatus: String,
-        updatedAt: Long = System.currentTimeMillis(),
     )
 
     @Query("UPDATE HouseholdMember SET sync_status =:syncStatus WHERE id = :id")
@@ -176,11 +178,12 @@ interface MemberDAO {
         syncStatus: OfflineSyncStatus = OfflineSyncStatus.NotSynced,
     )
 
-    @Query("UPDATE HouseholdMember SET isActive = :status, sync_status =:syncStatus  WHERE id = :id")
+    @Query("UPDATE HouseholdMember SET isActive = :status, sync_status =:syncStatus, updated_at =:updatedAt  WHERE id = :id")
     suspend fun updateMemberDeceasedStatus(
         id: Long,
         status: Boolean,
         syncStatus: OfflineSyncStatus,
+        updatedAt: Long = System.currentTimeMillis(),
     )
 
     @Query("UPDATE HouseholdMember SET isActive = :status, sync_status =:syncStatus , deceasedReason=:deceasedReason ,updated_at =:updatedAt WHERE id = :id")
@@ -285,7 +288,7 @@ interface MemberDAO {
      * **observedEntities** ensures Room re-delivers LiveData whenever any of the
      * three underlying tables change.
      */
-    @RawQuery(observedEntities = [HouseholdEntity::class, HouseholdMemberEntity::class, AssessmentEntity::class])
+    @RawQuery(observedEntities = [HouseholdEntity::class, HouseholdMemberEntity::class, MemberAssessmentHistoryEntity::class])
     fun getServiceMembersRaw(query: SimpleSQLiteQuery): LiveData<List<HouseholdMemberWithTb>>
 
     /**
@@ -405,6 +408,26 @@ interface MemberDAO {
             "INNER JOIN SubVillageEntity AS sv ON sv.id = hh.sub_village_id"
         }
 
+        val latestPregnancyEddExpr =
+            """
+            (
+                SELECT substr(lp.estimatedDeliveryDate, 1, 10)
+                FROM (${ServiceFilterConditions.LATEST_PREGNANCY_SUBQUERY}) AS lp
+            )
+            """.trimIndent()
+
+        val orderByClause = when (staticFilter) {
+            ServiceStaticFilter.EXPECTED_DELIVERIES -> {
+                "ORDER BY $latestPregnancyEddExpr ASC, hhm.id DESC"
+            }
+            ServiceStaticFilter.PENDING_DELIVERIES -> {
+                "ORDER BY $latestPregnancyEddExpr DESC, hhm.id DESC"
+            }
+            else -> {
+                "ORDER BY COALESCE(mahAgg.recent_service_date, hhm.created_at) DESC, hhm.id DESC"
+            }
+        }
+
         val query =
             """
             SELECT
@@ -444,7 +467,7 @@ interface MemberDAO {
             ON mahAgg.memberId = hhm.id
 
             $whereClause
-            ORDER BY hhm.id DESC
+            $orderByClause
             """.trimIndent()
         return getServiceMembersRaw(SimpleSQLiteQuery(query, args.toTypedArray()))
     }
@@ -454,7 +477,7 @@ interface MemberDAO {
      *
      * The query should project all aliases required by [ServiceMemberCounts].
      */
-    @RawQuery
+    @RawQuery(observedEntities = [HouseholdEntity::class, HouseholdMemberEntity::class, MemberAssessmentHistoryEntity::class])
     suspend fun getAllServiceMemberCountsRaw(query: SimpleSQLiteQuery): ServiceMemberCounts
 
     /**

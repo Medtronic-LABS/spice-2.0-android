@@ -9,12 +9,9 @@
         android:id="@+id/cgCalender"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/_16sdp"
-        app:layout_constraintBottom_toTopOf="@+id/tvFrom"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:singleSelection="true" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/centerGuideline"
@@ -32,7 +29,8 @@
         android:textSize="@dimen/_14ssp"
         app:layout_constraintEnd_toStartOf="@+id/centerGuideline"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cgCalender" />
+        android:layout_marginTop="@dimen/_16sdp"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/etFromDate"
@@ -64,7 +62,8 @@
         android:textSize="@dimen/_14ssp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/centerGuideline"
-        app:layout_constraintTop_toBottomOf="@+id/cgCalender" />
+        android:layout_marginTop="@dimen/_16sdp"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/etToDate"
@@ -100,7 +99,7 @@
         android:id="@+id/clDateRange"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:visibility="visible"
         app:constraint_referenced_ids="tvFrom,tvTo,etFromDate,etToDate" />
 
     <androidx.recyclerview.widget.RecyclerView

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <baseline version="1.0">
-    <file name="src/main/java/org/medtroniclabs/uhis/app/analytics/db/AnalyticsDatabase.kt">
+    <file name="../../../Spice/spice_mobile/Spice-SL/analytics/src/main/java/org/medtroniclabs/uhis/app/analytics/db/AnalyticsDatabase.kt">
         <error line="18" column="21" source="standard:property-naming" />
     </file>
-    <file name="src/main/java/org/medtroniclabs/uhis/app/analytics/utils/AnalyticsDefinedParams.kt">
+    <file name="../../../Spice/spice_mobile/Spice-SL/analytics/src/main/java/org/medtroniclabs/uhis/app/analytics/utils/AnalyticsDefinedParams.kt">
         <error line="4" column="15" source="standard:property-naming" />
         <error line="5" column="15" source="standard:property-naming" />
         <error line="6" column="15" source="standard:property-naming" />
