@@ -802,11 +802,13 @@ class AssessmentRMNCHSummaryFragment : BaseFragment(), View.OnClickListener {
                     }
                 val displayValue =
                     (
-                        (if (isTranslationEnabled) {
-                            option?.get(DefinedParams.CULTURE_VALUE)
-                        } else {
-                            option?.get(DefinedParams.NAME)
-                        }) as? String
+                        (
+                            if (isTranslationEnabled) {
+                                option?.get(DefinedParams.CULTURE_VALUE)
+                            } else {
+                                option?.get(DefinedParams.NAME)
+                            }
+                        ) as? String
                     )?.takeIf { it.isNotBlank() }
                         ?: option?.get(DefinedParams.NAME)?.toString()
                         ?: congenitalChoiceId

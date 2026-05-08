@@ -945,13 +945,6 @@
         <error line="863" column="13" source="standard:if-else-wrapping" />
         <error line="870" column="13" source="standard:if-else-wrapping" />
     </file>
-    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/AssessmentPregnancyOutcomeSummaryFragment.kt">
-        <error line="360" column="68" source="standard:function-expression-body" />
-    </file>
-    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/AssessmentRMNCHSummaryFragment.kt">
-        <error line="805" column="26" source="standard:wrapping" />
-        <error line="809" column="25" source="standard:wrapping" />
-    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/referrallogic/model/ReferralDefinedParams.kt">
         <error line="4" column="15" source="standard:property-naming" />
         <error line="5" column="15" source="standard:property-naming" />

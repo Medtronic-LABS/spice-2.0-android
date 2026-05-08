@@ -123,6 +123,20 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
         !binding.etFromDate.text.isNullOrEmpty() &&
             !binding.etToDate.text.isNullOrEmpty()
 
+    /**
+     * Returns true if the from-date is after to-date otherwise false.
+     */
+    private fun shouldResetToDate(newFromDate: String): Boolean {
+        val currentToDate = binding.etToDate.text
+            ?.toString()
+            .orEmpty()
+        if (currentToDate.isBlank()) return false
+
+        val fromDateValue = DateUtils.convertStringToDate(newFromDate, DATE_ddMMyyyy)
+        val toDateValue = DateUtils.convertStringToDate(currentToDate, DATE_ddMMyyyy)
+        return fromDateValue?.after(toDateValue) == true
+    }
+
     private fun resetCounts() {
         viewModel.userDashboardDetails.value
             ?.data
@@ -257,7 +271,9 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
                     if (isFromDate) {
                         resetCounts()
                         binding.etFromDate.text = stringDate
-                        binding.etToDate.text = getString(R.string.empty)
+                        if (shouldResetToDate(stringDate)) {
+                            binding.etToDate.text = getString(R.string.empty)
+                        }
                     } else {
                         binding.etToDate.text = stringDate
                     }

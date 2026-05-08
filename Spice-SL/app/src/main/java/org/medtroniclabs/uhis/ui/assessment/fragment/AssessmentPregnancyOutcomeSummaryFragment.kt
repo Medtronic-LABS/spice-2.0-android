@@ -357,13 +357,12 @@ class AssessmentPregnancyOutcomeSummaryFragment : BaseFragment(), View.OnClickLi
         return value?.toString() ?: ""
     }
 
-    private fun neonatalDeathCauseDisplayLabel(id: String): String {
-        return AssessmentDefinedParams.pregnancyOutcomeOptionDisplayLabel(
+    private fun neonatalDeathCauseDisplayLabel(id: String): String =
+        AssessmentDefinedParams.pregnancyOutcomeOptionDisplayLabel(
             RMNCH.neonatalDeathCauseOptions,
             id.trim(),
             isTranslationEnabled,
         ) ?: id.trim()
-    }
 
     /**
      * Checks if delivery is preterm (<37 weeks from EDD) and displays with highlighting
