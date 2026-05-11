@@ -267,4 +267,24 @@ class HouseHoldRepository @Inject constructor(
     ) = roomHelper.updateTBContactTraceStatus(hhmId, tbContactTracingStatus)
 
     suspend fun getHouseholdsCountBasedSubVillage(subVillageId: Long) = roomHelper.getHouseholdsCountBasedSubVillage(subVillageId)
+
+    /**
+     * Returns true when any compared business field differs.
+     */
+    fun hasMeaningfulHouseholdChanges(
+        before: HouseholdEntity,
+        after: HouseholdEntity,
+    ): Boolean {
+        if (before.name != after.name) return true
+        if (before.villageId != after.villageId) return true
+        if (before.shasthyaShebikaId != after.shasthyaShebikaId) return true
+        if (before.subVillageId != after.subVillageId) return true
+        if (before.householdType != after.householdType) return true
+        if (before.monthlyIncome != after.monthlyIncome) return true
+        if (before.householdHeadOccupation != after.householdHeadOccupation) return true
+        if (before.otherOccupation != after.otherOccupation) return true
+        if (before.noOfPeople != after.noOfPeople) return true
+        if (before.disabilityPersonsCount != after.disabilityPersonsCount) return true
+        return false
+    }
 }

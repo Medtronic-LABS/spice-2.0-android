@@ -149,10 +149,10 @@ class MemberRegistrationViewModel @Inject constructor(
                     isPhuWalkInFlow = isPhuWalkInsFlow,
                     location = location,
                 )
-                // Only update head phone number if householdId is not null
-                if (householdId != null) {
-                    memberRegistrationRepository.updateHeadPhoneNumber(householdId, map)
-                }
+//                // Only update head phone number if householdId is not null
+//                if (householdId != null) {
+//                    memberRegistrationRepository.updateHeadPhoneNumber(householdId, map)
+//                }
                 if (memberId == null) {
                     memberRegistrationLiveData.postError()
                 } else {
