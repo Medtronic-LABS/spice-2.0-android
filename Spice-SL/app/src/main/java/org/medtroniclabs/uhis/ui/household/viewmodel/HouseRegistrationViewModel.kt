@@ -144,9 +144,18 @@ class HouseRegistrationViewModel @Inject constructor(
         viewModelScope.launch(dispatcherIO) {
             try {
                 houseHoldUpdateLiveData.postLoading()
+                val detail = householdEntityDetail ?: run {
+                    houseHoldUpdateLiveData.postError()
+                    return@launch
+                }
+                val before = houseHoldRepository.getHouseHoldDetailsById(detail.id)
                 val householdEntity =
-                    houseHoldRepository.createOrUpdateHouseHoldEntity(map, householdEntityDetail)
-                houseHoldRepository.updateHouseHoldEntity(householdEntity)
+                    houseHoldRepository.createOrUpdateHouseHoldEntity(map, detail)
+                if (houseHoldRepository.hasMeaningfulHouseholdChanges(before, householdEntity)) {
+                    houseHoldRepository.updateHouseHoldEntity(householdEntity)
+                } else {
+                    householdEntityDetail = before
+                }
                 houseHoldUpdateLiveData.postSuccess()
             } catch (e: Exception) {
                 houseHoldUpdateLiveData.postError()

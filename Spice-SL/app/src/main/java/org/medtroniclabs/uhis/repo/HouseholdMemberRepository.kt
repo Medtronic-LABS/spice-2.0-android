@@ -41,15 +41,20 @@ class HouseholdMemberRepository @Inject constructor(
         isPhuWalkInFlow: Boolean? = null,
         location: Location?,
     ): Long {
+        val beforeMember = if (entity != null) roomHelper.getMemberDetailsByID(entity.id) else null
+
         val memberEntity = createOrUpdateHouseHoldMemberEntity(map, householdId, entity, parentReferenceId, location)
 //         if (memberEntity.patientId == null) {
 //             return  null
 //         }
 
         // If updating a member and isHouseholdHead is not explicitly set in the map, preserve the old value
-        if (entity != null && !map.containsKey(MemberRegistration.IS_HOUSEHOLD_HEAD)) {
-            val oldMemberEntity = roomHelper.getMemberDetailsByID(memberEntity.id)
-            memberEntity.isHouseholdHead = oldMemberEntity.isHouseholdHead
+        if (entity != null && beforeMember != null && !map.containsKey(MemberRegistration.IS_HOUSEHOLD_HEAD)) {
+            memberEntity.isHouseholdHead = beforeMember.isHouseholdHead
+        }
+
+        if (entity != null && beforeMember != null && !hasMeaningfulMemberChanges(beforeMember, memberEntity)) {
+            return entity.id
         }
 
         val memberId = roomHelper.registerMember(memberEntity)
@@ -104,6 +109,32 @@ class HouseholdMemberRepository @Inject constructor(
                 null, // phoneNumberCategory parameter kept for interface compatibility
             )
         }
+    }
+
+    /**
+     * Returns true when any compared business field differs.
+     */
+    private fun hasMeaningfulMemberChanges(
+        before: HouseholdMemberEntity,
+        after: HouseholdMemberEntity,
+    ): Boolean {
+        if (before.name != after.name) return true
+        if (before.phoneNumber != after.phoneNumber) return true
+        if (before.phoneNumberCategory != after.phoneNumberCategory) return true
+        if (before.dateOfBirth != after.dateOfBirth) return true
+        if (before.gender != after.gender) return true
+        if (before.householdId != after.householdId) return true
+        if (before.villageId != after.villageId) return true
+        if (before.shasthyaShebikaId != after.shasthyaShebikaId) return true
+        if (before.subVillageId != after.subVillageId) return true
+        if (before.motherReferenceId != after.motherReferenceId) return true
+        if (before.idType != after.idType) return true
+        if (before.nationalId != after.nationalId) return true
+        if (before.isHouseholdHead != after.isHouseholdHead) return true
+        if (before.guardianId != after.guardianId) return true
+        if (before.maritalStatus != after.maritalStatus) return true
+        if (before.disability != after.disability) return true
+        return false
     }
 
     private suspend fun createOrUpdateHouseHoldMemberEntity(
