@@ -38,7 +38,6 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_UNIT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HBA1CUnit
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HEIGHT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.MMHG
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NCD_SYMPTOM
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NCD_SYMPTOMS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.REFERRAL_FACILITY_TYPE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ReferredPHUSiteID
@@ -46,7 +45,6 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.WEIGHT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.hba1c
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.utils.ReferralStatus
 import org.medtroniclabs.uhis.ui.assessment.viewmodel.AssessmentViewModel
-import kotlin.collections.set
 
 class BDNCDAssessmentSummaryFragment : BaseFragment() {
     private val viewModel: AssessmentViewModel by activityViewModels()
@@ -186,7 +184,7 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
         jsonObject: JSONObject,
     ): String? {
         return when (id) {
-            NCD_SYMPTOMS, NCD_SYMPTOM -> {
+            NCD_SYMPTOMS -> {
                 val list = mutableListOf<String>()
                 findValueByKey(jsonObject, id)?.let {
                     val jsonArray = it as JSONArray
@@ -209,7 +207,7 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
                 val glucoseValue = findValueByKey(jsonObject, id)
                 val unit = findValueByKey(jsonObject, GLUCOSE_UNIT)
                 val type = findValueByKey(jsonObject, GLUCOSE_TYPE)
-                return if (unit != null && type != null && glucoseValue != null) {
+                if (unit != null && type != null && glucoseValue != null) {
                     "${glucoseValue as Double} ${unit as String} (${type as String})"
                 } else {
                     null
@@ -219,7 +217,7 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
             hba1c -> {
                 val hba1 = findValueByKey(jsonObject, id)
                 val unit = findValueByKey(jsonObject, HBA1CUnit)
-                return if (unit != null && hba1 != null) {
+                if (unit != null && hba1 != null) {
                     "${hba1 as Double} ${unit as String}"
                 } else {
                     null
@@ -229,7 +227,7 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
             BMI -> {
                 val bmi = findValueByKey(jsonObject, id)
                 val bmiCategory = findValueByKey(jsonObject, BMI_CATEGORY)
-                return if (bmiCategory != null && bmi != null) {
+                if (bmiCategory != null && bmi != null) {
                     "${bmi as Double} (${bmiCategory as String})"
                 } else {
                     null
@@ -238,12 +236,12 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
 
             BP_LOG_DETAILS -> {
                 val bp = findValueByKey(jsonObject, AVG_BLOOD_PRESSURE) as? String
-                return "$bp $MMHG"
+                "$bp $MMHG"
             }
 
             CVD_RISK -> {
                 val cvdRiskLevel = findValueByKey(jsonObject, CVD_RISK_SCORE_DISPLAY)
-                return if (cvdRiskLevel != null) {
+                if (cvdRiskLevel != null) {
                     cvdRiskLevel as String
                 } else {
                     null

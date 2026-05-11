@@ -281,7 +281,9 @@ object AssessmentUtil {
                 context.getString(R.string.uncontrolled_bg)
             }
 
-            AssessmentStatus.DEFAULT -> {
+            AssessmentStatus.DEFAULT,
+            AssessmentStatus.GLASSES_SOLD,
+            -> {
                 status.uppercase(Locale.ENGLISH)
             }
         }

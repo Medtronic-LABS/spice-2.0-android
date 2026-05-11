@@ -8,6 +8,9 @@ import org.medtroniclabs.uhis.ncd.screening.utils.ReferredReason.bloodGlucose
 import org.medtroniclabs.uhis.ncd.screening.utils.ReferredReason.bloodPressure
 import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.EYE_CARE
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_HAVE_THE_GLASSES_BEEN_SOLD
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.YES
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 
@@ -117,7 +120,31 @@ object AssessmentStatusGenerator {
                 }
             }
 
-            map.containsKey(MenuConstants.NCD_MENU_ID) || map.containsKey(MenuConstants.CATARACT_MENU_ID) -> {
+            map.containsKey(MenuConstants.NCD_MENU_ID) -> {
+                val results = referralResult?.second ?: listOf()
+                val statusList = arrayListOf<AssessmentStatus>()
+                if (results.isNotEmpty()) {
+                    if (results.contains(bloodPressure) && results.contains(bloodGlucose)) {
+                        statusList.add(AssessmentStatus.UNCONTROLLED_BP)
+                        statusList.add(AssessmentStatus.UNCONTROLLED_BG)
+                    } else if (results.contains(bloodPressure)) {
+                        statusList.add(AssessmentStatus.UNCONTROLLED_BP)
+                    } else {
+                        statusList.add(AssessmentStatus.UNCONTROLLED_BG)
+                    }
+                } else {
+                    statusList.add(AssessmentStatus.CONTROLLED_BP)
+                    statusList.add(AssessmentStatus.CONTROLLED_BG)
+                }
+                val ncdMap = map[MenuConstants.NCD_MENU_ID] as Map<*, *>
+                val eyeCareMap = ncdMap[EYE_CARE] as? Map<*, *>
+                if (YES.equals(eyeCareMap?.get(ID_HAVE_THE_GLASSES_BEEN_SOLD)?.toString(), true)) {
+                    statusList.add(AssessmentStatus.GLASSES_SOLD)
+                }
+                statusList
+            }
+
+            map.containsKey(MenuConstants.CATARACT_MENU_ID) -> {
                 val results = referralResult?.second ?: listOf()
                 if (results.isNotEmpty()) {
                     if (results.contains(bloodPressure) && results.contains(bloodGlucose)) {
@@ -130,6 +157,16 @@ object AssessmentStatusGenerator {
                 } else {
                     arrayListOf(AssessmentStatus.CONTROLLED_BP, AssessmentStatus.CONTROLLED_BG)
                 }
+            }
+
+            map.containsKey(MenuConstants.EYE_CARE_MENU_ID) -> {
+                val map = map[MenuConstants.EYE_CARE_MENU_ID] as Map<*, *>
+                val eyeCareMap = map[EYE_CARE] as? Map<*, *>
+                val statusList = arrayListOf<AssessmentStatus>()
+                if (YES.equals(eyeCareMap?.get(ID_HAVE_THE_GLASSES_BEEN_SOLD)?.toString(), true)) {
+                    statusList.add(AssessmentStatus.GLASSES_SOLD)
+                }
+                statusList
             }
 
             else -> {

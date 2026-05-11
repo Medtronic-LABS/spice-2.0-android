@@ -87,5 +87,7 @@ enum class AssessmentStatus {
 
     UNCONTROLLED_BG,
 
+    GLASSES_SOLD,
+
     DEFAULT,
 }

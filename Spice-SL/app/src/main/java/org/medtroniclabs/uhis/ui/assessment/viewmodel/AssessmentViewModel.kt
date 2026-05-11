@@ -2017,4 +2017,10 @@ class AssessmentViewModel @Inject constructor(
             }
         }
     }
+
+    suspend fun getLastServiceHistory(type: String): MemberAssessmentHistoryEntity? =
+        assessmentRepository.getLastServiceHistory(
+            selectedHouseholdMemberId,
+            type.lowercase(),
+        )
 }

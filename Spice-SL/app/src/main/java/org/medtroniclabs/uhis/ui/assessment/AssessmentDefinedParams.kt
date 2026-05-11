@@ -216,11 +216,29 @@ object AssessmentDefinedParams {
 
     const val NCD_SYMPTOMS = "ncdSymptoms"
 
-    const val NCD_SYMPTOM = "ncdSymptom"
-
     const val ANY_NEW_OR_WORSENING_SYMPTOMS = "Any new or worsening symptoms"
 
     const val NEW_WORSENING_SYMPTOMS = "newWorseningSymptoms"
+
+    /**
+     * Spinner : Are you taking medication regularly? (symptomsLog)
+     */
+    const val ID_NCD_SYMPTOMS_MEDICATION = "ncdSymptomsMedication"
+
+    /**
+     * SingleSelectionView : Have you been diagnosed with High blood pressure or hypertension before?
+     */
+    const val ID_DIAGNOSED_BP = "diagnosedBP"
+
+    /**
+     * SingleSelectionView : Have you been diagnosed with High blood Sugar or diabetes before?
+     */
+    const val ID_DIAGNOSED_GLUCOSE = "diagnosedGlucose"
+
+    /**
+     * Spinner : Have the glasses been sold?
+     */
+    const val ID_HAVE_THE_GLASSES_BEEN_SOLD = "haveTheGlassesBeenSold"
 
     // RMNCH Field IDs
     const val BLOOD_SUGAR = "bloodSugar"

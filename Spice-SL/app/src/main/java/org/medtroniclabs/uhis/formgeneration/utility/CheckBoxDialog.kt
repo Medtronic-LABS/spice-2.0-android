@@ -15,8 +15,6 @@ import org.medtroniclabs.uhis.databinding.CheckboxDialogLayoutBinding
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NCD_SYMPTOM
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NCD_SYMPTOMS
 import org.medtroniclabs.uhis.ui.assessment.viewmodel.AssessmentViewModel
 
 class CheckBoxDialog() : DialogFragment(), View.OnClickListener {
@@ -165,15 +163,7 @@ class CheckBoxDialog() : DialogFragment(), View.OnClickListener {
         key: String?,
         inputData: List<SignsAndSymptomsEntity>?,
     ) {
-        key?.let { viewModel.getSymptomListByType(getType(it), inputData) }
-    }
-
-    private fun getType(inputType: String): String {
-        if (inputType == NCD_SYMPTOMS) {
-            return NCD_SYMPTOM
-        }
-
-        return inputType
+        key?.let { viewModel.getSymptomListByType(it, inputData) }
     }
 
     private fun initializeView() {

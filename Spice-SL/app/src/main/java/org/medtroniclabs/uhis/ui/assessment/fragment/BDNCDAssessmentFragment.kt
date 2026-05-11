@@ -5,8 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import org.medtroniclabs.uhis.appextensions.gone
+import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CVDRiskCalculator
+import org.medtroniclabs.uhis.common.DateUtils
+import org.medtroniclabs.uhis.common.EntityMapper
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
 import org.medtroniclabs.uhis.databinding.FragmentAssessmentBinding
@@ -20,6 +26,10 @@ import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseFragment
 import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ANY_NEW_OR_WORSENING_SYMPTOMS
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.EYE_CARE
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_DIAGNOSED_BP
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_DIAGNOSED_GLUCOSE
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_NCD_SYMPTOMS_MEDICATION
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NAME
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NEW_WORSENING_SYMPTOMS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ncd
@@ -30,7 +40,7 @@ import org.medtroniclabs.uhis.ui.assessment.viewmodel.AssessmentViewModel
 import org.medtroniclabs.uhis.ui.common.GeneralInfoDialog
 
 @AndroidEntryPoint
-class BDNCDAssessmentFragment() : BaseFragment(), FormEventListener {
+class BDNCDAssessmentFragment : BaseFragment(), FormEventListener {
     private lateinit var binding: FragmentAssessmentBinding
 
     private lateinit var formGenerator: FormGenerator
@@ -103,12 +113,14 @@ class BDNCDAssessmentFragment() : BaseFragment(), FormEventListener {
                 ResourceState.LOADING -> {
                     showProgress()
                 }
+
                 ResourceState.SUCCESS -> {
                     hideProgress()
                     resourceState.data?.let { data ->
                         formGenerator.populateViews(data.formLayout)
                     }
                 }
+
                 ResourceState.ERROR -> {
                     hideProgress()
                 }
@@ -131,8 +143,9 @@ class BDNCDAssessmentFragment() : BaseFragment(), FormEventListener {
         formLayout: FormLayout,
         resultMap: Any?,
     ) {
+        val inputData = EntityMapper.mapToSignsAndSymptomsEntity(formLayout.optionsList)
         CheckBoxDialog
-            .newInstance(id, resultMap) { resultMap ->
+            .newInstance(id, resultMap, inputData = inputData) { resultMap ->
                 formGenerator.validateCheckboxDialogue(id, formLayout, resultMap)
                 hideOrShowAnyNewWorseningSymptomView(resultMap)
             }.show(childFragmentManager, CheckBoxDialog.TAG)
@@ -197,6 +210,30 @@ class BDNCDAssessmentFragment() : BaseFragment(), FormEventListener {
     }
 
     override fun onRenderingComplete() {
+        handleDateOfBirth()
+        lifecycleScope.launch {
+            val assessmentHistory = viewModel.getLastServiceHistory(MenuConstants.NCD_MENU_ID)
+            if (assessmentHistory != null) {
+                formGenerator.getViewByTag(ID_NCD_SYMPTOMS_MEDICATION + rootSuffix)?.visible()
+                formGenerator.getViewByTag(ID_DIAGNOSED_BP + rootSuffix)?.gone()
+                formGenerator.getViewByTag(ID_DIAGNOSED_GLUCOSE + rootSuffix)?.gone()
+            }
+        }
+    }
+
+    /**
+     * Hide eye care section if the member's age is less than 35 years
+     */
+    private fun handleDateOfBirth() {
+        val age = DateUtils.calculateAge(viewModel.selectedMemberDob)
+        if (age < 35) {
+            formGenerator.getServerData()?.let { serverData ->
+                formGenerator.getViewByTag(EYE_CARE + rootSuffix)?.gone()
+                serverData.filter { it.family == EYE_CARE }.forEach {
+                    formGenerator.getViewByTag(it.id + rootSuffix)?.gone()
+                }
+            }
+        }
     }
 
     override fun onUpdateInstruction(

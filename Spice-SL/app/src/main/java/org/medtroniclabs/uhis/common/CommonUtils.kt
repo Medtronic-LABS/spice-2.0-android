@@ -170,6 +170,15 @@ object CommonUtils {
 
     fun getStringOrEmptyString(answer: Any?): String = answer as? String ?: ""
 
+    fun getStringElse(
+        answer: Any?,
+        alternateText: String,
+    ) = if (answer is String && answer.isNotBlank()) {
+        answer
+    } else {
+        alternateText
+    }
+
     fun getIsBooleanFromString(answer: Any?): Boolean = (answer is String) && answer.equals(HouseHoldRegistration.YES, true)
 
     fun displayAge(

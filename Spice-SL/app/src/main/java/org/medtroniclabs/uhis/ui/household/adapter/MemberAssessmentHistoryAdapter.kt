@@ -6,10 +6,12 @@ import android.widget.LinearLayout
 import androidx.core.view.setPadding
 import androidx.recyclerview.widget.RecyclerView
 import org.medtroniclabs.uhis.R
+import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.databinding.SummaryListItemBinding
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
 import org.medtroniclabs.uhis.formgeneration.extension.px
+import org.medtroniclabs.uhis.ui.assessment.statuslogic.AssessmentStatus
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 
 /**
@@ -54,12 +56,12 @@ class MemberAssessmentHistoryAdapter(
                 context.getString(R.string.service_date),
                 DateUtils.formatDateToDisplayFormat(visitDateMillis) ?: "",
             )
-            val currentStatus = history.customStatus?.joinToString {
+            val currentStatus = history.customStatus?.filterNot { it == AssessmentStatus.GLASSES_SOLD.name }?.joinToString {
                 AssessmentUtil.mapAssessmentStatus(it, context)
-            } ?: context.getString(R.string.separator_double_hyphen)
+            }
             addSummaryView(
                 context.getString(R.string.current_status),
-                currentStatus,
+                CommonUtils.getStringElse(currentStatus, context.getString(R.string.separator_double_hyphen)),
             )
             val referralStatus = AssessmentUtil.getReferralStatus(
                 context,

@@ -169,6 +169,8 @@ class AssessmentRepository @Inject constructor(
                     CommonUtils.getStringFromAssets(AssessmentDefinedParams.RMNCH_PNC_FORM + ".json", context.assets)
                 } else if (formType == RMNCH.ChildHoodVisit) {
                     CommonUtils.getStringFromAssets(AssessmentDefinedParams.RMNCH_CHILD_VISIT_FORM + ".json", context.assets)
+                } else if (formType == MenuConstants.NCD_MENU_ID) {
+                    CommonUtils.getStringFromAssets(MenuConstants.NCD_MENU_ID + ".json", context.assets)
                 } else {
                     roomHelper.getFormData(formType)
                 }
@@ -296,4 +298,9 @@ class AssessmentRepository @Inject constructor(
         } catch (_: Exception) {
         }
     }
+
+    suspend fun getLastServiceHistory(
+        memberLocalId: Long,
+        serviceTypeFor: String,
+    ): MemberAssessmentHistoryEntity? = roomHelper.getLastServiceHistory(memberLocalId, serviceTypeFor)
 }
