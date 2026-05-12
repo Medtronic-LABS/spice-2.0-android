@@ -94,6 +94,8 @@ import org.medtroniclabs.uhis.db.entity.RiskFactorEntity
 import org.medtroniclabs.uhis.db.entity.RxBuddyDetails
 import org.medtroniclabs.uhis.db.entity.RxBuddyFollowUpEntity
 import org.medtroniclabs.uhis.db.entity.ScreeningEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
@@ -233,6 +235,69 @@ class RoomHelperImpl @Inject constructor(
 
     override suspend fun getShasthyaShebikaByShasthyaKormiId(shasthyaKormiId: Long): List<ShasthyaShebikaEntity> =
         metaDataDAO.getShasthyaShebikaByShasthyaKormiId(shasthyaKormiId)
+
+    override suspend fun getShasthyaShebikaById(id: Long): ShasthyaShebikaEntity? = metaDataDAO.getShasthyaShebikaById(id)
+
+    override suspend fun saveChiefdoms(chiefdomEntityList: List<ChiefDomEntity>) {
+        metaDataDAO.insertChiefDoms(chiefdomEntityList)
+    }
+
+    override suspend fun deleteAllChiefdoms() {
+        metaDataDAO.deleteChiefDoms()
+    }
+
+    override suspend fun getChiefdomByVillageId(villageId: Long): List<ChiefDomEntity> =
+        metaDataDAO.getChiefdomByVillageId(villageId)
+
+    override suspend fun getAllChiefdoms(): List<ChiefDomEntity> = metaDataDAO.getAllChiefdoms()
+
+    override suspend fun getChiefdomByShasthyaKormiId(shasthyaKormiId: Long): List<ChiefDomEntity> =
+        metaDataDAO.getChiefdomByShasthyaKormiId(shasthyaKormiId)
+
+    override suspend fun getChiefdomByShasthyaKormiIds(shasthyaKormiIds: List<Long>): List<ChiefDomEntity> =
+        if (shasthyaKormiIds.isEmpty()) {
+            emptyList()
+        } else {
+            metaDataDAO.getChiefdomByShasthyaKormiIds(shasthyaKormiIds)
+        }
+
+    override suspend fun getChiefdomById(chiefdomId: Long): ChiefDomEntity? = metaDataDAO.getChiefdomById(chiefdomId)
+
+    override suspend fun saveShasthyaKormis(shasthyaKormiEntityList: List<ShasthyaKormiEntity>) {
+        metaDataDAO.insertShasthyaKormis(shasthyaKormiEntityList)
+    }
+
+    override suspend fun deleteAllShasthyaKormis() {
+        metaDataDAO.deleteAllShasthyaKormis()
+    }
+
+    override suspend fun getShasthyaKormiByVillageId(villageId: Long): List<ShasthyaKormiEntity> =
+        metaDataDAO.getShasthyaKormiByVillageId(villageId)
+
+    override suspend fun getAllShasthyaKormis(): List<ShasthyaKormiEntity> = metaDataDAO.getAllShasthyaKormis()
+
+    override suspend fun insertShasthyaKormiLinkedVillages(linkedVillages: List<ShasthyaKormiLinkedVillageEntity>) {
+        metaDataDAO.insertShasthyaKormiLinkedVillages(linkedVillages)
+    }
+
+    override suspend fun deleteAllShasthyaKormiLinkedVillages() {
+        metaDataDAO.deleteAllShasthyaKormiLinkedVillages()
+    }
+
+    override suspend fun getSubVillagesByShasthyaKormiId(shasthyaKormiId: Long): List<SubVillageEntity> =
+        metaDataDAO.getSubVillagesByShasthyaKormiId(shasthyaKormiId)
+
+    override suspend fun getSubVillagesByShasthyaKormiIds(shasthyaKormiIds: List<Long>): List<SubVillageEntity> =
+        if (shasthyaKormiIds.isEmpty()) {
+            emptyList()
+        } else {
+            metaDataDAO.getSubVillagesByShasthyaKormiIds(shasthyaKormiIds)
+        }
+
+    override suspend fun getVillagesForShasthyaKormiAndChiefdom(
+        shasthyaKormiId: Long,
+        chiefdomId: Long,
+    ): List<VillageEntity> = metaDataDAO.getVillagesForShasthyaKormiAndChiefdom(shasthyaKormiId, chiefdomId)
 
     override suspend fun insertShasthyaShebikaLinkedVillages(linkedVillages: List<ShasthyaShebikaLinkedVillageEntity>) {
         metaDataDAO.insertShasthyaShebikaLinkedVillages(linkedVillages)
@@ -1246,7 +1311,8 @@ class RoomHelperImpl @Inject constructor(
         filterBySs: List<Long>,
         filterBySubVillages: List<Long>,
         staticFilter: ServiceStaticFilter,
-    ) = memberDAO.getServiceMembers(searchInput, filterBySs, filterBySubVillages, staticFilter)
+        allowNullHousehold: Boolean,
+    ) = memberDAO.getServiceMembers(searchInput, filterBySs, filterBySubVillages, staticFilter, allowNullHousehold)
 
     /**
      * Delegates service-member count aggregation to [MemberDAO].
@@ -1255,7 +1321,9 @@ class RoomHelperImpl @Inject constructor(
         searchInput: String,
         filterBySs: List<Long>,
         filterBySubVillages: List<Long>,
-    ): ServiceMemberCounts = memberDAO.getAllServiceMemberCounts(searchInput, filterBySs, filterBySubVillages)
+        allowNullHousehold: Boolean,
+    ): ServiceMemberCounts =
+        memberDAO.getAllServiceMemberCounts(searchInput, filterBySs, filterBySubVillages, allowNullHousehold)
 
     override suspend fun getMemberAssessmentHistory(
         memberFhirId: String?,

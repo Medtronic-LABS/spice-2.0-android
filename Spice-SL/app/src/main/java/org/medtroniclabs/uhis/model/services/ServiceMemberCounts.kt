@@ -28,4 +28,8 @@ data class ServiceMemberCounts(
     @ColumnInfo("expected_deliveries") val expectedDeliveries: Int,
     /** Pregnancies with overdue expected delivery. */
     @ColumnInfo("pending_deliveries") val pendingDeliveries: Int,
+    /** Members with NCD assessment history (FO/PO service recipient filters). */
+    @ColumnInfo("ncd_services") val ncdServices: Int,
+    @ColumnInfo("cataract_screening") val cataractScreening: Int,
+    @ColumnInfo("eye_screening") val eyeScreening: Int,
 )

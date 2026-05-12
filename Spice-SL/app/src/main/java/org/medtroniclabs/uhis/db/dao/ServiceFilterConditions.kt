@@ -134,4 +134,29 @@ object ServiceFilterConditions {
         $FAMILY_PLANNING_BASE
         AND NOT $PREGNANT_WOMEN
         """.trimIndent()
+
+    /** Member has at least one NCD-related assessment history row (FO/PO service list). */
+    const val HAS_NCD_SERVICE_HISTORY = """
+        EXISTS (
+            SELECT 1 FROM memberassessmenthistory AS mah
+            WHERE (mah.memberId = hhm.id OR (mah.memberFhirId IS NOT NULL AND mah.memberFhirId = hhm.fhir_id))
+            AND LOWER(mah.serviceProvided) IN ('ncd', 'bd_ncd')
+        )
+    """
+
+    const val HAS_CATARACT_SCREENING_HISTORY = """
+        EXISTS (
+            SELECT 1 FROM memberassessmenthistory AS mah
+            WHERE (mah.memberId = hhm.id OR (mah.memberFhirId IS NOT NULL AND mah.memberFhirId = hhm.fhir_id))
+            AND LOWER(mah.serviceProvided) = 'cataract'
+        )
+    """
+
+    const val HAS_EYE_SCREENING_HISTORY = """
+        EXISTS (
+            SELECT 1 FROM memberassessmenthistory AS mah
+            WHERE (mah.memberId = hhm.id OR (mah.memberFhirId IS NOT NULL AND mah.memberFhirId = hhm.fhir_id))
+            AND LOWER(mah.serviceProvided) = 'eye_care'
+        )
+    """
 }

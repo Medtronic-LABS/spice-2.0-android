@@ -12,6 +12,25 @@
             "condition":
             [],
             "defaultValue": null,
+            "errorMessage": "Please select Upazila",
+            "cultureErrorMessage": "অনুগ্রহ করে উপজেলা নির্বাচন করুন",
+            "family": "locationInformation",
+            "fieldName": "Upazila",
+            "titleCulture": "উপজেলা",
+            "id": "chiefdom_id",
+            "isEditable": true,
+            "isEnabled": true,
+            "isMandatory": true,
+            "isNeededDefault": true,
+            "title": "Upazila",
+            "orderId": 2,
+            "viewType": "Spinner",
+            "visibility": "gone"
+        },
+        {
+            "condition":
+            [],
+            "defaultValue": null,
             "errorMessage": "Please select Union",
             "cultureErrorMessage": "অনুগ্রহ করে ইউনিয়ন নির্বাচন করুন",
             "family": "locationInformation",
@@ -24,6 +43,27 @@
             "isNeededDefault": true,
             "localDataCache": "village_id",
             "title": "Union",
+            "orderId": 0,
+            "viewType": "Spinner",
+            "visibility": "gone"
+        },
+        {
+            "condition":
+            [],
+            "defaultValue": null,
+            "errorMessage": "Please select SK",
+            "cultureErrorMessage": "অনুগ্রহ করে শাস্থ্য কর্মী নির্বাচন করুন",
+            "family": "locationInformation",
+            "fieldName": "SK Name",
+            "titleCulture": "শাস্থ্য কর্মী",
+            "id": "shasthya_kormi_id",
+            "isEditable": true,
+            "isEnabled": true,
+            "isMandatory": true,
+            "isNeededDefault": true,
+            "localDataCache": "shasthya_kormi_id",
+            "dependentID": "shasthya_shebika_id",
+            "title": "SK Name",
             "orderId": 0,
             "viewType": "Spinner",
             "visibility": "gone"

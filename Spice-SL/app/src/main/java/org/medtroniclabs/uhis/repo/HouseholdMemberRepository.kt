@@ -246,6 +246,9 @@ class HouseholdMemberRepository @Inject constructor(
             }
         } else {
             householdMemberEntity.sync_status = OfflineSyncStatus.NotSynced
+            if (householdId == null) {
+                applyLocationFromMap(householdMemberEntity, map)
+            }
         }
         householdMemberEntity.updatedAt = currentTime
         location?.let {
@@ -273,6 +276,16 @@ class HouseholdMemberRepository @Inject constructor(
         val subVillageIdFromMap = CommonUtils.getLongOrNull(map[HouseHoldRegistration.SUB_VILLAGE_ID])
         if (subVillageIdFromMap != null) {
             householdMemberEntity.subVillageId = subVillageIdFromMap
+        }
+
+        val shasthyaKormiIdFromMap = CommonUtils.getLongOrNull(map[HouseHoldRegistration.SHASTHYA_KORMI_ID])
+        if (shasthyaKormiIdFromMap != null) {
+            householdMemberEntity.shasthyaKormiId = shasthyaKormiIdFromMap
+        }
+
+        val chiefdomIdFromMap = CommonUtils.getLongOrNull(map[HouseHoldRegistration.CHIEFDOM_ID])
+        if (chiefdomIdFromMap != null) {
+            householdMemberEntity.chiefdomId = chiefdomIdFromMap
         }
     }
 
@@ -441,7 +454,8 @@ class HouseholdMemberRepository @Inject constructor(
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
         staticFilter: ServiceStaticFilter,
-    ) = roomHelper.getServiceMembers(searchInput, filterBySs, filterBySubVillages, staticFilter)
+        allowNullHousehold: Boolean = false,
+    ) = roomHelper.getServiceMembers(searchInput, filterBySs, filterBySubVillages, staticFilter, allowNullHousehold)
 
     /**
      * Fetches all service static-filter counts using the same dynamic filters as [getServiceMembers].
@@ -450,7 +464,8 @@ class HouseholdMemberRepository @Inject constructor(
         searchInput: String = "",
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
-    ): ServiceMemberCounts = roomHelper.getAllServiceMemberCounts(searchInput, filterBySs, filterBySubVillages)
+        allowNullHousehold: Boolean = false,
+    ): ServiceMemberCounts = roomHelper.getAllServiceMemberCounts(searchInput, filterBySs, filterBySubVillages, allowNullHousehold)
 
     /**
      * Retrieves all National IDs for the specified ID type from the Room database.

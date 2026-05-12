@@ -171,6 +171,10 @@ class AssessmentRepository @Inject constructor(
                     CommonUtils.getStringFromAssets(AssessmentDefinedParams.RMNCH_CHILD_VISIT_FORM + ".json", context.assets)
                 } else if (formType == MenuConstants.NCD_MENU_ID) {
                     CommonUtils.getStringFromAssets(MenuConstants.NCD_MENU_ID + ".json", context.assets)
+                } else if (formType == MenuConstants.EYE_CARE_MENU_ID) {
+                    CommonUtils.getStringFromAssets(AssessmentDefinedParams.EYE_CARE_FORM + ".json", context.assets)
+                } else if (formType == MenuConstants.CATARACT_MENU_ID) {
+                    CommonUtils.getStringFromAssets(AssessmentDefinedParams.CATARACT_FORM + ".json", context.assets)
                 } else {
                     roomHelper.getFormData(formType)
                 }

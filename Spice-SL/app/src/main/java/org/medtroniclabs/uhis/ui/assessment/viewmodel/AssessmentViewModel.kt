@@ -1129,7 +1129,9 @@ class AssessmentViewModel @Inject constructor(
     ) {
         viewModelScope.launch(dispatcherIO) {
             formLayoutsLiveData.postLoading()
-            formLayoutsLiveData.postValue(assessmentRepository.getFormData(formType, tbType))
+            val formData = assessmentRepository.getFormData(formType, tbType)
+            applyBdCampFieldVisibility(formData, formType)
+            formLayoutsLiveData.postValue(formData)
         }
     }
 
@@ -1147,8 +1149,63 @@ class AssessmentViewModel @Inject constructor(
             } else if (isTbPatient == true) {
                 updateRxBuddyFieldViewStatus(formData, isRxBuddy)
             }
+            applyBdCampFieldVisibility(formData, formType)
 
             formLayoutsLiveData.postValue(formData)
+        }
+    }
+
+    /**
+     * Bangladesh FO/PO flows: show camp date (cataract) or camp type (eye care / NCD for PO only)
+     * from assets JSON where those rows default to [gone].
+     */
+    private fun applyBdCampFieldVisibility(
+        formResponse: Resource<FormResponse>,
+        formType: String,
+    ) {
+        if (formResponse.state != ResourceState.SUCCESS) return
+        val layout = formResponse.data?.formLayout ?: return
+        when (formType) {
+            CATARACT_MENU_ID -> {
+                if (!CommonUtils.isFoOrPo()) return
+                revealBdCampFields(layout, showCampDate = true, showCampType = false)
+            }
+            EYE_CARE_MENU_ID -> {
+                if (!CommonUtils.isFoOrPo()) return
+                revealBdCampFields(layout, showCampDate = false, showCampType = true)
+            }
+            NCD_MENU_ID -> {
+                if (!CommonUtils.isPo()) return
+                revealBdCampFields(layout, showCampDate = false, showCampType = true)
+            }
+            else -> return
+        }
+    }
+
+    private fun revealBdCampFields(
+        layout: List<FormLayout>,
+        showCampDate: Boolean,
+        showCampType: Boolean,
+    ) {
+        val showGeneralCard = showCampDate || showCampType
+        layout.forEach { field ->
+            when (field.id) {
+                AssessmentDefinedParams.GENERAL_INFORMATION -> {
+                    if (showGeneralCard) {
+                        field.visibility = "visible"
+                    }
+                }
+                AssessmentDefinedParams.CAMP_DATE -> {
+                    if (showCampDate) {
+                        field.visibility = "visible"
+                    }
+                }
+                AssessmentDefinedParams.CAMP_TYPE -> {
+                    if (showCampType) {
+                        field.visibility = "visible"
+                    }
+                }
+            }
         }
     }
 

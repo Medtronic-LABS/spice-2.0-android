@@ -6,6 +6,7 @@ import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
+import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.SpiceLocationManager
 import org.medtroniclabs.uhis.databinding.ActivityExternalMemberRegistrationBinding
 import org.medtroniclabs.uhis.ui.BaseActivity
@@ -22,10 +23,16 @@ class ExternalMemberRegistrationActivity : BaseActivity(), OnDialogDismissListen
         super.onCreate(savedInstanceState)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         binding = ActivityExternalMemberRegistrationBinding.inflate(layoutInflater)
+        val toolbarTitle =
+            if (CommonUtils.isFoOrPo()) {
+                getString(R.string.member_registration)
+            } else {
+                getString(R.string.external_member_registration)
+            }
         setMainContentView(
             binding.root,
             isToolbarVisible = true,
-            title = getString(R.string.external_member_registration),
+            title = toolbarTitle,
             homeAndBackVisibility = Pair(true, true),
             callback = {
                 if (validateFormInputs()) {

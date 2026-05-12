@@ -44,11 +44,12 @@ class DashboardMenuItemsAdapter(
         position: Int,
     ) {
         val model = roleBasedActivitiesList[position]
-        holder.binding.tvTitle.text = if (CommonUtils.parseUserLocale() == DefinedParams.EN) {
-            model.name
-        } else {
-            model.displayValue ?: model.name
-        }
+        holder.binding.tvTitle.text =
+            if (CommonUtils.parseUserLocale() == DefinedParams.EN) {
+                model.name
+            } else {
+                model.displayValue ?: model.name
+            }
 
         val imageModel = getResourceActivityId(
             model.menuId,

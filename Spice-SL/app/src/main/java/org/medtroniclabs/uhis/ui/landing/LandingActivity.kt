@@ -629,6 +629,10 @@ class LandingActivity :
             }
         }
 
+        if (CommonUtils.isFoOrPo()) {
+            menu.findItem(R.id.external_member)?.let { menu.removeItem(it.itemId) }
+        }
+
         onNavigationItemSelected(binding.navView.menu.findItem(R.id.home))
         val toolBar = binding.appBarMain.toolbar
         val toggle = ActionBarDrawerToggle(

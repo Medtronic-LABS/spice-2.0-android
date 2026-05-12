@@ -12,6 +12,7 @@ import android.widget.EditText
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,6 +21,9 @@ import org.medtroniclabs.uhis.app.analytics.model.UserDetail
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsUtils
 import org.medtroniclabs.uhis.appextensions.startBackgroundOfflineSync
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
@@ -33,6 +37,8 @@ import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
 import org.medtroniclabs.uhis.databinding.FragmentExternalMemberRegistrationBinding
 import org.medtroniclabs.uhis.db.entity.HouseholdMemberEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaEntity
 import org.medtroniclabs.uhis.db.entity.SubVillageEntity
 import org.medtroniclabs.uhis.db.entity.VillageEntity
 import org.medtroniclabs.uhis.formgeneration.FormGenerator
@@ -40,6 +46,8 @@ import org.medtroniclabs.uhis.formgeneration.listener.FormEventListener
 import org.medtroniclabs.uhis.formgeneration.model.FormLayout
 import org.medtroniclabs.uhis.formgeneration.model.FormResponse
 import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
+import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.CHIEFDOM_ID
+import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.SHASTHYA_KORMI_ID
 import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.SHASTHYA_SHEBIKA_ID
 import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.SUB_VILLAGE_ID
 import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.VILLAGE_ID
@@ -63,6 +71,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
     private var editMemberId: Long = -1L
     private var pendingVillageId: Long? = null
     private var pendingSsId: Long? = null
+    private var pendingShasthyaKormiId: Long? = null
     private var pendingSubVillageId: Long? = null
     private var lastSubVillageList: List<SubVillageEntity> = emptyList()
 
@@ -209,14 +218,64 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
             }
         }
 
+        householdRegistrationViewModel.shasthyaKormiListResponse.observe(viewLifecycleOwner) { resourceState ->
+            when (resourceState.state) {
+                ResourceState.SUCCESS -> {
+                    resourceState.data?.let { data ->
+                        val mapList = getResultSpinnerMapList(data)
+                        if (mapList.isNotEmpty()) {
+                            formGenerator.spinnerDataInjection(data, mapList)
+                            applyPendingSelectionIfReady(SHASTHYA_KORMI_ID, pendingShasthyaKormiId) {
+                                pendingShasthyaKormiId = null
+                            }
+                            if (CommonUtils.isFoOrPo() &&
+                                data.response is List<*> &&
+                                data.response.size == 1 &&
+                                data.response[0] is ShasthyaKormiEntity
+                            ) {
+                                val mapItem = mapList.firstOrNull()
+                                mapItem?.let { map ->
+                                    val id = map[DefinedParams.ID]
+                                    formGenerator.getViewByTag(SHASTHYA_KORMI_ID)?.let { spinnerView ->
+                                        spinnerView.post {
+                                            formGenerator.setValueForView(id, spinnerView)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else -> {
+                    // Invoked if response state is not success
+                }
+            }
+        }
+
         householdRegistrationViewModel.shasthyaShebikaListResponse.observe(viewLifecycleOwner) { resourceState ->
             when (resourceState.state) {
                 ResourceState.SUCCESS -> {
                     resourceState.data?.let { data ->
-                        formGenerator.spinnerDataInjection(data, getResultSpinnerMapList(data))
-                        // Apply pending SS selection after data injection
-                        applyPendingSelectionIfReady(SHASTHYA_SHEBIKA_ID, pendingSsId) {
-                            pendingSsId = null
+                        val mapList = getResultSpinnerMapList(data)
+                        if (mapList.isNotEmpty()) {
+                            formGenerator.spinnerDataInjection(data, mapList)
+                            applyPendingSelectionIfReady(SHASTHYA_SHEBIKA_ID, pendingSsId) {
+                                pendingSsId = null
+                            }
+                            if (data.response is List<*> &&
+                                data.response.size == 1 &&
+                                data.response[0] is ShasthyaShebikaEntity
+                            ) {
+                                val mapItem = mapList.firstOrNull()
+                                mapItem?.let { map ->
+                                    val id = map[DefinedParams.ID]
+                                    formGenerator.getViewByTag(SHASTHYA_SHEBIKA_ID)?.let { spinnerView ->
+                                        spinnerView.post {
+                                            formGenerator.setValueForView(id, spinnerView)
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -293,11 +352,18 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
             when (resources.state) {
                 ResourceState.SUCCESS -> {
                     resources.data?.let { jsonString ->
-                        val formLayout: FormResponse = Gson().fromJson(
+                        val formResponse: FormResponse = Gson().fromJson(
                             jsonString,
                             object : TypeToken<FormResponse>() {}.type,
                         )
-                        formGenerator.populateViews(formLayout.formLayout)
+                        if (CommonUtils.isFoOrPo()) {
+                            formResponse.formLayout.forEach { field ->
+                                if (field.id == SHASTHYA_KORMI_ID) {
+                                    field.visibility = "visible"
+                                }
+                            }
+                        }
+                        formGenerator.populateViews(formResponse.formLayout)
                         if (editMemberId != -1L) {
                             memberRegistrationViewModel.getMemberDetailsByID(editMemberId)
                         }
@@ -400,6 +466,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
 
         // Defer spinner cascade selections until data injection observers
         pendingVillageId = details.villageId
+        pendingShasthyaKormiId = details.shasthyaKormiId
         pendingSsId = details.shasthyaShebikaId
         pendingSubVillageId = details.subVillageId
 
@@ -407,11 +474,18 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
         applyPendingSelectionIfReady(VILLAGE_ID, pendingVillageId) {
             pendingVillageId = null
         }
+        applyPendingSelectionIfReady(SHASTHYA_KORMI_ID, pendingShasthyaKormiId) {
+            pendingShasthyaKormiId = null
+        }
         applyPendingSelectionIfReady(SHASTHYA_SHEBIKA_ID, pendingSsId) {
             pendingSsId = null
         }
         applyPendingSelectionIfReady(SUB_VILLAGE_ID, pendingSubVillageId) {
             pendingSubVillageId = null
+        }
+
+        if (CommonUtils.isFoOrPo()) {
+            details.chiefdomId?.let { formGenerator.getResultMap()[CHIEFDOM_ID] = it }
         }
 
         // Lock location selections for external-member edit mode.
@@ -437,6 +511,15 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
         val parentVillageId = lastSubVillageList.find { it.id == subVillageId }?.villageId ?: return
         formGenerator.getViewByTag(VILLAGE_ID)?.let { view ->
             formGenerator.setValueForView(parentVillageId, view)
+        }
+        if (!CommonUtils.isFoOrPo()) return
+        viewLifecycleOwner.lifecycleScope.launch {
+            val village = householdRegistrationViewModel.getVillageEntity(parentVillageId) ?: return@launch
+            withContext(Dispatchers.Main) {
+                village.chiefdomId?.let { chiefdom ->
+                    formGenerator.getResultMap()[CHIEFDOM_ID] = chiefdom
+                }
+            }
         }
     }
 
@@ -473,6 +556,9 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
     private fun disableLocationFieldsInEditMode() {
         if (editMemberId == -1L) return
         formGenerator.getViewByTag(VILLAGE_ID)?.isEnabled = false
+        if (CommonUtils.isFoOrPo()) {
+            formGenerator.getViewByTag(SHASTHYA_KORMI_ID)?.isEnabled = false
+        }
         formGenerator.getViewByTag(SHASTHYA_SHEBIKA_ID)?.isEnabled = false
         formGenerator.getViewByTag(SUB_VILLAGE_ID)?.isEnabled = false
     }
@@ -483,11 +569,14 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
             VILLAGE_ID,
             "",
         )
-        // SS list is scoped to logged-in Kormi user, not to Union selection
-        householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType(
-            SHASTHYA_SHEBIKA_ID,
-            "",
-        )
+        if (!CommonUtils.isFoOrPo()) {
+            // SS list is scoped to logged-in Kormi user, not to Union selection
+            householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType(
+                SHASTHYA_SHEBIKA_ID,
+                "",
+            )
+        }
+        // FO/PO: SK list is loaded via [loadLocalCache] when the SK spinner is built; SS loads after SK selection.
     }
 
     override fun onUpdateInstruction(
@@ -495,7 +584,15 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
         selectedId: Any?,
     ) {
         when (id) {
+            SHASTHYA_KORMI_ID -> {
+                if (CommonUtils.isFoOrPo()) {
+                    formGenerator.getResultMap().remove(CHIEFDOM_ID)
+                }
+            }
             SHASTHYA_SHEBIKA_ID -> {
+                if (CommonUtils.isFoOrPo()) {
+                    formGenerator.getResultMap().remove(CHIEFDOM_ID)
+                }
                 // SS selected - load Village list
                 val shasthyaShebikaIdLong = CommonUtils.getLongOrNull(selectedId) ?: 0L
                 if (shasthyaShebikaIdLong != 0L) {
@@ -528,8 +625,20 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                 VILLAGE_ID -> {
                     householdRegistrationViewModel.loadDataCacheByType(id, localDataCache)
                 }
+                SHASTHYA_KORMI_ID -> {
+                    if (CommonUtils.isFoOrPo()) {
+                        householdRegistrationViewModel.loadAllShasthyaKormis()
+                    }
+                }
                 SHASTHYA_SHEBIKA_ID -> {
-                    householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType(id, localDataCache)
+                    when {
+                        CommonUtils.isFoOrPo() && selectedParent != null -> {
+                            householdRegistrationViewModel.loadShasthyaShebikaForKormiId(selectedParent)
+                        }
+                        !CommonUtils.isFoOrPo() -> {
+                            householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType(id, localDataCache)
+                        }
+                    }
                 }
                 SUB_VILLAGE_ID -> {
                     selectedParent?.let {

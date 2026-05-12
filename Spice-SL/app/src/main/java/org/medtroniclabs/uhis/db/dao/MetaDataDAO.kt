@@ -24,6 +24,8 @@ import org.medtroniclabs.uhis.db.entity.MedicalComplianceEntity
 import org.medtroniclabs.uhis.db.entity.MentalHealthEntity
 import org.medtroniclabs.uhis.db.entity.MenuEntity
 import org.medtroniclabs.uhis.db.entity.NCDAssessmentClinicalWorkflow
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
@@ -312,6 +314,94 @@ interface MetaDataDAO {
 
     @Query("SELECT * FROM ShasthyaShebikaEntity WHERE shasthyaKormiId = :shasthyaKormiId")
     suspend fun getShasthyaShebikaByShasthyaKormiId(shasthyaKormiId: Long): List<ShasthyaShebikaEntity>
+
+    @Query("SELECT * FROM ShasthyaShebikaEntity WHERE id = :id LIMIT 1")
+    suspend fun getShasthyaShebikaById(id: Long): ShasthyaShebikaEntity?
+
+    @Query(
+        "SELECT cd.* FROM ChiefDomEntity cd INNER JOIN VillageEntity v ON v.chiefdomId = cd.id WHERE v.id = :villageId",
+    )
+    suspend fun getChiefdomByVillageId(villageId: Long): List<ChiefDomEntity>
+
+    @Query("SELECT * FROM ChiefDomEntity ORDER BY name ASC")
+    suspend fun getAllChiefdoms(): List<ChiefDomEntity>
+
+    @Query(
+        """
+        SELECT DISTINCT cd.* FROM ChiefDomEntity cd
+        INNER JOIN VillageEntity v ON v.chiefdomId = cd.id
+        INNER JOIN ShasthyaKormiLinkedVillageEntity sklv ON sklv.villageId = v.id
+        WHERE sklv.shasthyaKormiId = :shasthyaKormiId
+        """,
+    )
+    suspend fun getChiefdomByShasthyaKormiId(shasthyaKormiId: Long): List<ChiefDomEntity>
+
+    @Query(
+        """
+        SELECT DISTINCT cd.* FROM ChiefDomEntity cd
+        INNER JOIN VillageEntity v ON v.chiefdomId = cd.id
+        INNER JOIN ShasthyaKormiLinkedVillageEntity sklv ON sklv.villageId = v.id
+        WHERE sklv.shasthyaKormiId IN (:shasthyaKormiIds)
+        """,
+    )
+    suspend fun getChiefdomByShasthyaKormiIds(shasthyaKormiIds: List<Long>): List<ChiefDomEntity>
+
+    @Query("SELECT * FROM ChiefDomEntity WHERE id = :chiefdomId LIMIT 1")
+    suspend fun getChiefdomById(chiefdomId: Long): ChiefDomEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertShasthyaKormis(shasthyaKormiEntityList: List<ShasthyaKormiEntity>)
+
+    @Query("DELETE FROM ShasthyaKormiEntity")
+    suspend fun deleteAllShasthyaKormis()
+
+    @Query(
+        """
+        SELECT DISTINCT sk.* FROM ShasthyaKormiEntity sk
+        INNER JOIN ShasthyaKormiLinkedVillageEntity lk ON lk.shasthyaKormiId = sk.id
+        WHERE lk.villageId = :villageId
+        """,
+    )
+    suspend fun getShasthyaKormiByVillageId(villageId: Long): List<ShasthyaKormiEntity>
+
+    @Query("SELECT * FROM ShasthyaKormiEntity ORDER BY lastName ASC, firstName ASC")
+    suspend fun getAllShasthyaKormis(): List<ShasthyaKormiEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertShasthyaKormiLinkedVillages(linkedVillages: List<ShasthyaKormiLinkedVillageEntity>)
+
+    @Query("DELETE FROM ShasthyaKormiLinkedVillageEntity")
+    suspend fun deleteAllShasthyaKormiLinkedVillages()
+
+    @Query(
+        """
+        SELECT DISTINCT sv.* FROM SubVillageEntity sv
+        INNER JOIN ShasthyaKormiLinkedVillageEntity sklv ON sv.villageId = sklv.villageId
+        WHERE sklv.shasthyaKormiId = :shasthyaKormiId
+        """,
+    )
+    suspend fun getSubVillagesByShasthyaKormiId(shasthyaKormiId: Long): List<SubVillageEntity>
+
+    @Query(
+        """
+        SELECT DISTINCT sv.* FROM SubVillageEntity sv
+        INNER JOIN ShasthyaKormiLinkedVillageEntity sklv ON sv.villageId = sklv.villageId
+        WHERE sklv.shasthyaKormiId IN (:shasthyaKormiIds)
+        """,
+    )
+    suspend fun getSubVillagesByShasthyaKormiIds(shasthyaKormiIds: List<Long>): List<SubVillageEntity>
+
+    @Query(
+        """
+        SELECT v.* FROM VillageEntity v
+        INNER JOIN ShasthyaKormiLinkedVillageEntity sklv ON v.id = sklv.villageId
+        WHERE sklv.shasthyaKormiId = :shasthyaKormiId AND v.chiefdomId = :chiefdomId
+        """,
+    )
+    suspend fun getVillagesForShasthyaKormiAndChiefdom(
+        shasthyaKormiId: Long,
+        chiefdomId: Long,
+    ): List<VillageEntity>
 
     // ShasthyaShebikaLinkedVillage methods
     @Insert(onConflict = OnConflictStrategy.REPLACE)

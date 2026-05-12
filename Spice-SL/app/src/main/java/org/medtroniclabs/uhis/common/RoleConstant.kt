@@ -4,7 +4,9 @@ object RoleConstant {
     const val SHASTIYA_KORMI = "SHASTIYA_KORMI"
     val PROVIDER = "PROVIDER"
     val COMMUNITY_HEALTH_WORKER = "CHW"
-    val CHWs = arrayOf(SHASTIYA_KORMI, COMMUNITY_HEALTH_WORKER)
+    val PO = "PO"
+    val FO = "FO"
+    val CHWs = arrayOf(SHASTIYA_KORMI, COMMUNITY_HEALTH_WORKER, PO, FO)
     val PEER_SUPERVISOR = "PEER_SUPERVISOR"
     val SECHN = "SECHN"
     val MCHA = "MCHA"

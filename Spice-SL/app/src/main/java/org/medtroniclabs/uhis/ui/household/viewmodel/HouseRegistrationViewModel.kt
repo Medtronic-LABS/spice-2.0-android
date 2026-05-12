@@ -13,6 +13,7 @@ import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.LocalSpinnerResponse
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineConstant
 import org.medtroniclabs.uhis.db.entity.HouseholdEntity
+import org.medtroniclabs.uhis.db.entity.VillageEntity
 import org.medtroniclabs.uhis.di.IoDispatcher
 import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.VILLAGE_ID
 import org.medtroniclabs.uhis.mappingkey.MemberRegistration.ID_GUARDIAN
@@ -40,6 +41,7 @@ class HouseRegistrationViewModel @Inject constructor(
     var villageListResponse = MutableLiveData<Resource<LocalSpinnerResponse>>()
     var memberVillageListResponse = MutableLiveData<Resource<LocalSpinnerResponse>>()
     var shasthyaShebikaListResponse = MutableLiveData<Resource<LocalSpinnerResponse>>()
+    var shasthyaKormiListResponse = MutableLiveData<Resource<LocalSpinnerResponse>>()
     var subVillageListResponse = MutableLiveData<Resource<LocalSpinnerResponse>>()
     var guardianMembers = MutableLiveData<Resource<LocalSpinnerResponse>>()
     var memberID: Long = -1L
@@ -116,6 +118,22 @@ class HouseRegistrationViewModel @Inject constructor(
             shasthyaShebikaListResponse.postValue(houseHoldRepository.getShasthyaShebikasByKormiId(userId))
         }
     }
+
+    fun loadAllShasthyaKormis() {
+        viewModelScope.launch(dispatcherIO) {
+            shasthyaKormiListResponse.postLoading()
+            shasthyaKormiListResponse.postValue(houseHoldRepository.getAllShasthyaKormisSpinner())
+        }
+    }
+
+    fun loadShasthyaShebikaForKormiId(kormiId: Long) {
+        viewModelScope.launch(dispatcherIO) {
+            shasthyaShebikaListResponse.postLoading()
+            shasthyaShebikaListResponse.postValue(houseHoldRepository.getShasthyaShebikasByKormiId(kormiId))
+        }
+    }
+
+    suspend fun getVillageEntity(villageId: Long): VillageEntity? = houseHoldRepository.getVillageByID(villageId).data
 
     fun loadSubVillageDataCacheByType(
         type: String,

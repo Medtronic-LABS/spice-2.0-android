@@ -2,6 +2,7 @@ package org.medtroniclabs.uhis.formgeneration
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.util.Log
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.DialogInterface
@@ -46,6 +47,7 @@ import androidx.core.widget.NestedScrollView
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import org.medtroniclabs.uhis.BuildConfig
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.invisible
@@ -150,9 +152,11 @@ import org.medtroniclabs.uhis.mappingkey.MemberRegistration.PHONE_NUMBER
 import org.medtroniclabs.uhis.mappingkey.RxBuddy
 import org.medtroniclabs.uhis.mappingkey.Screening
 import org.medtroniclabs.uhis.mappingkey.Screening.DateOfBirth
+import org.medtroniclabs.uhis.mappingkey.Screening.TODAY
 import org.medtroniclabs.uhis.mappingkey.Screening.Hour
 import org.medtroniclabs.uhis.mappingkey.Screening.Minute
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.CAMP_DATE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.MUAC
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.muacCode
 import java.time.LocalDate
@@ -191,6 +195,38 @@ class FormGenerator(
     val lastMealTypeDateSuffix = Screening.lastMealTypeDateSuffix
     private var mentalHealthQuestions: HashMap<String, ArrayList<MentalHealthOption>>? = null
     private var mentalHealthEditList: ArrayList<Map<String, Any>>? = null
+
+    companion object {
+        private const val TAG_VALIDATE = "FormValidation"
+    }
+
+    private fun logValidationFailure(
+        formLayout: FormLayout,
+        message: String?,
+    ) {
+        if (!BuildConfig.DEBUG) return
+        val id = formLayout.id
+        val current = resultHashMap[id]
+        val valueStr =
+            when (current) {
+                null -> "<no value in map>"
+                is String ->
+                    if (current.isEmpty()) {
+                        "\"\" (empty string)"
+                    } else {
+                        val t = current.take(100)
+                        "\"$t\"${if (current.length > 100) "…" else ""}"
+                    }
+                else -> "${current.javaClass.simpleName}: ${current.toString().take(120)}"
+            }
+        val reason = message ?: formLayout.errorMessage ?: formLayout.cultureErrorMessage ?: "validation failed"
+        Log.w(
+            TAG_VALIDATE,
+            "Invalid field id=\"$id\" title=\"${formLayout.title}\" viewType=${formLayout.viewType} " +
+                "mandatory=${formLayout.isMandatory} visible=${isViewVisible(id)} enabled=${isViewEnabled(id)} " +
+                "value=$valueStr reason=$reason",
+        )
+    }
 
     fun populateViews(serverData: List<FormLayout>) {
         this.serverData = serverData
@@ -1869,7 +1905,31 @@ class FormGenerator(
             }
             setViewVisibility(visibility, binding.root)
             setViewEnableDisable(isEnabled, binding.root)
+            applyTodayDefaultForVisibleCampDate(this, binding)
         }
+    }
+
+    /**
+     * BD cataract camp date: when field is shown with [Screening.TODAY] in JSON, pre-fill today
+     * only if empty so drafts / [FormAutofill] can still replace with a saved value.
+     */
+    private fun applyTodayDefaultForVisibleCampDate(
+        formLayout: FormLayout,
+        binding: DatepickerLayoutBinding,
+    ) {
+        if (formLayout.id != CAMP_DATE) return
+        if (formLayout.visibility != VISIBLE) return
+        if (formLayout.defaultValue != TODAY) return
+        if (binding.etUserInput.text?.isNotBlank() == true) return
+        if (resultHashMap.containsKey(formLayout.id)) return
+        val now = Calendar.getInstance().time
+        binding.etUserInput.setText(DateUtils.getDateDDMMYYYY().format(now))
+        resultHashMap[formLayout.id] =
+            DateUtils.getDateString(
+                now.time,
+                inputFormat = DateUtils.DATE_FORMAT_yyyyMMdd,
+                outputFormat = DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
+            )
     }
 
     private lateinit var textWatcher: TextWatcher
@@ -3868,8 +3928,15 @@ class FormGenerator(
                 }
             }
         }
+        if (!isValid && BuildConfig.DEBUG) {
+            Log.w(
+                TAG_VALIDATE,
+                "validateInputs(): submit blocked — one or more fields failed (see \"Invalid field\" lines above; first field is scrolled into view).",
+            )
+        }
         return isValid
     }
+
 
     private fun continueChanges(root: View): Boolean {
         serverData?.firstOrNull { (it.id + rootSuffix) == root.tag }?.multipleParents?.let { parents ->
@@ -3899,10 +3966,9 @@ class FormGenerator(
                 false
             }
         }
-
     fun isViewVisible(id: String): Boolean {
         val view = getViewByTag(id + rootSuffix)
-        return view != null && view.isVisible
+        return view != null && view.isShown
     }
 
     fun isViewEnabled(id: String): Boolean {
@@ -3932,6 +3998,7 @@ class FormGenerator(
         formLayout: FormLayout,
         message: String? = null,
     ) {
+        logValidationFailure(formLayout, message)
         if (focusNeeded == null) {
             focusNeeded = showValidationMessage(formLayout, message)
         } else {

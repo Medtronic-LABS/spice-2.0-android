@@ -2,6 +2,7 @@ package org.medtroniclabs.uhis.ui.services
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import androidx.activity.viewModels
@@ -70,12 +71,24 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
         preSelectedStaticFilter = intent.getStringExtra(DashboardConstants.EXTRA_DASHBOARD_STATIC_FILTER)?.let {
             runCatching { ServiceStaticFilter.valueOf(it) }.getOrNull()
         }
-
-        val title = if (isExternalMember) {
-            getString(R.string.external_member)
-        } else {
-            getString(R.string.service_recipient_list)
+        if (CommonUtils.isFoOrPo() && !isExternalMember) {
+            val allowedFoPoFilters =
+                setOf(
+                    ServiceStaticFilter.ALL_MEMBERS,
+                    ServiceStaticFilter.NCD_SERVICES,
+                    ServiceStaticFilter.CATARACT_SCREENING,
+                    ServiceStaticFilter.EYE_SCREENING,
+                )
+            if (preSelectedStaticFilter != null && preSelectedStaticFilter !in allowedFoPoFilters) {
+                preSelectedStaticFilter = null
+            }
         }
+
+        val title =
+            when {
+                isExternalMember -> getString(R.string.external_member)
+                else -> getString(R.string.service_recipient_list)
+            }
 
         setMainContentView(
             binding.root,
@@ -114,9 +127,13 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
             binding.tvMemberTypes.gone()
             binding.viewMemberTypes.gone()
             binding.bottomNavigationView.visible()
+            binding.btnAddExternalMember.text = getString(R.string.add_external_member)
             binding.btnAddExternalMember.safeClickListener(this)
-            // Set external member filter directly
             servicesViewModel.setFilterLiveData(staticFilter = ServiceStaticFilter.EXTERNAL_MEMBERS)
+        } else if (CommonUtils.isFoOrPo()) {
+            binding.bottomNavigationView.visible()
+            binding.btnAddExternalMember.text = getString(R.string.add_new_member_small)
+            binding.btnAddExternalMember.safeClickListener(this)
         } else {
             binding.bottomNavigationView.gone()
         }
@@ -198,18 +215,41 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
      */
     private fun buildDropDownList(counts: ServiceMemberCounts): ArrayList<Map<String, Any>> {
         val dropdownList = arrayListOf<Map<String, Any>>()
-        val staticFilters = mapOf(
-            ServiceStaticFilter.ALL_MEMBERS to counts.allMembers,
-            ServiceStaticFilter.FAMILY_PLANNING_COUNSELLING_ELIGIBLE to counts.familyPlanning,
-            ServiceStaticFilter.PREGNANT_WOMEN to counts.pregnantWomen,
-            ServiceStaticFilter.HIGH_RISK_PREGNANT_WOMEN to counts.highRiskPregnant,
-            ServiceStaticFilter.POSTNATAL_CARE_MOTHERS to counts.postnatalMothers,
-            ServiceStaticFilter.CHILDREN_UNDER_TWO_YEARS to counts.childrenUnderTwo,
-            ServiceStaticFilter.EXPECTED_DELIVERIES to counts.expectedDeliveries,
-            ServiceStaticFilter.PENDING_DELIVERIES to counts.pendingDeliveries,
-            ServiceStaticFilter.EXTERNAL_MEMBERS to counts.externalMembers,
-            ServiceStaticFilter.EXTERNAL_PREGNANT_WOMEN to counts.externalPregnant,
-        )
+//        val roleNames =
+//            SecuredPreference.getUserDetails()?.roles?.joinToString(",") { it.name } ?: "null"
+        val isFoOrPoUser = CommonUtils.isFoOrPo()
+//        Log.d(
+//            LOG_TAG_FO_PO_DEBUG,
+//            "buildDropDownList enter: isFoOrPo=$isFoOrPoUser isFo=${CommonUtils.isFo()} " +
+//                "isPo=${CommonUtils.isPo()} roles=[$roleNames]",
+//        )
+        val staticFilters =
+            if (isFoOrPoUser) {
+                linkedMapOf(
+                    ServiceStaticFilter.ALL_MEMBERS to counts.allMembers,
+                    ServiceStaticFilter.NCD_SERVICES to counts.ncdServices,
+                    ServiceStaticFilter.CATARACT_SCREENING to counts.cataractScreening,
+                    ServiceStaticFilter.EYE_SCREENING to counts.eyeScreening,
+                )
+            } else {
+                linkedMapOf(
+                    ServiceStaticFilter.ALL_MEMBERS to counts.allMembers,
+                    ServiceStaticFilter.FAMILY_PLANNING_COUNSELLING_ELIGIBLE to counts.familyPlanning,
+                    ServiceStaticFilter.PREGNANT_WOMEN to counts.pregnantWomen,
+                    ServiceStaticFilter.HIGH_RISK_PREGNANT_WOMEN to counts.highRiskPregnant,
+                    ServiceStaticFilter.POSTNATAL_CARE_MOTHERS to counts.postnatalMothers,
+                    ServiceStaticFilter.CHILDREN_UNDER_TWO_YEARS to counts.childrenUnderTwo,
+                    ServiceStaticFilter.EXPECTED_DELIVERIES to counts.expectedDeliveries,
+                    ServiceStaticFilter.PENDING_DELIVERIES to counts.pendingDeliveries,
+                    ServiceStaticFilter.EXTERNAL_MEMBERS to counts.externalMembers,
+                    ServiceStaticFilter.EXTERNAL_PREGNANT_WOMEN to counts.externalPregnant,
+                )
+            }
+//        Log.d(
+//            LOG_TAG_FO_PO_DEBUG,
+//            "buildDropDownList result: branch=${if (isFoOrPoUser) "FO_PO" else "FULL"} " +
+//                "filterCount=${staticFilters.size} filters=${staticFilters.keys.joinToString { it.name }}",
+//        )
         staticFilters.forEach { filterEntry ->
             val filter = filterEntry.key
             val filterCount = filterEntry.value
@@ -318,7 +358,13 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
 
             R.id.btnAddExternalMember -> {
                 withLocationCheck({
-                    servicesViewModel.setUserJourney("ADD_EXTERNAL_MEMBER_BUTTON_TRIGGERED")
+                    servicesViewModel.setUserJourney(
+                        if (isExternalMember) {
+                            "ADD_EXTERNAL_MEMBER_BUTTON_TRIGGERED"
+                        } else {
+                            "ADD_MEMBER_BUTTON_FO_PO"
+                        },
+                    )
                     val intent = Intent(this, ExternalMemberRegistrationActivity::class.java)
                     startActivity(intent)
                 })
@@ -347,5 +393,8 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
 
     companion object {
         const val ENTRY_POINT_SERVICES = "Services"
+
+        /** Logcat filter: `adb logcat -s ServicesFoPoD` */
+        private const val LOG_TAG_FO_PO_DEBUG = "ServicesFoPoD"
     }
 }

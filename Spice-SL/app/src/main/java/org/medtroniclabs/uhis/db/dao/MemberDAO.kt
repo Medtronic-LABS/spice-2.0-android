@@ -306,6 +306,8 @@ interface MemberDAO {
         filterBySs: List<Long>,
         filterBySubVillages: List<Long>,
         staticFilter: ServiceStaticFilter,
+        /** FO/PO: members may have no household; use member-level joins and sub-village like external flow. */
+        allowNullHousehold: Boolean = false,
     ): LiveData<List<HouseholdMemberWithTb>> {
         val args = mutableListOf<Any>()
         val conditions = mutableListOf<String>()
@@ -314,6 +316,8 @@ interface MemberDAO {
         val isExternalMember =
             staticFilter == ServiceStaticFilter.EXTERNAL_MEMBERS ||
                 staticFilter == ServiceStaticFilter.EXTERNAL_PREGNANT_WOMEN
+
+        val useOptionalHouseholdJoins = isExternalMember || allowNullHousehold
 
         if (staticFilter != ServiceStaticFilter.EXTERNAL_MEMBERS &&
             staticFilter != ServiceStaticFilter.ALL_MEMBERS &&
@@ -330,7 +334,7 @@ interface MemberDAO {
         }
 
         if (filterBySubVillages.isNotEmpty() || filterBySs.isNotEmpty()) {
-            val subVillageColumn = if (isExternalMember) "hhm.sub_village_id" else "hh.sub_village_id"
+            val subVillageColumn = if (useOptionalHouseholdJoins) "hhm.sub_village_id" else "hh.sub_village_id"
             val subVillageFilterConditions = mutableListOf<String>()
             if (filterBySubVillages.isNotEmpty()) {
                 subVillageFilterConditions += "$subVillageColumn IN (${filterBySubVillages.joinToString(",") { "?" }})"
@@ -380,6 +384,15 @@ interface MemberDAO {
                 conditions += ServiceFilterConditions.EXTERNAL_MEMBER
                 conditions += ServiceFilterConditions.PREGNANT_WOMEN
             }
+            ServiceStaticFilter.NCD_SERVICES -> {
+                conditions += ServiceFilterConditions.HAS_NCD_SERVICE_HISTORY
+            }
+            ServiceStaticFilter.CATARACT_SCREENING -> {
+                conditions += ServiceFilterConditions.HAS_CATARACT_SCREENING_HISTORY
+            }
+            ServiceStaticFilter.EYE_SCREENING -> {
+                conditions += ServiceFilterConditions.HAS_EYE_SCREENING_HISTORY
+            }
             else -> {}
         }
 
@@ -389,20 +402,20 @@ interface MemberDAO {
             "WHERE ${conditions.joinToString(" AND ")}"
         }
 
-        // For external members, use LEFT JOIN since household_id is NULL
-        val householdJoin = if (isExternalMember) {
+        // External / FO–PO without household: LEFT JOIN so household_id may be NULL
+        val householdJoin = if (useOptionalHouseholdJoins) {
             "LEFT JOIN Household AS hh ON hh.id = hhm.household_id"
         } else {
             "INNER JOIN Household AS hh ON hh.id = hhm.household_id"
         }
 
-        val ssJoin = if (isExternalMember) {
+        val ssJoin = if (useOptionalHouseholdJoins) {
             "LEFT JOIN ShasthyaShebikaEntity AS ss ON hhm.shasthya_shebika_id = ss.id"
         } else {
             "INNER JOIN ShasthyaShebikaEntity AS ss ON ss.id = hh.shasthya_shebika_id"
         }
 
-        val svJoin = if (isExternalMember) {
+        val svJoin = if (useOptionalHouseholdJoins) {
             "LEFT JOIN SubVillageEntity AS sv ON hhm.sub_village_id = sv.id"
         } else {
             "INNER JOIN SubVillageEntity AS sv ON sv.id = hh.sub_village_id"
@@ -497,6 +510,8 @@ interface MemberDAO {
         searchInput: String = "",
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
+        /** FO/PO: include members with null household_id using member-level area filters. */
+        allowNullHousehold: Boolean = false,
     ): ServiceMemberCounts {
         val args = mutableListOf<Any>()
         val globalArgs = mutableListOf<Any>()
@@ -560,12 +575,21 @@ interface MemberDAO {
             ""
         }
 
+        val memberListScope =
+            if (allowNullHousehold) {
+                "1=1"
+            } else {
+                ServiceFilterConditions.HAS_HOUSEHOLD
+            }
+        val memberListAreaFilter = if (allowNullHousehold) externalAreaFilter else householdAreaFilter
+        val memberListAreaArgs = if (allowNullHousehold) externalFilterArgs else householdFilterArgs
+
         val query =
             """
             SELECT
                 SUM(CASE WHEN
-                    ${ServiceFilterConditions.HAS_HOUSEHOLD}
-                    $householdAreaFilter
+                    $memberListScope
+                    $memberListAreaFilter
                 THEN 1 ELSE 0 END) AS all_members,
 
                 SUM(CASE WHEN
@@ -626,15 +650,36 @@ interface MemberDAO {
                     $externalAreaFilter
                     AND ${ServiceFilterConditions.IS_ACTIVE}
                     AND ${ServiceFilterConditions.PREGNANT_WOMEN}
-                THEN 1 ELSE 0 END) AS external_pregnant
+                THEN 1 ELSE 0 END) AS external_pregnant,
+
+                SUM(CASE WHEN
+                    $memberListScope
+                    $memberListAreaFilter
+                    AND ${ServiceFilterConditions.IS_ACTIVE}
+                    AND ${ServiceFilterConditions.HAS_NCD_SERVICE_HISTORY}
+                THEN 1 ELSE 0 END) AS ncd_services,
+
+                SUM(CASE WHEN
+                    $memberListScope
+                    $memberListAreaFilter
+                    AND ${ServiceFilterConditions.IS_ACTIVE}
+                    AND ${ServiceFilterConditions.HAS_CATARACT_SCREENING_HISTORY}
+                THEN 1 ELSE 0 END) AS cataract_screening,
+
+                SUM(CASE WHEN
+                    $memberListScope
+                    $memberListAreaFilter
+                    AND ${ServiceFilterConditions.IS_ACTIVE}
+                    AND ${ServiceFilterConditions.HAS_EYE_SCREENING_HISTORY}
+                THEN 1 ELSE 0 END) AS eye_screening
             FROM householdmember AS hhm
             LEFT JOIN Household AS hh ON hh.id = hhm.household_id
             $globalWhereClause
             """.trimIndent()
 
         // Placeholder order in SELECT is:
-        // household filter x8, external filter x2 then global WHERE args.
-        repeat(8) { args.addAll(householdFilterArgs) }
+        // member-list area filter x11 (household- or member-scoped), external filter x2, then global WHERE args.
+        repeat(11) { args.addAll(memberListAreaArgs) }
         repeat(2) { args.addAll(externalFilterArgs) }
         args.addAll(globalArgs)
 

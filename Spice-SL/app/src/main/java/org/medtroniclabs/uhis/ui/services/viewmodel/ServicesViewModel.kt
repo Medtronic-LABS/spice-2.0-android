@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.appextensions.postLoading
+import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberWithTb
@@ -59,11 +60,13 @@ class ServicesViewModel @Inject constructor(
                         state = ResourceState.LOADING,
                     ),
                 )
+                val allowNullHousehold = CommonUtils.isFoOrPo()
                 val counts =
                     memberRepository.getAllServiceMemberCounts(
                         searchInput = filter.searchInput,
                         filterBySs = filter.filterBySs.map { it.id!! },
                         filterBySubVillages = filter.filterBySubVillages.map { it.id!! },
+                        allowNullHousehold = allowNullHousehold,
                     )
                 emitSource(
                     memberRepository
@@ -72,6 +75,7 @@ class ServicesViewModel @Inject constructor(
                             filter.filterBySs.map { it.id!! },
                             filter.filterBySubVillages.map { it.id!! },
                             filter.staticFilter,
+                            allowNullHousehold = allowNullHousehold,
                         ).map { members ->
                             Resource(
                                 state = ResourceState.SUCCESS,
@@ -108,15 +112,51 @@ class ServicesViewModel @Inject constructor(
         staticFilter?.let {
             filter.staticFilter = staticFilter
         }
-        filterLiveData.value = filter
+        filterLiveData.postValue(filter)
     }
 
     fun getFilterLiveData(): LiveData<ServicesSearchFilter> = filterLiveData
 
+    private var lastLoadedFoPoKormiId: Long? = null
+
     fun getFilterUiData() {
         viewModelScope.launch(dispatcherIO) {
+            lastLoadedFoPoKormiId = null
             filterUiData.postLoading()
-            filterUiData.postValue(houseHoldRepository.getHouseHoldFilterUiData(SecuredPreference.getUserId()))
+            val userId = SecuredPreference.getUserId()
+            val initial = houseHoldRepository.getHouseHoldFilterUiDataForServiceRecipient(userId)
+            filterUiData.postValue(initial)
+            if (CommonUtils.isFoOrPo() &&
+                initial.state == ResourceState.SUCCESS &&
+                initial.data != null
+            ) {
+                val firstSsId = filterLiveData.value?.filterBySs?.firstOrNull()?.id
+                if (firstSsId != null) {
+                    val kormiId =
+                        houseHoldRepository.getShasthyaKormiIdForShasthyaShebika(firstSsId)
+                    if (kormiId != null) {
+                        lastLoadedFoPoKormiId = kormiId
+                        filterUiData.postValue(
+                            houseHoldRepository.getHouseHoldFilterUiDataForShasthyaKormi(kormiId),
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun loadFilterUiDataForSelectedKormi(kormiId: Long) {
+        if (lastLoadedFoPoKormiId == kormiId) {
+            val current = filterUiData.value?.data
+            if (current?.ssList?.isNotEmpty() == true) return
+        }
+        lastLoadedFoPoKormiId = kormiId
+        viewModelScope.launch(dispatcherIO) {
+            setFilterLiveData(ssFilter = emptyList(), subVillagesFilter = emptyList())
+            filterUiData.postLoading()
+            filterUiData.postValue(
+                houseHoldRepository.getHouseHoldFilterUiDataForShasthyaKormi(kormiId),
+            )
         }
     }
 }

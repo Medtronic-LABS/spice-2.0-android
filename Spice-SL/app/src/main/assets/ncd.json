@@ -2,6 +2,45 @@
     "formLayout":
     [
         {
+            "id": "generalInformation",
+            "title": "General Information",
+            "viewType": "CardView",
+            "familyOrder": 0,
+            "titleCulture": "সাধারণ তথ্য",
+            "visibility": "gone"
+          },
+          {
+            "id": "camp_type",
+            "title": "Camp Type",
+            "family": "generalInformation",
+            "orderId": 0,
+            "viewType": "SingleSelectionView",
+            "condition": [],
+            "fieldName": "Camp Type",
+            "isEnabled": true,
+            "isSummary": true,
+            "optionType": "string",
+            "visibility": "gone",
+            "isMandatory": true,
+            "optionsList": [
+              {
+                "id": "Combined",
+                "name": "Combined",
+                "cultureValue": "সমন্বিত"
+              },
+              {
+                "id": "Single",
+                "name": "Single",
+                "cultureValue": "একক"
+              }
+            ],
+            "orientation": 0,
+            "errorMessage": "Please select camp type",
+            "titleCulture": "ক্যাম্পের ধরণ",
+            "isNeededDefault": true,
+            "cultureErrorMessage": "অনুগ্রহ করে ক্যাম্পের ধরণ নির্বাচন করুন"
+          },
+        {
             "familyOrder": 1,
             "id": "symptomsLog",
             "title": "Symptoms",

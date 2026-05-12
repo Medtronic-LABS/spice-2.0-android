@@ -4,6 +4,8 @@ object HouseHoldRegistration {
     const val HOUSEHOLD_NAME = "householdName"
     const val NO_OF_PEOPLE = "no_of_people"
     const val VILLAGE_ID = "village_id"
+    const val CHIEFDOM_ID = "chiefdom_id"
+    const val SHASTHYA_KORMI_ID = "shasthya_kormi_id"
     const val SHASTHYA_SHEBIKA_ID = "shasthya_shebika_id"
     const val SUB_VILLAGE_ID = "sub_village_id"
     const val HOUSEHOLD_TYPE = "household_type"

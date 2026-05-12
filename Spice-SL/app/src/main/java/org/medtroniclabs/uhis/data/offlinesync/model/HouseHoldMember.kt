@@ -37,6 +37,10 @@ data class HouseHoldMember(
     val villageId: Long,
     @ColumnInfo(name = "sub_village_name")
     val subVillage: String? = null,
+    @ColumnInfo("shasthya_kormi_id")
+    var shasthyaKormiId: Long? = null,
+    @ColumnInfo("chiefdom_id")
+    var chiefdomId: Long? = null,
     @ColumnInfo(name = "sub_village_id")
     val subVillageId: Long? = null,
     @ColumnInfo(name = "shasthya_shebika_id")
@@ -96,6 +100,8 @@ data class HouseHoldMember(
             patientId = this.patientId,
             villageId = this.villageId,
             shasthyaShebikaId = this.shasthyaShebikaId,
+            shasthyaKormiId = this.shasthyaKormiId,
+            chiefdomId = this.chiefdomId,
             subVillageId = this.subVillageId,
             isActive = this.isActive,
             version = this.version,

@@ -7,6 +7,7 @@ import org.medtroniclabs.uhis.db.entity.ChiefDomEntity
 import org.medtroniclabs.uhis.db.entity.DistrictEntity
 import org.medtroniclabs.uhis.db.entity.HealthFacilityEntity
 import org.medtroniclabs.uhis.db.entity.HouseholdMemberEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaEntity
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
 import org.medtroniclabs.uhis.db.entity.SubVillageEntity
@@ -53,6 +54,14 @@ object EntityMapper {
 
             is ProgramEntity -> {
                 updateMapsIdName(map, properties.id, properties.name)
+            }
+            is ShasthyaKormiEntity -> {
+                val displayName = if (!properties.firstName.isNullOrBlank() && !properties.lastName.isNullOrBlank()) {
+                    "${properties.firstName} ${properties.lastName}"
+                } else {
+                    ""
+                }
+                updateMapsIdName(map, properties.id, displayName)
             }
 
             is ShasthyaShebikaEntity -> {

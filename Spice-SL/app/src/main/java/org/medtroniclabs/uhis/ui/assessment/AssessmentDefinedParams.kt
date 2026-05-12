@@ -645,6 +645,13 @@ object AssessmentDefinedParams {
     const val SUMMARY_VALUE = "summaryValue"
     const val SUMMARY_ROOT = "summaryRoot"
 
+    const val EYE_CARE_FORM = "eye_care"
+    const val CATARACT_FORM = "cataract"
+
+    const val GENERAL_INFORMATION = "generalInformation"
+    const val CAMP_DATE = "camp_date"
+    const val CAMP_TYPE = "camp_type"
+    
     const val EYE_DISEASE = "eyeDisease"
 
     const val HISTORY_OF_OTHER_DISEASES = "historyOfOtherDiseases"

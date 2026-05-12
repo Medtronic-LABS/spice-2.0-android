@@ -57,6 +57,25 @@
                 app:layout_constraintStart_toStartOf="@id/tvVillageTitle"
                 app:layout_constraintTop_toBottomOf="@id/tvVillageTitle" />
 
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/spShasthyaKormi"
+                style="@style/Form_Input_Style"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_16sdp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/tvVillageTitle"
+                app:layout_constraintTop_toBottomOf="@id/tvVillageTitle" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrierBelowVillageOrSk"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierAllowsGoneWidgets="true"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="villageChipGroup,spShasthyaKormi" />
+
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvSsTitle"
                 style="@style/TextStyle_Medium_16_NoBG"
@@ -68,7 +87,7 @@
                 android:textColor="@color/grey_black"
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/villageChipGroup" />
+                app:layout_constraintTop_toBottomOf="@id/barrierBelowVillageOrSk" />
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/ssChipGroup"

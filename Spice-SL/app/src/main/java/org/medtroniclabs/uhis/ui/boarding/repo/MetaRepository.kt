@@ -26,6 +26,7 @@ import org.medtroniclabs.uhis.data.MenuDetail
 import org.medtroniclabs.uhis.data.ModelQuestion
 import org.medtroniclabs.uhis.data.ProgramEntity
 import org.medtroniclabs.uhis.data.UserProfile
+import org.medtroniclabs.uhis.data.model.ShasthyaKormi
 import org.medtroniclabs.uhis.data.model.ShasthyaShebika
 import org.medtroniclabs.uhis.data.model.SubVillage
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowConditionEntity
@@ -42,6 +43,8 @@ import org.medtroniclabs.uhis.db.entity.NCDAssessmentClinicalWorkflow
 import org.medtroniclabs.uhis.db.entity.PregnancyDetail
 import org.medtroniclabs.uhis.db.entity.RiskClassificationModel
 import org.medtroniclabs.uhis.db.entity.RiskFactorEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
@@ -125,6 +128,7 @@ class MetaRepository @Inject constructor(
                             saveSubVillages(shasthyaShebikas?.flatMap { it.subVillages ?: emptyList() })
                             // Save ShasthyaShebikas (includes saving linked subVillages)
                             saveShasthyaShebikas(shasthyaShebikas)
+                            saveShasthyaKormisFromMeta(shasthyaKormis)
                             deleteAllFrequencyList()
                             frequency?.let {
                                 saveFrequencyList(it)
@@ -1305,6 +1309,40 @@ class MetaRepository @Inject constructor(
             }
             roomHelper.deleteAllSubVillages()
             roomHelper.saveSubVillages(subVillageEntities)
+        }
+    }
+
+    private suspend fun saveShasthyaKormisFromMeta(shasthyaKormis: List<ShasthyaKormi>?) {
+        if (shasthyaKormis == null) return
+        roomHelper.deleteAllShasthyaKormiLinkedVillages()
+        roomHelper.deleteAllShasthyaKormis()
+        if (shasthyaKormis.isEmpty()) return
+        val entities =
+            shasthyaKormis.map { k ->
+                ShasthyaKormiEntity(
+                    id = k.id,
+                    firstName = k.firstName,
+                    lastName = k.lastName,
+                    gender = k.gender,
+                    phoneNumber = k.phoneNumber,
+                    username = k.username,
+                    email = k.email,
+                )
+            }
+        roomHelper.saveShasthyaKormis(entities)
+        val linked = mutableListOf<ShasthyaKormiLinkedVillageEntity>()
+        shasthyaKormis.forEach { k ->
+            k.villages?.forEach { v ->
+                linked.add(
+                    ShasthyaKormiLinkedVillageEntity(
+                        shasthyaKormiId = k.id,
+                        villageId = v.id,
+                    ),
+                )
+            }
+        }
+        if (linked.isNotEmpty()) {
+            roomHelper.insertShasthyaKormiLinkedVillages(linked)
         }
     }
 

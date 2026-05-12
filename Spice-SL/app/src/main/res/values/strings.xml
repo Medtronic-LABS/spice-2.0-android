@@ -1651,6 +1651,7 @@
     <string name="regimen_line" translatable="false">Regimen Line</string>
     <string name="men_having_sex_with_men_msm">Men Having Sex with Men (MSM)</string>
     <string name="ss_name">SS Name</string>
+    <string name="shasthya_kormi_sk">Shasthya Kormi (SK)</string>
 
     <string name="lmp_last_menstrual_period">LMP (Last Menstrual Period)</string>
     <string name="edd_estimated_delivery_date">👶 EDD (Expected Date of Delivery)</string>

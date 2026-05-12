@@ -78,6 +78,8 @@ import org.medtroniclabs.uhis.db.entity.RiskFactorEntity
 import org.medtroniclabs.uhis.db.entity.RxBuddyDetails
 import org.medtroniclabs.uhis.db.entity.RxBuddyFollowUpEntity
 import org.medtroniclabs.uhis.db.entity.ScreeningEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
@@ -100,12 +102,14 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentNCDEntity
         DosageFrequency::class, NCDDiagnosisEntity::class, TreatmentPlanEntity::class, ShortageReasonEntity::class, DosageDurationEntity::class, NCDFollowUp::class,
         LinkedVillageEntity::class, NCDCallDetails::class, NCDPatientDetailsEntity::class, CommunityProfile::class, RxBuddyDetails::class, TreatmentDetailsEntity::class, RxBuddyFollowUpEntity::class,
         SubVillageEntity::class, ShasthyaShebikaEntity::class, ShasthyaShebikaLinkedVillageEntity::class,
+        ShasthyaKormiEntity::class, ShasthyaKormiLinkedVillageEntity::class,
         MemberAssessmentHistoryEntity::class,
     ],
-    version = 4,
+    version = 5,
     autoMigrations = [
         AutoMigration(1, 2),
         AutoMigration(2, 3),
+        AutoMigration(4, 5),
     ],
 )
 @TypeConverters(OfflineStatusTypeConverter::class)

@@ -1,0 +1,1201 @@
+{
+    "time": 1678841138701,
+    "formLayout": [
+      {
+        "id": "generalInformation",
+        "title": "General Information",
+        "viewType": "CardView",
+        "familyOrder": 0,
+        "titleCulture": "সাধারণ তথ্য",
+        "visibility": "gone"
+      },
+      {
+        "id": "camp_date",
+        "title": "Camp Date",
+        "family": "generalInformation",
+        "orderId": 0,
+        "viewType": "DatePicker",
+        "hint": "DD-MM-YYYY",
+        "hintCulture": "দিন-মাস-বছর",
+        "defaultValue": "TODAY",
+        "fieldName": "Camp Date",
+        "isEnabled": true,
+        "isMandatory": true,
+        "isSummary": true,
+        "visibility": "gone",
+        "titleCulture": "ক্যাম্পের তারিখ"
+      },
+      {
+        "id": "cataract",
+        "title": "Eye Problems",
+        "viewType": "CardView",
+        "familyOrder": 1,
+        "titleCulture": "চোখের সমস্যা সমূহ"
+      },
+      {
+        "id": "eyeDisease",
+        "title": "Types of Eye Diseases",
+        "family": "cataract",
+        "orderId": 1,
+        "viewType": "MultiSelectSpinner",
+        "condition": [
+          {
+            "eqList": [
+              "cataracts",
+              "lecrimalTearDuctProblem",
+              "pterygium",
+              "glaucoma"
+            ],
+            "targetId": "historyOfOtherDiseases",
+            "visibility": "visible"
+          },
+          {
+            "eqList": [
+              "myopia",
+              "otherProblem"
+            ],
+            "targetId": "referPlace",
+            "visibility": "visible"
+          },
+          {
+            "eq": "presbyopia",
+            "targetId": "glassPower",
+            "visibility": "visible"
+          },
+          {
+            "eq": "otherProblem",
+            "targetId": "ncdServiceProvided",
+            "visibility": "visible"
+          }
+        ],
+        "fieldName": "Types of Eye Diseases",
+        "isEnabled": true,
+        "isSummary": true,
+        "visibility": "visible",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "cataracts",
+            "name": "Cataracts",
+            "cultureValue": "ছানি"
+          },
+          {
+            "id": "lecrimalTearDuctProblem",
+            "name": "Lecrimal (Tear Duct) Problem",
+            "cultureValue": "নেত্রনালীর সমস্যা"
+          },
+          {
+            "id": "pterygium",
+            "name": "Pterygium",
+            "cultureValue": "টেরিজিয়াম/মাংসবৃদ্ধি"
+          },
+          {
+            "id": "glaucoma",
+            "name": "Glaucoma",
+            "cultureValue": "গ্লুকোমা"
+          },
+          {
+            "id": "myopia",
+            "name": "Myopia",
+            "cultureValue": "দূরদৃষ্টি সমস্যা"
+          },
+          {
+            "id": "presbyopia",
+            "name": "Presbyopia",
+            "cultureValue": "প্রেসবায়োপিয়া বা নিকট দৃষ্টি সমস্যা"
+          },
+          {
+            "id": "otherProblem",
+            "name": "Other Problem",
+            "cultureValue": "অন্যান্য সমস্যা"
+          }
+        ],
+        "errorMessage": "Please select a valid option",
+        "titleCulture": "চোখের রোগের ধরন",
+        "isNeededDefault": true,
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      },
+      {
+        "id": "glassPower",
+        "title": "Glass Power",
+        "family": "cataract",
+        "orderId": 2,
+        "viewType": "Spinner",
+        "condition": [
+          {
+            "eqList": [
+              "+1.00",
+              "+1.50",
+              "+2.00",
+              "+2.50",
+              "+3.00"
+            ],
+            "targetId": "haveTheGlassesBeenSold",
+            "visibility": "visible"
+          }
+        ],
+        "fieldName": "Glass Power",
+        "isEnabled": true,
+        "isSummary": true,
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "+1.00",
+            "name": "+1.00"
+          },
+          {
+            "id": "+1.50",
+            "name": "+1.50"
+          },
+          {
+            "id": "+2.00",
+            "name": "+2.00"
+          },
+          {
+            "id": "+2.50",
+            "name": "+2.50"
+          },
+          {
+            "id": "+3.00",
+            "name": "+3.00"
+          }
+        ],
+        "errorMessage": "Please select a valid option",
+        "titleCulture": "পাওয়ার",
+        "isNeededDefault": true,
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      },
+      {
+        "id": "haveTheGlassesBeenSold",
+        "title": "Have the glasses been sold?",
+        "family": "cataract",
+        "orderId": 3,
+        "viewType": "Spinner",
+        "condition": [
+          {
+            "eq": "Yes",
+            "targetId": "typeOfGlass",
+            "visibility": "visible"
+          },
+          {
+            "eq": "No",
+            "targetId": "ncdServiceProvided",
+            "visibility": "visible"
+          }
+        ],
+        "fieldName": "Have the glasses been sold?",
+        "isEnabled": true,
+        "isSummary": true,
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes",
+            "cultureValue": "হ্যাঁ"
+          },
+          {
+            "id": "No",
+            "name": "No",
+            "cultureValue": "না"
+          }
+        ],
+        "errorMessage": "Please select a valid option",
+        "titleCulture": "চশমা দেয়া হয়েছে কি",
+        "isNeededDefault": true,
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      },
+      {
+        "id": "typeOfGlass",
+        "title": "Type of Glass",
+        "family": "cataract",
+        "orderId": 4,
+        "viewType": "Spinner",
+        "condition": [
+          {
+            "eqList": [
+              "biFocal",
+              "singleVision"
+            ],
+            "targetId": "typeOfFrame",
+            "visibility": "visible"
+          }
+        ],
+        "fieldName": "Type of Glass",
+        "isEnabled": true,
+        "isSummary": true,
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "biFocal",
+            "name": "Bi Focal",
+            "cultureValue": "বাই-ফোকাল"
+          },
+          {
+            "id": "singleVision",
+            "name": "Single Vision",
+            "cultureValue": "সিঙ্গেল ভিশন"
+          }
+        ],
+        "errorMessage": "Please select a valid option",
+        "titleCulture": "চশমার ধরণ",
+        "isNeededDefault": true,
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      },
+      {
+        "id": "typeOfFrame",
+        "title": "Type of Frame",
+        "family": "cataract",
+        "orderId": 5,
+        "viewType": "Spinner",
+        "condition": [
+          {
+            "eqList": [
+              "Metal",
+              "Plastic"
+            ],
+            "targetId": "firstTimeUser",
+            "visibility": "visible"
+          }
+        ],
+        "fieldName": "Type of Frame",
+        "isEnabled": true,
+        "isSummary": true,
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "Metal",
+            "name": "Metal",
+            "cultureValue": "মেটাল"
+          },
+          {
+            "id": "Plastic",
+            "name": "Plastic",
+            "cultureValue": "প্লাস্টিক"
+          }
+        ],
+        "errorMessage": "Please select a valid option",
+        "titleCulture": "ফ্রেমের ধরণ",
+        "isNeededDefault": true,
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      },
+      {
+        "id": "firstTimeUser",
+        "title": "First time user?",
+        "family": "cataract",
+        "orderId": 6,
+        "viewType": "Spinner",
+        "condition": [
+          {
+            "eqList": [
+              "Yes",
+              "No"
+            ],
+            "targetId": "ncdServiceProvided",
+            "visibility": "visible"
+          }
+        ],
+        "fieldName": "First time user?",
+        "isEnabled": true,
+        "isSummary": true,
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes",
+            "cultureValue": "হ্যাঁ"
+          },
+          {
+            "id": "No",
+            "name": "No",
+            "cultureValue": "না"
+          }
+        ],
+        "errorMessage": "Please select a valid option",
+        "titleCulture": "প্রথম চশমা ব্যবহারকারী কিনা",
+        "isNeededDefault": true,
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      },
+      {
+        "id": "referPlace",
+        "title": "Refer place",
+        "family": "cataract",
+        "orderId": 2,
+        "viewType": "Spinner",
+        "condition": [
+          {
+            "eqList": [
+              "upazilaHealthComplex",
+              "districtHospital",
+              "medicalCollegeHospital",
+              "govtPrivateSpecializedHospital",
+              "others"
+            ],
+            "targetId": "ncdServiceProvided",
+            "visibility": "visible"
+          }
+        ],
+        "fieldName": "Refer place",
+        "isEnabled": true,
+        "isSummary": true,
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "upazilaHealthComplex",
+            "name": "Upazila Health Complex",
+            "cultureValue": "উপজেলা স্বাস্থ্য কমপ্লেক্স"
+          },
+          {
+            "id": "districtHospital",
+            "name": "District Hospital",
+            "cultureValue": "জেলা সদর হাসপাতাল"
+          },
+          {
+            "id": "medicalCollegeHospital",
+            "name": "Medical College Hospital",
+            "cultureValue": "মেডিকেল কলেজ হাসপাতাল"
+          },
+          {
+            "id": "govtPrivateSpecializedHospital",
+            "name": "Govt/Private Specialized Hospital",
+            "cultureValue": "সরকারি/বেসরকারি বিশেষায়িত হাসপাতাল"
+          },
+          {
+            "id": "others",
+            "name": "Others",
+            "cultureValue": "অন্যান্য"
+          }
+        ],
+        "errorMessage": "Please select a valid option",
+        "titleCulture": "রেফারের স্থান",
+        "isNeededDefault": true,
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      },
+      {
+        "id": "historyOfOtherDiseases",
+        "title": "History of other Diseases",
+        "family": "cataract",
+        "orderId": 1,
+        "viewType": "MultiSelectSpinner",
+        "condition": [
+          {
+            "eqList": [
+              "diabetes",
+              "hypertension",
+              "asthma",
+              "heartDisease",
+              "Eye Pressure",
+              "noProblem"
+            ],
+            "targetId": "patientReferredForOperation",
+            "visibility": "visible"
+          }
+        ],
+        "fieldName": "History of other Diseases",
+        "isEnabled": true,
+        "isSummary": true,
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "diabetes",
+            "name": "Diabetes",
+            "cultureValue": "ডায়াবেটিস"
+          },
+          {
+            "id": "hypertension",
+            "name": "Hypertension",
+            "cultureValue": "উচ্চ রক্তচাপ"
+          },
+          {
+            "id": "asthma",
+            "name": "Asthma",
+            "cultureValue": "হাপানি"
+          },
+          {
+            "id": "heartDisease",
+            "name": "Heart Disease",
+            "cultureValue": "হৃদরোগ"
+          },
+          {
+            "id": "Eye Pressure",
+            "name": "Eye Pressure",
+            "cultureValue": "চোঁখের প্রেসার"
+          },
+          {
+            "id": "noProblem",
+            "name": "No Problem",
+            "reset": true,
+            "cultureValue": "সমস্যা নেই"
+          }
+        ],
+        "errorMessage": "Please select a valid option",
+        "titleCulture": "অন্যান্য রোগের ইতিহাস ",
+        "isNeededDefault": true,
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      },
+      {
+        "id": "patientReferredForOperation",
+        "title": "Has the patient is referred for operation?",
+        "family": "cataract",
+        "orderId": 2,
+        "viewType": "SingleSelectionView",
+        "condition": [
+          {
+            "eq": "Yes",
+            "targetId": "operationName",
+            "visibility": "visible"
+          },
+          {
+            "eq": "No",
+            "targetId": "reason",
+            "visibility": "visible"
+          }
+        ],
+        "fieldName": "Has the patient is referred for operation?",
+        "isEnabled": true,
+        "isSummary": true,
+        "isEditable": true,
+        "optionType": "string",
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes",
+            "cultureValue": "হ্যাঁ"
+          },
+          {
+            "id": "No",
+            "name": "No",
+            "cultureValue": "না"
+          }
+        ],
+        "orientation": 0,
+        "errorMessage": "Please select a valid option",
+        "titleCulture": "রোগী অপারেশনের জন্য রেফার করা হয়েছে কিনা?",
+        "isNeededDefault": true,
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      },
+      {
+        "id": "operationName",
+        "title": "Operation Name",
+        "family": "cataract",
+        "orderId": 3,
+        "viewType": "MultiSelectSpinner",
+        "condition": [
+          {
+            "eqList": [
+              "cataracts",
+              "DCT",
+              "DCR",
+              "pterygium",
+              "other"
+            ],
+            "targetId": "pseudophakiaPostCataractSurgery",
+            "visibility": "visible"
+          }
+        ],
+        "fieldName": "Operation Name",
+        "isEnabled": true,
+        "isSummary": true,
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "cataracts",
+            "name": "Cataracts",
+            "cultureValue": "ছানি"
+          },
+          {
+            "id": "DCT",
+            "name": "DCT",
+            "cultureValue": "ডিসিটি/নেত্রনালী"
+          },
+          {
+            "id": "DCR",
+            "name": "DCR",
+            "cultureValue": "ডিসিআর/নেত্রনালী"
+          },
+          {
+            "id": "pterygium",
+            "name": "Pterygium",
+            "cultureValue": "টেরিজিয়াম/মাংসবৃদ্ধি"
+          },
+          {
+            "id": "other",
+            "name": "Other",
+            "cultureValue": "অন্যান্য"
+          }
+        ],
+        "errorMessage": "Please select a valid option",
+        "titleCulture": "অপারেশনের নাম",
+        "isNeededDefault": true,
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      },
+      {
+        "id": "reason",
+        "title": "Reason",
+        "family": "cataract",
+        "orderId": 4,
+        "viewType": "MultiSelectSpinner",
+        "condition": [
+          {
+            "eqList": [
+              "diabetes",
+              "hypertension",
+              "highIOP",
+              "heartDisease",
+              "lecrimalDuctProblem",
+              "financialIssue",
+              "noProblem"
+            ],
+            "targetId": "pseudophakiaPostCataractSurgery",
+            "visibility": "visible"
+          }
+        ],
+        "fieldName": "Reason",
+        "isEnabled": true,
+        "isSummary": true,
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "diabetes",
+            "name": "Diabetes",
+            "cultureValue": "ডায়াবেটিস"
+          },
+          {
+            "id": "hypertension",
+            "name": "Hypertension",
+            "cultureValue": "উচ্চ রক্তচাপ"
+          },
+          {
+            "id": "highIOP",
+            "name": "High IOP",
+            "cultureValue": "হাই আইওপি"
+          },
+          {
+            "id": "heartDisease",
+            "name": "Heart Disease",
+            "cultureValue": "হৃদরোগ"
+          },
+          {
+            "id": "lecrimalDuctProblem",
+            "name": "Lecrimal Duct Problem",
+            "cultureValue": "নেত্রনালীর সমস্যা"
+          },
+          {
+            "id": "financialIssue",
+            "name": "Financial issue",
+            "cultureValue": "আর্থিক সমস্যা"
+          },
+          {
+            "id": "noProblem",
+            "name": "No Problem",
+            "cultureValue": "সমস্যা নেই"
+          }
+        ],
+        "errorMessage": "Please select a valid option",
+        "titleCulture": "কারণ",
+        "isNeededDefault": true,
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      },
+      {
+        "id": "pseudophakiaPostCataractSurgery",
+        "title": "Pseudophakia/ Post-cataract surgery ",
+        "family": "cataract",
+        "orderId": 5,
+        "viewType": "SingleSelectionView",
+        "condition": [
+          {
+            "eqList": [
+              "Yes",
+              "No"
+            ],
+            "targetId": "ncdServiceProvided",
+            "visibility": "visible"
+          }
+        ],
+        "fieldName": "Pseudophakia/ Post-cataract surgery ",
+        "isEnabled": true,
+        "isSummary": true,
+        "isEditable": true,
+        "optionType": "string",
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes",
+            "cultureValue": "হ্যাঁ"
+          },
+          {
+            "id": "No",
+            "name": "No",
+            "cultureValue": "না"
+          }
+        ],
+        "orientation": 0,
+        "errorMessage": "Please select a valid option",
+        "titleCulture": "সিওডোফাকিয়া বা পূর্বে একচোখ অপারেশন হয়েছে",
+        "isNeededDefault": true,
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      },
+      {
+        "id": "ncdServiceProvided",
+        "title": "Has NCD service been provided?",
+        "family": "cataract",
+        "orderId": 6,
+        "viewType": "SingleSelectionView",
+        "condition": [
+          {
+            "eq": "Yes",
+            "targetId": "bpLog",
+            "visibility": "visible"
+          },
+          {
+            "eq": "Yes",
+            "targetId": "isBeforeHtnDiagnosis",
+            "visibility": "visible"
+          },
+          {
+            "eq": "Yes",
+            "targetId": "bpLogDetails",
+            "visibility": "visible"
+          },
+          {
+            "eq": "Yes",
+            "targetId": "isRegularSmoker",
+            "visibility": "visible"
+          },
+          {
+            "eq": "Yes",
+            "targetId": "glucoseLog",
+            "visibility": "visible"
+          },
+          {
+            "eq": "Yes",
+            "targetId": "isBeforeDiabetesDiagnosis",
+            "visibility": "visible"
+          },
+          {
+            "eq": "Yes",
+            "targetId": "glucoseType",
+            "visibility": "visible"
+          },
+          {
+            "eq": "Yes",
+            "targetId": "glucose",
+            "visibility": "visible"
+          },
+          {
+            "eq": "Yes",
+            "targetId": "height",
+            "visibility": "visible"
+          },
+          {
+            "eq": "Yes",
+            "targetId": "weight",
+            "visibility": "visible"
+          },
+          {
+            "eq": "Yes",
+            "targetId": "bmi",
+            "visibility": "visible"
+          },
+          {
+            "eq": "No",
+            "targetId": "referralInformation",
+            "visibility": "visible"
+          },
+          {
+            "eq": "No",
+            "targetId": "whoReferredThisPerson",
+            "visibility": "visible"
+          }
+        ],
+        "fieldName": "Has NCD service been provided?",
+        "isEnabled": true,
+        "isSummary": true,
+        "isEditable": true,
+        "optionType": "string",
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes",
+            "cultureValue": "হ্যাঁ"
+          },
+          {
+            "id": "No",
+            "name": "No",
+            "cultureValue": "না"
+          }
+        ],
+        "orientation": 0,
+        "errorMessage": "Please select a valid option",
+        "titleCulture": "এনসিডি সার্ভিস দেওয়া হয়েছে কি?",
+        "isNeededDefault": true,
+        "multipleParents": {
+          "eyeDisease": [
+            "otherProblem"
+          ],
+          "referPlace": [
+            "upazilaHealthComplex",
+            "districtHospital",
+            "medicalCollegeHospital",
+            "govtPrivateSpecializedHospital",
+            "others"
+          ],
+          "firstTimeUser": [
+            "Yes",
+            "No"
+          ],
+          "haveTheGlassesBeenSold": [
+            "No"
+          ],
+          "pseudophakiaPostCataractSurgery": [
+            "Yes",
+            "No"
+          ]
+        },
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      },
+      {
+        "id": "bpLog",
+        "title": "Blood Pressure & Vitals",
+        "viewType": "CardView",
+        "visibility": "gone",
+        "familyOrder": 3,
+        "titleCulture": "রক্তচাপের গুরুত্বপূর্ণ উপাদান"
+      },
+      {
+        "id": "height",
+        "hint": "Enter Height",
+        "title": "Height (in cm)",
+        "family": "bpLog",
+        "orderId": 3,
+        "maxValue": 300,
+        "minValue": 50,
+        "viewType": "EditText",
+        "condition": [],
+        "fieldName": "Height",
+        "inputType": 8192,
+        "isEnabled": true,
+        "isSummary": true,
+        "visibility": "gone",
+        "hintCulture": "উচ্চতা লিখুন",
+        "isMandatory": true,
+        "errorMessage": "Height is required and must be in a range from 50 to 300",
+        "isNotDefault": true,
+        "titleCulture": "উচ্চতা (সেন্টিমিটারে)",
+        "cultureErrorMessage": "উচ্চতা প্রয়োজন এবং ৫০ থেকে ৩০০ রেঞ্জের মধ্যে হতে হবে"
+      },
+      {
+        "id": "weight",
+        "hint": "Enter Weight",
+        "title": "Weight (in kg)",
+        "family": "bpLog",
+        "orderId": 4,
+        "maxValue": 400,
+        "minValue": 10,
+        "viewType": "EditText",
+        "condition": [],
+        "fieldName": "Weight",
+        "inputType": 8192,
+        "isEnabled": true,
+        "isSummary": true,
+        "visibility": "gone",
+        "hintCulture": "ওজন লিখুন",
+        "isMandatory": true,
+        "errorMessage": "Weight is required and must be in a range from 10 to 400",
+        "isNotDefault": false,
+        "titleCulture": "ওজন (কিলোগ্রামে)",
+        "cultureErrorMessage": "ওজন প্রয়োজন এবং ১০ থেকে ৪০০ রেঞ্জের মধ্যে হতে হবে"
+      },
+      {
+        "id": "bmi",
+        "title": "BMI",
+        "family": "bpLog",
+        "viewType": "InformationLabel",
+        "isSummary": true,
+        "visibility": "gone",
+        "titleCulture": "বিএমআই"
+      },
+      {
+        "id": "isBeforeHtnDiagnosis",
+        "title": "Have you been diagnosed with High Blood Pressure or Hypertension before?",
+        "family": "bpLog",
+        "orderId": 1,
+        "viewType": "SingleSelectionView",
+        "condition": [
+          {
+            "eq": "Yes",
+            "targetId": "medicationFrequencyBp",
+            "visibility": "visible"
+          }
+        ],
+        "fieldName": "Have you been diagnosed with High Blood Pressure or Hypertension before?",
+        "isEnabled": true,
+        "isSummary": false,
+        "optionType": "boolean",
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes",
+            "cultureValue": "হ্যাঁ"
+          },
+          {
+            "id": "No",
+            "name": "No",
+            "cultureValue": "না"
+          }
+        ],
+        "orientation": 0,
+        "errorMessage": "Please select a valid option",
+        "titleCulture": "আগে আপনার কি কখনও উচ্চ রক্তচাপ বা হাইপারটেনশন রোগ নির্ণয় হয়েছিল?",
+        "isNeededDefault": true,
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      },
+      {
+        "id": "medicationFrequencyBp",
+        "title": "Are you taking medication regularly?",
+        "family": "bpLog",
+        "orderId": 3,
+        "viewType": "Spinner",
+        "condition": [],
+        "fieldName": "Are you taking medication regularly?",
+        "isEnabled": true,
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes",
+            "cultureValue": "হ্যাঁ"
+          },
+          {
+            "id": "No",
+            "name": "No",
+            "cultureValue": "না"
+          }
+        ],
+        "errorMessage": "Please select the medication",
+        "titleCulture": "আপনি কি নিয়মিত ঔষধ খাচ্ছেন?",
+        "localDataCache": "conditions",
+        "isNeededDefault": true,
+        "cultureErrorMessage": "অনুগ্রহ করে ঔষধ নির্বাচন করুন"
+      },
+      {
+        "id": "bpLogDetails",
+        "title": "Blood Pressure",
+        "family": "bpLog",
+        "orderId": 2,
+        "maxValue": 300,
+        "minValue": 30,
+        "viewType": "BP",
+        "fieldName": "Blood Pressure",
+        "isEnabled": true,
+        "isSummary": true,
+        "maxLength": 3,
+        "totalCount": 2,
+        "visibility": "gone",
+        "isMandatory": true,
+        "errorMessage": "Please enter a blood pressure value",
+        "instructions": [
+          "Ensure participant has rested for at least 5 minutes before capturing readings.",
+          "Ensure participant is sitting calmly on a chair/stool with their feet flat on the floor, their back upright and supported.",
+          "Rest the participant's arm on a flat surface at heart level.",
+          "Place the bottom of the cuff above the bend of the elbow.",
+          "Take at least 2 readings (on separate arms of the participant) with a gap/break of 1 minute between the two readings and record both results."
+        ],
+        "titleCulture": "রক্তচাপ",
+        "pulseMaxValue": 300,
+        "pulseMinValue": 35,
+        "mandatoryCount": 1,
+        "isNeededDefault": true,
+        "cultureErrorMessage": "অনুগ্রহ করে রক্তচাপের ভ্যালু লিখুন",
+        "instructionsCulture": [
+          "নিশ্চিত করুন যে অংশগ্রহণকারী রিডিং ক্যাপচার করার আগে কমপক্ষে 5 মিনিটের জন্য বিশ্রাম নিয়েছে।",
+          "নিশ্চিত করুন যে অংশগ্রহণকারী একটি চেয়ার/স্টুলে তাদের পা মেঝেতে সমতল রেখে শান্তভাবে বসে আছে এবং তাদের পিঠ সোজা এবং সমর্থিত।",
+          "হার্ট লেভেলে সমতল পৃষ্ঠে অংশগ্রহণকারীর বাহু বিশ্রাম করুন।",
+          "কাফের নীচের অংশটি কনুইয়ের বাঁকের উপরে রাখুন।",
+          "দুটি রিডিংয়ের মধ্যে 1 মিনিটের ব্যবধান/ব্রেক সহ কমপক্ষে 2টি রিডিং নিন (অংশগ্রহণকারীর পৃথক বাহুতে) এবং উভয় ফলাফল রেকর্ড করুন।"
+        ]
+      },
+      {
+        "id": "isRegularSmoker",
+        "title": "Are you smoking or consuming tobacco in the past 12 months?",
+        "family": "bpLog",
+        "orderId": 5,
+        "viewType": "SingleSelectionView",
+        "condition": [],
+        "fieldName": "Are you smoking or consuming tobacco in the past 12 months?",
+        "isEnabled": true,
+        "isSummary": false,
+        "optionType": "boolean",
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": true,
+            "name": "Yes",
+            "cultureValue": "হ্যাঁ"
+          },
+          {
+            "id": false,
+            "name": "No",
+            "cultureValue": "না"
+          }
+        ],
+        "orientation": 0,
+        "errorMessage": "Please select a valid option",
+        "titleCulture": "আপনি কি নিয়মিত ধূমপায়ী অথবা গত ১২ মাসে ধূমপান বা তামাক জাতীয় দ্রব্য সেবন করেছেন?",
+        "isNeededDefault": true,
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      },
+      {
+        "id": "cvdRisk",
+        "title": "CVD Risk",
+        "family": "bpLog",
+        "viewType": "InformationLabel",
+        "isSummary": true,
+        "visibility": "gone",
+        "titleCulture": "সিভিডি ঝুঁকি"
+      },
+      {
+        "id": "glucoseLog",
+        "title": "Blood Glucose",
+        "viewType": "CardView",
+        "visibility": "gone",
+        "familyOrder": 4,
+        "titleCulture": "ব্লাড গ্লুকোজ"
+      },
+      {
+        "id": "isBeforeDiabetesDiagnosis",
+        "title": "Have you been diagnosed with High Blood Sugar or Diabetes before?",
+        "family": "glucoseLog",
+        "orderId": 1,
+        "viewType": "SingleSelectionView",
+        "condition": [
+          {
+            "eq": "Yes",
+            "targetId": "medicationFrequencyBg",
+            "visibility": "visible"
+          },
+          {
+            "eqList": [
+              "Yes",
+              "No"
+            ],
+            "targetId": "referralInformation",
+            "visibility": "visible"
+          },
+          {
+            "eqList": [
+              "Yes",
+              "No"
+            ],
+            "targetId": "whoReferredThisPerson",
+            "visibility": "visible"
+          }
+        ],
+        "fieldName": "Have you been diagnosed with High Blood Sugar or Diabetes before?",
+        "isEnabled": true,
+        "isSummary": false,
+        "optionType": "boolean",
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes",
+            "cultureValue": "হ্যাঁ"
+          },
+          {
+            "id": "No",
+            "name": "No",
+            "cultureValue": "না"
+          }
+        ],
+        "orientation": 0,
+        "errorMessage": "Please select a valid option",
+        "titleCulture": "আগে আপনার কি কখনও উচ্চ ব্লাড সুগার বা ডায়াবেটিস রোগ নির্ণয় হয়েছিল?",
+        "isNeededDefault": true,
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      },
+      {
+        "id": "medicationFrequencyBg",
+        "title": "Are you taking medication regularly?",
+        "family": "glucoseLog",
+        "orderId": 3,
+        "viewType": "Spinner",
+        "condition": [],
+        "fieldName": "Are you taking medication regularly?",
+        "isEnabled": true,
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "Yes",
+            "name": "Yes",
+            "cultureValue": "হ্যাঁ"
+          },
+          {
+            "id": "No",
+            "name": "No",
+            "cultureValue": "না"
+          }
+        ],
+        "errorMessage": "Please select the medication",
+        "titleCulture": "আপনি কি নিয়মিত ঔষধ খাচ্ছেন?",
+        "isNeededDefault": true,
+        "cultureErrorMessage": "অনুগ্রহ করে ঔষধ নির্বাচন করুন"
+      },
+      {
+        "id": "glucoseType",
+        "title": "Name of Investigation",
+        "family": "glucoseLog",
+        "orderId": 1,
+        "viewType": "Spinner",
+        "condition": [
+          {
+            "eqList": [
+              "fbs",
+              "rbs"
+            ],
+            "targetId": "glucose",
+            "visibility": "visible"
+          }
+        ],
+        "fieldName": "Name of Investigation",
+        "isEnabled": true,
+        "isSummary": false,
+        "optionType": "boolean",
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "fbs",
+            "name": "FBS (Before Meal)",
+            "cultureValue": "এফবিএস (খালি পেটে)"
+          },
+          {
+            "id": "rbs",
+            "name": "RBS (After Meal)",
+            "cultureValue": "আরবিএস (ভরা পেটে)"
+          }
+        ],
+        "orientation": 0,
+        "errorMessage": "Please select a valid option",
+        "titleCulture": "পরীক্ষার নাম",
+        "isNeededDefault": false,
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      },
+      {
+        "id": "glucose",
+        "hint": "Enter Glucose Reading",
+        "title": "Blood Glucose",
+        "family": "glucoseLog",
+        "orderId": 2,
+        "maxValue": 33,
+        "minValue": 0.6,
+        "viewType": "EditText",
+        "condition": [],
+        "fieldName": "Blood Glucose",
+        "inputType": 8192,
+        "isEnabled": true,
+        "isSummary": true,
+        "visibility": "gone",
+        "hintCulture": "গ্লুকোজ রিডিং লিখুন",
+        "isMandatory": true,
+        "errorMessage": "",
+        "isNotDefault": false,
+        "titleCulture": "ব্লাড গ্লুকোজ",
+        "unitMeasurement": "mmol/L",
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      },
+      {
+        "id": "referralInformation",
+        "title": "Referral Information",
+        "viewType": "CardView",
+        "visibility": "gone",
+        "familyOrder": 5,
+        "titleCulture": "রেফারেল তথ্য",
+        "multipleParents": {
+          "ncdServiceProvided": [
+            "No"
+          ],
+          "isBeforeDiabetesDiagnosis": [
+            "Yes",
+            "No"
+          ]
+        }
+      },
+      {
+        "id": "whoReferredThisPerson",
+        "title": "Who referred this person",
+        "family": "referralInformation",
+        "orderId": 3,
+        "viewType": "SingleSelectionView",
+        "condition": [],
+        "fieldName": "Who referred this person",
+        "isEnabled": true,
+        "isSummary": true,
+        "isEditable": true,
+        "optionType": "string",
+        "visibility": "gone",
+        "isMandatory": true,
+        "optionsList": [
+          {
+            "id": "SK",
+            "name": "SK",
+            "cultureValue": "স্বাস্থ্যকর্মী"
+          },
+          {
+            "id": "SS",
+            "name": "SS",
+            "cultureValue": "স্বাস্থ্য সেবিকা"
+          },
+          {
+            "id": "Patient to Patient",
+            "name": "Patient to Patient",
+            "cultureValue": "পেশেন্ট টু পেশেন্ট"
+          },
+          {
+            "id": "Volunteer",
+            "name": "Volunteer",
+            "cultureValue": "ভলান্টিয়ার"
+          },
+          {
+            "id": "Other",
+            "name": "Other",
+            "cultureValue": "অন্যান্য"
+          }
+        ],
+        "orientation": 0,
+        "errorMessage": "Please select a valid option",
+        "titleCulture": "এই ব্যক্তিকে কে রেফার করেছে",
+        "isNeededDefault": true,
+        "multipleParents": {
+          "ncdServiceProvided": [
+            "No"
+          ],
+          "isBeforeDiabetesDiagnosis": [
+            "Yes",
+            "No"
+          ]
+        },
+        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+      }
+    ]
+  }

@@ -30,6 +30,8 @@ import org.medtroniclabs.uhis.db.entity.CallHistory
 import org.medtroniclabs.uhis.db.entity.ChiefDomEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowConditionEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.CommunityProfile
 import org.medtroniclabs.uhis.db.entity.ConsentEntity
 import org.medtroniclabs.uhis.db.entity.ConsentForm
@@ -147,11 +149,49 @@ interface RoomHelper {
     suspend fun deleteAllSubVillages()
 
     // ShasthyaShebika methods
+    suspend fun getShasthyaShebikaById(id: Long): ShasthyaShebikaEntity?
     suspend fun saveShasthyaShebikas(shasthyaShebikaEntityList: List<ShasthyaShebikaEntity>)
 
     suspend fun deleteAllShasthyaShebikas()
 
     suspend fun getShasthyaShebikaByShasthyaKormiId(shasthyaKormiId: Long): List<ShasthyaShebikaEntity>
+    // Chiefdom methods
+    suspend fun saveChiefdoms(chiefdomEntityList: List<ChiefDomEntity>)
+
+    suspend fun deleteAllChiefdoms()
+
+    suspend fun getChiefdomByVillageId(villageId: Long): List<ChiefDomEntity>
+
+    suspend fun getAllChiefdoms(): List<ChiefDomEntity>
+
+    suspend fun getChiefdomByShasthyaKormiId(shasthyaKormiId: Long): List<ChiefDomEntity>
+
+    suspend fun getChiefdomByShasthyaKormiIds(shasthyaKormiIds: List<Long>): List<ChiefDomEntity>
+
+    suspend fun getChiefdomById(chiefdomId: Long): ChiefDomEntity?
+
+    // ShasthyaKormi methods
+    suspend fun saveShasthyaKormis(shasthyaKormiEntityList: List<ShasthyaKormiEntity>)
+
+    suspend fun deleteAllShasthyaKormis()
+
+    suspend fun getShasthyaKormiByVillageId(villageId: Long): List<ShasthyaKormiEntity>
+
+    suspend fun getAllShasthyaKormis(): List<ShasthyaKormiEntity>
+
+    // ShasthyaKormiLinkedVillage methods
+    suspend fun insertShasthyaKormiLinkedVillages(linkedVillages: List<ShasthyaKormiLinkedVillageEntity>)
+
+    suspend fun deleteAllShasthyaKormiLinkedVillages()
+
+    suspend fun getSubVillagesByShasthyaKormiId(shasthyaKormiId: Long): List<SubVillageEntity>
+
+    suspend fun getSubVillagesByShasthyaKormiIds(shasthyaKormiIds: List<Long>): List<SubVillageEntity>
+
+    suspend fun getVillagesForShasthyaKormiAndChiefdom(
+        shasthyaKormiId: Long,
+        chiefdomId: Long,
+    ): List<VillageEntity>
 
     // ShasthyaShebikaLinkedVillage methods
     suspend fun insertShasthyaShebikaLinkedVillages(linkedVillages: List<ShasthyaShebikaLinkedVillageEntity>)
@@ -879,6 +919,7 @@ interface RoomHelper {
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
         staticFilter: ServiceStaticFilter,
+        allowNullHousehold: Boolean = false,
     ): LiveData<List<HouseholdMemberWithTb>>
 
     /**
@@ -890,6 +931,7 @@ interface RoomHelper {
         searchInput: String = "",
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
+        allowNullHousehold: Boolean = false,
     ): ServiceMemberCounts
 
     suspend fun getMemberAssessmentHistory(

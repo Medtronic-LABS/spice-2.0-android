@@ -1568,6 +1568,7 @@
     <string name="regimen_line" translatable="false">Regimen Line</string>
     <string name="men_having_sex_with_men_msm">পুরুষ যারা পুরুষদের সাথে যৌন সম্পর্ক করে (MSM)</string>
     <string name="ss_name">SS নাম</string>
+    <string name="shasthya_kormi_sk">স্বাস্থ্য কর্মী (SK)</string>
 
     <string name="lmp_last_menstrual_period">এলএমপি (শেষ মাসিকের তারিখ)</string>
     <string name="edd_estimated_delivery_date">👶 ইডিডি (প্রসবের সম্ভাব্য তারিখ)</string>

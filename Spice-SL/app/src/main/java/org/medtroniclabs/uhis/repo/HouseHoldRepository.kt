@@ -90,6 +90,55 @@ class HouseHoldRepository @Inject constructor(
             Resource(state = ResourceState.ERROR)
         }
 
+
+        
+    /**
+     * Service recipient filter: FO/PO must pick a Shasthya Kormi (SK) before SS/sub-village lists apply.
+     * Non–FO/PO delegates to [getHouseHoldFilterUiData].
+     */
+    suspend fun getHouseHoldFilterUiDataForServiceRecipient(userId: Long): Resource<HouseHoldFilterUiData> =
+        if (!CommonUtils.isFoOrPo()) {
+            getHouseHoldFilterUiData(userId)
+        } else {
+            try {
+                val skList = roomHelper.getAllShasthyaKormis()
+                Resource(
+                    state = ResourceState.SUCCESS,
+                    HouseHoldFilterUiData(
+                        ssList = emptyList(),
+                        subVillages = emptyList(),
+                        skList = skList,
+                    ),
+                )
+            } catch (_: Exception) {
+                Resource(state = ResourceState.ERROR)
+            }
+        }
+
+    suspend fun getHouseHoldFilterUiDataForShasthyaKormi(kormiId: Long): Resource<HouseHoldFilterUiData> =
+        try {
+            val skList = roomHelper.getAllShasthyaKormis()
+            val swasthyaSevikas = roomHelper.getShasthyaShebikaByShasthyaKormiId(kormiId)
+            val subVillages = mutableListOf<SubVillageEntity>()
+            if (swasthyaSevikas.isNotEmpty()) {
+                subVillages.addAll(roomHelper.getSubVillagesByShasthyaShebikaIds(swasthyaSevikas.map { it.id }))
+            }
+            Resource(
+                state = ResourceState.SUCCESS,
+                HouseHoldFilterUiData(
+                    ssList = swasthyaSevikas,
+                    subVillages = subVillages,
+                    skList = skList,
+                    selectedShasthyaKormiId = kormiId,
+                ),
+            )
+        } catch (_: Exception) {
+            Resource(state = ResourceState.ERROR)
+        }
+
+    suspend fun getShasthyaKormiIdForShasthyaShebika(ssId: Long): Long? =
+        roomHelper.getShasthyaShebikaById(ssId)?.shasthyaKormiId
+
     suspend fun createOrUpdateHouseHoldEntity(
         map: HashMap<String, Any>,
         entity: HouseholdEntity? = null,
@@ -164,6 +213,14 @@ class HouseHoldRepository @Inject constructor(
         try {
             val response = roomHelper.getShasthyaShebikaByShasthyaKormiId(shasthyaKormiId)
             Resource(state = ResourceState.SUCCESS, LocalSpinnerResponse("shasthya_shebika_id", response))
+        } catch (_: Exception) {
+            Resource(state = ResourceState.ERROR)
+        }
+
+    suspend fun getAllShasthyaKormisSpinner(): Resource<LocalSpinnerResponse> =
+        try {
+            val response = roomHelper.getAllShasthyaKormis()
+            Resource(state = ResourceState.SUCCESS, LocalSpinnerResponse("shasthya_kormi_id", response))
         } catch (_: Exception) {
             Resource(state = ResourceState.ERROR)
         }
