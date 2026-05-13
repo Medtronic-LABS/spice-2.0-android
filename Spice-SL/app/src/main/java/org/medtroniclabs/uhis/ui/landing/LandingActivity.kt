@@ -1,5 +1,6 @@
 package org.medtroniclabs.uhis.ui.landing
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -13,13 +14,16 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.GravityCompat
 import androidx.core.view.forEach
+import androidx.core.view.isNotEmpty
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.Constraints
@@ -31,6 +35,13 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.android.material.navigation.NavigationView
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.android.play.core.ktx.requestAppUpdateInfo
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import org.medtroniclabs.uhis.BuildConfig
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.model.UserDetail
@@ -43,6 +54,7 @@ import org.medtroniclabs.uhis.appextensions.WORKER_UNIQUE_NAME_FOR_NCD
 import org.medtroniclabs.uhis.appextensions.cancelAllWorker
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.isVisible
+import org.medtroniclabs.uhis.appextensions.openPlayStore
 import org.medtroniclabs.uhis.appextensions.setError
 import org.medtroniclabs.uhis.appextensions.startBackgroundOfflineSync
 import org.medtroniclabs.uhis.appextensions.triggerOneTimeWorker
@@ -81,13 +93,14 @@ import org.medtroniclabs.uhis.ui.landing.adapter.PeerSupervisorNotificationAdapt
 import org.medtroniclabs.uhis.ui.landing.viewmodel.LandingViewModel
 import org.medtroniclabs.uhis.ui.landing.viewmodel.LanguagePreferenceViewModel
 import org.medtroniclabs.uhis.ui.mypatients.fragment.PatientSearchFragment
-import org.medtroniclabs.uhis.ui.mypatients.viewmodel.PatientDetailViewModel
 import org.medtroniclabs.uhis.ui.patientTransfer.NCDApproveRejectListener
 import org.medtroniclabs.uhis.ui.patientTransfer.adapter.NCDIncomingRequestAdapter
 import org.medtroniclabs.uhis.ui.patientTransfer.adapter.NCDInformationMessageAdapter
 import org.medtroniclabs.uhis.ui.patientTransfer.dialog.NCDPatientDetailDialogue
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import kotlin.system.exitProcess
 
 class LandingActivity :
     BaseActivity(),
@@ -101,12 +114,34 @@ class LandingActivity :
 
     private val viewModel: LandingViewModel by viewModels()
     private val offlineDataViewModel: NCDOfflineDataViewModel by viewModels()
-    private val patientViewModel: PatientDetailViewModel by viewModels()
     private val languageViewModel: LanguagePreferenceViewModel by viewModels()
+
+    @Inject
+    lateinit var appUpdateManager: AppUpdateManager
+
+    /**
+     * Held true while the app-version check is in flight so the splash blocks navigation
+     * (immediate updates root themselves on this activity, so we can't let the user wander
+     * off to another activity mid-check). Flipped to false as soon as the check completes
+     * or times out.
+     */
+    @Volatile
+    private var keepSplashOnScreen = true
+
+    private val appUpdateLauncher =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            // Immediate updates must succeed; treat anything other than RESULT_OK as enforcement.
+            if (result.resultCode != RESULT_OK) {
+                finishAffinity()
+                exitProcess(0)
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
-        splashScreen.setKeepOnScreenCondition { true }
+        // Splash stays up while the backend app-version check is in flight; this blocks the
+        // user from navigating into another activity before we decide whether to force-update.
+        splashScreen.setKeepOnScreenCondition { keepSplashOnScreen }
 
         super.onCreate(savedInstanceState)
 
@@ -122,7 +157,7 @@ class LandingActivity :
 
         if (!(isLoggedIn && isMetaLoaded)) {
             startActivity(Intent(this, LoginActivity::class.java))
-            splashScreen.setKeepOnScreenCondition { false }
+            keepSplashOnScreen = false
             finish()
             return
         } else {
@@ -131,6 +166,7 @@ class LandingActivity :
                     intent?.categories?.contains(Intent.CATEGORY_LAUNCHER) ?: false
                 if (isFromLauncher && !SecuredPreference.getTermsAndConditionsStatus()) {
                     startActivity(Intent(this, UserTermsConditionsActivity::class.java))
+                    keepSplashOnScreen = false
                     finish()
                     return
                 }
@@ -143,7 +179,6 @@ class LandingActivity :
         // screening and assessment sync
         offlineDataViewModel.getCountOfflineData()
         binding = ActivityLandingBinding.inflate(layoutInflater)
-        splashScreen.setKeepOnScreenCondition { false }
         setContentView(binding.root)
         // Since landing activity is setting content with setContentView,
         // applying insets separately for this screen only
@@ -156,9 +191,6 @@ class LandingActivity :
         )
         if (CommonUtils.isNonCommunity()) {
             languageViewModel.getCultures()
-        } else {
-            val menu = binding.navView.menu
-            //     menu.findItem(R.id.switch_language)?.let { menu.removeItem(it.itemId) }
         }
         initializeDrawerView()
         initializeHomeViews()
@@ -168,7 +200,7 @@ class LandingActivity :
         UserDetail.updateUserIdIfEmpty(SecuredPreference.getUserId().toString())
         UserDetail.getAppVersion(BuildConfig.VERSION_NAME)
         attachObserver()
-
+        runAppVersionCheck()
         // Deeplink for directly goes to Search patient
         patientSearchDeepLink()
     }
@@ -192,8 +224,8 @@ class LandingActivity :
         }
         offlineDataViewModel.followUpType.observe(this) {
         }
-        viewModel.patientListResponse.observe(this) { resoruceState ->
-            when (resoruceState.state) {
+        viewModel.patientListResponse.observe(this) { resourceState ->
+            when (resourceState.state) {
                 ResourceState.LOADING -> {
                     showHideList(false)
                 }
@@ -204,14 +236,14 @@ class LandingActivity :
 
                 ResourceState.SUCCESS -> {
                     showHideList(true)
-                    resoruceState.data?.let { data ->
+                    resourceState.data?.let { data ->
                         loadAdapterData(data)
                     }
                 }
             }
         }
-        viewModel.patientUpdateResponse.observe(this) { resorceState ->
-            when (resorceState.state) {
+        viewModel.patientUpdateResponse.observe(this) { resourceState ->
+            when (resourceState.state) {
                 ResourceState.LOADING -> {
                     showHideList(false)
                 }
@@ -223,7 +255,7 @@ class LandingActivity :
                 ResourceState.SUCCESS -> {
                     showHideList(true)
                     binding.drawerLayout.closeDrawer(binding.navNotificationView)
-                    resorceState.data?.let {
+                    resourceState.data?.let {
                         val generalErrorDialog =
                             GeneralErrorDialog.newInstance(
                                 if (viewModel.isSupport) {
@@ -345,7 +377,7 @@ class LandingActivity :
                 ResourceState.SUCCESS -> {
                     hideLoading()
                     resourceState.data?.let { notifications ->
-                        if (!notifications.isNullOrEmpty()) {
+                        if (notifications.isNotEmpty()) {
                             storeNotificationIds(notifications)
                         } else {
                             binding.CenterProgress.gone()
@@ -385,7 +417,7 @@ class LandingActivity :
                 ResourceState.SUCCESS -> {
                     hideLoading()
                     resourceState.data?.let { notifications ->
-                        if (!notifications.isNullOrEmpty()) {
+                        if (notifications.isNotEmpty()) {
                             showNotificationView(notifications)
                         } else {
                             binding.tvNoNotificationsFound.visible()
@@ -467,7 +499,7 @@ class LandingActivity :
     }
 
     private fun loadAdapterData(data: PatientTransferListResponse) {
-        if (data.incomingPatientList.size > 0) {
+        if (data.incomingPatientList.isNotEmpty()) {
             binding.rvOutgoingList.visible()
             binding.rvOutgoingList.addItemDecoration(
                 DividerItemDecoration(
@@ -480,7 +512,7 @@ class LandingActivity :
         } else {
             binding.rvOutgoingList.gone()
         }
-        if (data.outgoingPatientList.size > 0) {
+        if (data.outgoingPatientList.isNotEmpty()) {
             binding.rvInformationList.visible()
             binding.rvInformationList.layoutManager = LinearLayoutManager(this@LandingActivity)
             binding.rvInformationList.addItemDecoration(
@@ -518,7 +550,7 @@ class LandingActivity :
     }
 
     private fun onClickUploadLog() {
-        if (BuildConfig.BUILD_TYPE == "debug" || BuildConfig.BUILD_TYPE == "staging" || BuildConfig.BUILD_TYPE == "training") {
+        if (viewModel.isNonProdEnv()) {
             binding.uploadLog.setOnClickListener {
                 val uploadWorkRequest = OneTimeWorkRequest
                     .Builder(UploadWorker::class.java)
@@ -767,7 +799,6 @@ class LandingActivity :
             }
 
             R.id.support -> {
-                // TODO : Handle the tiberbu
                 launchSupportDialogFragment()
                 return true
             }
@@ -833,6 +864,7 @@ class LandingActivity :
         }
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     private fun handleNavigation(isDeepLink: Boolean = false) {
         if (CommonUtils.isCommunity() && CommonUtils.isRolePresent()) {
             binding.appBarMain.tvTitle.text = getString(R.string.search_patient)
@@ -862,7 +894,7 @@ class LandingActivity :
     }
 
     private fun selectNavigationMenu(item: MenuItem) {
-        if (binding.navView.menu.size() > 0) {
+        if (binding.navView.menu.isNotEmpty()) {
             binding.navView.menu.forEach { menuItem ->
                 menuItem.isChecked = (menuItem.itemId == item.itemId)
             }
@@ -935,7 +967,7 @@ class LandingActivity :
             if (CommonUtils.isNonCommunity()) {
                 withNetworkAvailability(online = {
                     this.triggerOneTimeWorker()
-                    // i added chp condition inside the method
+                    // Added chp condition inside the method
                     startSyncWorker()
                 })
             }
@@ -979,6 +1011,7 @@ class LandingActivity :
         }
     }
 
+    @SuppressLint("LogNotTimber")
     private fun schedulePeriodicUploadWork(context: Context) {
         val periodicRequest =
             PeriodicWorkRequestBuilder<UploadWorker>(60, TimeUnit.MINUTES)
@@ -1019,6 +1052,106 @@ class LandingActivity :
     override fun onResume() {
         super.onResume()
         doRefreshForDataUpdate()
+        resumeInProgressAppUpdateIfAny()
+    }
+
+    /**
+     * Sequential entry point for the in-app update flow. The splash screen is held over the
+     * UI while this runs so the user cannot navigate into another activity mid-check (an
+     * immediate update is rooted on this activity and cancelling it does [exitProcess]).
+     *
+     * Flow:
+     *   1. Ask the backend whether this build is still allowed.
+     *   2. Dismiss the splash.
+     *   3. If an update is required, show a single modal dialog using the message returned
+     *      by the API. The dialog is the only way the user can proceed.
+     *   4. On the user accepting, route to Play Core's immediate update if available,
+     *      otherwise open the Play Store URL.
+     *
+     * Failures (no network, timeout, HTTP error) are non-fatal: we dismiss the splash and let
+     * the user continue.
+     */
+    private fun runAppVersionCheck() {
+        lifecycleScope.launch {
+            val result = withTimeoutOrNull(APP_VERSION_CHECK_TIMEOUT_MS) {
+                viewModel.checkAppVersion()
+            }
+            keepSplashOnScreen = false
+            if (result?.state == ResourceState.SUCCESS && result.optionalData == true) {
+                showAppUpdateRequiredDialog(result.data)
+            }
+        }
+    }
+
+    /**
+     * Shows a single non-cancellable dialog with the message returned by the [app-version]
+     * API. The dialog is the entry point for both the Play Core in-app update and the
+     * Play Store URL fallback - the user cannot reach the rest of the app without acting on
+     * it (the same enforcement pattern used in [LoginActivity]).
+     */
+    private fun showAppUpdateRequiredDialog(serverMessage: String?) {
+        showErrorDialogue(
+            title = getString(R.string.alert),
+            message = serverMessage ?: getString(R.string.please_update_the_app),
+            positiveButtonName = getString(R.string.open_play_store),
+        ) { status ->
+            if (status) {
+                lifecycleScope.launch { startImmediateUpdateOrFallback() }
+            }
+        }
+    }
+
+    /**
+     * Starts app update flow using play core API if possible
+     * Otherwise open play store with app package.
+     */
+    private suspend fun startImmediateUpdateOrFallback() {
+        val info = runCatching { appUpdateManager.requestAppUpdateInfo() }.getOrNull()
+        val canImmediate =
+            info != null &&
+                info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+                info.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+        if (canImmediate && info != null) {
+            appUpdateManager.startUpdateFlowForResult(
+                info,
+                appUpdateLauncher,
+                AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build(),
+            )
+        } else {
+            openPlayStoreUrl()
+        }
+    }
+
+    /**
+     * Unable to trigger update using play core API, ask user to manually update using play store.
+     */
+    private fun openPlayStoreUrl() {
+        val opened = openPlayStore()
+        if (!opened) {
+            showErrorDialogue(message = getString(R.string.please_check_if_play_store_available)) {}
+            return
+        }
+        finishAffinity()
+        exitProcess(0)
+    }
+
+    /**
+     * Resumes an immediate update that was interrupted (e.g. user backgrounded the app while
+     * the Play update screen was visible). Google requires this to be checked in onResume of
+     * the entry activity for [AppUpdateType.IMMEDIATE] flows.
+     */
+    private fun resumeInProgressAppUpdateIfAny() {
+        lifecycleScope.launch {
+            val info = runCatching { appUpdateManager.requestAppUpdateInfo() }.getOrNull()
+                ?: return@launch
+            if (info.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                appUpdateManager.startUpdateFlowForResult(
+                    info,
+                    appUpdateLauncher,
+                    AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build(),
+                )
+            }
+        }
     }
 
     private fun checkBGSyncStatusForNCD() {
@@ -1101,7 +1234,7 @@ class LandingActivity :
                     NCDSupportRequest(
                         userId = SecuredPreference.getUserId().toString(),
                         summary = it,
-                        healthFacilityId = SecuredPreference.getOrganizationId().toLong(),
+                        healthFacilityId = SecuredPreference.getOrganizationId(),
                     )
                 viewModel.createSupportRequest(request)
             }
@@ -1208,5 +1341,10 @@ class LandingActivity :
         cancelAllWorker()
         startActivity(Intent(this, LoginActivity::class.java))
         finish()
+    }
+
+    companion object {
+        /** Max time we hold the splash for the version check before failing open. */
+        private const val APP_VERSION_CHECK_TIMEOUT_MS = 5_000L
     }
 }

@@ -17,13 +17,13 @@ import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.CVD_RISK_SCORE_DISPLAY
 import org.medtroniclabs.uhis.common.DefinedParams.DefaultID
-import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.databinding.FragmentBdNcdSummaryBinding
 import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
 import org.medtroniclabs.uhis.model.AssessmentSummaryModel
 import org.medtroniclabs.uhis.ui.BaseFragment
 import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils
 import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils.findValueByKey
+import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils.getSpinnerDisplayValue
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_BLOOD_PRESSURE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BMI
@@ -38,6 +38,7 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_UNIT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HBA1CUnit
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HEIGHT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.MMHG
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NAME
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NCD_SYMPTOMS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.REFERRAL_FACILITY_TYPE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ReferredPHUSiteID
@@ -110,10 +111,17 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
                 )
             }
 
-            val isTranslationEnabled = SecuredPreference.getIsTranslationEnabled()
-
             summaryData.forEach { item ->
-                bindSummaryView(if (isTranslationEnabled) item.cultureValue else item.title, item.value)
+                val displayValue =
+                    getSpinnerDisplayValue(
+                        item.id.toString(),
+                        item.value,
+                        isTranslationEnabled,
+                        viewModel.formLayoutsLiveData.value
+                            ?.data
+                            ?.formLayout,
+                    ) ?: item.value
+                bindSummaryView(if (isTranslationEnabled) item.cultureValue else item.title, displayValue)
             }
         }
     }
@@ -191,9 +199,12 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
 
                     for (i in 0 until jsonArray.length()) {
                         val sign = jsonArray.getJSONObject(i)
-
-                        sign.optString(CULTURE_VALUE).let { value ->
-                            list.add(value)
+                        val name = sign.optString(NAME)
+                        val cultureValue = sign.optString(CULTURE_VALUE)
+                        if (isTranslationEnabled && cultureValue.isNotBlank()) {
+                            list.add(cultureValue)
+                        } else {
+                            list.add(name)
                         }
                     }
 

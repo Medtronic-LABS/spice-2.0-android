@@ -99,6 +99,35 @@ class MetaRepository @Inject constructor(
             Resource(state = ResourceState.ERROR)
         }
 
+    /**
+     * Checks whether the installed app version is still allowed by the backend.
+     *
+     * Result semantics:
+     *  - SUCCESS + optionalData == true  -> Update REQUIRED (data carries the server message, if any).
+     *  - SUCCESS + optionalData == false -> Up-to-date.
+     *  - ERROR                           -> Check failed (network/parse). Callers should fail open.
+     */
+    suspend fun checkAppVersion(): Resource<String> =
+        try {
+            val response = apiHelper.checkAppVersion()
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body?.entity == false) {
+                    Resource(
+                        state = ResourceState.SUCCESS,
+                        data = body.message,
+                        optionalData = true,
+                    )
+                } else {
+                    Resource(state = ResourceState.SUCCESS, optionalData = false)
+                }
+            } else {
+                Resource(state = ResourceState.ERROR)
+            }
+        } catch (_: Exception) {
+            Resource(state = ResourceState.ERROR)
+        }
+
     suspend fun getMetaDataInformation(
         workflowNames: MutableList<Long>,
         meta: MutableList<String>,

@@ -25,7 +25,7 @@ class LoginViewModel @Inject constructor(
     private val houseHoldRepository: HouseHoldRepository,
     private val assessmentRepository: AssessmentRepository,
     private val followUpRepository: FollowUpRepository,
-    @IoDispatcher private val dispatcherIO: CoroutineDispatcher,
+    @param:IoDispatcher private val dispatcherIO: CoroutineDispatcher,
     private val isNonProd: Boolean,
 ) : ViewModel() {
     @Inject

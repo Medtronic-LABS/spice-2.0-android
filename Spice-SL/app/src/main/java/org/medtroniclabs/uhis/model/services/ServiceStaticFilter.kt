@@ -55,19 +55,19 @@ enum class ServiceStaticFilter(val value: String, val culturalValue: String) {
     PENDING_DELIVERIES("Pending Delivery List", "পেন্ডিং ডেলিভারি লিস্ট"),
 
     /**
-    * Members with NCD-related service history (FO/PO service list)
-    */
- 
+     * Members with NCD-related service history (FO/PO service list)
+     */
+
     NCD_SERVICES("NCD Services", "এনসিডি সেবা"),
- 
+
     /**
-    * Members with cataract screening service history
-    */
- 
+     * Members with cataract screening service history
+     */
+
     CATARACT_SCREENING("Cataract Screening", "ছানি স্ক্রিনিং"),
- 
+
     /**
-    * Members with eye screening (eye care) service history
-    */
+     * Members with eye screening (eye care) service history
+     */
     EYE_SCREENING("Eye Screening", "চোখের স্ক্রিনিং"),
 }

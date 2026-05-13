@@ -8,7 +8,6 @@ import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.common.CVDRiskCalculator
-import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
 import org.medtroniclabs.uhis.databinding.FragmentAssessmentBinding
 import org.medtroniclabs.uhis.formgeneration.FormGenerator
@@ -74,7 +73,7 @@ class BDCataractAssessmentFragment() : BaseFragment(), FormEventListener {
             binding.llForm,
             this,
             binding.scrollView,
-            translate = SecuredPreference.getIsTranslationEnabled(),
+            translate = isTranslationEnabled,
         ) { map, id ->
             when (id) {
                 Screening.Weight, Screening.Height -> {

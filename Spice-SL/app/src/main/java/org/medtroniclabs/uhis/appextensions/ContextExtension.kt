@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Bitmap
@@ -12,12 +13,14 @@ import android.os.Build
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import org.medtroniclabs.uhis.BuildConfig
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.offlinesync.GetSyncStatusWorker
 import org.medtroniclabs.uhis.offlinesync.ScheduledSyncWork
@@ -238,3 +241,20 @@ fun Context.getStringForLocale(
         .resources
         .getString(resId)
 }
+
+/**
+ * Opens play store app with the package name, returns true if able to open
+ */
+fun Context.openPlayStore(): Boolean =
+    try {
+        startActivity(
+            Intent(Intent.ACTION_VIEW).apply {
+                data =
+                    ("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID).toUri()
+                setPackage("com.android.vending")
+            },
+        )
+        true
+    } catch (_: Exception) {
+        false
+    }

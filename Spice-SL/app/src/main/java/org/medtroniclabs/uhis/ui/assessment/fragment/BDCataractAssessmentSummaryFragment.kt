@@ -18,7 +18,6 @@ import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.CVD_RISK_SCORE_DISPLAY
 import org.medtroniclabs.uhis.common.DefinedParams.DefaultID
 import org.medtroniclabs.uhis.common.DefinedParams.ID
-import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.databinding.FragmentBdNcdSummaryBinding
 import org.medtroniclabs.uhis.formgeneration.model.FormLayout
 import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
@@ -26,6 +25,7 @@ import org.medtroniclabs.uhis.model.AssessmentSummaryModel
 import org.medtroniclabs.uhis.ui.BaseFragment
 import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils
 import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils.findValueByKey
+import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils.getSpinnerDisplayValue
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_BLOOD_PRESSURE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BMI
@@ -115,10 +115,17 @@ class BDCataractAssessmentSummaryFragment : BaseFragment() {
                 )
             }
 
-            val isTranslationEnabled = SecuredPreference.getIsTranslationEnabled()
-
             summaryData.forEach { item ->
-                bindSummaryView(if (isTranslationEnabled) item.cultureValue else item.title, item.value)
+                val displayValue =
+                    getSpinnerDisplayValue(
+                        item.id.toString(),
+                        item.value,
+                        isTranslationEnabled,
+                        viewModel.formLayoutsLiveData.value
+                            ?.data
+                            ?.formLayout,
+                    ) ?: item.value
+                bindSummaryView(if (isTranslationEnabled) item.cultureValue else item.title, displayValue)
             }
         }
     }

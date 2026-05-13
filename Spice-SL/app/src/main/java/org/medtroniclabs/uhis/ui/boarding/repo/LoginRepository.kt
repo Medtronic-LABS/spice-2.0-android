@@ -10,7 +10,6 @@ import org.medtroniclabs.uhis.common.EncryptionUtil
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.ErrorResponse
 import org.medtroniclabs.uhis.data.LoginResponse
-import org.medtroniclabs.uhis.db.local.RoomHelper
 import org.medtroniclabs.uhis.ncd.data.DeviceDetails
 import org.medtroniclabs.uhis.network.ApiHelper
 import org.medtroniclabs.uhis.network.resource.Resource
@@ -19,7 +18,6 @@ import javax.inject.Inject
 
 class LoginRepository @Inject constructor(
     private var apiHelper: ApiHelper,
-    private var roomHelper: RoomHelper,
 ) {
     suspend fun doLogin(
         username: String,

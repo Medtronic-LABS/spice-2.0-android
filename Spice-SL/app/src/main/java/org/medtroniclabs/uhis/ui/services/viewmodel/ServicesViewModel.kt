@@ -130,7 +130,10 @@ class ServicesViewModel @Inject constructor(
                 initial.state == ResourceState.SUCCESS &&
                 initial.data != null
             ) {
-                val firstSsId = filterLiveData.value?.filterBySs?.firstOrNull()?.id
+                val firstSsId = filterLiveData.value
+                    ?.filterBySs
+                    ?.firstOrNull()
+                    ?.id
                 if (firstSsId != null) {
                     val kormiId =
                         houseHoldRepository.getShasthyaKormiIdForShasthyaShebika(firstSsId)

@@ -710,8 +710,8 @@ class AssessmentViewModel @Inject constructor(
 
         if (referralStatus != null && referralStatus == ReferralStatus.Referred.name) {
             // Add referralFacilityType to otherDetails if it does NOT exist in otherAssessmentDetails
-            if (!otherAssessmentDetails.containsKey(AssessmentDefinedParams.ReferralFacilityType)) {
-                otherDetails[AssessmentDefinedParams.ReferralFacilityType] =
+            if (!otherAssessmentDetails.containsKey(REFERRAL_FACILITY_TYPE)) {
+                otherDetails[REFERRAL_FACILITY_TYPE] =
                     SecuredPreference.getString(SecuredPreference.EnvironmentKey.DEFAULT_SITE_ID.name)
                         ?: "-1"
             }
@@ -730,8 +730,8 @@ class AssessmentViewModel @Inject constructor(
                     inUTC = true,
                 )
             // Add referralFacilityType to otherDetails if it does NOT exist in otherAssessmentDetails
-            if (!otherAssessmentDetails.containsKey(AssessmentDefinedParams.ReferralFacilityType)) {
-                otherDetails[AssessmentDefinedParams.ReferralFacilityType] =
+            if (!otherAssessmentDetails.containsKey(REFERRAL_FACILITY_TYPE)) {
+                otherDetails[REFERRAL_FACILITY_TYPE] =
                     otherDetails[AssessmentDefinedParams.ReferredPHUSiteID]
                         ?: "-1"
             }
@@ -1068,8 +1068,8 @@ class AssessmentViewModel @Inject constructor(
                 val isTakenToClinical = otherAssessmentDetails[IsClinicTaken] as String
                 otherAssessmentDetails[IsClinicTaken] = (isTakenToClinical == "Yes")
             }
-            if (!otherAssessmentDetails.containsKey(AssessmentDefinedParams.ReferralFacilityType)) {
-                otherAssessmentDetails[AssessmentDefinedParams.ReferralFacilityType] =
+            if (!otherAssessmentDetails.containsKey(REFERRAL_FACILITY_TYPE)) {
+                otherAssessmentDetails[REFERRAL_FACILITY_TYPE] =
                     otherAssessmentDetails[AssessmentDefinedParams.ReferredPHUSiteID]
                         ?: "-1"
                 otherAssessmentDetails.remove(AssessmentDefinedParams.ReferredPHUSiteID)

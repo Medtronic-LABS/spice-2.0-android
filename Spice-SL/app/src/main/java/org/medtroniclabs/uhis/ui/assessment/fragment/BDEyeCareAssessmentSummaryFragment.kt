@@ -23,6 +23,7 @@ import org.medtroniclabs.uhis.model.AssessmentSummaryModel
 import org.medtroniclabs.uhis.ui.BaseFragment
 import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils
 import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils.findValueByKey
+import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils.getSpinnerDisplayValue
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.CULTURE_VALUE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.EYE_TEST_OUTCOME
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FACILITY_TYPE_UPAZILA
@@ -73,7 +74,6 @@ class BDEyeCareAssessmentSummaryFragment : BaseFragment() {
 
     private fun attachObservers() {
         viewModel.assessmentStringLiveData.value?.let {
-            val isTranslationEnabled = SecuredPreference.getIsTranslationEnabled()
             val json = JSONObject(it)
             updateStatusBar(json)
             val items = createNCDSummaryData(json, isTranslationEnabled)
@@ -96,7 +96,16 @@ class BDEyeCareAssessmentSummaryFragment : BaseFragment() {
             }
 
             summaryData.forEach { item ->
-                bindSummaryView(if (isTranslationEnabled) item.cultureValue else item.title, item.value)
+                val displayValue =
+                    getSpinnerDisplayValue(
+                        item.id.toString(),
+                        item.value,
+                        isTranslationEnabled,
+                        viewModel.formLayoutsLiveData.value
+                            ?.data
+                            ?.formLayout,
+                    ) ?: item.value
+                bindSummaryView(if (isTranslationEnabled) item.cultureValue else item.title, displayValue)
             }
         }
     }

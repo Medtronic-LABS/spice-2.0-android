@@ -246,13 +246,11 @@ class RoomHelperImpl @Inject constructor(
         metaDataDAO.deleteChiefDoms()
     }
 
-    override suspend fun getChiefdomByVillageId(villageId: Long): List<ChiefDomEntity> =
-        metaDataDAO.getChiefdomByVillageId(villageId)
+    override suspend fun getChiefdomByVillageId(villageId: Long): List<ChiefDomEntity> = metaDataDAO.getChiefdomByVillageId(villageId)
 
     override suspend fun getAllChiefdoms(): List<ChiefDomEntity> = metaDataDAO.getAllChiefdoms()
 
-    override suspend fun getChiefdomByShasthyaKormiId(shasthyaKormiId: Long): List<ChiefDomEntity> =
-        metaDataDAO.getChiefdomByShasthyaKormiId(shasthyaKormiId)
+    override suspend fun getChiefdomByShasthyaKormiId(shasthyaKormiId: Long): List<ChiefDomEntity> = metaDataDAO.getChiefdomByShasthyaKormiId(shasthyaKormiId)
 
     override suspend fun getChiefdomByShasthyaKormiIds(shasthyaKormiIds: List<Long>): List<ChiefDomEntity> =
         if (shasthyaKormiIds.isEmpty()) {
@@ -271,8 +269,7 @@ class RoomHelperImpl @Inject constructor(
         metaDataDAO.deleteAllShasthyaKormis()
     }
 
-    override suspend fun getShasthyaKormiByVillageId(villageId: Long): List<ShasthyaKormiEntity> =
-        metaDataDAO.getShasthyaKormiByVillageId(villageId)
+    override suspend fun getShasthyaKormiByVillageId(villageId: Long): List<ShasthyaKormiEntity> = metaDataDAO.getShasthyaKormiByVillageId(villageId)
 
     override suspend fun getAllShasthyaKormis(): List<ShasthyaKormiEntity> = metaDataDAO.getAllShasthyaKormis()
 
@@ -1322,8 +1319,7 @@ class RoomHelperImpl @Inject constructor(
         filterBySs: List<Long>,
         filterBySubVillages: List<Long>,
         allowNullHousehold: Boolean,
-    ): ServiceMemberCounts =
-        memberDAO.getAllServiceMemberCounts(searchInput, filterBySs, filterBySubVillages, allowNullHousehold)
+    ): ServiceMemberCounts = memberDAO.getAllServiceMemberCounts(searchInput, filterBySs, filterBySubVillages, allowNullHousehold)
 
     override suspend fun getMemberAssessmentHistory(
         memberFhirId: String?,

@@ -16,6 +16,7 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.model.UserDetail
 import org.medtroniclabs.uhis.appextensions.getStringForLocale
 import org.medtroniclabs.uhis.appextensions.hideKeyboard
+import org.medtroniclabs.uhis.appextensions.openPlayStore
 import org.medtroniclabs.uhis.common.AppConstants.IS_DIFFERENT_LOGIN
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.EncryptionUtil
@@ -99,14 +100,8 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
                                 positiveButtonName = getString(R.string.open_play_store),
                             ) { status ->
                                 if (status) {
-                                    try {
-                                        startActivity(
-                                            Intent(Intent.ACTION_VIEW).apply {
-                                                data = ("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID).toUri()
-                                                setPackage("com.android.vending")
-                                            },
-                                        )
-                                    } catch (_: Exception) {
+                                    val opened = openPlayStore()
+                                    if (!opened) {
                                         showErrorDialogue(message = getString(R.string.please_check_if_play_store_available)) {}
                                     }
                                 }

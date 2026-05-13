@@ -19,9 +19,7 @@ object AssessmentDefinedParams {
     const val IsClinicTaken = "isTakenToClinic"
     const val AssessmentNotes = "notes"
     const val NextFollowupDate = "nextVisitDate"
-    const val ReferredPHUSite = "referredSite"
     const val ReferredPHUSiteID = "referredSiteId"
-    const val ReferralFacilityType = "referralFacilityType"
     const val Green = "Green"
     const val Red = "Red"
     const val Yellow = "Yellow"
@@ -651,7 +649,7 @@ object AssessmentDefinedParams {
     const val GENERAL_INFORMATION = "generalInformation"
     const val CAMP_DATE = "camp_date"
     const val CAMP_TYPE = "camp_type"
-    
+
     const val EYE_DISEASE = "eyeDisease"
 
     const val HISTORY_OF_OTHER_DISEASES = "historyOfOtherDiseases"

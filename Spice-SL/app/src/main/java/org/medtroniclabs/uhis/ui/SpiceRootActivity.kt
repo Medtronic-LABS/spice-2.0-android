@@ -5,15 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.google.android.play.core.appupdate.AppUpdateManager
-import com.google.android.play.core.appupdate.AppUpdateManagerFactory
-import com.google.android.play.core.appupdate.AppUpdateOptions
-import com.google.android.play.core.install.model.ActivityResult
-import com.google.android.play.core.install.model.AppUpdateType
-import com.google.android.play.core.install.model.UpdateAvailability
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.model.UserDetail
 import org.medtroniclabs.uhis.appextensions.cancelAllWorker
@@ -26,7 +19,6 @@ import org.medtroniclabs.uhis.ui.boarding.LoginActivity
 import org.medtroniclabs.uhis.ui.dialog.GeneralSuccessDialog
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.system.exitProcess
 
 open class SpiceRootActivity : AppCompatActivity() {
     private lateinit var sessionExpiredBroadcastReceiver: SessionExpiredBroadcastReceiver
@@ -34,12 +26,9 @@ open class SpiceRootActivity : AppCompatActivity() {
     @Inject
     lateinit var connectivityManager: ConnectivityManager
 
-    private lateinit var appUpdateManager: AppUpdateManager
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         sessionExpiredBroadcastReceiver = SessionExpiredBroadcastReceiver()
-        checkInAppUpdate()
     }
 
     override fun onResume() {
@@ -50,26 +39,7 @@ open class SpiceRootActivity : AppCompatActivity() {
                 DefinedParams.ACTION_SESSION_EXPIRED,
             ),
         )
-        if (this::appUpdateManager.isInitialized) {
-            appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
-                if (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
-                    appUpdateManager.startUpdateFlowForResult(
-                        appUpdateInfo,
-                        activityResultLauncher,
-                        AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build(),
-                    )
-                }
-            }
-        }
     }
-
-    private val activityResultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result: androidx.activity.result.ActivityResult ->
-            if ((result.resultCode == ActivityResult.RESULT_IN_APP_UPDATE_FAILED || result.resultCode == RESULT_CANCELED) && result.resultCode != RESULT_OK) {
-                finishAffinity()
-                exitProcess(0)
-            }
-        }
 
     override fun onPause() {
         super.onPause()
@@ -148,28 +118,6 @@ open class SpiceRootActivity : AppCompatActivity() {
         val errorFragment = supportFragmentManager.findFragmentByTag(GeneralErrorDialog.TAG)
         if (errorFragment == null) {
             generalErrorDialog.show(supportFragmentManager, GeneralErrorDialog.TAG)
-        }
-    }
-
-    private fun checkInAppUpdate() {
-        if (connectivityManager.isNetworkAvailable()) {
-            appUpdateManager = AppUpdateManagerFactory.create(this)
-
-            val appUpdateInfoTask = appUpdateManager.appUpdateInfo
-
-            appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
-                if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
-                    appUpdateInfo.isUpdateTypeAllowed(
-                        AppUpdateType.IMMEDIATE,
-                    )
-                ) {
-                    appUpdateManager.startUpdateFlowForResult(
-                        appUpdateInfo,
-                        activityResultLauncher,
-                        AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build(),
-                    )
-                }
-            }
         }
     }
 }

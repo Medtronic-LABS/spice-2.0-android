@@ -30,8 +30,6 @@ import org.medtroniclabs.uhis.db.entity.CallHistory
 import org.medtroniclabs.uhis.db.entity.ChiefDomEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowConditionEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowEntity
-import org.medtroniclabs.uhis.db.entity.ShasthyaKormiEntity
-import org.medtroniclabs.uhis.db.entity.ShasthyaKormiLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.CommunityProfile
 import org.medtroniclabs.uhis.db.entity.ConsentEntity
 import org.medtroniclabs.uhis.db.entity.ConsentForm
@@ -63,6 +61,8 @@ import org.medtroniclabs.uhis.db.entity.RiskFactorEntity
 import org.medtroniclabs.uhis.db.entity.RxBuddyDetails
 import org.medtroniclabs.uhis.db.entity.RxBuddyFollowUpEntity
 import org.medtroniclabs.uhis.db.entity.ScreeningEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
@@ -150,11 +150,13 @@ interface RoomHelper {
 
     // ShasthyaShebika methods
     suspend fun getShasthyaShebikaById(id: Long): ShasthyaShebikaEntity?
+
     suspend fun saveShasthyaShebikas(shasthyaShebikaEntityList: List<ShasthyaShebikaEntity>)
 
     suspend fun deleteAllShasthyaShebikas()
 
     suspend fun getShasthyaShebikaByShasthyaKormiId(shasthyaKormiId: Long): List<ShasthyaShebikaEntity>
+
     // Chiefdom methods
     suspend fun saveChiefdoms(chiefdomEntityList: List<ChiefDomEntity>)
 

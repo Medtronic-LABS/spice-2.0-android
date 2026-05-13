@@ -90,8 +90,6 @@ class HouseHoldRepository @Inject constructor(
             Resource(state = ResourceState.ERROR)
         }
 
-
-        
     /**
      * Service recipient filter: FO/PO must pick a Shasthya Kormi (SK) before SS/sub-village lists apply.
      * Non–FO/PO delegates to [getHouseHoldFilterUiData].
@@ -136,8 +134,7 @@ class HouseHoldRepository @Inject constructor(
             Resource(state = ResourceState.ERROR)
         }
 
-    suspend fun getShasthyaKormiIdForShasthyaShebika(ssId: Long): Long? =
-        roomHelper.getShasthyaShebikaById(ssId)?.shasthyaKormiId
+    suspend fun getShasthyaKormiIdForShasthyaShebika(ssId: Long): Long? = roomHelper.getShasthyaShebikaById(ssId)?.shasthyaKormiId
 
     suspend fun createOrUpdateHouseHoldEntity(
         map: HashMap<String, Any>,

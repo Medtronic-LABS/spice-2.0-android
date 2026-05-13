@@ -2,7 +2,6 @@ package org.medtroniclabs.uhis.formgeneration
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
-import android.util.Log
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.DialogInterface
@@ -20,6 +19,7 @@ import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.RelativeSizeSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -152,9 +152,9 @@ import org.medtroniclabs.uhis.mappingkey.MemberRegistration.PHONE_NUMBER
 import org.medtroniclabs.uhis.mappingkey.RxBuddy
 import org.medtroniclabs.uhis.mappingkey.Screening
 import org.medtroniclabs.uhis.mappingkey.Screening.DateOfBirth
-import org.medtroniclabs.uhis.mappingkey.Screening.TODAY
 import org.medtroniclabs.uhis.mappingkey.Screening.Hour
 import org.medtroniclabs.uhis.mappingkey.Screening.Minute
+import org.medtroniclabs.uhis.mappingkey.Screening.TODAY
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.CAMP_DATE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.MUAC
@@ -3937,7 +3937,6 @@ class FormGenerator(
         return isValid
     }
 
-
     private fun continueChanges(root: View): Boolean {
         serverData?.firstOrNull { (it.id + rootSuffix) == root.tag }?.multipleParents?.let { parents ->
             for ((key, value) in parents) {
@@ -3966,6 +3965,7 @@ class FormGenerator(
                 false
             }
         }
+
     fun isViewVisible(id: String): Boolean {
         val view = getViewByTag(id + rootSuffix)
         return view != null && view.isShown

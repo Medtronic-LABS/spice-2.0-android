@@ -3,6 +3,7 @@ package org.medtroniclabs.uhis.di
 import android.content.Context
 import android.content.Intent
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -305,6 +306,12 @@ object AppModule {
     @Singleton
     @Provides
     fun provideIsNonProd() = BuildConfig.FLAVOR != AppConstants.FLAVOUR_PROD
+
+    @Singleton
+    @Provides
+    fun provideAppUpdateManager(
+        @ApplicationContext context: Context,
+    ) = AppUpdateManagerFactory.create(context)
 }
 
 @Retention(AnnotationRetention.BINARY)

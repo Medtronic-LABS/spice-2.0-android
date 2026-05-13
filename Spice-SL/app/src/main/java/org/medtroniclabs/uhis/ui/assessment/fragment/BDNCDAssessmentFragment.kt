@@ -13,7 +13,6 @@ import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CVDRiskCalculator
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.EntityMapper
-import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
 import org.medtroniclabs.uhis.databinding.FragmentAssessmentBinding
 import org.medtroniclabs.uhis.formgeneration.FormGenerator
@@ -89,7 +88,7 @@ class BDNCDAssessmentFragment : BaseFragment(), FormEventListener {
             binding.llForm,
             this,
             binding.scrollView,
-            translate = SecuredPreference.getIsTranslationEnabled(),
+            translate = isTranslationEnabled,
         ) { map, id ->
             when (id) {
                 Screening.Weight, Screening.Height -> {

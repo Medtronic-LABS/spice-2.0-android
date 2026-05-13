@@ -25,6 +25,7 @@ import org.medtroniclabs.uhis.common.RoleConstant.CHA
 import org.medtroniclabs.uhis.common.RoleConstant.CHWs
 import org.medtroniclabs.uhis.common.RoleConstant.COMMUNITY_HEALTH_ASSISTANT
 import org.medtroniclabs.uhis.common.RoleConstant.COMMUNITY_HEALTH_PROMOTER
+import org.medtroniclabs.uhis.common.RoleConstant.FO
 import org.medtroniclabs.uhis.common.RoleConstant.HEALTH_SCREENER
 import org.medtroniclabs.uhis.common.RoleConstant.LAB_ASSISTANT
 import org.medtroniclabs.uhis.common.RoleConstant.MCHA
@@ -32,11 +33,10 @@ import org.medtroniclabs.uhis.common.RoleConstant.MID_WIFE
 import org.medtroniclabs.uhis.common.RoleConstant.PEER_SUPERVISOR
 import org.medtroniclabs.uhis.common.RoleConstant.PHARMACIST
 import org.medtroniclabs.uhis.common.RoleConstant.PHYSICIAN_PRESCRIBER
+import org.medtroniclabs.uhis.common.RoleConstant.PO
 import org.medtroniclabs.uhis.common.RoleConstant.PROVIDER
 import org.medtroniclabs.uhis.common.RoleConstant.SECHN
 import org.medtroniclabs.uhis.common.RoleConstant.SRN
-import org.medtroniclabs.uhis.common.RoleConstant.FO
-import org.medtroniclabs.uhis.common.RoleConstant.PO
 import org.medtroniclabs.uhis.data.ErrorResponse
 import org.medtroniclabs.uhis.data.Prescription
 import org.medtroniclabs.uhis.data.history.Investigation
@@ -2140,10 +2140,10 @@ object CommonUtils {
         return false
     }
 
-    fun isFo(): Boolean =
-            SecuredPreference.getUserDetails()?.roles?.any { it.name == FO } == true
-    fun isPo(): Boolean =
-            SecuredPreference.getUserDetails()?.roles?.any { it.name == PO } == true
+    fun isFo(): Boolean = SecuredPreference.getUserDetails()?.roles?.any { it.name == FO } == true
+
+    fun isPo(): Boolean = SecuredPreference.getUserDetails()?.roles?.any { it.name == PO } == true
+
     fun isFoOrPo(): Boolean = isFo() || isPo()
 
     fun gestationalWeekLimitCheck(date: String?): Boolean {

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.medtroniclabs.uhis.appextensions.postLoading
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.UserProfile
@@ -28,7 +29,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LandingViewModel @Inject constructor(
     private val metaRepository: MetaRepository,
-    @IoDispatcher override var dispatcherIO: CoroutineDispatcher,
+    @param:IoDispatcher override var dispatcherIO: CoroutineDispatcher,
+    private val isNonProd: Boolean,
 ) : BaseViewModel(dispatcherIO) {
     val menuListLiveData = MutableLiveData<Resource<List<MenuEntity>>>()
     val userProfileLiveData = MutableLiveData<Resource<UserProfile>>()
@@ -121,4 +123,15 @@ class LandingViewModel @Inject constructor(
             cbsNotificationUpdateResponse.postValue(result)
         }
     }
+
+    /**
+     * Sequentially asks the backend whether this build is still allowed to run.
+     * Returns a [Resource] following the same contract as [MetaRepository.checkAppVersion].
+     */
+    suspend fun checkAppVersion(): Resource<String> =
+        withContext(dispatcherIO) {
+            metaRepository.checkAppVersion()
+        }
+
+    fun isNonProdEnv() = isNonProd
 }

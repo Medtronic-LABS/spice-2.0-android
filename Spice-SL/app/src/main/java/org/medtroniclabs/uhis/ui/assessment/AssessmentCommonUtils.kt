@@ -16,6 +16,7 @@ import org.medtroniclabs.uhis.databinding.AssessmentSummaryLayoutBinding
 import org.medtroniclabs.uhis.databinding.TextLabelLayoutBinding
 import org.medtroniclabs.uhis.formgeneration.extension.px
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
+import org.medtroniclabs.uhis.formgeneration.model.FormLayout
 import org.medtroniclabs.uhis.model.AssessmentSummaryModel
 
 object AssessmentCommonUtils {
@@ -185,6 +186,39 @@ object AssessmentCommonUtils {
                 for (i in 0 until json.length()) {
                     val result = findValueByKey(json.get(i), targetKey)
                     if (result != null) return result
+                }
+            }
+        }
+
+        return null
+    }
+
+    /**
+     * Returns display value for the given selected id
+     */
+    fun getSpinnerDisplayValue(
+        fieldId: String,
+        valueId: String?,
+        isTranslationEnabled: Boolean,
+        formLayouts: List<FormLayout>?,
+    ): String? {
+        if (valueId.isNullOrBlank()) return null
+
+        val formLayout = formLayouts?.find {
+            it.id == fieldId
+        } ?: return null
+
+        val optionsList = formLayout.optionsList ?: return null
+        optionsList.forEach { option ->
+            val optionId = option[DefinedParams.ID] as? String
+                ?: option[DefinedParams.id] as? String
+            if (optionId == valueId) {
+                // Return cultureValue if translation is enabled, otherwise return name
+                return if (isTranslationEnabled) {
+                    option[DefinedParams.CULTURE_VALUE] as? String
+                        ?: option[DefinedParams.NAME] as? String
+                } else {
+                    option[DefinedParams.NAME] as? String
                 }
             }
         }

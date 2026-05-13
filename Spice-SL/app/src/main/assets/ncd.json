@@ -51,12 +51,12 @@
             "condition":
             [
                 {
-                    "eq": "yes",
+                    "eq": "Yes",
                     "targetId": "ncdSymptoms",
                     "visibility": "visible"
                 },
                 {
-                    "eq": "no",
+                    "eq": "No",
                     "targetId": "newWorseningSymptoms",
                     "visibility": "gone"
                 }
@@ -72,12 +72,12 @@
             [
                 {
                     "cultureValue": "হ্যাঁ",
-                    "id": "yes",
+                    "id": "Yes",
                     "name": "Yes"
                 },
                 {
                     "cultureValue": "না",
-                    "id": "no",
+                    "id": "No",
                     "name": "No"
                 }
             ],
@@ -198,12 +198,12 @@
             [
                 {
                     "cultureValue": "হ্যাঁ",
-                    "id": "yes",
+                    "id": "Yes",
                     "name": "Yes"
                 },
                 {
                     "cultureValue": "না",
-                    "id": "no",
+                    "id": "No",
                     "name": "No"
                 }
             ],
@@ -284,7 +284,7 @@
             "condition":
             [
                 {
-                    "eq": "yes",
+                    "eq": "Yes",
                     "targetId": "diagnosedBPMedication",
                     "visibility": "visible"
                 }
@@ -300,12 +300,12 @@
             [
                 {
                     "cultureValue": "হ্যাঁ",
-                    "id": "yes",
+                    "id": "Yes",
                     "name": "Yes"
                 },
                 {
                     "cultureValue": "না",
-                    "id": "no",
+                    "id": "No",
                     "name": "No"
                 }
             ],
@@ -327,12 +327,12 @@
             [
                 {
                     "cultureValue": "হ্যাঁ",
-                    "id": "yes",
+                    "id": "Yes",
                     "name": "Yes"
                 },
                 {
                     "cultureValue": "না",
-                    "id": "no",
+                    "id": "No",
                     "name": "No"
                 }
             ],
@@ -377,7 +377,7 @@
             "titleCulture": "রক্তচাপ",
             "titleSummary": "Average Blood Pressure",
             "titleSummaryCulture": "গড় রক্তচাপ",
-            "totalCount": 3.0,
+            "totalCount": 2.0,
             "viewType": "BP",
             "visibility": "visible"
         },
@@ -395,19 +395,19 @@
             [
                 {
                     "cultureValue": "হ্যাঁ",
-                    "id": "yes",
+                    "id": "Yes",
                     "name": "Yes"
                 },
                 {
                     "cultureValue": "না",
-                    "id": "no",
+                    "id": "No",
                     "name": "No"
                 }
             ],
             "orderId": 4,
             "orientation": 0.0,
-            "title": "Are you a regular smoker or have you been a regular smoker in the past 12 months?",
-            "titleCulture": "আপনি কি নিয়মিত ধূমপায়ী অথবা আপনি গত ১২ বছরে নিয়মিত ধূমপায়ী ছিলেন?",
+            "title": "Are you smoking or consuming tobacco in the past 12 months?",
+            "titleCulture": "গত ১২ মাসে আপনি কি ধূমপান করেছেন অথবা তামাক সেবন করেছেন?",
             "viewType": "SingleSelectionView",
             "visibility": "visible"
         },
@@ -432,7 +432,7 @@
             "condition":
             [
                 {
-                    "eq": "yes",
+                    "eq": "Yes",
                     "targetId": "diagnosedGlucoseMedication",
                     "visibility": "visible"
                 }
@@ -448,12 +448,12 @@
             [
                 {
                     "cultureValue": "হ্যাঁ",
-                    "id": "yes",
+                    "id": "Yes",
                     "name": "Yes"
                 },
                 {
                     "cultureValue": "না",
-                    "id": "no",
+                    "id": "No",
                     "name": "No"
                 }
             ],
@@ -475,12 +475,12 @@
             [
                 {
                     "cultureValue": "হ্যাঁ",
-                    "id": "yes",
+                    "id": "Yes",
                     "name": "Yes"
                 },
                 {
                     "cultureValue": "না",
-                    "id": "no",
+                    "id": "No",
                     "name": "No"
                 }
             ],
@@ -551,27 +551,6 @@
             "unitMeasurement": "mmol/L",
             "viewType": "EditText",
             "visibility": "gone"
-        },
-        {
-            "condition":
-            [],
-            "errorMessage": "",
-            "family": "glucoseLog",
-            "hint": "Enter HbA1c Reading",
-            "hintCulture": "HbA1c রিডিং লিখুন",
-            "id": "hba1c",
-            "inputType": 8192.0,
-            "isEnabled": true,
-            "isMandatory": false,
-            "isSummary": true,
-            "maxValue": 50.0,
-            "minValue": 1.0,
-            "orderId": 5,
-            "title": "HbA1c",
-            "titleCulture": "HbA1c",
-            "unitMeasurement": "%",
-            "viewType": "EditText",
-            "visibility": "visible"
         },
         {
             "familyOrder": 5,
@@ -696,7 +675,7 @@
             "condition":
             [
                 {
-                    "eq": "yes",
+                    "eq": "Yes",
                     "targetId": "typeOfGlass",
                     "visibility": "visible"
                 }
@@ -712,12 +691,12 @@
             [
                 {
                     "cultureValue": "হ্যাঁ",
-                    "id": "yes",
+                    "id": "Yes",
                     "name": "Yes"
                 },
                 {
                     "cultureValue": "না",
-                    "id": "no",
+                    "id": "No",
                     "name": "No"
                 }
             ],
@@ -819,12 +798,12 @@
             [
                 {
                     "cultureValue": "হ্যাঁ",
-                    "id": "yes",
+                    "id": "Yes",
                     "name": "Yes"
                 },
                 {
                     "cultureValue": "না",
-                    "id": "no",
+                    "id": "No",
                     "name": "No"
                 }
             ],

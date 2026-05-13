@@ -754,6 +754,7 @@
     </plurals>
     <string name="open_play_store">Open Play Store</string>
     <string name="please_check_if_play_store_available">Please check if Google Play Store is installed in the device</string>
+    <string name="please_update_the_app">A new version of the app is available. Please update to continue.</string>
 
     <!-- Registration -->
     <string name="register">Register</string>

@@ -2,7 +2,6 @@ package org.medtroniclabs.uhis.ui.services
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import androidx.activity.viewModels
@@ -215,14 +214,7 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
      */
     private fun buildDropDownList(counts: ServiceMemberCounts): ArrayList<Map<String, Any>> {
         val dropdownList = arrayListOf<Map<String, Any>>()
-//        val roleNames =
-//            SecuredPreference.getUserDetails()?.roles?.joinToString(",") { it.name } ?: "null"
         val isFoOrPoUser = CommonUtils.isFoOrPo()
-//        Log.d(
-//            LOG_TAG_FO_PO_DEBUG,
-//            "buildDropDownList enter: isFoOrPo=$isFoOrPoUser isFo=${CommonUtils.isFo()} " +
-//                "isPo=${CommonUtils.isPo()} roles=[$roleNames]",
-//        )
         val staticFilters =
             if (isFoOrPoUser) {
                 linkedMapOf(
@@ -245,11 +237,6 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
                     ServiceStaticFilter.EXTERNAL_PREGNANT_WOMEN to counts.externalPregnant,
                 )
             }
-//        Log.d(
-//            LOG_TAG_FO_PO_DEBUG,
-//            "buildDropDownList result: branch=${if (isFoOrPoUser) "FO_PO" else "FULL"} " +
-//                "filterCount=${staticFilters.size} filters=${staticFilters.keys.joinToString { it.name }}",
-//        )
         staticFilters.forEach { filterEntry ->
             val filter = filterEntry.key
             val filterCount = filterEntry.value
@@ -393,8 +380,5 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
 
     companion object {
         const val ENTRY_POINT_SERVICES = "Services"
-
-        /** Logcat filter: `adb logcat -s ServicesFoPoD` */
-        private const val LOG_TAG_FO_PO_DEBUG = "ServicesFoPoD"
     }
 }

@@ -738,6 +738,7 @@
     </plurals>
     <string name="open_play_store">প্লে স্টোর খুলুন</string>
     <string name="please_check_if_play_store_available">অনুগ্রহ করে যাচাই করুন মোবাইলে Google Play Store ইনস্টল আছে কিনা</string>
+    <string name="please_update_the_app">অ্যাপের একটি নতুন সংস্করণ উপলব্ধ। চালিয়ে যেতে অনুগ্রহ করে আপডেট করুন।</string>
     <string name="register">নিবন্ধন</string>
     <string name="registration">নিবন্ধন</string>
     <string name="registered">নিবন্ধিত</string>

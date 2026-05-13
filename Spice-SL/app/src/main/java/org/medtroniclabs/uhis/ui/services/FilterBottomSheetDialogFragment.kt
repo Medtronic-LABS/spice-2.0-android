@@ -309,15 +309,18 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
                 hasValidSkSelected()
             ) {
                 val impliedSs =
-                    viewModel.filterUiData.value?.data?.ssList?.map { ss ->
-                        val name =
-                            if (ss.ssId.isNullOrBlank()) {
-                                ss.name
-                            } else {
-                                "${ss.ssId} - ${ss.name}"
-                            }
-                        ChipViewItemModel(id = ss.id, name = name)
-                    }.orEmpty()
+                    viewModel.filterUiData.value
+                        ?.data
+                        ?.ssList
+                        ?.map { ss ->
+                            val name =
+                                if (ss.ssId.isNullOrBlank()) {
+                                    ss.name
+                                } else {
+                                    "${ss.ssId} - ${ss.name}"
+                                }
+                            ChipViewItemModel(id = ss.id, name = name)
+                        }.orEmpty()
                 Pair(impliedSs, emptyList())
             } else {
                 Pair(ssSelection, subSelection)
