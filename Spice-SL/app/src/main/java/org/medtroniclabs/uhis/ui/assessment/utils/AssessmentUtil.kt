@@ -135,6 +135,7 @@ object AssessmentUtil {
             MenuConstants.FP_MENU_ID.lowercase() -> context.getString(R.string.family_planning)
             MenuConstants.EYE_CARE_MENU_ID.lowercase() -> context.getString(R.string.eye_care)
             MenuConstants.CATARACT_MENU_ID.lowercase() -> context.getString(R.string.cataract)
+            MenuConstants.NCD_MENU_ID.lowercase() -> context.getString(R.string.ncd)
             MenuConstants.PREGNANCY_OUTCOME.lowercase() -> context.getString(R.string.pregnancy_outcome)
             RMNCH.ANC.lowercase() -> context.getString(R.string.anc)
             RMNCH.PNC_MOTHER_MENU.lowercase() -> context.getString(R.string.pnc)
@@ -281,8 +282,19 @@ object AssessmentUtil {
                 context.getString(R.string.uncontrolled_bg)
             }
 
+            AssessmentStatus.GLASSES_SOLD -> {
+                context.getString(R.string.assessment_status_glasses_sold)
+            }
+
+            AssessmentStatus.NCD_SERVICE_IN_CATARACT_CAMP -> {
+                context.getString(R.string.assessment_status_ncd_service_cataract_camp)
+            }
+
+            AssessmentStatus.REFERRED_FOR_OPERATION -> {
+                context.getString(R.string.assessment_status_referred_for_operation)
+            }
+
             AssessmentStatus.DEFAULT,
-            AssessmentStatus.GLASSES_SOLD,
             -> {
                 status.uppercase(Locale.ENGLISH)
             }

@@ -1400,6 +1400,13 @@ class RoomHelperImpl @Inject constructor(
             pwIdentifiedFirst4MonthsWithAncCount = maternal?.pwIdentifiedFirst4MonthsWithAncCount ?: 0,
             anc3PlusCount = maternal?.anc3PlusCount ?: 0,
             highRiskPregnantWomenCount = 0,
+            totalNcdServicesCount = 0,
+            ncdScreeningFirstServiceCount = 0,
+            ncdFollowUpAssessmentCount = 0,
+            ncdFollowUpReferralCount = 0,
+            glassesSoldCustomStatusCount = 0,
+            ncdServicesInCataractCampCount = 0,
+            patientsReferredForOperationCount = 0,
         )
     }
 

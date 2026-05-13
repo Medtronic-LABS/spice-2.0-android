@@ -76,7 +76,95 @@ interface MemberAssessmentHistoryDao {
                     THEN 1
                     ELSE 0
                 END
-            ) AS highRiskPregnantWomenCount
+            ) AS highRiskPregnantWomenCount,
+            SUM(CASE WHEN LOWER(h.serviceProvided) = 'ncd' THEN 1 ELSE 0 END) AS totalNcdServicesCount,
+            SUM(
+                CASE
+                    WHEN LOWER(h.serviceProvided) = 'ncd'
+                    AND NOT EXISTS (
+                        SELECT 1 FROM memberassessmenthistory p
+                        WHERE p.memberId = h.memberId
+                        AND LOWER(p.serviceProvided) = 'ncd'
+                        AND (
+                            date(datetime(p.visitDate, 'localtime')) < date(datetime(h.visitDate, 'localtime'))
+                            OR (
+                                date(datetime(p.visitDate, 'localtime')) = date(datetime(h.visitDate, 'localtime'))
+                                AND p.id < h.id
+                            )
+                        )
+                    )
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS ncdScreeningFirstServiceCount,
+            SUM(
+                CASE
+                    WHEN LOWER(h.serviceProvided) = 'ncd'
+                    AND EXISTS (
+                        SELECT 1 FROM memberassessmenthistory p
+                        WHERE p.memberId = h.memberId
+                        AND LOWER(p.serviceProvided) = 'ncd'
+                        AND (
+                            date(datetime(p.visitDate, 'localtime')) < date(datetime(h.visitDate, 'localtime'))
+                            OR (
+                                date(datetime(p.visitDate, 'localtime')) = date(datetime(h.visitDate, 'localtime'))
+                                AND p.id < h.id
+                            )
+                        )
+                    )
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS ncdFollowUpAssessmentCount,
+            SUM(
+                CASE
+                    WHEN LOWER(h.serviceProvided) = 'ncd'
+                    AND EXISTS (
+                        SELECT 1 FROM memberassessmenthistory p
+                        WHERE p.memberId = h.memberId
+                        AND LOWER(p.serviceProvided) = 'ncd'
+                        AND (
+                            date(datetime(p.visitDate, 'localtime')) < date(datetime(h.visitDate, 'localtime'))
+                            OR (
+                                date(datetime(p.visitDate, 'localtime')) = date(datetime(h.visitDate, 'localtime'))
+                                AND p.id < h.id
+                            )
+                        )
+                    )
+                    AND h.referralStatus IS NOT NULL
+                    AND (
+                        h.referralStatus = 'Referred'
+                        OR h.referralStatus LIKE 'Referred To%'
+                    )
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS ncdFollowUpReferralCount,
+            SUM(
+                CASE
+                    WHEN h.customStatus IS NOT NULL AND INSTR(h.customStatus, 'GLASSES_SOLD') > 0
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS glassesSoldCustomStatusCount,
+            SUM(
+                CASE
+                    WHEN LOWER(h.serviceProvided) = 'cataract'
+                    AND h.customStatus IS NOT NULL
+                    AND INSTR(h.customStatus, 'NCD_SERVICE_IN_CATARACT_CAMP') > 0
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS ncdServicesInCataractCampCount,
+            SUM(
+                CASE
+                    WHEN LOWER(h.serviceProvided) = 'cataract'
+                    AND h.customStatus IS NOT NULL
+                    AND INSTR(h.customStatus, 'REFERRED_FOR_OPERATION') > 0
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS patientsReferredForOperationCount
         FROM memberassessmenthistory AS h
         LEFT JOIN householdmember AS hm ON hm.id = h.memberId
         LEFT JOIN household AS hh ON hh.id = hm.household_id

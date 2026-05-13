@@ -216,6 +216,18 @@
     <string name="household_registered">খানা নিবন্ধন</string>
     <string name="pregnancy_outcome_dashboard">ডেলিভারি রেজিস্ট্রেশন</string>
     <string name="family_planning_dashboard">পরিবার পরিকল্পনা কাউন্সেলিংয়ের সংখ্যা</string>
+    <string name="dashboard_ncd_screening">এনসিডি স্ক্রিনিং</string>
+    <string name="dashboard_ncd_referred_followup">এনসিডি এর জন্য রেফার </string>
+    <string name="dashboard_ncd_follow_up_assessment">এনসিডি মূল্যায়ন</string>
+    <string name="dashboard_total_ncd_services">সর্বমোট এনসিডি সেবা</string>
+    <string name="dashboard_total_eye_screening">সর্বমোট চক্ষু পরীক্ষা</string>
+    <string name="dashboard_cataract_screening">ক্যাটারেক্ট স্ক্রিনিং</string>
+    <string name="dashboard_ncd_in_cataract_camp">ক্যাটারেক্ট ক্যাম্পে এনসিডি সেবা</string>
+    <string name="dashboard_referred_for_operation">অপারেশনের জন্য রেফার</string>
+    <string name="dashboard_glasses_sold">চশমা বিক্রয়</string>
+    <string name="assessment_status_ncd_service_cataract_camp">ক্যাটারেক্ট ক্যাম্পে এনসিডি সেবা</string>
+    <string name="assessment_status_referred_for_operation">অপারেশনের জন্য রেফার</string>
+    <string name="assessment_status_glasses_sold">চশমা বিক্রয়</string>
     <string name="child_hood_visit">শিশু ফলোআপ</string>
     <string name="other_value" translatable="false">%1$s - %2$s</string>
     <string name="gps_disabled_title">লোকেশন সেবা বন্ধ!</string>

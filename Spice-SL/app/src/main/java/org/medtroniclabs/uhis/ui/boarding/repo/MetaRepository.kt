@@ -1118,6 +1118,20 @@ class MetaRepository @Inject constructor(
             Resource(state = ResourceState.ERROR)
         }
 
+    /**
+     * Lowercased [ClinicalWorkflowEntity.workflowName] values from forms sync ([saveClinicalWorkflowsInDb]).
+     * Aligns dashboard tiles with configured clinical tools rather than [MenuEntity.menuId].
+     */
+    suspend fun getClinicalWorkflowWorkflowNamesLower(): Set<String> =
+        try {
+            roomHelper.getMenuForClinicalWorkflows()
+                .mapNotNull { wf ->
+                    wf.workflowName?.trim()?.lowercase()?.takeIf { it.isNotEmpty() }
+                }.toSet()
+        } catch (_: Exception) {
+            emptySet()
+        }
+
     suspend fun getUserProfile(): Resource<UserProfile> =
         try {
             val data = roomHelper.getUserProfile()

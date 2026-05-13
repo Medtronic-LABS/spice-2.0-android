@@ -22,16 +22,26 @@ import org.medtroniclabs.uhis.databinding.FragmentDashboardBinding
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseFragment
+import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_ANC
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_ANC_3_PLUS
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_CHILD_VISIT
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_FAMILY_PLANNING
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_HIGH_RISK_PREGNANT_WOMEN
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_HOUSEHOLD_REGISTERED
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_NCD_FOLLOW_UP_ASSESSMENT
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_NCD_IN_CATARACT_CAMP
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_NCD_REFERRED_FOLLOWUP
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_NCD_SCREENING
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_PNC
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_PREGNANCY_OUTCOME
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_PREGNANT_WOMEN_REGISTRATION
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_PW_IDENTIFIED_4_MONTHS_ANC
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_REFERRED_FOR_OPERATION
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_TOTAL_EYE_SCREENING
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_TOTAL_NCD_SERVICES
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_CATARACT_SCREENING
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_GLASSES_SOLD
 import org.medtroniclabs.uhis.ui.dashboard.ncd.adapter.DashboardCardItem
 import org.medtroniclabs.uhis.ui.dashboard.ncd.adapter.UserDashboardAdapter
 import org.medtroniclabs.uhis.ui.dashboard.ncd.viewmodel.NCDDashBoardViewModel
@@ -41,6 +51,26 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
     private lateinit var binding: FragmentDashboardBinding
     private val viewModel: NCDDashBoardViewModel by activityViewModels()
     private var dashboardFilterCount: Int = 0
+
+    /** Lowercased clinical workflow slugs from forms sync; gates NCD / eye / cataract tiles. */
+    private var clinicalWorkflowNamesLower: Set<String> = emptySet()
+
+    private fun workflowSlugsContain(vararg slug: String): Boolean =
+        slug.any { candidate -> clinicalWorkflowNamesLower.contains(candidate.lowercase()) }
+
+    private fun hasNcdWorkflow(): Boolean =
+        workflowSlugsContain(MenuConstants.NCD_MENU_ID)
+
+    private fun hasEyeCareWorkflow(): Boolean = workflowSlugsContain(MenuConstants.EYE_CARE_MENU_ID)
+
+    private fun hasCataractWorkflow(): Boolean = workflowSlugsContain(MenuConstants.CATARACT_MENU_ID)
+
+    private fun reboundDashboardAfterClinicalWorkflowsLoaded() {
+        val resource = viewModel.userDashboardDetails.value
+        if (resource?.isSuccess() == true) {
+            resource.data?.let { showView(false, it) }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,9 +90,14 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
         applyTodayDefaultDatesToFields()
         attachObservers()
         viewModel.getMenus()
+        viewModel.loadDashboardClinicalWorkflowGate()
     }
 
     private fun attachObservers() {
+        viewModel.clinicalWorkflowNamesLowerLiveData.observe(viewLifecycleOwner) { names ->
+            clinicalWorkflowNamesLower = names ?: emptySet()
+            reboundDashboardAfterClinicalWorkflowsLoaded()
+        }
         viewModel.getFilterLiveData().observe(viewLifecycleOwner) { filter ->
             var count = 0
             if (filter.filterBySs.isNotEmpty()) count++
@@ -230,6 +265,84 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
                     R.drawable.ic_family_planning,
                 ),
             )
+            if (hasNcdWorkflow()) {
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_NCD_SCREENING,
+                        getString(R.string.dashboard_ncd_screening),
+                        it.ncdScreeningFirstServiceCount,
+                        R.drawable.ic_ncd_tool,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_NCD_REFERRED_FOLLOWUP,
+                        getString(R.string.dashboard_ncd_referred_followup),
+                        it.ncdFollowUpReferralCount,
+                        R.drawable.ic_referred,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_NCD_FOLLOW_UP_ASSESSMENT,
+                        getString(R.string.dashboard_ncd_follow_up_assessment),
+                        it.ncdFollowUpAssessmentCount,
+                        R.drawable.ic_ncd_tool,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_TOTAL_NCD_SERVICES,
+                        getString(R.string.dashboard_total_ncd_services),
+                        it.totalNcdServicesCount,
+                        R.drawable.ic_ncd_tool,
+                    ),
+                )
+            }
+            if (hasEyeCareWorkflow()) {
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_TOTAL_EYE_SCREENING,
+                        getString(R.string.dashboard_total_eye_screening),
+                        it.eyeCareCount,
+                        R.drawable.ic_eye_care,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_GLASSES_SOLD,
+                        getString(R.string.dashboard_glasses_sold),
+                        it.glassesSoldCustomStatusCount,
+                        R.drawable.ic_eye_care,
+                    ),
+                )
+            }
+            if (hasCataractWorkflow()) {
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_CATARACT_SCREENING,
+                        getString(R.string.dashboard_cataract_screening),
+                        it.cataractCount,
+                        R.drawable.ic_eye_care,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_NCD_IN_CATARACT_CAMP,
+                        getString(R.string.dashboard_ncd_in_cataract_camp),
+                        it.ncdServicesInCataractCampCount,
+                        R.drawable.ic_ncd_tool,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_REFERRED_FOR_OPERATION,
+                        getString(R.string.dashboard_referred_for_operation),
+                        it.patientsReferredForOperationCount,
+                        R.drawable.ic_referred,
+                    ),
+                )
+            }
         }
         binding.rvActivitiesList.apply {
             layoutManager = LinearLayoutManager(requireContext())

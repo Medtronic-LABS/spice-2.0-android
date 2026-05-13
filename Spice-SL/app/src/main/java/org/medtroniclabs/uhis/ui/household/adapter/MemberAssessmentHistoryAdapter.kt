@@ -56,7 +56,7 @@ class MemberAssessmentHistoryAdapter(
                 context.getString(R.string.service_date),
                 DateUtils.formatDateToDisplayFormat(visitDateMillis) ?: "",
             )
-            val currentStatus = history.customStatus?.filterNot { it == AssessmentStatus.GLASSES_SOLD.name }?.joinToString {
+            val currentStatus = history.customStatus?.joinToString {
                 AssessmentUtil.mapAssessmentStatus(it, context)
             }
             addSummaryView(

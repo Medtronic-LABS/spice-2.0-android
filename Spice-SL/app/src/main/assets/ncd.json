@@ -388,6 +388,7 @@
             "errorMessage": "Please select a valid option",
             "family": "bpLog",
             "id": "isRegularSmoker",
+            "optionType": "boolean",
             "isEnabled": true,
             "isMandatory": true,
             "isSummary": false,
@@ -395,12 +396,12 @@
             [
                 {
                     "cultureValue": "হ্যাঁ",
-                    "id": "Yes",
+                    "id": true,
                     "name": "Yes"
                 },
                 {
                     "cultureValue": "না",
-                    "id": "No",
+                    "id": false,
                     "name": "No"
                 }
             ],

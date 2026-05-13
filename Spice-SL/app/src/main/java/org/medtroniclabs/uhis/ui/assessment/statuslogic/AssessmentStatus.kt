@@ -89,5 +89,11 @@ enum class AssessmentStatus {
 
     GLASSES_SOLD,
 
+    /** NCD vitals captured during a cataract camp visit (form: ncdServiceProvided = Yes). */
+    NCD_SERVICE_IN_CATARACT_CAMP,
+
+    /** Cataract form: patientReferredForOperation = Yes. */
+    REFERRED_FOR_OPERATION,
+
     DEFAULT,
 }

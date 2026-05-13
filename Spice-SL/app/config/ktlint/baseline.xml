@@ -1006,10 +1006,24 @@
         <error line="4" column="5" source="standard:enum-entry-name-case" />
         <error line="5" column="5" source="standard:enum-entry-name-case" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/boarding/repo/MetaRepository.kt">
+        <error line="1127" column="23" source="standard:chain-method-continuation" />
+        <error line="1129" column="36" source="standard:chain-method-continuation" />
+        <error line="1129" column="44" source="standard:chain-method-continuation" />
+        <error line="1129" column="57" source="standard:chain-method-continuation" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/common/composeui/DialogComposeUtils.kt">
         <error line="29" column="9" source="standard:function-naming" />
         <error line="49" column="9" source="standard:function-naming" />
         <error line="88" column="9" source="standard:function-naming" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/dashboard/ncd/DashboardFragment.kt">
+        <error line="3" column="1" source="standard:import-ordering" />
+        <error line="58" column="69" source="standard:function-signature" />
+        <error line="61" column="44" source="standard:function-signature" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/dashboard/ncd/viewmodel/NCDDashBoardViewModel.kt">
+        <error line="70" column="5" source="standard:blank-line-before-declaration" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/followup/FollowUpDefinedParams.kt">
         <error line="4" column="15" source="standard:property-naming" />
@@ -1028,6 +1042,9 @@
         <error line="29" column="15" source="standard:property-naming" />
         <error line="30" column="15" source="standard:property-naming" />
         <error line="31" column="15" source="standard:property-naming" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/household/adapter/MemberAssessmentHistoryAdapter.kt">
+        <error line="14" column="1" source="standard:no-unused-imports" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/landing/viewmodel/OfflineSyncViewModel.kt">
         <error line="3" column="1" source="standard:import-ordering" />

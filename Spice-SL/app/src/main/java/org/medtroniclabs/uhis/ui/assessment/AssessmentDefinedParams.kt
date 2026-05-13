@@ -652,6 +652,12 @@ object AssessmentDefinedParams {
 
     const val EYE_DISEASE = "eyeDisease"
 
+    /** Cataract form: Has NCD service been provided? */
+    const val NCD_SERVICE_PROVIDED = "ncdServiceProvided"
+
+    /** Cataract form: Has the patient been referred for operation? */
+    const val PATIENT_REFERRED_FOR_OPERATION = "patientReferredForOperation"
+
     const val HISTORY_OF_OTHER_DISEASES = "historyOfOtherDiseases"
 
     const val OPERATION_NAME = "operationName"

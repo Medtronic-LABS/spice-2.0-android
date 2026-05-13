@@ -33,6 +33,7 @@ class NCDDashBoardViewModel @Inject constructor(
 ) : BaseViewModel(dispatcherIO) {
     var userDashboardDetails = MutableLiveData<Resource<NCDUserDashboardResponse>>()
     val menuListLiveData = MutableLiveData<List<String>?>()
+    val clinicalWorkflowNamesLowerLiveData = MutableLiveData<Set<String>>()
     val filterUiData = MutableLiveData<Resource<HouseHoldFilterUiData>>()
     private val filterLiveData = MutableLiveData(DashboardSearchFilter())
 
@@ -59,6 +60,13 @@ class NCDDashBoardViewModel @Inject constructor(
         }
     }
 
+    fun loadDashboardClinicalWorkflowGate() {
+        viewModelScope.launch(dispatcherIO) {
+            clinicalWorkflowNamesLowerLiveData.postValue(
+                metaRepository.getClinicalWorkflowWorkflowNamesLower(),
+            )
+        }
+    }
     fun getFilterUiData() {
         viewModelScope.launch(dispatcherIO) {
             filterUiData.postLoading()

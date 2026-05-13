@@ -18,6 +18,12 @@ import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
  * Object class to evaluate status for different work flows
  */
 object AssessmentStatusGenerator {
+    private fun getCataractFieldSection(map: HashMap<String, Any>): Map<*, *>? {
+        val wrapped = map[MenuConstants.CATARACT_MENU_ID] as? Map<*, *> ?: return null
+        val inner = wrapped[AssessmentDefinedParams.CATARACT] as? Map<*, *>
+        return inner ?: wrapped
+    }
+
     fun evaluateStatus(
         map: HashMap<String, Any>,
         memberDetails: AssessmentMemberDetails?,
@@ -146,17 +152,31 @@ object AssessmentStatusGenerator {
 
             map.containsKey(MenuConstants.CATARACT_MENU_ID) -> {
                 val results = referralResult?.second ?: listOf()
+                val statusList = arrayListOf<AssessmentStatus>()
                 if (results.isNotEmpty()) {
                     if (results.contains(bloodPressure) && results.contains(bloodGlucose)) {
-                        arrayListOf(AssessmentStatus.UNCONTROLLED_BP, AssessmentStatus.UNCONTROLLED_BG)
+                        statusList.add(AssessmentStatus.UNCONTROLLED_BP)
+                        statusList.add(AssessmentStatus.UNCONTROLLED_BG)
                     } else if (results.contains(bloodPressure)) {
-                        arrayListOf(AssessmentStatus.UNCONTROLLED_BP)
+                        statusList.add(AssessmentStatus.UNCONTROLLED_BP)
                     } else {
-                        arrayListOf(AssessmentStatus.UNCONTROLLED_BG)
+                        statusList.add(AssessmentStatus.UNCONTROLLED_BG)
                     }
                 } else {
-                    arrayListOf(AssessmentStatus.CONTROLLED_BP, AssessmentStatus.CONTROLLED_BG)
+                    statusList.add(AssessmentStatus.CONTROLLED_BP)
+                    statusList.add(AssessmentStatus.CONTROLLED_BG)
                 }
+                val cataractSection = getCataractFieldSection(map)
+                if (YES.equals(cataractSection?.get(AssessmentDefinedParams.ID_HAVE_THE_GLASSES_BEEN_SOLD)?.toString(), true)) {
+                    statusList.add(AssessmentStatus.GLASSES_SOLD)
+                }
+                if (YES.equals(cataractSection?.get(AssessmentDefinedParams.NCD_SERVICE_PROVIDED)?.toString(), true)) {
+                    statusList.add(AssessmentStatus.NCD_SERVICE_IN_CATARACT_CAMP)
+                }
+                if (YES.equals(cataractSection?.get(AssessmentDefinedParams.PATIENT_REFERRED_FOR_OPERATION)?.toString(), true)) {
+                    statusList.add(AssessmentStatus.REFERRED_FOR_OPERATION)
+                }
+                statusList
             }
 
             map.containsKey(MenuConstants.EYE_CARE_MENU_ID) -> {
