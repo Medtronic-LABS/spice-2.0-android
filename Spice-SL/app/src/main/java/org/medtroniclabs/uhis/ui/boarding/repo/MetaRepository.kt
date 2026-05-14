@@ -1124,9 +1124,13 @@ class MetaRepository @Inject constructor(
      */
     suspend fun getClinicalWorkflowWorkflowNamesLower(): Set<String> =
         try {
-            roomHelper.getMenuForClinicalWorkflows()
+            roomHelper
+                .getMenuForClinicalWorkflows()
                 .mapNotNull { wf ->
-                    wf.workflowName?.trim()?.lowercase()?.takeIf { it.isNotEmpty() }
+                    wf.workflowName
+                        ?.trim()
+                        ?.lowercase()
+                        ?.takeIf { it.isNotEmpty() }
                 }.toSet()
         } catch (_: Exception) {
             emptySet()

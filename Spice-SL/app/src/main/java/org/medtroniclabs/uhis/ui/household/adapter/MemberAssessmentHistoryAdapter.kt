@@ -11,7 +11,6 @@ import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.databinding.SummaryListItemBinding
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
 import org.medtroniclabs.uhis.formgeneration.extension.px
-import org.medtroniclabs.uhis.ui.assessment.statuslogic.AssessmentStatus
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 
 /**

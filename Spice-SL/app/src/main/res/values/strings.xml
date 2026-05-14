@@ -452,7 +452,7 @@
     <string name="hh_visit">HH Visit</string>
     <string name="scheduled_visit">Scheduled Visit</string>
     <string name="no_patient_found">No Patient found.</string>
-    <string name="patient_count">%1$d Patients</string>
+    <string name="patient_count">%1$s Patients</string>
     <string name="reason">Reason</string>
     <string name="start_date">Start Date</string>
     <string name="hh_name">HH Name</string>
@@ -1747,4 +1747,7 @@
     <string name="disabled_account">Disabled Account</string>
     <string name="account_locked_multiple_attempts">Account locked due to multiple invalid login attempts.</string>
     <string name="string_slash_string" translatable="false">%1$s/%2$s</string>
+    <string name="upcoming_in_days">Upcoming in %1$s days</string>
+    <string name="day_overdue">%1$s day, Overdue</string>
+    <string name="days_overdue">%1$s days, Overdue</string>
 </resources>

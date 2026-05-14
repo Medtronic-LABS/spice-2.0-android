@@ -25,8 +25,10 @@ import org.medtroniclabs.uhis.ui.BaseFragment
 import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_ANC
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_ANC_3_PLUS
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_CATARACT_SCREENING
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_CHILD_VISIT
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_FAMILY_PLANNING
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_GLASSES_SOLD
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_HIGH_RISK_PREGNANT_WOMEN
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_HOUSEHOLD_REGISTERED
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_NCD_FOLLOW_UP_ASSESSMENT
@@ -40,8 +42,6 @@ import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_PW_IDENTI
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_REFERRED_FOR_OPERATION
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_TOTAL_EYE_SCREENING
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_TOTAL_NCD_SERVICES
-import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_CATARACT_SCREENING
-import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_GLASSES_SOLD
 import org.medtroniclabs.uhis.ui.dashboard.ncd.adapter.DashboardCardItem
 import org.medtroniclabs.uhis.ui.dashboard.ncd.adapter.UserDashboardAdapter
 import org.medtroniclabs.uhis.ui.dashboard.ncd.viewmodel.NCDDashBoardViewModel
@@ -55,11 +55,9 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
     /** Lowercased clinical workflow slugs from forms sync; gates NCD / eye / cataract tiles. */
     private var clinicalWorkflowNamesLower: Set<String> = emptySet()
 
-    private fun workflowSlugsContain(vararg slug: String): Boolean =
-        slug.any { candidate -> clinicalWorkflowNamesLower.contains(candidate.lowercase()) }
+    private fun workflowSlugsContain(vararg slug: String): Boolean = slug.any { candidate -> clinicalWorkflowNamesLower.contains(candidate.lowercase()) }
 
-    private fun hasNcdWorkflow(): Boolean =
-        workflowSlugsContain(MenuConstants.NCD_MENU_ID)
+    private fun hasNcdWorkflow(): Boolean = workflowSlugsContain(MenuConstants.NCD_MENU_ID)
 
     private fun hasEyeCareWorkflow(): Boolean = workflowSlugsContain(MenuConstants.EYE_CARE_MENU_ID)
 

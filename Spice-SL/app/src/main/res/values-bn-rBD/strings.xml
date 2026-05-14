@@ -448,7 +448,7 @@
     <string name="hh_visit">খানা ভিজিট</string>
     <string name="scheduled_visit">নির্ধারিত পরিদর্শন</string>
     <string name="no_patient_found">কোন রোগী পাওয়া যায়নি।</string>
-    <string name="patient_count">%1$d জন রোগী</string>
+    <string name="patient_count">%1$s জন রোগী</string>
     <string name="reason">কারণ</string>
     <string name="start_date">শুরুর তারিখ</string>
     <string name="hh_name">খানার নাম</string>
@@ -1677,4 +1677,7 @@
     <string name="follow_up_visit">ফলো-আপ ভিজিট</string>
     <string name="disabled_account">অ্যাকাউন্টটি নিষ্ক্রিয় করা হয়েছে</string>
     <string name="account_locked_multiple_attempts">একাধিকবার ভুল লগইন চেষ্টার কারণে অ্যাকাউন্টটি সাময়িকভাবে লক করা হয়েছে।</string>
+    <string name="upcoming_in_days">%1$s দিনের মধ্যে আসছে</string>
+    <string name="day_overdue">%1$s দিন, বকেয়া</string>
+    <string name="days_overdue">%1$s দিন, মেয়াদোত্তীর্ণ</string>
 </resources>

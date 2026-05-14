@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:backgroundTint="@color/white"
@@ -34,11 +35,11 @@
                 android:layout_height="wrap_content"
                 android:drawableEnd="@drawable/ic_arrow_forward"
                 android:gravity="start"
-                android:text="Serena Kamara - 38 - F"
                 android:textColor="@color/secondary_black"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Serena Kamara - 38 - F" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/startGuideline"
@@ -62,16 +63,108 @@
                 app:layout_constraintGuide_percent="0.44" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLabelService"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/service_name"
+                android:textColor="@color/charcoal_grey"
+                app:layout_constraintEnd_toStartOf="@id/startGuideline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvPatientName" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLabelServiceSeparator"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/separator_colon"
+                android:textColor="@color/charcoal_grey"
+                app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                app:layout_constraintStart_toEndOf="@id/startGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvLabelService" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvService"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingStart="@dimen/_0dp"
+                android:paddingEnd="@dimen/_8sdp"
+                android:textColor="@color/secondary_black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="5"
+                app:layout_constraintStart_toEndOf="@id/endGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvLabelService"
+                tools:text="ANC" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/groupService"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="tvLabelService,tvLabelServiceSeparator,tvService" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLabelServiceDate"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/service_date"
+                android:textColor="@color/charcoal_grey"
+                app:layout_constraintEnd_toStartOf="@id/startGuideline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvLabelService" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLabelServiceDateSeparator"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/separator_colon"
+                android:textColor="@color/charcoal_grey"
+                app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                app:layout_constraintStart_toEndOf="@id/startGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvLabelServiceDate" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvServiceDate"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingStart="@dimen/_0dp"
+                android:paddingEnd="@dimen/_8sdp"
+                android:textColor="@color/secondary_black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="5"
+                app:layout_constraintStart_toEndOf="@id/endGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvLabelServiceDate"
+                tools:text="ANC" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/groupServiceDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="tvLabelServiceDate,tvLabelServiceDateSeparator,tvServiceDate" />
+
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvLabelReason"
                 style="@style/TextStyle_Regular_16_Blue"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_10sdp"
-                android:text="Reason"
+                android:text="@string/reason"
                 android:textColor="@color/charcoal_grey"
                 app:layout_constraintEnd_toStartOf="@id/startGuideline"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvPatientName" />
+                app:layout_constraintTop_toBottomOf="@+id/tvLabelServiceDate" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvLabelReasonSeperator"
@@ -94,13 +187,18 @@
                 android:maxLines="1"
                 android:paddingStart="@dimen/_0dp"
                 android:paddingEnd="@dimen/_8sdp"
-                android:text="ANC Visit 3"
                 android:textColor="@color/secondary_black"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_weight="5"
                 app:layout_constraintStart_toEndOf="@id/endGuideline"
-                app:layout_constraintTop_toTopOf="@+id/tvLabelReason" />
+                app:layout_constraintTop_toTopOf="@+id/tvLabelReason"
+                tools:text="ANC Visit 3" />
 
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/groupReason"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="tvLabelReason,tvLabelReasonSeperator,tvReason" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvLabelMembersRegistered"
@@ -108,7 +206,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_10sdp"
-                android:text="Patient Status"
+                android:text="@string/patient_status"
                 android:textColor="@color/charcoal_grey"
                 app:layout_constraintEnd_toStartOf="@id/startGuideline"
                 app:layout_constraintStart_toStartOf="parent"
@@ -134,11 +232,99 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="On Treatment"
                 android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/endGuideline"
-                app:layout_constraintTop_toTopOf="@+id/tvLabelMembersRegistered" />
+                app:layout_constraintTop_toTopOf="@+id/tvLabelMembersRegistered"
+                tools:text="On Treatment" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/groupPatientStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="tvLabelMembersRegistered,tvMembersRegisteredSeperator,tvPatientStatus" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLabelNextVisitDate"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/next_visit_date"
+                android:textColor="@color/charcoal_grey"
+                app:layout_constraintEnd_toStartOf="@id/startGuideline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvLabelMembersRegistered" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNextVisitDateSeparator"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/separator_colon"
+                android:textColor="@color/charcoal_grey"
+                app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                app:layout_constraintStart_toEndOf="@id/startGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvLabelNextVisitDate" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNextVisitDate"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/endGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvLabelNextVisitDate"
+                tools:text="24/05/2026" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLabelLastVisitDate"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/last_visit_date"
+                android:textColor="@color/charcoal_grey"
+                app:layout_constraintEnd_toStartOf="@id/startGuideline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvLabelNextVisitDate" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLastVisitDateSeparator"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/separator_colon"
+                android:textColor="@color/charcoal_grey"
+                app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                app:layout_constraintStart_toEndOf="@id/startGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvLabelLastVisitDate" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLastVisitDate"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/endGuideline"
+                app:layout_constraintTop_toTopOf="@+id/tvLabelLastVisitDate"
+                tools:text="20/05/2026" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/groupVisitDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="tvLabelNextVisitDate,tvNextVisitDateSeparator,tvNextVisitDate,tvLabelLastVisitDate,tvLastVisitDateSeparator,tvLastVisitDate" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvLastCallAtLabel"
@@ -150,7 +336,7 @@
                 android:textColor="@color/charcoal_grey"
                 app:layout_constraintEnd_toStartOf="@id/startGuideline"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvLabelMembersRegistered" />
+                app:layout_constraintTop_toBottomOf="@+id/tvLabelLastVisitDate" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvLastCallAtLabelSeperator"
@@ -172,12 +358,17 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="3:44 pm"
                 android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/endGuideline"
-                app:layout_constraintTop_toTopOf="@+id/tvLastCallAtLabel" />
+                app:layout_constraintTop_toTopOf="@+id/tvLastCallAtLabel"
+                tools:text="3:44 pm" />
 
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/groupLastCall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="tvLastCallAtLabel,tvLastCallAtLabelSeperator,tvLastCallAtValue" />
 
             <LinearLayout
                 android:id="@+id/llButtonView"
@@ -215,23 +406,35 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tvLastCallAtLabel" />
-
-
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/tvRemainingCount"
+                android:layout_width="@dimen/_18sdp"
+                android:layout_height="@dimen/_18sdp"
+                android:background="@drawable/bg_circle"
+                android:backgroundTint="@color/a_red_error"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10ssp"
+                android:layout_marginTop="@dimen/_minus5sdp"
+                android:layout_marginEnd="@dimen/_minus5sdp"
+                app:layout_constraintEnd_toEndOf="@id/llButtonView"
+                app:layout_constraintTop_toTopOf="@id/llButtonView"
+                tools:text="5" />
 
             <TextView
                 android:id="@+id/tvDueInformation"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="2 days, Overdue"
                 android:textSize="@dimen/_16ssp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@id/llButtonView"
                 app:layout_constraintEnd_toEndOf="@id/centreGuideline"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvLastCallAtLabel"
-                app:layout_constraintTop_toTopOf="@id/llButtonView" />
+                app:layout_constraintTop_toTopOf="@id/llButtonView"
+                tools:text="2 days, Overdue" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.card.MaterialCardView>

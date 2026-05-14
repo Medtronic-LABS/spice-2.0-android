@@ -280,7 +280,7 @@ class FollowUpMyPatientActivity : BaseActivity() {
 
     private fun initObserver() {
         viewModel.followUpPatientListLiveData.observe(this) {
-            binding.tvHPatientCount.text = getString(R.string.patient_count, it.size)
+            binding.tvHPatientCount.text = getString(R.string.patient_count, CommonUtils.formatCountForCurrentLocale(it.size))
         }
 
         viewModel.getFilterDataLiveData().observe(this) {

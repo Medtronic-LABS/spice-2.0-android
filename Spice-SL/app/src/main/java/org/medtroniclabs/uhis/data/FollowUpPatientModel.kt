@@ -16,6 +16,7 @@ data class FollowUpPatientModel(
     val landmark: String?,
     val type: String?,
     val encounterType: String?,
+    val encounterName: String?,
     val calledAt: Long? = null,
     val successfulAttempts: Int = 0,
     val unsuccessfulAttempts: Int = 0,

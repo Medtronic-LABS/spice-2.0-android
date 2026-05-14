@@ -21,9 +21,11 @@ import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.databinding.FragmentFollowUpMyPatientListBinding
 import org.medtroniclabs.uhis.ui.BaseFragment
 import org.medtroniclabs.uhis.ui.MenuConstants
+import org.medtroniclabs.uhis.ui.followup.FollowUpDefinedParams.FU_TYPE_HH_VISIT
 import org.medtroniclabs.uhis.ui.followup.adapter.PatientListAdapter
 import org.medtroniclabs.uhis.ui.followup.viewmodel.FollowUpViewModel
 import org.medtroniclabs.uhis.ui.home.AssessmentToolsActivity
+import org.medtroniclabs.uhis.ui.household.summary.MemberSummaryActivity
 
 class FollowUpPatientListFragment : BaseFragment(), FollowUpDialogFragment.FollowUpClickListener {
     private lateinit var binding: FragmentFollowUpMyPatientListBinding
@@ -66,11 +68,11 @@ class FollowUpPatientListFragment : BaseFragment(), FollowUpDialogFragment.Follo
             if (!it.isNullOrEmpty()) {
                 binding.tvPatientNoFound.gone()
                 binding.rvPatientList.visible()
-                adapter.updateList(it)
+                adapter.updateList(it, viewModel.maxSuccessfulCallLimit)
             } else {
                 binding.tvPatientNoFound.visible()
                 binding.rvPatientList.gone()
-                adapter.updateList(listOf())
+                adapter.updateList(listOf(), viewModel.maxSuccessfulCallLimit)
             }
         }
 
@@ -84,10 +86,18 @@ class FollowUpPatientListFragment : BaseFragment(), FollowUpDialogFragment.Follo
             viewModel.selectedFollowUpDetail = data
             when (index) {
                 PatientListAdapter.ConstantPatientListAdapter.PATIENT_DETAIL -> {
-                    FollowUpDialogFragment.newInstance(this).show(
-                        parentFragmentManager,
-                        FollowUpDialogFragment.TAG,
-                    )
+                    if (data.type == FU_TYPE_HH_VISIT) {
+                        val intent = Intent(requireContext(), MemberSummaryActivity::class.java)
+                        intent.putExtra(DefinedParams.HOUSEHOLD_ID, data.householdId)
+                        intent.putExtra(DefinedParams.MEMBER_ID, data.localPatientId)
+                        intent.putExtra(DefinedParams.DOB, data.dateOfBirth)
+                        startActivity(intent)
+                    } else {
+                        FollowUpDialogFragment.newInstance(this).show(
+                            parentFragmentManager,
+                            FollowUpDialogFragment.TAG,
+                        )
+                    }
                 }
 
                 PatientListAdapter.ConstantPatientListAdapter.CALL -> {

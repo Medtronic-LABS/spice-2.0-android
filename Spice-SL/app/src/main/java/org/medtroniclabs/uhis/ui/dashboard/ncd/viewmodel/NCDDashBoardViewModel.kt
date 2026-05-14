@@ -67,6 +67,7 @@ class NCDDashBoardViewModel @Inject constructor(
             )
         }
     }
+
     fun getFilterUiData() {
         viewModelScope.launch(dispatcherIO) {
             filterUiData.postLoading()
