@@ -881,6 +881,15 @@ class AssessmentViewModel @Inject constructor(
             if (ncdMap.containsKey(BP_LOG)) {
                 updateBPLogs(ncdMap[BP_LOG] as HashMap<Any, Any>)
             }
+            // Request modification for syncing EyeCare Symptoms to Backend
+            if (ncdMap.containsKey(EYE_CARE)) {
+                val eyeCareMap = ncdMap[EYE_CARE] as HashMap<Any, Any>
+                if (eyeCareMap.containsKey(EYE_TEST_OUTCOME)) {
+                    val eyeTestOutCome = eyeCareMap[EYE_TEST_OUTCOME] as String
+                    eyeCareMap[EYE_TEST_OUTCOMES] = listOf(eyeTestOutCome)
+                    eyeCareMap.remove(EYE_TEST_OUTCOME)
+                }
+            }
         }
 
         // Request modification for syncing EyeCare Symptoms to Backend
