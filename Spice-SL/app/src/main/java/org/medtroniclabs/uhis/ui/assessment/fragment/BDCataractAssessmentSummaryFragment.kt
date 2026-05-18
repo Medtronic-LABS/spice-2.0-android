@@ -13,6 +13,7 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
+import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.CVD_RISK_SCORE_DISPLAY
@@ -31,6 +32,7 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_BLOOD_PR
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BMI
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BMI_CATEGORY
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BP_LOG_DETAILS
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.CAMP_DATE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.CULTURE_VALUE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.CVD_RISK
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.EYE_DISEASE
@@ -146,11 +148,16 @@ class BDCataractAssessmentSummaryFragment : BaseFragment() {
                 val referralTypeSite = findValueByKey(json, REFERRAL_FACILITY_TYPE) as String
                 viewModel.otherAssessmentDetails[REFERRAL_FACILITY_TYPE] = referralTypeSite
 
-                viewModel.nearestFacilityLiveData.value?.data?.let { siteList ->
-                    loadPhuSitesList(siteList)
+                if (CommonUtils.isFoOrPo()) {
+                    binding.labelPhuReferred.gone()
+                    binding.etPhuChange.gone()
+                } else {
+                    viewModel.nearestFacilityLiveData.value?.data?.let { siteList ->
+                        loadPhuSitesList(siteList)
+                    }
+                    binding.labelPhuReferred.visible()
+                    binding.etPhuChange.visible()
                 }
-                binding.labelPhuReferred.visible()
-                binding.etPhuChange.visible()
                 binding.riskResultLayout.backgroundTintList =
                     ContextCompat.getColorStateList(requireContext(), R.color.attention_color)
 
@@ -234,6 +241,17 @@ class BDCataractAssessmentSummaryFragment : BaseFragment() {
                     "${bmi as Double} (${bmiCategory as String})"
                 } else {
                     null
+                }
+            }
+
+            CAMP_DATE -> {
+                val campDate = findValueByKey(jsonObject, id) as? String
+                return campDate?.let {
+                    DateUtils.convertDateFormat(
+                        it,
+                        DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
+                        DateUtils.DATE_ddMMyyyy,
+                    )
                 }
             }
 

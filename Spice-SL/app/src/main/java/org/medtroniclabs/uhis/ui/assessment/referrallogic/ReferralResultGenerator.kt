@@ -666,20 +666,24 @@ class ReferralResultGenerator {
 
         // Add Referred Facility Type
         if (referredReasonList.isNotEmpty()) {
-            val hasBpOrBgReason = ReferredReason.bloodPressure in referredReasonList ||
-                ReferredReason.bloodGlucose in referredReasonList
-
-            val shouldReferUpazila = hasBpOrBgReason &&
-                (
-                    isBPReferredForUpazila(bpResult.first, bpResult.second) ||
-                        isBGReferredForUpazila(bgResult.third)
-                )
-
             map[REFERRAL_FACILITY_TYPE] =
-                if (shouldReferUpazila) {
+                if (CommonUtils.isFoOrPo()) {
                     FACILITY_TYPE_UPAZILA
                 } else {
-                    FACILITY_TYPE_COMMUNITY_CLINIC
+                    val hasBpOrBgReason = ReferredReason.bloodPressure in referredReasonList ||
+                        ReferredReason.bloodGlucose in referredReasonList
+
+                    val shouldReferUpazila = hasBpOrBgReason &&
+                        (
+                            isBPReferredForUpazila(bpResult.first, bpResult.second) ||
+                                isBGReferredForUpazila(bgResult.third)
+                        )
+
+                    if (shouldReferUpazila) {
+                        FACILITY_TYPE_UPAZILA
+                    } else {
+                        FACILITY_TYPE_COMMUNITY_CLINIC
+                    }
                 }
         }
 

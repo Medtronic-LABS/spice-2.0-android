@@ -22,6 +22,7 @@
         "isEnabled": true,
         "isMandatory": true,
         "isSummary": true,
+        "disableFutureDate": true,
         "visibility": "gone",
         "titleCulture": "ক্যাম্পের তারিখ"
       },

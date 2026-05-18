@@ -13,6 +13,7 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
+import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.CVD_RISK_SCORE_DISPLAY
@@ -142,11 +143,16 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
                 val referralTypeSite = findValueByKey(json, REFERRAL_FACILITY_TYPE) as String
                 viewModel.otherAssessmentDetails[REFERRAL_FACILITY_TYPE] = referralTypeSite
 
-                viewModel.nearestFacilityLiveData.value?.data?.let { siteList ->
-                    loadPhuSitesList(siteList)
+                if (CommonUtils.isFoOrPo()) {
+                    binding.labelPhuReferred.gone()
+                    binding.etPhuChange.gone()
+                } else {
+                    viewModel.nearestFacilityLiveData.value?.data?.let { siteList ->
+                        loadPhuSitesList(siteList)
+                    }
+                    binding.labelPhuReferred.visible()
+                    binding.etPhuChange.visible()
                 }
-                binding.labelPhuReferred.visible()
-                binding.etPhuChange.visible()
                 binding.riskResultLayout.backgroundTintList =
                     ContextCompat.getColorStateList(requireContext(), R.color.attention_color)
 
