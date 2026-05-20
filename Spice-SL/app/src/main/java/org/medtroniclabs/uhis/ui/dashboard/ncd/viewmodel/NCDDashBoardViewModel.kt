@@ -8,33 +8,26 @@ import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.app.analytics.model.UserDetail
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.appextensions.postLoading
-import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.NCDUserDashboardRequest
 import org.medtroniclabs.uhis.data.NCDUserDashboardResponse
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.di.IoDispatcher
-import org.medtroniclabs.uhis.model.household.HouseHoldFilterUiData
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.resource.ResourceState
-import org.medtroniclabs.uhis.repo.HouseHoldRepository
-import org.medtroniclabs.uhis.ui.BaseViewModel
+import org.medtroniclabs.uhis.ui.BaseFilterViewModel
 import org.medtroniclabs.uhis.ui.boarding.repo.MetaRepository
 import org.medtroniclabs.uhis.ui.dashboard.ncd.repository.DashboardLocalRepository
-import org.medtroniclabs.uhis.ui.dashboard.ncd.repository.NCDDashBoardRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class NCDDashBoardViewModel @Inject constructor(
-    private val ncdDashBoardRepository: NCDDashBoardRepository,
-    private val metaRepository: MetaRepository,
-    private val houseHoldRepository: HouseHoldRepository,
+    override val metaRepository: MetaRepository,
     private val dashboardLocalRepository: DashboardLocalRepository,
-    @IoDispatcher override var dispatcherIO: CoroutineDispatcher,
-) : BaseViewModel(dispatcherIO) {
+    @param:IoDispatcher override var dispatcherIO: CoroutineDispatcher,
+) : BaseFilterViewModel(dispatcherIO, metaRepository) {
     var userDashboardDetails = MutableLiveData<Resource<NCDUserDashboardResponse>>()
     val menuListLiveData = MutableLiveData<List<String>?>()
     val clinicalWorkflowNamesLowerLiveData = MutableLiveData<Set<String>>()
-    val filterUiData = MutableLiveData<Resource<HouseHoldFilterUiData>>()
     private val filterLiveData = MutableLiveData(DashboardSearchFilter())
 
     fun getUserDashboardDetails(request: NCDUserDashboardRequest) {
@@ -65,13 +58,6 @@ class NCDDashBoardViewModel @Inject constructor(
             clinicalWorkflowNamesLowerLiveData.postValue(
                 metaRepository.getClinicalWorkflowWorkflowNamesLower(),
             )
-        }
-    }
-
-    fun getFilterUiData() {
-        viewModelScope.launch(dispatcherIO) {
-            filterUiData.postLoading()
-            filterUiData.postValue(houseHoldRepository.getHouseHoldFilterUiData(SecuredPreference.getUserId()))
         }
     }
 

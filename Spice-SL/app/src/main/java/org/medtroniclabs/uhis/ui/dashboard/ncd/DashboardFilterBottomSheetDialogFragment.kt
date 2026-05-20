@@ -14,10 +14,8 @@ import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams.HOUSEHOLDFILTER
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
-import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.databinding.FragmentFilterBottomSheetDialogBinding
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
-import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.TagListCustomView
 import org.medtroniclabs.uhis.ui.dashboard.ncd.viewmodel.NCDDashBoardViewModel
 
@@ -57,6 +55,7 @@ class DashboardFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vi
         initView()
         initializeListeners()
         attachObservers()
+        viewModel.getShashtyaShebikas()
     }
 
     private fun enableConfirm() {
@@ -71,33 +70,24 @@ class DashboardFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vi
     }
 
     private fun attachObservers() {
-        viewModel.filterUiData.observe(viewLifecycleOwner) { resource ->
-            when (resource.state) {
-                ResourceState.LOADING -> showLoading()
-                ResourceState.SUCCESS -> {
-                    hideLoading()
-                    resource.data?.let { data ->
-                        val ssList = data.ssList.map {
-                            val name = if (it.ssId.isNullOrBlank()) {
-                                it.name
-                            } else {
-                                "${it.ssId} - ${it.name}"
-                            }
-                            ChipViewItemModel(
-                                id = it.id,
-                                name = name,
-                            )
-                        }
-                        ssListTagView.addChipItemList(ssList, viewModel.getFilterLiveData().value?.filterBySs)
-                        val subVillageList = data.subVillages.map { ChipViewItemModel(id = it.id, name = it.name) }
-                        subVillageListTagView.addChipItemList(
-                            subVillageList,
-                            viewModel.getFilterLiveData().value?.filterBySubVillages,
-                        )
-                    }
-                }
-                ResourceState.ERROR -> hideLoading()
+        viewModel.shashthyaShebikasLiveData.observe(viewLifecycleOwner) {
+            ssListTagView.addChipItemList(
+                it,
+                viewModel.getFilterLiveData().value?.filterBySs,
+            )
+        }
+        viewModel.subVillagesLiveData.observe(viewLifecycleOwner) {
+            binding.subVillageChipGroup.clearCheck()
+            if (it.isEmpty()) {
+                hideVillage()
+            } else {
+                binding.tvSubVillage.visible()
+                binding.subVillageChipGroup.visible()
             }
+            subVillageListTagView.addChipItemList(
+                it,
+                viewModel.getFilterLiveData().value?.filterBySubVillages,
+            )
         }
     }
 
@@ -109,14 +99,28 @@ class DashboardFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vi
         binding.ssChipGroup.visible()
         binding.tvRegistrationStatus.gone()
         binding.registrationStatusChipGroup.gone()
-        binding.tvSubVillage.visible()
-        binding.subVillageChipGroup.visible()
 
-        ssListTagView = TagListCustomView(binding.root.context, binding.ssChipGroup) { _, _, _ -> enableConfirm() }
-        subVillageListTagView =
-            TagListCustomView(binding.root.context, binding.subVillageChipGroup) { _, _, _ -> enableConfirm() }
+        // Hide village(sub-village)
+        hideVillage()
 
-        viewModel.getFilterUiData()
+        ssListTagView = TagListCustomView(binding.root.context, binding.ssChipGroup, true) { _, _, _ ->
+            val selectedTags = ssListTagView.getSelectedTags()
+            if (selectedTags.isEmpty()) {
+                hideVillage()
+            } else {
+                viewModel.onShashtyaShebikaSelected(ssListTagView.getSelectedTags())
+            }
+            enableConfirm()
+        }
+        subVillageListTagView = TagListCustomView(binding.root.context, binding.subVillageChipGroup) { _, _, _ ->
+            enableConfirm()
+        }
+    }
+
+    private fun hideVillage() {
+        binding.tvSubVillage.gone()
+        binding.subVillageChipGroup.gone()
+        binding.subVillageChipGroup.clearCheck()
     }
 
     override fun onClick(view: View) {
@@ -129,6 +133,7 @@ class DashboardFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vi
                 )
                 dismiss()
             }
+
             R.id.btnCancel -> {
                 viewModel.setUserJourney(AnalyticsDefinedParams.HOUSEHOLDFILTERCANCELTRIGGERED)
                 viewModel.setFilterLiveData(
@@ -140,13 +145,5 @@ class DashboardFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vi
                 dismiss()
             }
         }
-    }
-
-    private fun showLoading() {
-        binding.loadingProgress.visibility = View.VISIBLE
-    }
-
-    private fun hideLoading() {
-        binding.loadingProgress.visibility = View.GONE
     }
 }

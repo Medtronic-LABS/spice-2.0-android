@@ -2,8 +2,10 @@ package org.medtroniclabs.uhis.ui.household
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextWatcher
 import android.view.View
 import androidx.activity.viewModels
+import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import org.medtroniclabs.uhis.R
@@ -12,7 +14,6 @@ import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams.HOUSEHO
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams.HOUSEHOLDS
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.hideKeyboard
-import org.medtroniclabs.uhis.appextensions.setTextChangeListener
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
@@ -35,6 +36,8 @@ class HouseholdSearchActivity : BaseActivity(), View.OnClickListener {
     private lateinit var householdListAdapter: HouseholdListAdapter
     private var preSelectedSsIds: LongArray = longArrayOf()
     private var preSelectedSubVillageIds: LongArray = longArrayOf()
+
+    private lateinit var textChange: TextWatcher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,6 +78,7 @@ class HouseholdSearchActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun initViews() {
+        binding.llExactSearch.btnSearch.gone()
         binding.llFilter.btnFilter.text = getString(R.string.filter)
         binding.llFilter.btnSort.visible()
         binding.llFilter.btnSort.setText(R.string.sort)
@@ -98,15 +102,8 @@ class HouseholdSearchActivity : BaseActivity(), View.OnClickListener {
         binding.btnAddHousehold.safeClickListener(this)
         binding.llFilter.btnFilter.safeClickListener(this)
         binding.llFilter.btnSort.safeClickListener(this)
-        binding.llExactSearch.etSearchTerm.setTextChangeListener {
-            val input = it?.trim().toString()
-            binding.llExactSearch.btnSearch.isEnabled =
-                input.isNotEmpty() &&
-                ((input[0].isLetter() && input.length >= 3) || input[0].isDigit())
-
-            if (input.isEmpty()) {
-                householdListViewModel.setFilterLiveData(search = "")
-            }
+        textChange = binding.llExactSearch.etSearchTerm.doOnTextChanged { text, _, _, _ ->
+            householdListViewModel.onTextChange(text?.toString())
         }
     }
 

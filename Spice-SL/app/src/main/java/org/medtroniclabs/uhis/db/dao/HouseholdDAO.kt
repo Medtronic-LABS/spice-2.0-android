@@ -118,15 +118,15 @@ interface HouseholdDAO {
             date(datetime(hh.created_at / 1000, 'unixepoch', 'localtime')) <= :endDate
         )
         AND (
-            (:ssIdsSize = 0 AND :subVillageIdsSize = 0)
-            OR (:subVillageIdsSize > 0 AND hh.sub_village_id IN (:subVillageIds))
-            OR ( :ssIdsSize > 0
-                AND hh.sub_village_id IN (
-                    SELECT DISTINCT sslv.subVillageId
-                    FROM ShasthyaShebikaLinkedVillageEntity AS sslv
-                    WHERE sslv.shasthyaShebikaId IN (:ssIds)
-                )
-            )
+            CASE
+                WHEN :subVillageIdsSize > 0
+                THEN hh.sub_village_id IN (:subVillageIds)
+
+                WHEN :ssIdsSize > 0
+                THEN hh.sub_village_id IN (SELECT DISTINCT sslv.subVillageId FROM ShasthyaShebikaLinkedVillageEntity AS sslv WHERE sslv.shasthyaShebikaId IN (:ssIds))
+
+                ELSE 1
+            END
         )
         """,
     )
@@ -217,8 +217,7 @@ interface HouseholdDAO {
                 val placeholders = subVillageIds.joinToString(",") { "?" }
                 subVillageFilterConditions += "hh.sub_village_id IN ($placeholders)"
                 args.addAll(subVillageIds)
-            }
-            if (shasthyaShebikaIds.isNotEmpty()) {
+            } else {
                 val placeholders = shasthyaShebikaIds.joinToString(",") { "?" }
                 subVillageFilterConditions +=
                     """

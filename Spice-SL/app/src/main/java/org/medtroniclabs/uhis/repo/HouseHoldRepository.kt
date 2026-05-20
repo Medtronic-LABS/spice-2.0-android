@@ -14,7 +14,6 @@ import org.medtroniclabs.uhis.db.dao.HouseholdSortOrder
 import org.medtroniclabs.uhis.db.entity.ConsentForm
 import org.medtroniclabs.uhis.db.entity.HouseholdEntity
 import org.medtroniclabs.uhis.db.entity.HouseholdMemberEntity
-import org.medtroniclabs.uhis.db.entity.SubVillageEntity
 import org.medtroniclabs.uhis.db.entity.VillageEntity
 import org.medtroniclabs.uhis.db.local.RoomHelper
 import org.medtroniclabs.uhis.db.response.HouseHoldEntityWithLastActivity
@@ -27,7 +26,7 @@ import org.medtroniclabs.uhis.network.resource.ResourceState
 import javax.inject.Inject
 
 class HouseHoldRepository @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private var apiHelper: ApiHelper,
     private var roomHelper: RoomHelper,
 ) {
@@ -78,63 +77,30 @@ class HouseHoldRepository @Inject constructor(
             Resource(state = ResourceState.ERROR)
         }
 
-    suspend fun getHouseHoldFilterUiData(userId: Long): Resource<HouseHoldFilterUiData> =
+    /** FO/PO Services filter: Shasthya Kormi list for the SK spinner (SS loads after a Kormi is chosen). */
+    suspend fun getHouseHoldFilterUiDataForServiceRecipient(): Resource<HouseHoldFilterUiData> =
         try {
-            val swasthyaSevikas = roomHelper.getShasthyaShebikaByShasthyaKormiId(userId)
-            val subVillages = mutableListOf<SubVillageEntity>()
-            if (swasthyaSevikas.isNotEmpty()) {
-                subVillages.addAll(roomHelper.getSubVillagesByShasthyaShebikaIds(swasthyaSevikas.map { it.id }))
-            }
-            Resource(state = ResourceState.SUCCESS, HouseHoldFilterUiData(swasthyaSevikas, subVillages))
-        } catch (_: Exception) {
-            Resource(state = ResourceState.ERROR)
-        }
-
-    /**
-     * Service recipient filter: FO/PO must pick a Shasthya Kormi (SK) before SS/sub-village lists apply.
-     * Non–FO/PO delegates to [getHouseHoldFilterUiData].
-     */
-    suspend fun getHouseHoldFilterUiDataForServiceRecipient(userId: Long): Resource<HouseHoldFilterUiData> =
-        if (!CommonUtils.isFoOrPo()) {
-            getHouseHoldFilterUiData(userId)
-        } else {
-            try {
-                val skList = roomHelper.getAllShasthyaKormis()
-                Resource(
-                    state = ResourceState.SUCCESS,
-                    HouseHoldFilterUiData(
-                        ssList = emptyList(),
-                        subVillages = emptyList(),
-                        skList = skList,
-                    ),
-                )
-            } catch (_: Exception) {
-                Resource(state = ResourceState.ERROR)
-            }
-        }
-
-    suspend fun getHouseHoldFilterUiDataForShasthyaKormi(kormiId: Long): Resource<HouseHoldFilterUiData> =
-        try {
-            val skList = roomHelper.getAllShasthyaKormis()
-            val swasthyaSevikas = roomHelper.getShasthyaShebikaByShasthyaKormiId(kormiId)
-            val subVillages = mutableListOf<SubVillageEntity>()
-            if (swasthyaSevikas.isNotEmpty()) {
-                subVillages.addAll(roomHelper.getSubVillagesByShasthyaShebikaIds(swasthyaSevikas.map { it.id }))
-            }
             Resource(
                 state = ResourceState.SUCCESS,
-                HouseHoldFilterUiData(
-                    ssList = swasthyaSevikas,
-                    subVillages = subVillages,
-                    skList = skList,
-                    selectedShasthyaKormiId = kormiId,
-                ),
+                HouseHoldFilterUiData(skList = roomHelper.getAllShasthyaKormis()),
             )
         } catch (_: Exception) {
             Resource(state = ResourceState.ERROR)
         }
 
-    suspend fun getShasthyaKormiIdForShasthyaShebika(ssId: Long): Long? = roomHelper.getShasthyaShebikaById(ssId)?.shasthyaKormiId
+    /** FO/PO Services filter: SK + SS for the selected Kormi (sub-villages load on SS selection in the UI). */
+    suspend fun getHouseHoldFilterUiDataForShasthyaKormi(kormiId: Long): Resource<HouseHoldFilterUiData> =
+        try {
+            Resource(
+                state = ResourceState.SUCCESS,
+                HouseHoldFilterUiData(
+                    ssList = roomHelper.getShasthyaShebikaByShasthyaKormiId(kormiId),
+                    skList = roomHelper.getAllShasthyaKormis(),
+                ),
+            )
+        } catch (_: Exception) {
+            Resource(state = ResourceState.ERROR)
+        }
 
     suspend fun createOrUpdateHouseHoldEntity(
         map: HashMap<String, Any>,

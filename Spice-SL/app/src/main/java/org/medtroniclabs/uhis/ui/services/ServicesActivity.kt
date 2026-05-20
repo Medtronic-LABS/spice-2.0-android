@@ -2,15 +2,16 @@ package org.medtroniclabs.uhis.ui.services
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextWatcher
 import android.view.View
 import android.widget.AdapterView
 import androidx.activity.viewModels
+import androidx.core.widget.doOnTextChanged
 import dagger.hilt.android.AndroidEntryPoint
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.hideKeyboard
-import org.medtroniclabs.uhis.appextensions.setTextChangeListener
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.SecuredPreference
@@ -58,6 +59,8 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
     private lateinit var spinnerAdapter: CustomSpinnerAdapter
 
     private var lastPosition = -1
+
+    private lateinit var textChange: TextWatcher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,6 +140,7 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
             binding.bottomNavigationView.gone()
         }
         applyPrefiltersFromDashboard()
+        binding.llExactSearch.btnSearch.gone()
     }
 
     private fun applyPrefiltersFromDashboard() {
@@ -252,23 +256,18 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
     }
 
     private fun setListeners() {
-        binding.llExactSearch.btnSearch.safeClickListener(this)
         binding.llFilter.btnFilter.safeClickListener(this)
-        binding.llExactSearch.etSearchTerm.setTextChangeListener {
-            val input = it?.trim().toString()
-            binding.llExactSearch.btnSearch.isEnabled =
-                input.isNotEmpty() &&
-                ((input[0].isLetter() && input.length >= 3) || input[0].isDigit())
-
-            if (input.isEmpty()) {
-                servicesViewModel.setFilterLiveData(search = "")
-            }
+        textChange = binding.llExactSearch.etSearchTerm.doOnTextChanged { text, _, _, _ ->
+            servicesViewModel.onTextChange(text?.toString())
         }
     }
 
     private fun attachObserver() {
         servicesViewModel.getFilterLiveData().observe(this) {
             var count = 0
+            if (it.filterSk != -1L) {
+                count++
+            }
             if (it.filterBySs.isNotEmpty()) {
                 count++
             }
@@ -292,7 +291,6 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
                     // Do Nothing
                 }
                 ResourceState.LOADING -> {
-                    hideKeyboard(binding.llExactSearch.etSearchTerm)
                     showLoading()
                 }
                 ResourceState.SUCCESS -> {

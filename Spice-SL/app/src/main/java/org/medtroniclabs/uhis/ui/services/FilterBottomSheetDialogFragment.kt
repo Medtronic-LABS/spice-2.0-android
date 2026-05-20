@@ -15,7 +15,6 @@ import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams.HOUSEHOLDFILTER
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
-import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.databinding.FragmentFilterBottomSheetDialogBinding
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
@@ -34,6 +33,8 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
     private var suppressSkSpinnerSelection: Boolean = false
     private var isFoPoFilterMode: Boolean = false
     private val viewModel: ServicesViewModel by activityViewModels()
+
+    private var spinnerDataSet = false
 
     companion object {
         const val TAG = "FilterBottomSheetDialogFragment"
@@ -66,10 +67,14 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
         initView()
         initializeListeners()
         attachObservers()
+        if (isFoPoFilterMode) {
+            viewModel.getFilterUiData()
+        } else {
+            viewModel.getShashtyaShebikas()
+        }
     }
 
     private fun hasValidSkSelected(): Boolean {
-        if (!isFoPoFilterMode) return false
         val adapter = skSpinnerAdapter ?: return false
         val position = binding.spShasthyaKormi.selectedItemPosition
         if (position < 0) return false
@@ -91,54 +96,72 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
     }
 
     private fun attachObservers() {
-        viewModel.filterUiData.observe(viewLifecycleOwner) { resource ->
-            when (resource.state) {
-                ResourceState.LOADING -> {
-                    showLoading()
-                }
+        if (isFoPoFilterMode) {
+            viewModel.filterUiData.observe(viewLifecycleOwner) { resource ->
+                when (resource.state) {
+                    ResourceState.LOADING -> {
+                        showLoading()
+                    }
 
-                ResourceState.SUCCESS -> {
-                    hideLoading()
-                    resource.data?.let { data ->
-                        if (isFoPoFilterMode) {
+                    ResourceState.SUCCESS -> {
+                        hideLoading()
+                        resource.data?.let { data ->
                             bindSkSpinner(data)
 
                             val hasSsData = data.ssList.isNotEmpty()
                             if (hasSsData) {
                                 binding.tvSsTitle.visible()
                                 binding.ssChipGroup.visible()
-                                binding.tvSubVillage.visible()
-                                binding.subVillageChipGroup.visible()
-                                bindSsAndSubVillageChips(data)
+                                hideVillage()
+                                bindSsChips(data)
                             } else {
-                                binding.tvSsTitle.gone()
-                                binding.ssChipGroup.gone()
-                                binding.tvSubVillage.gone()
-                                binding.subVillageChipGroup.gone()
-                                ssListTagView.addChipItemList(emptyList(), null)
-                                subVillageListTagView.addChipItemList(emptyList(), null)
+                                hideSS()
+                                hideVillage()
                             }
-                        } else {
-                            bindSsAndSubVillageChips(data)
+                            enableConfirm()
                         }
+                    }
+
+                    ResourceState.ERROR -> {
+                        hideLoading()
                         enableConfirm()
                     }
                 }
+            }
+        }
 
-                ResourceState.ERROR -> {
-                    hideLoading()
-                    enableConfirm()
+        if (!isFoPoFilterMode) {
+            viewModel.shashthyaShebikasLiveData.observe(viewLifecycleOwner) {
+                ssListTagView.addChipItemList(
+                    it,
+                    viewModel.getFilterLiveData().value?.filterBySs,
+                )
+            }
+        }
+        viewModel.subVillagesLiveData.observe(viewLifecycleOwner) {
+            binding.subVillageChipGroup.clearCheck()
+            if (it.isEmpty()) {
+                hideVillage()
+            } else {
+                binding.tvSubVillage.post {
+                    binding.tvSubVillage.visible()
+                    binding.subVillageChipGroup.visible()
                 }
             }
+            subVillageListTagView.addChipItemList(
+                it,
+                viewModel.getFilterLiveData().value?.filterBySubVillages,
+            )
         }
     }
 
     private fun initView() {
         viewModel.setUserJourney(HOUSEHOLDFILTER)
-        isFoPoFilterMode = CommonUtils.isFoOrPo()
+        isFoPoFilterMode = viewModel.isFoPo
 
         binding.tvRegistrationStatus.gone()
         binding.registrationStatusChipGroup.gone()
+        hideVillage()
 
         if (isFoPoFilterMode) {
             binding.tvVillageTitle.visible()
@@ -147,8 +170,6 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
             binding.spShasthyaKormi.visible()
             binding.tvSsTitle.gone()
             binding.ssChipGroup.gone()
-            binding.tvSubVillage.gone()
-            binding.subVillageChipGroup.gone()
 
             skSpinnerAdapter = CustomSpinnerAdapter(requireContext())
             binding.spShasthyaKormi.adapter = skSpinnerAdapter
@@ -167,10 +188,12 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
                         }
                         val kormiId = adapter.getData(position)?.get(DefinedParams.ID) as? Long
                         if (kormiId == null || kormiId == SK_SPINNER_PLACEHOLDER_ID) {
+                            hideSS()
+                            hideVillage()
                             enableConfirm()
                             return
                         }
-                        viewModel.loadFilterUiDataForSelectedKormi(kormiId)
+                        viewModel.loadSsListForSelectedKormi(kormiId)
                         enableConfirm()
                     }
 
@@ -184,25 +207,41 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
             binding.spShasthyaKormi.gone()
             binding.tvSsTitle.visible()
             binding.ssChipGroup.visible()
-            binding.tvSubVillage.visible()
-            binding.subVillageChipGroup.visible()
             skSpinnerAdapter = null
         }
 
-        ssListTagView = TagListCustomView(binding.root.context, binding.ssChipGroup) { _, _, _ ->
+        ssListTagView = TagListCustomView(binding.root.context, binding.ssChipGroup, true) { _, _, _ ->
+            if (ssListTagView.getSelectedTags().isEmpty()) {
+                hideVillage()
+            } else {
+                viewModel.onShashtyaShebikaSelected(ssListTagView.getSelectedTags())
+            }
             enableConfirm()
         }
         subVillageListTagView = TagListCustomView(binding.root.context, binding.subVillageChipGroup) { _, _, _ ->
             enableConfirm()
         }
 
-        viewModel.getFilterUiData()
         binding.etFromDate.safeClickListener(this)
         binding.etToDate.safeClickListener(this)
     }
 
+    private fun hideVillage() {
+        binding.tvSubVillage.gone()
+        binding.subVillageChipGroup.gone()
+        binding.subVillageChipGroup.clearCheck()
+    }
+
+    private fun hideSS() {
+        binding.tvSsTitle.gone()
+        binding.ssChipGroup.gone()
+        binding.ssChipGroup.clearCheck()
+    }
+
     private fun bindSkSpinner(data: HouseHoldFilterUiData) {
         val adapter = skSpinnerAdapter ?: return
+        if (spinnerDataSet) return
+        spinnerDataSet = true
         val placeholder =
             linkedMapOf<String, Any>(
                 DefinedParams.ID to SK_SPINNER_PLACEHOLDER_ID,
@@ -231,7 +270,7 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
         adapter.setData(items)
         binding.spShasthyaKormi.adapter = adapter
         val selectedIdx =
-            data.selectedShasthyaKormiId?.let { kid ->
+            viewModel.getFilterLiveData().value?.filterSk?.let { kid ->
                 adapter.getIndexOfItem(kid)
             } ?: -1
         val position = if (selectedIdx >= 0) selectedIdx else 0
@@ -241,7 +280,7 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
         }
     }
 
-    private fun bindSsAndSubVillageChips(data: HouseHoldFilterUiData) {
+    private fun bindSsChips(data: HouseHoldFilterUiData) {
         val ssList =
             data.ssList.map {
                 val name =
@@ -259,17 +298,6 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
             ssList,
             viewModel.getFilterLiveData().value?.filterBySs,
         )
-        val subVillageList =
-            data.subVillages.map {
-                ChipViewItemModel(
-                    id = it.id,
-                    name = it.name,
-                )
-            }
-        subVillageListTagView.addChipItemList(
-            subVillageList,
-            viewModel.getFilterLiveData().value?.filterBySubVillages,
-        )
     }
 
     override fun onClick(view: View) {
@@ -283,9 +311,11 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
                 viewModel.setFilterLiveData(
                     ssFilter = listOf(),
                     subVillagesFilter = listOf(),
+                    filterSk = -1,
                 )
                 ssListTagView.clearSelection()
                 subVillageListTagView.clearSelection()
+                hideVillage()
                 if (isFoPoFilterMode) {
                     suppressSkSpinnerSelection = true
                     binding.spShasthyaKormi.setSelection(0, false)
@@ -302,32 +332,20 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
         viewModel.setUserJourney(AnalyticsDefinedParams.HOUSEHOLDFILTERAPPLYTRIGGERED)
         val ssSelection = ssListTagView.getSelectedTags()
         val subSelection = subVillageListTagView.getSelectedTags()
-        val (ssFilter, subVillagesFilter) =
-            if (isFoPoFilterMode &&
-                ssSelection.isEmpty() &&
-                subSelection.isEmpty() &&
-                hasValidSkSelected()
-            ) {
-                val impliedSs =
-                    viewModel.filterUiData.value
-                        ?.data
-                        ?.ssList
-                        ?.map { ss ->
-                            val name =
-                                if (ss.ssId.isNullOrBlank()) {
-                                    ss.name
-                                } else {
-                                    "${ss.ssId} - ${ss.name}"
-                                }
-                            ChipViewItemModel(id = ss.id, name = name)
-                        }.orEmpty()
-                Pair(impliedSs, emptyList())
+        val filterSk = if (isFoPoFilterMode) {
+            if (hasValidSkSelected()) {
+                val position = binding.spShasthyaKormi.selectedItemPosition
+                skSpinnerAdapter?.getData(position)?.get(DefinedParams.ID) as? Long
             } else {
-                Pair(ssSelection, subSelection)
+                null
             }
+        } else {
+            null
+        }
         viewModel.setFilterLiveData(
-            ssFilter = ssFilter,
-            subVillagesFilter = subVillagesFilter,
+            ssFilter = ssSelection,
+            subVillagesFilter = subSelection,
+            filterSk = filterSk,
         )
         dismiss()
     }

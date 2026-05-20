@@ -171,16 +171,15 @@ interface MemberAssessmentHistoryDao {
         WHERE (:startDate IS NULL OR date(datetime(h.visitDate, 'localtime')) >= :startDate)
         AND (:endDate IS NULL OR date(datetime(h.visitDate, 'localtime')) <= :endDate)
         AND (
-            (:ssIdsSize = 0 AND :subVillageIdsSize = 0)
-            OR (:subVillageIdsSize > 0 AND COALESCE(hm.sub_village_id, hh.sub_village_id) IN (:subVillageIds))
-            OR (
-                :ssIdsSize > 0
-                AND COALESCE(hm.sub_village_id, hh.sub_village_id) IN (
-                    SELECT DISTINCT sslv.subVillageId
-                    FROM ShasthyaShebikaLinkedVillageEntity AS sslv
-                    WHERE sslv.shasthyaShebikaId IN (:ssIds)
-                )
-            )
+            CASE
+                WHEN :subVillageIdsSize > 0
+                THEN COALESCE(hm.sub_village_id, hh.sub_village_id) IN (:subVillageIds)
+
+                WHEN :ssIdsSize > 0
+                THEN COALESCE(hm.sub_village_id, hh.sub_village_id) IN (SELECT DISTINCT sslv.subVillageId FROM ShasthyaShebikaLinkedVillageEntity AS sslv WHERE sslv.shasthyaShebikaId IN (:ssIds))
+
+                ELSE 1
+            END
         )
         """,
     )
@@ -250,15 +249,15 @@ interface MemberAssessmentHistoryDao {
         AND (lp.lastMenstrualPeriod IS NOT NULL AND lp.lastMenstrualPeriod != '')
         AND (lp.estimatedDeliveryDate IS NULL OR substr(lp.estimatedDeliveryDate, 1, 10) >= date('now', '-45 days'))
         AND (
-            (:ssIdsSize = 0 AND :subVillageIdsSize = 0)
-            OR (:subVillageIdsSize > 0 AND fm.subVillageId IN (:subVillageIds))
-            OR ( :ssIdsSize > 0
-                AND fm.subVillageId IN (
-                    SELECT DISTINCT sslv.subVillageId
-                    FROM ShasthyaShebikaLinkedVillageEntity AS sslv
-                    WHERE sslv.shasthyaShebikaId IN (:ssIds)
-                )
-            )
+            CASE
+                WHEN :subVillageIdsSize > 0
+                THEN fm.subVillageId IN (:subVillageIds)
+
+                WHEN :ssIdsSize > 0
+                THEN fm.subVillageId IN (SELECT DISTINCT sslv.subVillageId FROM ShasthyaShebikaLinkedVillageEntity AS sslv WHERE sslv.shasthyaShebikaId IN (:ssIds))
+
+                ELSE 1
+            END
         )
         """,
     )

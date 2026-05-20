@@ -339,8 +339,7 @@ interface MemberDAO {
             if (filterBySubVillages.isNotEmpty()) {
                 subVillageFilterConditions += "$subVillageColumn IN (${filterBySubVillages.joinToString(",") { "?" }})"
                 args.addAll(filterBySubVillages)
-            }
-            if (filterBySs.isNotEmpty()) {
+            } else {
                 val ssPlaceholders = filterBySs.joinToString(",") { "?" }
                 subVillageFilterConditions +=
                     """
@@ -526,22 +525,27 @@ interface MemberDAO {
 
         val globalWhereClause = if (globalConditions.isEmpty()) "" else "WHERE ${globalConditions.joinToString(" AND ")}"
 
-        val ssPlaceholders = if (filterBySs.isNotEmpty()) filterBySs.joinToString(",") { "?" } else ""
-        val subVillagePlaceholders = if (filterBySubVillages.isNotEmpty()) filterBySubVillages.joinToString(",") { "?" } else ""
+        val placeHolders =
+            if (filterBySubVillages.isNotEmpty()) {
+                filterBySubVillages.joinToString(",") { "?" }
+            } else if (filterBySs.isNotEmpty()) {
+                filterBySs.joinToString(",") { "?" }
+            } else {
+                ""
+            }
 
         val householdSubVillageFilters = mutableListOf<String>()
         val householdFilterArgs = mutableListOf<Any>()
         if (filterBySubVillages.isNotEmpty()) {
-            householdSubVillageFilters += "hh.sub_village_id IN ($subVillagePlaceholders)"
+            householdSubVillageFilters += "hh.sub_village_id IN ($placeHolders)"
             householdFilterArgs.addAll(filterBySubVillages)
-        }
-        if (filterBySs.isNotEmpty()) {
+        } else if (filterBySs.isNotEmpty()) {
             householdSubVillageFilters +=
                 """
                 hh.sub_village_id IN (
                     SELECT DISTINCT sslv.subVillageId
                     FROM ShasthyaShebikaLinkedVillageEntity AS sslv
-                    WHERE sslv.shasthyaShebikaId IN ($ssPlaceholders)
+                    WHERE sslv.shasthyaShebikaId IN ($placeHolders)
                 )
                 """.trimIndent()
             householdFilterArgs.addAll(filterBySs)
@@ -555,16 +559,15 @@ interface MemberDAO {
         val externalSubVillageFilters = mutableListOf<String>()
         val externalFilterArgs = mutableListOf<Any>()
         if (filterBySubVillages.isNotEmpty()) {
-            externalSubVillageFilters += "hhm.sub_village_id IN ($subVillagePlaceholders)"
+            externalSubVillageFilters += "hhm.sub_village_id IN ($placeHolders)"
             externalFilterArgs.addAll(filterBySubVillages)
-        }
-        if (filterBySs.isNotEmpty()) {
+        } else if (filterBySs.isNotEmpty()) {
             externalSubVillageFilters +=
                 """
                 hhm.sub_village_id IN (
                     SELECT DISTINCT sslv.subVillageId
                     FROM ShasthyaShebikaLinkedVillageEntity AS sslv
-                    WHERE sslv.shasthyaShebikaId IN ($ssPlaceholders)
+                    WHERE sslv.shasthyaShebikaId IN ($placeHolders)
                 )
                 """.trimIndent()
             externalFilterArgs.addAll(filterBySs)
