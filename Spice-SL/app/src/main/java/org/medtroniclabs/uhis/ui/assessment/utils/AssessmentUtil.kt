@@ -329,6 +329,9 @@ object AssessmentUtil {
             RMNCH.CHILD_MENU.lowercase() -> R.drawable.ic_services_child_health
             MenuConstants.PREGNANCY_OUTCOME.lowercase() -> R.drawable.ic_services_pnc
             RMNCH.PNC_MOTHER_MENU.lowercase() -> R.drawable.ic_services_pnc
+            MenuConstants.NCD_MENU_ID.lowercase() -> R.drawable.ic_services_ncd
+            MenuConstants.EYE_CARE_MENU_ID.lowercase() -> R.drawable.ic_services_eye_care
+            MenuConstants.CATARACT_MENU_ID.lowercase() -> R.drawable.ic_cataract
             else -> {
                 View.NO_ID
             }

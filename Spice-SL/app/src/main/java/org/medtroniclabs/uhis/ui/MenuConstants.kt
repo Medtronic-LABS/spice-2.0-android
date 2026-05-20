@@ -17,7 +17,6 @@ object MenuConstants {
 
     const val CATARACT_MENU_ID = "cataract"
 
-    const val BD_NCD_MENU_ID = "BD_NCD"
     const val WORKFLOW_NAME = "workflowName"
     const val DIALOG_RESULT = "DialogResult"
     const val OTHER_SYMPTOMS = "other_symptoms"
