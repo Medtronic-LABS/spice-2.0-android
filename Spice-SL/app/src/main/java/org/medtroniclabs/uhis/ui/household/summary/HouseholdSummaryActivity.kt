@@ -195,9 +195,9 @@ class HouseholdSummaryActivity : BaseActivity(), MemberSelectionListener, View.O
                         addNewMember()
                     }
 
-                    R.id.editHousehold -> {
-                        editHouseholdDetails()
-                    }
+//                    R.id.editHousehold -> {
+//                        editHouseholdDetails()
+//                    }
 
                     R.id.editMember -> {
                         MemberEditDialogFragment
