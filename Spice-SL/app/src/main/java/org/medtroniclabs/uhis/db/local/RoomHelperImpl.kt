@@ -1352,4 +1352,8 @@ class RoomHelperImpl @Inject constructor(
         memberId: Long,
         noOfDays: Int,
     ) = memberAssessmentHistoryDao.decrementDateByDays(memberId, noOfDays)
+
+    override suspend fun deleteDuplicateAssessmentHistory(date: String) {
+        memberAssessmentHistoryDao.deleteDuplicateRecords(date)
+    }
 }

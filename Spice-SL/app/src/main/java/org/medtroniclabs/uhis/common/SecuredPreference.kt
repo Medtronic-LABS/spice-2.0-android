@@ -77,6 +77,11 @@ object SecuredPreference {
         PEER_SUPERVISOR_NOTIFICATION_TOKEN,
         IS_FAMILY_PLANNING_LOADED,
         IS_HIV_DATA_LOADED,
+
+        /**
+         * Flag to store whether duplicate assessment history are deleted
+         */
+        DELETED_DUPLICATE_ASSESSMENT_HISTORY,
     }
 
     private const val DEFAULT_SUFFIX = "_preferences"
@@ -183,6 +188,8 @@ object SecuredPreference {
      * @see android.content.SharedPreferences.getBoolean
      */
     fun getBoolean(key: String): Boolean = preferences.getBoolean(key, false)
+
+    fun getBoolean(key: EnvironmentKey): Boolean = getBoolean(key.name)
 
     /**
      * Retrieves a stored long value.
@@ -371,6 +378,13 @@ object SecuredPreference {
         val editor = preferences.edit()
         editor.putBoolean(key, value)
         editor.apply()
+    }
+
+    fun putBoolean(
+        key: EnvironmentKey,
+        value: Boolean,
+    ) {
+        putBoolean(key.name, value)
     }
 
     /**

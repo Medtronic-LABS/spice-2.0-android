@@ -1343,4 +1343,6 @@ class MetaRepository @Inject constructor(
     }
 
     suspend fun riskFactorListing() = roomHelper.getAllRiskFactorEntityList()
+
+    suspend fun deleteDuplicateAssessmentHistory(date: String) = roomHelper.deleteDuplicateAssessmentHistory(date)
 }

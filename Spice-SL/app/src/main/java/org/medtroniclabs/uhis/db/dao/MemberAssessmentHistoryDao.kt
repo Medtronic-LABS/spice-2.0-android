@@ -4,7 +4,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import org.medtroniclabs.uhis.db.entity.EntitiesName.MEMBER_ASSESSMENT_HISTORY_ENTITY
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
 import org.medtroniclabs.uhis.db.response.DashboardCountsRow
 import org.medtroniclabs.uhis.db.response.MaternalDashboardCountsRow
@@ -203,4 +205,8 @@ interface MemberAssessmentHistoryDao {
         memberId: Long,
         noOfDays: Int,
     )
+
+    @Transaction
+    @Query("DELETE FROM $MEMBER_ASSESSMENT_HISTORY_ENTITY WHERE id NOT IN (SELECT MIN(id) FROM $MEMBER_ASSESSMENT_HISTORY_ENTITY GROUP BY memberId, serviceProvided, visitDate, customStatus) AND date(datetime(visitDate, 'localtime')) >= :date")
+    suspend fun deleteDuplicateRecords(date: String)
 }

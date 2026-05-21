@@ -28,7 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LandingViewModel @Inject constructor(
     private val metaRepository: MetaRepository,
-    @IoDispatcher override var dispatcherIO: CoroutineDispatcher,
+    @param:IoDispatcher override var dispatcherIO: CoroutineDispatcher,
 ) : BaseViewModel(dispatcherIO) {
     val menuListLiveData = MutableLiveData<Resource<List<MenuEntity>>>()
     val userProfileLiveData = MutableLiveData<Resource<UserProfile>>()
@@ -119,6 +119,19 @@ class LandingViewModel @Inject constructor(
             supportResponseMutableLiveData.postLoading()
             val result = metaRepository.updateCBSNotification(PeerSupervisorNotificationRequest(ids = SecuredPreference.notificationIds))
             cbsNotificationUpdateResponse.postValue(result)
+        }
+    }
+
+    /**
+     * Delete duplicate assessment history from May 1st, 2026,
+     * as we want to fix only for non-migrated data.
+     */
+    fun deleteDuplicateAssessmentHistory() {
+        viewModelScope.launch(dispatcherIO) {
+            if (!SecuredPreference.getBoolean(SecuredPreference.EnvironmentKey.DELETED_DUPLICATE_ASSESSMENT_HISTORY)) {
+                metaRepository.deleteDuplicateAssessmentHistory("2026-05-01")
+                SecuredPreference.putBoolean(SecuredPreference.EnvironmentKey.DELETED_DUPLICATE_ASSESSMENT_HISTORY, true)
+            }
         }
     }
 }
