@@ -125,6 +125,19 @@ class LandingViewModel @Inject constructor(
     }
 
     /**
+     * Delete duplicate assessment history from May 1st, 2026,
+     * as we want to fix only for non-migrated data.
+     */
+    fun deleteDuplicateAssessmentHistory() {
+        viewModelScope.launch(dispatcherIO) {
+            if (!SecuredPreference.getBoolean(SecuredPreference.EnvironmentKey.DELETED_DUPLICATE_ASSESSMENT_HISTORY)) {
+                metaRepository.deleteDuplicateAssessmentHistory("2026-05-01")
+                SecuredPreference.putBoolean(SecuredPreference.EnvironmentKey.DELETED_DUPLICATE_ASSESSMENT_HISTORY, true)
+            }
+        }
+    }
+
+    /**
      * Sequentially asks the backend whether this build is still allowed to run.
      * Returns a [Resource] following the same contract as [MetaRepository.checkAppVersion].
      */
