@@ -31,7 +31,7 @@ interface AssessmentDAO {
 
     @Query(
         "SELECT a.id, a.householdMemberLocalId, a.villageId, a.assessmentType, a.assessmentDetails, a.patientId, a.referralStatus, a.referredReason, a.otherDetails, a.callResult, a.memberId, a.householdId, a.isReferred, a.created_at AS createdAt, a.followUpId, a.latitude, a.longitude, pd.neonatePatientId as neonatePatientId, pd.neonateHouseholdMemberLocalId as neonatePatientReferenceId, a.status as status " +
-            "FROM Assessment AS a LEFT JOIN PregnancyDetail AS pd ON a.householdMemberLocalId = pd.householdMemberLocalId " +
+            "FROM Assessment AS a LEFT JOIN PregnancyDetail AS pd ON pd.id = (SELECT pd2.id FROM PregnancyDetail AS pd2 WHERE pd2.householdMemberLocalId = a.householdMemberLocalId ORDER BY COALESCE(pd2.endAt, '') DESC, pd2.id DESC LIMIT 1) " +
             "WHERE a.sync_status IN (:status) AND a.householdMemberLocalId =:hhmId",
     )
     suspend fun getUnSyncedAssessmentByHHMId(

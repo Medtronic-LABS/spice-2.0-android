@@ -203,6 +203,13 @@ class LandingActivity :
         runAppVersionCheck()
         // Deeplink for directly goes to Search patient
         patientSearchDeepLink()
+
+        // Delete duplicate assessment history
+        deleteDuplicateAssessmentHistory()
+    }
+
+    private fun deleteDuplicateAssessmentHistory() {
+        viewModel.deleteDuplicateAssessmentHistory()
     }
 
     private fun syncScreeningAndAssessment() {

@@ -969,4 +969,6 @@ interface RoomHelper {
         memberId: Long,
         noOfDays: Int,
     )
+
+    suspend fun deleteDuplicateAssessmentHistory(date: String)
 }

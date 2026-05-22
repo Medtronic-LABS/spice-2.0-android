@@ -1429,6 +1429,8 @@ class MetaRepository @Inject constructor(
 
     suspend fun riskFactorListing() = roomHelper.getAllRiskFactorEntityList()
 
+    suspend fun deleteDuplicateAssessmentHistory(date: String) = roomHelper.deleteDuplicateAssessmentHistory(date)
+
     suspend fun getShastyhaShebikas(shasthyaKormiId: Long): List<ShasthyaShebikaEntity> = roomHelper.getShasthyaShebikaByShasthyaKormiId(shasthyaKormiId)
 
     suspend fun getSubVillagesByShasthyaShebikaIds(ids: List<Long>): List<SubVillageEntity> = roomHelper.getSubVillagesByShasthyaShebikaIds(ids)
