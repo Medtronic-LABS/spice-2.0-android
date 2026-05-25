@@ -21,14 +21,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollContainer"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_380sdp"
-        android:scrollbars="vertical"
         android:fadeScrollbars="false"
         android:scrollbarStyle="insideOverlay"
+        android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@id/bottomView"
         app:layout_constraintTop_toBottomOf="@id/tvTitle">
 
@@ -38,16 +37,39 @@
             android:layout_height="match_parent">
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSsTitle"
+                style="@style/TextStyle_Medium_16_NoBG"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:text="@string/ss_name"
+                android:textColor="@color/grey_black"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/ssChipGroup"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_16sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/tvSsTitle"
+                app:layout_constraintTop_toBottomOf="@id/tvSsTitle"
+                app:singleSelection="false" />
+
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvVillageTitle"
                 style="@style/TextStyle_Medium_16_NoBG"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="@dimen/_10sdp"
                 android:layout_marginStart="@dimen/_16sdp"
-                android:text="@string/household_location"
+                android:text="@string/village"
                 android:textColor="@color/grey_black"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/ssChipGroup" />
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/villageChipGroup"
@@ -60,29 +82,26 @@
                 app:layout_constraintTop_toBottomOf="@id/tvVillageTitle" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tvRegistrationStatus"
+                android:id="@+id/tvDateRange"
                 style="@style/TextStyle_Medium_16_NoBG"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="@dimen/_10sdp"
                 android:layout_marginStart="@dimen/_16sdp"
-                android:text="@string/registration_status"
+                android:text="@string/date_range"
                 android:textColor="@color/grey_black"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/villageChipGroup" />
 
-
             <com.google.android.material.chip.ChipGroup
-                android:id="@+id/registrationStatusChipGroup"
+                android:id="@+id/dateRangeChipGroup"
                 android:layout_width="@dimen/_0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="@dimen/_10sdp"
                 android:layout_marginEnd="@dimen/_16sdp"
-                android:layout_marginBottom="@dimen/_20sdp"
                 android:paddingVertical="@dimen/_10sdp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@id/tvRegistrationStatus"
-                app:layout_constraintTop_toBottomOf="@id/tvRegistrationStatus"
+                app:layout_constraintStart_toStartOf="@id/tvDateRange"
+                app:layout_constraintTop_toBottomOf="@id/tvDateRange"
                 app:singleSelection="true" />
 
 
@@ -95,7 +114,7 @@
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/registrationStatusChipGroup">
+                app:layout_constraintTop_toBottomOf="@+id/dateRangeChipGroup">
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvFrom"
@@ -185,13 +204,60 @@
                 android:id="@+id/cgReferralReason"
                 android:layout_width="@dimen/_0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="@dimen/_10sdp"
                 android:layout_marginEnd="@dimen/_16sdp"
                 android:layout_marginBottom="@dimen/_20sdp"
                 android:paddingVertical="@dimen/_10sdp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@id/tvReferralReason"
                 app:layout_constraintTop_toBottomOf="@id/tvReferralReason" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNcdReason"
+                style="@style/TextStyle_Medium_16_NoBG"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:text="@string/reason"
+                android:textColor="@color/grey_black"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cgReferralReason" />
+
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/cgNcdReason"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_16sdp"
+                android:layout_marginBottom="@dimen/_20sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/tvNcdReason"
+                app:layout_constraintTop_toBottomOf="@id/tvNcdReason" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNcdReferral"
+                style="@style/TextStyle_Medium_16_NoBG"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:text="@string/referral_to"
+                android:textColor="@color/grey_black"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cgNcdReason" />
+
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/cgNcdReferral"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_16sdp"
+                android:layout_marginBottom="@dimen/_20sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/tvNcdReferral"
+                app:layout_constraintTop_toBottomOf="@id/tvNcdReferral" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

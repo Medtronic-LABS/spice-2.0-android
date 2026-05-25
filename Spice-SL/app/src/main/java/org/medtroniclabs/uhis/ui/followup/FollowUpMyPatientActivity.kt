@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Typeface
 import android.os.Bundle
+import android.text.TextWatcher
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.addTextChangedListener
+import androidx.core.widget.doOnTextChanged
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -26,7 +28,6 @@ import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams.HH_VISI
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams.MYFOLLOWUPPATIENTS
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams.ONMOREBUTTONTRIGGERED
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams.REFERRED_TAB
-import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams.SEARCHBUTTONTRIGGERED
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.startBackgroundOfflineSync
 import org.medtroniclabs.uhis.appextensions.visible
@@ -53,6 +54,8 @@ class FollowUpMyPatientActivity : BaseActivity() {
     private val viewModel: FollowUpViewModel by viewModels()
     private val ncdFollowUpViewModel: NCDFollowUpViewModel by viewModels()
 
+    private lateinit var textChange: TextWatcher
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityFollowUpMyPatientBinding.inflate(layoutInflater)
@@ -77,6 +80,12 @@ class FollowUpMyPatientActivity : BaseActivity() {
             showHideVerticalIcon(false)
         }
         setOrientation()
+    }
+
+    private fun attachTextWatcher() {
+        textChange = binding.llExactSearch.etSearchTerm.doOnTextChanged { text, _, _, _ ->
+            viewModel.onTextChange(text?.toString())
+        }
     }
 
     private fun setOrientation() {
@@ -258,23 +267,8 @@ class FollowUpMyPatientActivity : BaseActivity() {
                     .newInstance()
                     .show(supportFragmentManager, FollowUpFilterBottomSheetDialogFragment.TAG)
             }
-
-            llExactSearch.etSearchTerm.addTextChangedListener {
-                val search = it?.trim().toString()
-                llExactSearch.btnSearch.isEnabled = search.isNotEmpty()
-                if (search.isEmpty()) {
-                    viewModel.updateFollowUpFilter(search = "")
-                }
-            }
-
-            llExactSearch.btnSearch.setOnClickListener {
-                viewModel.setUserJourney(SEARCHBUTTONTRIGGERED)
-                viewModel.updateFollowUpFilter(
-                    search = llExactSearch.etSearchTerm.text
-                        ?.trim()
-                        .toString(),
-                )
-            }
+            binding.llExactSearch.btnSearch.gone()
+            attachTextWatcher()
         }
     }
 
@@ -285,13 +279,22 @@ class FollowUpMyPatientActivity : BaseActivity() {
 
         viewModel.getFilterDataLiveData().observe(this) {
             var count = 0
+            if (!it.selectedShashtyaShebikas.isNullOrEmpty()) {
+                count++
+            }
             if (!it.selectedVillages.isNullOrEmpty()) {
                 count++
             }
             if (!it.selectedDateRange.isNullOrEmpty()) {
                 count++
             }
-            if (!it.selectedReasons.isNullOrEmpty()) {
+            if (!it.selectedReferralReasons.isNullOrEmpty()) {
+                count++
+            }
+            if (!it.ncdSelectedReasons.isNullOrEmpty()) {
+                count++
+            }
+            if (!it.ncdSelectedReferralTo.isNullOrEmpty()) {
                 count++
             }
 

@@ -28,7 +28,6 @@ import org.medtroniclabs.uhis.formgeneration.model.FormLayout
 import org.medtroniclabs.uhis.formgeneration.ui.SingleSelectionCustomView
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.assessment.viewmodel.AssessmentViewModel
-import org.medtroniclabs.uhis.ui.followup.fragment.CallResultDialogFragment
 
 class CbsCallResultFragment : BottomSheetDialogFragment(), View.OnClickListener {
     private lateinit var binding: FragmentBottomCallResultDialogBinding
@@ -108,7 +107,7 @@ class CbsCallResultFragment : BottomSheetDialogFragment(), View.OnClickListener 
             }
         getCallResultData().let {
             val view = SingleSelectionCustomView(binding.root.context)
-            view.tag = CallResultDialogFragment.TAG
+            view.tag = TAG
             view.addViewElements(
                 it,
                 false,

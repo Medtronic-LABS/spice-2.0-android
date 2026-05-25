@@ -372,8 +372,15 @@ interface RoomHelper {
 
     fun getFollowUpPatientListLiveData(
         type: String,
-        search: String? = null,
-        villageIds: List<Long> = listOf(),
+        search: String?,
+        shashthyaShebikaIds: List<Long>,
+        shashthyaShebikaIdsSize: Int,
+        villageIds: List<Long>,
+        villageIdsSize: Int,
+        selectedReferralReasonTypes: List<String>,
+        selectedReferralReasonTypesSize: Int,
+        ncdSelectedReason: String?,
+        ncdReferralFacility: String?,
         fromDate: String = "",
         toDate: String = "",
     ): LiveData<List<FollowUpPatientModel>>

@@ -9,6 +9,7 @@ import androidx.room.Transaction
 import org.medtroniclabs.uhis.data.FollowUpPatientModel
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineSyncStatus
 import org.medtroniclabs.uhis.db.entity.FollowUp
+import org.medtroniclabs.uhis.ui.followup.FollowUpDefinedParams
 
 @Dao
 interface FollowUpDao {
@@ -24,15 +25,26 @@ interface FollowUpDao {
     @Query(
         "SELECT fu.id, hhm.id AS localPatientId, hhm.name, fu.patientId, hhm.phone_number as phoneNumber, hhm.date_of_birth as dateOfBirth, hhm.gender, fu.reason, fu.patientStatus, ve.name AS village, hh.id as householdId, hh.name AS householdName, NULL as landmark, fu.type, fu.encounterType, fu.calledAt, fu.successfulAttempts, fu.unsuccessfulAttempts, fu.nextVisitDate, fu.encounterDate, fu.isWrongNumber, fu.updatedAt, fu.encounterName " +
             "FROM FollowUp AS fu INNER JOIN HouseholdMember AS hhm ON fu.memberId = hhm.fhir_id LEFT JOIN Household AS hh ON hhm.household_id = hh.id LEFT JOIN SubVillageEntity AS ve ON fu.villageId = ve.id " +
-            "WHERE fu.isCompleted = 0 AND hhm.isActive = 1 AND fu.id IS NOT NULL AND fu.villageId IN (:villageIds) AND " +
+            "WHERE fu.isCompleted = 0 AND " +
+            "hhm.isActive = 1 AND " +
+            "fu.id IS NOT NULL AND " +
+            "CASE WHEN :villageIdsSize > 0 THEN fu.villageId IN (:villageIds) WHEN :shashthyaShebikaIdsSize > 0 THEN fu.villageId IN (SELECT DISTINCT sslv.subVillageId FROM ShasthyaShebikaLinkedVillageEntity AS sslv WHERE sslv.shasthyaShebikaId IN (:shashthyaShebikaIds)) ELSE 1 END AND " +
+            "((:selectedReferralReasonTypesSize = 0 AND (:ncdSelectedReason IS NULL OR :ncdSelectedReason= '')) OR (:selectedReferralReasonTypesSize > 0 AND LOWER(fu.encounterName) IN (:selectedReferralReasonTypes)) OR (:ncdSelectedReason IS NOT NULL AND :ncdSelectedReason != '' AND LOWER(fu.encounterName) = LOWER('${FollowUpDefinedParams.FILTER_NCD}') AND LOWER(fu.reason) LIKE '%' || :ncdSelectedReason || '%')) AND " +
             "fu.type=:type AND " +
-            "(hhm.name LIKE '%' || :search || '%' OR fu.patientId LIKE :search || '%' OR :search IS NULL) AND " +
-            "CASE WHEN :fromDate = '' THEN 1 ELSE date(fu.encounterDate) BETWEEN :fromDate AND :toDate END ORDER BY fu.encounterDate",
+            "(hhm.name LIKE '%' || :search || '%' OR hhm.phone_number LIKE '%' || :search || '%' OR :search IS NULL) AND " +
+            "CASE WHEN :fromDate = '' THEN 1 ELSE date(fu.encounterDate) BETWEEN :fromDate AND :toDate END " +
+            "ORDER BY fu.encounterDate",
     )
     fun getReferredFollowUpPatientListLiveData(
         type: String,
         search: String? = null,
+        shashthyaShebikaIds: List<Long>,
+        shashthyaShebikaIdsSize: Int,
         villageIds: List<Long> = listOf(),
+        villageIdsSize: Int,
+        selectedReferralReasonTypes: List<String>,
+        selectedReferralReasonTypesSize: Int,
+        ncdSelectedReason: String?,
         fromDate: String = "",
         toDate: String = "",
     ): LiveData<List<FollowUpPatientModel>>
@@ -40,15 +52,26 @@ interface FollowUpDao {
     @Query(
         "SELECT fu.id, hhm.id AS localPatientId, hhm.name, fu.patientId, hhm.phone_number as phoneNumber, hhm.date_of_birth as dateOfBirth, hhm.gender, fu.reason, fu.patientStatus, ve.name AS village, hh.id as householdId, hh.name AS householdName, NULL as landmark, fu.type, fu.encounterType, fu.calledAt, fu.successfulAttempts, fu.unsuccessfulAttempts, fu.nextVisitDate, fu.encounterDate, fu.isWrongNumber, fu.updatedAt, fu.encounterName, hh.id AS householdLocalId " +
             "FROM FollowUp AS fu INNER JOIN HouseholdMember AS hhm ON fu.memberId = hhm.fhir_id LEFT JOIN Household AS hh ON hhm.household_id = hh.id LEFT JOIN SubVillageEntity AS ve ON fu.villageId = ve.id " +
-            "WHERE fu.isCompleted = 0 AND hhm.isActive = 1 AND fu.id IS NOT NULL AND fu.villageId IN (:villageIds) AND " +
+            "WHERE fu.isCompleted = 0 AND " +
+            "hhm.isActive = 1 AND " +
+            "fu.id IS NOT NULL AND " +
+            "CASE WHEN :villageIdsSize > 0 THEN fu.villageId IN (:villageIds) WHEN :shashthyaShebikaIdsSize > 0 THEN fu.villageId IN (SELECT DISTINCT sslv.subVillageId FROM ShasthyaShebikaLinkedVillageEntity AS sslv WHERE sslv.shasthyaShebikaId IN (:shashthyaShebikaIds)) ELSE 1 END AND " +
+            "((:selectedReferralReasonTypesSize = 0 AND (:ncdSelectedReason IS NULL OR :ncdSelectedReason= '')) OR (:selectedReferralReasonTypesSize > 0 AND LOWER(fu.encounterName) IN (:selectedReferralReasonTypes)) OR (:ncdSelectedReason IS NOT NULL AND :ncdSelectedReason != '' AND LOWER(fu.encounterName) = LOWER('${FollowUpDefinedParams.FILTER_NCD}') AND LOWER(fu.reason) LIKE '%' || :ncdSelectedReason || '%')) AND " +
             "fu.type=:type AND " +
-            "(hhm.name LIKE '%' || :search || '%' OR fu.patientId LIKE :search || '%' OR :search IS NULL) AND " +
-            "CASE WHEN :fromDate = '' THEN 1 ELSE date(fu.nextVisitDate) BETWEEN :fromDate AND :toDate END ORDER BY fu.nextVisitDate",
+            "(hhm.name LIKE '%' || :search || '%' OR hhm.phone_number LIKE '%' || :search || '%' OR :search IS NULL) AND " +
+            "CASE WHEN :fromDate = '' THEN 1 ELSE date(fu.nextVisitDate) BETWEEN :fromDate AND :toDate END " +
+            "ORDER BY fu.nextVisitDate",
     )
     fun getOtherFollowUpPatientListLiveData(
         type: String,
         search: String? = null,
+        shashthyaShebikaIds: List<Long>,
+        shashthyaShebikaIdsSize: Int,
         villageIds: List<Long> = listOf(),
+        villageIdsSize: Int,
+        selectedReferralReasonTypes: List<String>,
+        selectedReferralReasonTypesSize: Int,
+        ncdSelectedReason: String?,
         fromDate: String = "",
         toDate: String = "",
     ): LiveData<List<FollowUpPatientModel>>

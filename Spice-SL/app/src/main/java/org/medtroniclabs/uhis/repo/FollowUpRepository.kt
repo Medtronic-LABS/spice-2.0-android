@@ -1,7 +1,6 @@
 package org.medtroniclabs.uhis.repo
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import org.medtroniclabs.uhis.appextensions.convertToUtcDateTime
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMdd
 import org.medtroniclabs.uhis.common.DateUtils.DATE_ddMMyyyy
@@ -11,13 +10,10 @@ import org.medtroniclabs.uhis.data.offlinesync.model.FollowUpCallStatus
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineSyncStatus
 import org.medtroniclabs.uhis.db.entity.FollowUp
 import org.medtroniclabs.uhis.db.entity.FollowUpCall
-import org.medtroniclabs.uhis.db.entity.SubVillageEntity
 import org.medtroniclabs.uhis.db.local.RoomHelper
 import org.medtroniclabs.uhis.model.followup.FollowUpFilter
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.utils.ReferralStatus
 import org.medtroniclabs.uhis.ui.followup.FollowUpDefinedParams
-import org.medtroniclabs.uhis.ui.followup.FollowUpDefinedParams.INFORMED
-import org.medtroniclabs.uhis.ui.followup.FollowUpDefinedParams.NOT_INFORMED
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -29,34 +25,41 @@ class FollowUpRepository @Inject constructor(
         filter: FollowUpFilter,
         referralLimit: Int,
     ): LiveData<List<FollowUpPatientModel>> {
-        val villageIds = if (filter.selectedVillages.isNullOrEmpty()) {
-            filter.villages
-        } else {
-            filter.selectedVillages!!.map { it.id!! }
-        }
+        val villageIds = filter.selectedVillages?.map { it.id!! } ?: listOf()
+        val villageIdsSize = villageIds.size
+        val shashthyaShebikaIds = filter.selectedShashtyaShebikas?.map { it.id!! } ?: listOf()
+        val shashthyaShebikaIdsSize = shashthyaShebikaIds.size
+        // Filter out both from selected reason and get the first one, as it is single selection
+        val ncdSelectedReason = filter.ncdSelectedReasons
+            ?.map { it.type!! }
+            ?.filterNot { it == FollowUpDefinedParams.BOTH }
+            ?.firstOrNull()
+        // Get first referral facility as is single selection
+        val ncdReferralFacility = filter.ncdSelectedReferralTo?.map { it.type!! }?.firstOrNull()
+        // If there is any ncd selected reason or ncd referral facility, then remove NCD from the selected referral reason
+        val selectedReferralReasonTypes = filter.selectedReferralReasons?.map { it.type!!.lowercase() }?.filterNot {
+            (ncdSelectedReason != null || ncdReferralFacility != null) && it == FollowUpDefinedParams.FILTER_NCD.lowercase()
+        } ?: listOf()
+        val selectedReferralReasonTypesSize = selectedReferralReasonTypes.size
 
         val fromAndToDate = getFromDateAndToDate(filter, referralLimit)
 
         val result = roomHelper.getFollowUpPatientListLiveData(
             filter.type,
             filter.search,
+            shashthyaShebikaIds,
+            shashthyaShebikaIdsSize,
             villageIds,
+            villageIdsSize,
+            selectedReferralReasonTypes,
+            selectedReferralReasonTypesSize,
+            ncdSelectedReason,
+            ncdReferralFacility,
             fromAndToDate.first,
             fromAndToDate.second,
         )
 
-        val reasons = if (filter.type == FollowUpDefinedParams.FU_TYPE_MEDICAL_REVIEW) {
-            emptyList()
-        } else {
-            filter.selectedReasons?.map { it.name }.orEmpty()
-        }
-
-        return result.map { items ->
-            items
-                .filter { item ->
-                    reasons.isEmpty() || reasons.any { reason -> item.reason?.contains(reason, true) ?: true }
-                }.sortedBy { it.updatedAt }
-        }
+        return result
     }
 
     private fun getFromDateAndToDate(
@@ -67,17 +70,17 @@ class FollowUpRepository @Inject constructor(
             return Pair("", "")
         }
 
-        if (filter.selectedDateRange?.any { it.name == FollowUpDefinedParams.FilterToday } == true) {
+        if (filter.selectedDateRange?.any { it.name == FollowUpDefinedParams.FILTER_TODAY } == true) {
             val date = getTodayDateString(filter.type, referralLimit)
             return Pair(date, date)
         }
 
-        if (filter.selectedDateRange?.any { it.name == FollowUpDefinedParams.FilterTomorrow } == true) {
+        if (filter.selectedDateRange?.any { it.name == FollowUpDefinedParams.FILTER_TOMORROW } == true) {
             val date = getTomorrowDateString(filter.type, referralLimit)
             return Pair(date, date)
         }
 
-        if (filter.selectedDateRange?.any { it.name == FollowUpDefinedParams.FilterCustomize } == true) {
+        if (filter.selectedDateRange?.any { it.name == FollowUpDefinedParams.FILTER_CUSTOMIZE } == true) {
             return getDateRange(filter, referralLimit)
         }
 
@@ -129,8 +132,6 @@ class FollowUpRepository @Inject constructor(
         return Pair(fromDate.format(outputFormat), toDate.format(outputFormat))
     }
 
-    suspend fun getSubVillages(): List<SubVillageEntity> = roomHelper.getSubVillages()
-
     suspend fun getUnSyncedFollowUpCount(): Int = roomHelper.getUnSyncedFollowUpCount()
 
     suspend fun addCallHistory(
@@ -155,10 +156,13 @@ class FollowUpRepository @Inject constructor(
             duration = 0,
             attempts = followUp.attempts,
             status = callStatus,
-            patientStatus = patientStatus,
-            reason = reason,
             latitude = lat,
             longitude = lng,
+            callType = "",
+            isWillingToVisitUHC = true,
+            visitRejectReason = "",
+            otherVisitRejectReason = "",
+            unSuccessfulCallReason = "",
         )
 
         var newFollowUp: FollowUp? = null
@@ -179,22 +183,22 @@ class FollowUpRepository @Inject constructor(
         informedCallAttempts: Int,
     ): FollowUp? {
         // Get All other followup with same reason
-        call.patientStatus?.let {
-            updatePatientStatus(it, id, followUp)
-        }
+//        call.patientStatus?.let {
+//            updatePatientStatus(it, id, followUp)
+//        }
 
         followUp.successfulAttempts += 1
-        if (call.patientStatus == INFORMED || call.patientStatus == NOT_INFORMED) {
-            if (followUp.successfulAttempts >= informedCallAttempts) {
-                followUp.isCompleted = true
-                roomHelper.updateOtherDuplicateTickets(id, followUp)
-            }
-        } else {
-            if (followUp.successfulAttempts >= maxSuccessfulCallLimit) {
-                followUp.isCompleted = true
-                roomHelper.updateOtherDuplicateTickets(id, followUp)
-            }
-        }
+//        if (call.patientStatus == INFORMED || call.patientStatus == NOT_INFORMED) {
+//            if (followUp.successfulAttempts >= informedCallAttempts) {
+//                followUp.isCompleted = true
+//                roomHelper.updateOtherDuplicateTickets(id, followUp)
+//            }
+//        } else {
+//            if (followUp.successfulAttempts >= maxSuccessfulCallLimit) {
+//                followUp.isCompleted = true
+//                roomHelper.updateOtherDuplicateTickets(id, followUp)
+//            }
+//        }
 
         return null
     }
@@ -222,6 +226,7 @@ class FollowUpRepository @Inject constructor(
                     roomHelper.updateDuplicateTicketsAsCompleted(id, followUp)
                 }
             }
+
             else -> {
                 roomHelper.updateOnTreatmentStatus(id, followUp, currentTime)
             }
@@ -239,10 +244,10 @@ class FollowUpRepository @Inject constructor(
             followUp.isCompleted = true
         }
 
-        if (call.reason?.equals(FollowUpDefinedParams.WRONG_NUMBER, true) == true) {
-            followUp.isWrongNumber = true
-            followUp.isCompleted = followUp.type != FollowUpDefinedParams.FU_TYPE_HH_VISIT
-            roomHelper.updateOtherFollowUpForWrongNumber(followUpId, followUp.memberId)
-        }
+//        if (call.reason?.equals(FollowUpDefinedParams.WRONG_NUMBER, true) == true) {
+//            followUp.isWrongNumber = true
+//            followUp.isCompleted = followUp.type != FollowUpDefinedParams.FU_TYPE_HH_VISIT
+//            roomHelper.updateOtherFollowUpForWrongNumber(followUpId, followUp.memberId)
+//        }
     }
 }

@@ -66,7 +66,7 @@ class PatientListAdapter(private val callback: (Int, FollowUpPatientModel) -> Un
 
                 callButton.visible()
                 tvRemainingCount.visible()
-                callButton.isEnabled = !data.isWrongNumber
+                callButton.isEnabled = !data.isWrongNumber && !data.phoneNumber.isNullOrBlank() && data.phoneNumber != "0"
                 assessmentButton.visible()
 
                 groupReason.visible()

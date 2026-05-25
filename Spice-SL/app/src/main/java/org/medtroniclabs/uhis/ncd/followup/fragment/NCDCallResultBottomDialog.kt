@@ -45,7 +45,6 @@ import org.medtroniclabs.uhis.ncd.followup.NCDFollowUpUtils.wont_visit_facility
 import org.medtroniclabs.uhis.ncd.followup.viewmodel.NCDCallResultViewModel
 import org.medtroniclabs.uhis.ncd.followup.viewmodel.NCDFollowUpViewModel
 import org.medtroniclabs.uhis.ui.TagListCustomView
-import org.medtroniclabs.uhis.ui.followup.fragment.CallResultDialogFragment
 
 @AndroidEntryPoint
 class NCDCallResultBottomDialog : BottomSheetDialogFragment(), View.OnClickListener {
@@ -201,7 +200,7 @@ class NCDCallResultBottomDialog : BottomSheetDialogFragment(), View.OnClickListe
         viewModel.callResultHashMap[DefinedParams.CALL_RESULT] = FollowUpCallStatus.SUCCESSFUL.name
         getCallResultData().let {
             val view = SingleSelectionCustomView(binding.root.context)
-            view.tag = CallResultDialogFragment.TAG
+            view.tag = TAG
             view.addViewElements(
                 it,
                 SecuredPreference.getIsTranslationEnabled(),
@@ -404,7 +403,7 @@ class NCDCallResultBottomDialog : BottomSheetDialogFragment(), View.OnClickListe
         binding.tvPatientStatus.text = getString(R.string.reason)
         getUnsuccessfulData().let {
             val view = SingleSelectionCustomView(binding.root.context)
-            view.tag = CallResultDialogFragment.TAG
+            view.tag = TAG
             view.addViewElements(
                 it,
                 SecuredPreference.getIsTranslationEnabled(),
@@ -553,7 +552,7 @@ class NCDCallResultBottomDialog : BottomSheetDialogFragment(), View.OnClickListe
         binding.tvPatientStatus.text = getString(R.string.current_status)
         getPatientStatusForSuccessData().let {
             val view = SingleSelectionCustomView(binding.root.context)
-            view.tag = CallResultDialogFragment.TAG
+            view.tag = TAG
             view.addViewElements(
                 it,
                 SecuredPreference.getIsTranslationEnabled(),

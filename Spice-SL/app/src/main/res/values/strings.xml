@@ -1862,4 +1862,6 @@
     <string name="both_lower_case">Both</string>
     <string name="union">Union/Ward</string>
     <string name="linked_to_care">Linked to Care</string>
+    <string name="both">Both</string>
+    <string name="upazilla_health_complex">Upazila Health Complex</string>
 </resources>

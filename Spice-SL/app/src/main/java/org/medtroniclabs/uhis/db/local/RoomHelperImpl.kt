@@ -573,7 +573,14 @@ class RoomHelperImpl @Inject constructor(
     override fun getFollowUpPatientListLiveData(
         type: String,
         search: String?,
+        shashthyaShebikaIds: List<Long>,
+        shashthyaShebikaIdsSize: Int,
         villageIds: List<Long>,
+        villageIdsSize: Int,
+        selectedReferralReasonTypes: List<String>,
+        selectedReferralReasonTypesSize: Int,
+        ncdSelectedReason: String?,
+        ncdReferralFacility: String?,
         fromDate: String,
         toDate: String,
     ): LiveData<List<FollowUpPatientModel>> {
@@ -581,7 +588,13 @@ class RoomHelperImpl @Inject constructor(
             return followUpDao.getReferredFollowUpPatientListLiveData(
                 type = type,
                 search = search,
+                shashthyaShebikaIds = shashthyaShebikaIds,
+                shashthyaShebikaIdsSize = shashthyaShebikaIdsSize,
                 villageIds = villageIds,
+                villageIdsSize = villageIdsSize,
+                selectedReferralReasonTypes = selectedReferralReasonTypes,
+                selectedReferralReasonTypesSize = selectedReferralReasonTypesSize,
+                ncdSelectedReason = ncdSelectedReason,
                 fromDate = fromDate,
                 toDate = toDate,
             )
@@ -589,7 +602,13 @@ class RoomHelperImpl @Inject constructor(
             return followUpDao.getOtherFollowUpPatientListLiveData(
                 type = type,
                 search = search,
+                shashthyaShebikaIds = shashthyaShebikaIds,
+                shashthyaShebikaIdsSize = shashthyaShebikaIdsSize,
                 villageIds = villageIds,
+                villageIdsSize = villageIdsSize,
+                selectedReferralReasonTypes = selectedReferralReasonTypes,
+                selectedReferralReasonTypesSize = selectedReferralReasonTypesSize,
+                ncdSelectedReason = ncdSelectedReason,
                 fromDate = fromDate,
                 toDate = toDate,
             )

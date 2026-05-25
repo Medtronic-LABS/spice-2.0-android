@@ -15,4 +15,6 @@ object EntitiesName {
     const val TREATMENT_DETAILS_ENTITY = "TreatmentDetailsEntity"
     const val RX_BUDDY_FOLLOW_UP_ENTITY = "RxBuddyFollowUpEntity"
     const val MEMBER_ASSESSMENT_HISTORY_ENTITY = "MemberAssessmentHistory"
+
+    const val FOLLOW_UP_CALL = "FollowUpCall"
 }
