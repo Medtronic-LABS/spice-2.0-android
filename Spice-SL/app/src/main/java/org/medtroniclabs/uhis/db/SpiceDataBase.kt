@@ -124,6 +124,7 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentNCDEntity
         AutoMigration(1, 2),
         AutoMigration(2, 3),
         AutoMigration(4, 5),
+        AutoMigration(5, 6),
     ],
 )
 @TypeConverters(OfflineStatusTypeConverter::class)

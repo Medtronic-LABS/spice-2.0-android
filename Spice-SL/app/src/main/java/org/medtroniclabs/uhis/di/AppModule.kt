@@ -143,7 +143,7 @@ object AppModule {
     }
 
     @Provides
-    fun provideBaseUrl(): String = "https://first-naturally-oarfish.ngrok-free.app/"
+    fun provideBaseUrl(): String = BuildConfig.API_BASE_URL
 
     @Singleton
     @Provides
