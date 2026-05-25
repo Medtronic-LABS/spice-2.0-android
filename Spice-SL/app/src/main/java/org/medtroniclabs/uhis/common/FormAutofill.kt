@@ -98,7 +98,7 @@ object FormAutofill {
                 Screening.NotAtAll -> context.getString(R.string.not_at_all)
                 Screening.SeveralDays -> context.getString(R.string.several_days)
                 Screening.MoreThanHalfTheDays -> context.getString(R.string.more_than_half_day)
-                Screening.NearlyEveryDay -> context.getString(R.string.nearly_every_day)
+                Screening.NEARLY_EVERY_DAY -> context.getString(R.string.nearly_every_day)
                 else -> value
             }
         } else {

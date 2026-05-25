@@ -9,7 +9,7 @@ import org.medtroniclabs.uhis.appextensions.invisible
 import org.medtroniclabs.uhis.appextensions.textOrHyphen
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.Other
+import org.medtroniclabs.uhis.common.DefinedParams.OTHER
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.history.Prescription
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
@@ -126,7 +126,7 @@ object NCDMRUtil {
         val hasChips = chips.isNotEmpty() // Check if there are any chips selected
         val hasOtherChip = chips.any {
             it.name.equals(
-                DefinedParams.Other,
+                DefinedParams.OTHER,
                 ignoreCase = true,
             )
         } // Check if 'Other' chip is present
@@ -223,9 +223,9 @@ object NCDMRUtil {
 
     fun getTypeForDiagnoses(menu: String?): ArrayList<String> =
         when (menu?.lowercase()) {
-            NCD.lowercase() -> arrayListOf(HYPERTENSION, DIABETES, Other, HIV_DIAGNOSIS)
-            MENTAL_HEALTH.lowercase() -> arrayListOf(SUBSTANCE_DISORDER, MENTALHEALTH, Other, HIV_DIAGNOSIS)
-            DefinedParams.PregnancyANC.lowercase() -> arrayListOf(PREGNANCY, Other, HIV_DIAGNOSIS)
+            NCD.lowercase() -> arrayListOf(HYPERTENSION, DIABETES, OTHER, HIV_DIAGNOSIS)
+            MENTAL_HEALTH.lowercase() -> arrayListOf(SUBSTANCE_DISORDER, MENTALHEALTH, OTHER, HIV_DIAGNOSIS)
+            DefinedParams.PregnancyANC.lowercase() -> arrayListOf(PREGNANCY, OTHER, HIV_DIAGNOSIS)
             else -> arrayListOf()
         }
 
@@ -330,7 +330,7 @@ object NCDMRUtil {
 
             val bioMetricsData = hashMapOf(
                 MemberRegistration.GENDER to patientData.gender,
-                Screening.Age to patientData.age,
+                Screening.AGE to patientData.age,
             )
             if (!isGlucose) {
                 bioMetricsData[Screening.Height] = height ?: patientData.height

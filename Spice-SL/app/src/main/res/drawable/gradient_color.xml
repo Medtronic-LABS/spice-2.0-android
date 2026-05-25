@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Outer Stroke Shadow (Light-colored border) -->
+    <item>
+        <shape>
+            <solid android:color="@android:color/white" />
+            <corners android:topLeftRadius="6dp" android:topRightRadius="6dp" />
+        </shape>
+    </item>
+
+    <!-- Gradient Background -->
+    <item>
+        <shape>
+            <gradient
+                android:angle="315"
+                android:startColor="#D1D3FF"
+                android:centerColor="#FDCAB1"
+                android:endColor="#D1D3FF"
+                android:type="linear"
+                android:useLevel="false" />
+            <corners android:topLeftRadius="6dp" android:topRightRadius="6dp" />
+        </shape>
+    </item>
+
+    <!-- Inner Stroke Shadow (Dark-colored border) -->
+    <item>
+        <shape>
+            <solid android:color="#00000000" /> <!-- Transparent base -->
+            <corners android:topLeftRadius="7dp" android:topRightRadius="7dp" />
+            <stroke android:width="2dp" android:color="#0000001A" /> <!-- Inner shadow color -->
+        </shape>
+    </item>
+
+</layer-list>

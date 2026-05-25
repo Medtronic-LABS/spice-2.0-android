@@ -13,6 +13,8 @@ object MenuConstants {
     const val TB_MENU_ID = "TB"
     const val NCD_MENU_ID = "ncd"
 
+    const val MENU_REGISTRATION = "enrollment"
+
     const val EYE_CARE_MENU_ID = "eye_care"
 
     const val CATARACT_MENU_ID = "cataract"
@@ -30,6 +32,7 @@ object MenuConstants {
 
     const val SCREENING = "SCREENING"
     const val REGISTRATION = "REGISTRATION"
+    const val ENROLLMENT = "ENROLLMENT"
     const val ASSESSMENT = "ASSESSMENT"
     const val DASHBOARD = "DASHBOARD"
     const val MATERNAL_HEALTH = "maternalHealth"

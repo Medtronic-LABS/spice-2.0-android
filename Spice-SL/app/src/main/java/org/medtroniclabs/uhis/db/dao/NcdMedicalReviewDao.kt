@@ -34,6 +34,9 @@ interface NcdMedicalReviewDao {
     @Query("SELECT * FROM lifestyleentity ORDER BY displayOrder ASC")
     fun getLifeStyle(): LiveData<List<LifestyleEntity>>
 
+    @Query("SELECT * FROM lifestyleentity ORDER BY displayOrder ASC")
+    suspend fun getLifeStyleList(): List<LifestyleEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveNCDDiagnosisList(diseaseEntityList: ArrayList<NCDDiagnosisEntity>)
 

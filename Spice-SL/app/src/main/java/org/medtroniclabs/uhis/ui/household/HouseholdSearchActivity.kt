@@ -17,7 +17,7 @@ import org.medtroniclabs.uhis.appextensions.hideKeyboard
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.isHouseHold
+import org.medtroniclabs.uhis.common.DefinedParams.IS_HOUSE_HOLD
 import org.medtroniclabs.uhis.databinding.ActivityHouseholdSearchBinding
 import org.medtroniclabs.uhis.db.dao.HouseholdSortOrder
 import org.medtroniclabs.uhis.db.response.HouseHoldEntityWithLastActivity
@@ -210,7 +210,7 @@ class HouseholdSearchActivity : BaseActivity(), View.OnClickListener {
 
     private fun launchHouseholdActivity() {
         val intent = Intent(this, ConsentFormActivity::class.java)
-        intent.putExtra(isHouseHold, true)
+        intent.putExtra(IS_HOUSE_HOLD, true)
         startActivity(intent)
     }
 }

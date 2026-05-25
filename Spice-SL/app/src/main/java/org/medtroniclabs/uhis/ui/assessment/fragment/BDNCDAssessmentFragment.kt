@@ -261,4 +261,7 @@ class BDNCDAssessmentFragment : BaseFragment(), FormEventListener {
         resultHashMap: HashMap<String, Any>,
     ) {
     }
+
+    override fun onQRScanRequested() {
+    }
 }

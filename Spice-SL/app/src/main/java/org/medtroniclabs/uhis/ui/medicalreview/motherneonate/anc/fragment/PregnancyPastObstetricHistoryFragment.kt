@@ -95,7 +95,7 @@ class PregnancyPastObstetricHistoryFragment : BaseFragment() {
                 },
             )
         viewModel.pregnancyHistoryOther =
-            complaintList.firstOrNull { it.name.equals(DefinedParams.Other, ignoreCase = true) }
+            complaintList.firstOrNull { it.name.equals(DefinedParams.OTHER, ignoreCase = true) }
         complaintsTagView.addChipItemList(complaintList, viewModel.pregnancyHistoryChip)
         getRMNCHFlowData().let {
             val view = SingleSelectionCustomView(binding.root.context)

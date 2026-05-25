@@ -1,0 +1,77 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/llRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/_16sdp"
+    android:paddingTop="8dp"
+    android:paddingBottom="@dimen/_8sdp">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        style="@style/Form_Input_Style"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="@string/scan_qr"
+        app:layout_constraintBottom_toBottomOf="@id/ivScan"
+        app:layout_constraintStart_toEndOf="@id/ivScan"
+        app:layout_constraintTop_toTopOf="@id/ivScan"
+        tools:ignore="RtlSymmetry" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivScan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/qr_scan"
+        android:visibility="visible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/etQRCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:focusable="false"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@id/tvTitle"
+        app:layout_constraintTop_toTopOf="@id/tvTitle" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivScanDone"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:src="@drawable/ic_checked"
+        android:visibility="visible"
+        android:layout_marginStart="6dp"
+        app:layout_constraintStart_toEndOf="@id/tvTitle"
+        app:layout_constraintTop_toTopOf="@id/tvTitle"
+        app:layout_constraintBottom_toBottomOf="@id/tvTitle"/>
+
+
+    <TextView
+        android:id="@+id/tvNewScan"
+        style="@style/Form_Input_Style"
+        android:layout_width="0dp"
+        app:layout_constraintStart_toStartOf="@id/ivScan"
+        app:layout_constraintTop_toBottomOf="@id/ivScan"
+        android:text="@string/scan_new_qr"
+        android:layout_marginTop="10dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/table_title"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/tvErrorMessage"
+        style="@style/Form_TextStyle_Error_16"
+        android:layout_width="0dp"
+        app:layout_constraintStart_toStartOf="@id/ivScan"
+        app:layout_constraintTop_toBottomOf="@id/tvNewScan"
+        android:text="@string/linking_qr_code_is_mandatory"
+        android:layout_marginTop="10dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

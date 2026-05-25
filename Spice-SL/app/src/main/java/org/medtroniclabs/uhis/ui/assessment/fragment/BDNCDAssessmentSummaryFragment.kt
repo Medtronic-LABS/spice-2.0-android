@@ -17,7 +17,7 @@ import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.CVD_RISK_SCORE_DISPLAY
-import org.medtroniclabs.uhis.common.DefinedParams.DefaultID
+import org.medtroniclabs.uhis.common.DefinedParams.DEFAULT_ID
 import org.medtroniclabs.uhis.databinding.FragmentBdNcdSummaryBinding
 import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
 import org.medtroniclabs.uhis.model.AssessmentSummaryModel
@@ -283,8 +283,8 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
                 ) {
                     val selectedItem = adapter.getData(position = pos)
                     selectedItem?.let {
-                        val selectedId = it[DefinedParams.id] as String?
-                        if (selectedId != DefaultID) {
+                        val selectedId = it[DefinedParams.ID] as String?
+                        if (selectedId != DEFAULT_ID) {
                             viewModel.otherAssessmentDetails[ReferredPHUSiteID] = selectedId.toString()
                         } else {
                             if (viewModel.otherAssessmentDetails.containsKey(ReferredPHUSiteID)) {

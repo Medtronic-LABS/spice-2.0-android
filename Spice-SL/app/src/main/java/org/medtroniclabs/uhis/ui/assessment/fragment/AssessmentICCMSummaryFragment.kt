@@ -27,12 +27,12 @@ import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DateUtils.getDateAfterDays
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.ICCM
-import org.medtroniclabs.uhis.common.DefinedParams.IccmDiarrheaNotifiableCondition
-import org.medtroniclabs.uhis.common.DefinedParams.IccmFeverNotifiableCondition
+import org.medtroniclabs.uhis.common.DefinedParams.ICCM_DIARRHEA_NOTIFIABLE_CONDITION
+import org.medtroniclabs.uhis.common.DefinedParams.ICCM_FEVER_NOTIFIABLE_CONDITION
 import org.medtroniclabs.uhis.common.DefinedParams.OtherNotifiableConditionsForDiarrhoea
 import org.medtroniclabs.uhis.common.DefinedParams.OtherNotifiableConditionsForFever
 import org.medtroniclabs.uhis.common.DefinedParams.True
-import org.medtroniclabs.uhis.common.DefinedParams.Yes
+import org.medtroniclabs.uhis.common.DefinedParams.YES
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.SpiceLocationManager
 import org.medtroniclabs.uhis.common.StringConverter
@@ -196,8 +196,8 @@ class AssessmentICCMSummaryFragment : BaseFragment(), View.OnClickListener {
                 summaryData
                     .filter {
                         listOf(
-                            IccmDiarrheaNotifiableCondition,
-                            IccmFeverNotifiableCondition,
+                            ICCM_DIARRHEA_NOTIFIABLE_CONDITION,
+                            ICCM_FEVER_NOTIFIABLE_CONDITION,
                             OtherNotifiableConditionsForFever,
                             OtherNotifiableConditionsForDiarrhoea,
                         ).contains(it.id)
@@ -215,7 +215,7 @@ class AssessmentICCMSummaryFragment : BaseFragment(), View.OnClickListener {
             .filter {
                 it.value != null && !listOf(OtherNotifiableConditionsForDiarrhoea, OtherNotifiableConditionsForFever).contains(it.id)
             }.forEach { item ->
-                if (item.id.equals(IccmDiarrheaNotifiableCondition, true)) {
+                if (item.id.equals(ICCM_DIARRHEA_NOTIFIABLE_CONDITION, true)) {
                     val otherValue =
                         listSummaryData
                             .find {
@@ -227,7 +227,7 @@ class AssessmentICCMSummaryFragment : BaseFragment(), View.OnClickListener {
                     val value =
                         if (otherValue != null) "${item.value} - $otherValue" else item.value
                     bindSummaryView(item.title + " " + getString(R.string.hyphen_symbol) + " " + getString(R.string.diarrhoea), value, forCbs = true)
-                } else if (item.id.equals(IccmFeverNotifiableCondition, true)) {
+                } else if (item.id.equals(ICCM_FEVER_NOTIFIABLE_CONDITION, true)) {
                     val otherValue =
                         listSummaryData
                             .find {
@@ -324,7 +324,7 @@ class AssessmentICCMSummaryFragment : BaseFragment(), View.OnClickListener {
                 ) {
                     val selectedItem = adapter.getData(position = pos)
                     selectedItem?.let {
-                        val selectedId = it[DefinedParams.id] as String?
+                        val selectedId = it[DefinedParams.ID] as String?
                         viewModel.otherAssessmentDetails[ReferredPHUSiteID] =
                             selectedId?.toLong() ?: -1L
                     }
@@ -364,11 +364,11 @@ class AssessmentICCMSummaryFragment : BaseFragment(), View.OnClickListener {
                 val hasCbsCondition = filteredList.any { item ->
                     (item.id.equals(hasDiarrhoea, true) || item.id.equals(hasFever, true)) &&
                         summaryList.any {
-                            (it.id == IccmDiarrheaNotifiableCondition && it.value != null) ||
-                                it.id == IccmFeverNotifiableCondition &&
+                            (it.id == ICCM_DIARRHEA_NOTIFIABLE_CONDITION && it.value != null) ||
+                                it.id == ICCM_FEVER_NOTIFIABLE_CONDITION &&
                                 it.value != null
                         } &&
-                        item.value == Yes
+                        item.value == YES
                 }
                 if (hasCbsCondition) {
                     isCbs = true
@@ -456,8 +456,8 @@ class AssessmentICCMSummaryFragment : BaseFragment(), View.OnClickListener {
             binding.parentLayout.visibility = View.VISIBLE
             binding.parentLayout.removeAllViews()
             val cbsList = listOf(
-                IccmDiarrheaNotifiableCondition,
-                IccmFeverNotifiableCondition,
+                ICCM_DIARRHEA_NOTIFIABLE_CONDITION,
+                ICCM_FEVER_NOTIFIABLE_CONDITION,
                 OtherNotifiableConditionsForFever,
                 OtherNotifiableConditionsForDiarrhoea,
             )
@@ -528,7 +528,7 @@ class AssessmentICCMSummaryFragment : BaseFragment(), View.OnClickListener {
                     }
 
                     hasDiarrhoea -> {
-                        if (item.value == Yes) {
+                        if (item.value == YES) {
                             val dehydrationStatus = getDehydrationStatus(isSignContain)
                             bindICCMSummaryView(
                                 item.title,
@@ -552,7 +552,7 @@ class AssessmentICCMSummaryFragment : BaseFragment(), View.OnClickListener {
                     }
 
                     hasCough -> {
-                        if (item.value == Yes) {
+                        if (item.value == YES) {
                             val status = getPneumoniaStatus()
                             if (status) {
                                 bindICCMSummaryView(
@@ -603,7 +603,7 @@ class AssessmentICCMSummaryFragment : BaseFragment(), View.OnClickListener {
                                 )
                             feverObject?.optString(ReferralDefinedParams.RdtTest)
                         }
-                        if (item.value == Yes && rdtResult == RdtPositive) {
+                        if (item.value == YES && rdtResult == RdtPositive) {
                             bindICCMSummaryView(
                                 item.title,
                                 requireContext().getString(
@@ -795,9 +795,9 @@ class AssessmentICCMSummaryFragment : BaseFragment(), View.OnClickListener {
             AssessmentDefinedParams.SunkenFontanella.lowercase(),
         )
 
-        var result = DefinedParams.No
+        var result = DefinedParams.NO
         for (assessment in listSummaryData) {
-            if (assessment.value == Yes) {
+            if (assessment.value == YES) {
                 if (viewModel.isDangerSignFlow) {
                     result = when (viewModel.dangerSingsKey.toString()) {
                         isUnusualSleepy -> getString(R.string.unconscious_unusually_sleepy)

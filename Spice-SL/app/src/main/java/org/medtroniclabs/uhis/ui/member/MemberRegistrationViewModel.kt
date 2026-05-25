@@ -20,7 +20,7 @@ import org.medtroniclabs.uhis.db.entity.HouseholdMemberEntity
 import org.medtroniclabs.uhis.db.entity.VillageEntity
 import org.medtroniclabs.uhis.di.IoDispatcher
 import org.medtroniclabs.uhis.formgeneration.FormGenerator
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.HouseholdHeadRelationship
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.HOUSEHOLD_HEAD_RELATIONSHIP
 import org.medtroniclabs.uhis.mappingkey.MemberRegistration
 import org.medtroniclabs.uhis.model.medicalreview.AddMemberRegRequest
 import org.medtroniclabs.uhis.network.resource.Resource
@@ -111,7 +111,7 @@ class MemberRegistrationViewModel @Inject constructor(
 
                   /*
                    * Update Relation Household Head* */
-                memberResultMap[HouseholdHeadRelationship] = HouseholdHead
+                memberResultMap[HOUSEHOLD_HEAD_RELATIONSHIP] = HouseholdHead
 
                 registerMember(
                     memberResultMap,

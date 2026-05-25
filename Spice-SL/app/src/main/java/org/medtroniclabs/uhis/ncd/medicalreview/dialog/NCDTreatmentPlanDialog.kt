@@ -19,7 +19,7 @@ import org.medtroniclabs.uhis.appextensions.setVisible
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.CULTURE_VALUE
-import org.medtroniclabs.uhis.common.DefinedParams.DefaultID
+import org.medtroniclabs.uhis.common.DefinedParams.DEFAULT_ID
 import org.medtroniclabs.uhis.common.DefinedParams.ID
 import org.medtroniclabs.uhis.common.DefinedParams.NAME
 import org.medtroniclabs.uhis.common.DefinedParams.Value
@@ -194,7 +194,7 @@ class NCDTreatmentPlanDialog(private val callback: ((isPositiveResult: Boolean, 
             dropDownList.add(
                 hashMapOf<String, Any>(
                     NAME to getString(R.string.please_select),
-                    ID to DefaultID,
+                    ID to DEFAULT_ID,
                 ),
             )
             for (item in list) {

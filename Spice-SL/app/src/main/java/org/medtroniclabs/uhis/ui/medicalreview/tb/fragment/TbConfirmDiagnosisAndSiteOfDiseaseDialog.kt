@@ -24,7 +24,7 @@ import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.DrugSensitiveTB
 import org.medtroniclabs.uhis.common.DefinedParams.ExtraPulmonary
 import org.medtroniclabs.uhis.common.DefinedParams.OrganAffected
-import org.medtroniclabs.uhis.common.DefinedParams.SiteOfDisease
+import org.medtroniclabs.uhis.common.DefinedParams.SITE_OF_DISEASE
 import org.medtroniclabs.uhis.common.DefinedParams.TB
 import org.medtroniclabs.uhis.data.DiagnosisDiseaseModel
 import org.medtroniclabs.uhis.data.DiagnosisSaveUpdateRequest
@@ -114,7 +114,7 @@ class TbConfirmDiagnosisAndSiteOfDiseaseDialog : DialogFragment(), View.OnClickL
             binding.organChip,
         ) { _, _, _ ->
             val selectedTags = organAffectedTagView.getSelectedTags()
-            val hasOther = selectedTags.any { it.value.equals(DefinedParams.Other, ignoreCase = true) }
+            val hasOther = selectedTags.any { it.value.equals(DefinedParams.OTHER, ignoreCase = true) }
 
             enableBtn()
             showOtherNotes(hasOther)
@@ -138,7 +138,7 @@ class TbConfirmDiagnosisAndSiteOfDiseaseDialog : DialogFragment(), View.OnClickL
         val hasOrganTags = organTags.isNotEmpty()
         val hasDrugSensitiveTB = confirmTags.any { it.value == DrugSensitiveTB }
         val hasExtraPulmonary = siteTags.any { it.value == ExtraPulmonary }
-        val hasOtherOrgan = organTags.any { it.value.equals(DefinedParams.Other, true) }
+        val hasOtherOrgan = organTags.any { it.value.equals(DefinedParams.OTHER, true) }
         val otherNotesFilled = binding.etOtherDiagnosisNotes.text
             ?.toString()
             ?.trim()
@@ -279,7 +279,7 @@ class TbConfirmDiagnosisAndSiteOfDiseaseDialog : DialogFragment(), View.OnClickL
                     ChipViewItemModel(it.id, it.name, value = it.value)
                 } ?: emptyList()
 
-                val siteGetItem = listItems.filter { it.type == SiteOfDisease }
+                val siteGetItem = listItems.filter { it.type == SITE_OF_DISEASE }
                 val confirmGetItem = listItems.filter { it.type.isNullOrBlank() || it.type == TB.uppercase() }
                 val organGetItem = listItems.filter { it.type == OrganAffected }
 
@@ -306,8 +306,8 @@ class TbConfirmDiagnosisAndSiteOfDiseaseDialog : DialogFragment(), View.OnClickL
                             tvOrganError.gone()
                         }
                     }
-                    val hasOther = filteredOrganList.any { it.value.equals(DefinedParams.Other, ignoreCase = true) }
-                    val otherNotesItem = listItems.firstOrNull { it.diseaseCategory.equals(DefinedParams.OtherNotes, ignoreCase = true) }
+                    val hasOther = filteredOrganList.any { it.value.equals(DefinedParams.OTHER, ignoreCase = true) }
+                    val otherNotesItem = listItems.firstOrNull { it.diseaseCategory.equals(DefinedParams.OTHER_NOTES, ignoreCase = true) }
 
                     if (hasOther && otherNotesItem?.diseaseCondition?.isNotBlank() == true) {
                         binding.etOtherDiagnosisNotes.setText(otherNotesItem.diseaseCondition)
@@ -407,7 +407,7 @@ class TbConfirmDiagnosisAndSiteOfDiseaseDialog : DialogFragment(), View.OnClickL
                     diseaseCategory = it.value ?: "",
                     diseaseConditionId = null,
                     diseaseCondition = null,
-                    type = SiteOfDisease, // Set true for siteDiseaseCategoryTagView
+                    type = SITE_OF_DISEASE, // Set true for siteDiseaseCategoryTagView
                 )
             } + diseaseConfirmCategoryTagView.getSelectedTags().map {
                 DiagnosisDiseaseModel(

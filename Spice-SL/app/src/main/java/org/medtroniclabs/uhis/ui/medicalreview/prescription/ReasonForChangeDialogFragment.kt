@@ -9,9 +9,9 @@ import androidx.core.widget.doAfterTextChanged
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.setDialogWidthAndHeightAsWrapPercent
 import org.medtroniclabs.uhis.common.CommonUtils
-import org.medtroniclabs.uhis.common.DefinedParams.Medications
-import org.medtroniclabs.uhis.common.DefinedParams.PrescribedMedicine
-import org.medtroniclabs.uhis.common.DefinedParams.Regimen
+import org.medtroniclabs.uhis.common.DefinedParams.MEDICATIONS
+import org.medtroniclabs.uhis.common.DefinedParams.PRESCRIBED_MEDICINE
+import org.medtroniclabs.uhis.common.DefinedParams.REGIMEN
 import org.medtroniclabs.uhis.databinding.FragmentReasonForChangeDialogBinding
 import org.medtroniclabs.uhis.formgeneration.extension.markMandatory
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
@@ -32,9 +32,9 @@ class ReasonForChangeDialogFragment(
             callback: ReasonChangeCallback?,
         ): ReasonForChangeDialogFragment {
             val args = Bundle().apply {
-                putString(Medications, name)
-                regimen?.let { putInt(Regimen, it + 1) }
-                putBoolean(PrescribedMedicine, prescribedMedicine)
+                putString(MEDICATIONS, name)
+                regimen?.let { putInt(REGIMEN, it + 1) }
+                putBoolean(PRESCRIBED_MEDICINE, prescribedMedicine)
             }
             return ReasonForChangeDialogFragment(callback).apply {
                 arguments = args
@@ -78,16 +78,16 @@ class ReasonForChangeDialogFragment(
         binding.btnOkay.isEnabled = !reason.isNullOrEmpty()
     }
 
-    private fun isAlreadyPrescribedMedicine(): Boolean = arguments?.getBoolean(PrescribedMedicine, false) ?: false
+    private fun isAlreadyPrescribedMedicine(): Boolean = arguments?.getBoolean(PRESCRIBED_MEDICINE, false) ?: false
 
     private fun getRegimenLine(): String =
         if (isAlreadyPrescribedMedicine()) {
-            if (arguments?.getInt(Regimen) != null) {
-                when (arguments?.getInt(Regimen)) {
+            if (arguments?.getInt(REGIMEN) != null) {
+                when (arguments?.getInt(REGIMEN)) {
                     1 -> "1st"
                     2 -> "2nd"
                     3 -> "3rd"
-                    else -> "${arguments?.getInt(Regimen)}th"
+                    else -> "${arguments?.getInt(REGIMEN)}th"
                 }
             } else {
                 "1st"
@@ -98,7 +98,7 @@ class ReasonForChangeDialogFragment(
 
     private fun initView() {
         binding.tvReferredReasonLabel.markMandatory()
-        binding.tvName.text = arguments?.getString(Medications) ?: getString(R.string.seperator_hyphen)
+        binding.tvName.text = arguments?.getString(MEDICATIONS) ?: getString(R.string.seperator_hyphen)
         binding.tvRegimenLine.text = getRegimenLine()
     }
 

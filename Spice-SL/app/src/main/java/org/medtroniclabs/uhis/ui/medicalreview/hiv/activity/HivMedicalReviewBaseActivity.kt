@@ -346,12 +346,12 @@ class HivMedicalReviewBaseActivity :
             Bundle().apply {
                 putBoolean(DefinedParams.EMTCT, intent.getBooleanExtra(DefinedParams.EMTCT, false))
                 putBoolean(DefinedParams.isPregnant, patientViewModel.isPregnant())
-                putBoolean(DefinedParams.Gender, patientViewModel.getGenderIsFemale())
+                putBoolean(DefinedParams.GENDER, patientViewModel.getGenderIsFemale())
             }
         } else {
             Bundle().apply {
                 putBoolean(DefinedParams.isPregnant, patientViewModel.isPregnant())
-                putBoolean(DefinedParams.Gender, patientViewModel.getGenderIsFemale())
+                putBoolean(DefinedParams.GENDER, patientViewModel.getGenderIsFemale())
             }
         }
 
@@ -483,7 +483,7 @@ class HivMedicalReviewBaseActivity :
                 patientViewModel.patientDetailsLiveData.value?.data?.let { data ->
                     val intent = Intent(this, InvestigationActivity::class.java)
                     intent.putExtra(PatientId, data.patientId)
-                    intent.putExtra(DefinedParams.EncounterId, patientViewModel.encounterId)
+                    intent.putExtra(DefinedParams.ENCOUNTER_ID, patientViewModel.encounterId)
                     getResult.launch(intent)
                 }
             }
@@ -492,7 +492,7 @@ class HivMedicalReviewBaseActivity :
                 patientViewModel.patientDetailsLiveData.value?.data?.let { data ->
                     Intent(this, PrescriptionActivity::class.java).apply {
                         putExtra(PatientId, data.patientId)
-                        putExtra(DefinedParams.EncounterId, patientViewModel.encounterId)
+                        putExtra(DefinedParams.ENCOUNTER_ID, patientViewModel.encounterId)
                         getResult.launch(this)
                     }
                 }
@@ -530,7 +530,7 @@ class HivMedicalReviewBaseActivity :
         removeFragment(R.id.patientHIVTest)
         removeFragment(R.id.patientEligibility)
         val bundle = Bundle().apply {
-            putString(DefinedParams.EncounterId, encounterId)
+            putString(DefinedParams.ENCOUNTER_ID, encounterId)
             putString(DefinedParams.PatientReference, patientReference)
             putBoolean(DefinedParams.EMTCT, hivViewModel.isEMTCT)
         }
@@ -573,7 +573,7 @@ class HivMedicalReviewBaseActivity :
     private val getResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.getStringExtra(DefinedParams.EncounterId)?.let { value ->
+                result.data?.getStringExtra(DefinedParams.ENCOUNTER_ID)?.let { value ->
                     patientViewModel.encounterId = value
                 }
             }

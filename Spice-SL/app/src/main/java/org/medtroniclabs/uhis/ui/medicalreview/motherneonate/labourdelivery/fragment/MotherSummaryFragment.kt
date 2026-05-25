@@ -119,7 +119,7 @@ class MotherSummaryFragment : BaseFragment() {
         binding.tvGeneralConditionOfMother.text =
             motherDTO?.generalConditions ?: getString(R.string.hyphen_symbol)
         binding.tvStateOfThePerineum.text = when (motherDTO?.stateOfPerineum) {
-            DefinedParams.Episiotomy -> getString(R.string.episotomy)
+            DefinedParams.EPISIOTOMY -> getString(R.string.episotomy)
             Tear -> getString(R.string.hyphen_symbol)
             None -> getString(R.string.none)
             null -> getString(R.string.hyphen_symbol)

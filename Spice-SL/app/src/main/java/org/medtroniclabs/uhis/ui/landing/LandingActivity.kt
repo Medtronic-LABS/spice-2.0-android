@@ -890,7 +890,7 @@ class LandingActivity :
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             }
             val bundle = Bundle().apply {
-                putBoolean(DefinedParams.IsDeepLink, isDeepLink)
+                putBoolean(DefinedParams.IS_DEEP_LINK, isDeepLink)
             }
             replaceFragmentInId<HomeScreenFragment>(
                 R.id.fragmentContainerView,
@@ -1049,7 +1049,7 @@ class LandingActivity :
                 )
                 putAll(
                     mapOf(
-                        DefinedParams.Authorization to SecuredPreference.getString(
+                        DefinedParams.AUTHORIZATION to SecuredPreference.getString(
                             SecuredPreference.EnvironmentKey.TOKEN.toString(),
                         ),
                     ),

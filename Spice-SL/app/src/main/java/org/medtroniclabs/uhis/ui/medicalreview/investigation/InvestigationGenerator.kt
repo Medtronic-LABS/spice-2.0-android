@@ -43,7 +43,7 @@ import org.medtroniclabs.uhis.databinding.ResultSummaryInvestigationBinding
 import org.medtroniclabs.uhis.formgeneration.FormSupport
 import org.medtroniclabs.uhis.formgeneration.FormSupport.translateTitle
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.DefaultIDLabel
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.DEFAULT_ID_LABEL
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_DATEPICKER
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_EDITTEXT
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_SPINNER
@@ -207,7 +207,7 @@ class InvestigationGenerator(
             val testName = component[org.medtroniclabs.uhis.common.DefinedParams.TestName] as? String ?: ""
             val resultValue = component[org.medtroniclabs.uhis.common.DefinedParams.Result] as? String ?: ""
             val unit = component[org.medtroniclabs.uhis.common.DefinedParams.Uom] as? String ?: ""
-            val normalRange = component[org.medtroniclabs.uhis.common.DefinedParams.Description] as? String ?: "" // Assuming "description" holds the normal range
+            val normalRange = component[org.medtroniclabs.uhis.common.DefinedParams.DESCRIPTION] as? String ?: "" // Assuming "description" holds the normal range
 
             list.add(
                 LabTestResultModel(
@@ -380,7 +380,7 @@ class InvestigationGenerator(
             val dropDownList = java.util.ArrayList<Map<String, Any>>()
             dropDownList.add(
                 hashMapOf<String, Any>(
-                    DefinedParams.NAME to DefaultIDLabel,
+                    DefinedParams.NAME to DEFAULT_ID_LABEL,
                     DefinedParams.ID to "-1",
                 ),
             )
@@ -437,7 +437,7 @@ class InvestigationGenerator(
                 binding.etUserInputSpinner.visible()
                 unitDropDownList.add(
                     hashMapOf<String, Any>(
-                        DefinedParams.NAME to DefaultIDLabel,
+                        DefinedParams.NAME to DEFAULT_ID_LABEL,
                         DefinedParams.ID to "-1",
                     ),
                 )
@@ -502,7 +502,7 @@ class InvestigationGenerator(
                 inputFilter.add(DigitsInputFilter())
             }
 
-            if (id == DefinedParams.NationalId) {
+            if (id == DefinedParams.NATIONAL_ID) {
                 inputFilter.add(InputFilter.AllCaps())
             }
 
@@ -840,7 +840,7 @@ class InvestigationGenerator(
             true
         } else {
             data.resultHashMap!!.containsKey(
-                formData.id + org.medtroniclabs.uhis.common.DefinedParams.Unit,
+                formData.id + org.medtroniclabs.uhis.common.DefinedParams.UNIT,
             )
         }
 

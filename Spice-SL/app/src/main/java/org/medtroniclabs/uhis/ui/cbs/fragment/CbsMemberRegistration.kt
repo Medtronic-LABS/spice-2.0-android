@@ -119,8 +119,8 @@ class CbsMemberRegistration :
                     visibility = View.GONE
                 }
             val month =
-                map[org.medtroniclabs.uhis.formgeneration.config.DefinedParams.Month] as? Int
-            val week = map[org.medtroniclabs.uhis.formgeneration.config.DefinedParams.Week] as? Int
+                map[org.medtroniclabs.uhis.formgeneration.config.DefinedParams.MONTH_KEY] as? Int
+            val week = map[org.medtroniclabs.uhis.formgeneration.config.DefinedParams.WEEK_KEY] as? Int
             // Month and Week field validation
             if (month !in 0..11 || week !in 0..4) {
                 showInValidDob(getString(R.string.please_select_a_valid_value_month))
@@ -250,6 +250,9 @@ class CbsMemberRegistration :
         serverData: List<FormLayout>?,
         resultHashMap: HashMap<String, Any>,
     ) {
+    }
+
+    override fun onQRScanRequested() {
     }
 
     fun getCurrentAnsweredStatus(): Boolean = childFormGenerator.getResultMap().isNotEmpty()

@@ -86,13 +86,13 @@ class NCDInstructionExpansionDialog : DialogFragment(), View.OnClickListener {
     private fun initView() {
         binding.btnDone.safeClickListener(this)
         binding.ivClose.safeClickListener(this)
-        binding.etInstruction.setText(model?.instruction_entered ?: "")
+        binding.etInstruction.setText(model?.instructionEntered ?: "")
     }
 
     override fun onClick(view: View) {
         when (view.id) {
             binding.btnDone.id -> {
-                model?.instruction_entered = binding.etInstruction.text.toString()
+                model?.instructionEntered = binding.etInstruction.text.toString()
                 model?.isInstructionUpdated = true
                 prescriptionViewModel.reloadInstruction.value = true
                 dismiss()

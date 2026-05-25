@@ -174,7 +174,7 @@ class NCDMedicalReviewHistoryFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
-    private fun showLoading() {
+    override fun showLoading() {
         binding.clLoaderProgress.visible()
         binding.loaderProgress.visible()
         binding.retryButtonBp.gone()
@@ -364,7 +364,7 @@ class NCDMedicalReviewHistoryFragment : BaseFragment(), View.OnClickListener {
     private fun createMedicalReview(medicalReviewHistory: NCDMedicalReviewHistory): List<Map<String, String?>> {
         val commonFields = listOf(
             mapOf(
-                DefinedParams.label to requireContext().getString(R.string.date_of_review),
+                DefinedParams.LABEL to requireContext().getString(R.string.date_of_review),
                 DefinedParams.Value to (
                     viewModel.medicalReferralDates.value?.firstOrNull { it.id == viewModel.medicalVisitId }?.date?.let {
                         DateUtils.convertDateFormat(
@@ -376,7 +376,7 @@ class NCDMedicalReviewHistoryFragment : BaseFragment(), View.OnClickListener {
                 ),
             ),
             mapOf(
-                DefinedParams.label to requireContext().getString(R.string.chief_complaints),
+                DefinedParams.LABEL to requireContext().getString(R.string.chief_complaints),
                 DefinedParams.Value to CommonUtils.combineText(
                     CommonUtils.convertAnyToListOfString(medicalReviewHistory.medicalReview?.complaints),
                     "",
@@ -384,7 +384,7 @@ class NCDMedicalReviewHistoryFragment : BaseFragment(), View.OnClickListener {
                 ),
             ),
             mapOf(
-                DefinedParams.label to requireContext().getString(R.string.clinical_notes),
+                DefinedParams.LABEL to requireContext().getString(R.string.clinical_notes),
                 DefinedParams.Value to CommonUtils.combineText(
                     CommonUtils.convertAnyToListOfString(medicalReviewHistory.medicalReview?.notes),
                     "",
@@ -392,7 +392,7 @@ class NCDMedicalReviewHistoryFragment : BaseFragment(), View.OnClickListener {
                 ),
             ),
             mapOf(
-                DefinedParams.label to requireContext().getString(R.string.examination),
+                DefinedParams.LABEL to requireContext().getString(R.string.examination),
                 DefinedParams.Value to getPhysicalExamination(medicalReviewHistory.medicalReview?.physicalExams),
             ),
         )

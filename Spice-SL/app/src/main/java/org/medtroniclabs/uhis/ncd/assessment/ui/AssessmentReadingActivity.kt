@@ -302,6 +302,9 @@ class AssessmentReadingActivity : BaseActivity(), FormEventListener, View.OnClic
          */
     }
 
+    override fun onQRScanRequested() {
+    }
+
     private fun processValuesAndProceed(
         resultMap: HashMap<String, Any>,
         serverData: List<FormLayout>?,
@@ -323,13 +326,13 @@ class AssessmentReadingActivity : BaseActivity(), FormEventListener, View.OnClic
                 // CVD Risk Calculation
                 viewModel.patientDetails?.let { details ->
                     details.isRegularSmoker?.let { regularSmoke ->
-                        map[Screening.is_regular_smoker] = regularSmoke
+                        map[Screening.IS_REGULAR_SMOKER] = regularSmoke
                     }
                     details.dateOfBirth?.let { dob ->
                         map[Screening.DateOfBirth] = dob
                     }
                     details.gender?.let { sex ->
-                        map[DefinedParams.Gender] = sex
+                        map[DefinedParams.GENDER] = sex
                     }
                 }
                 val resultOne = bpViewModel.getRiskEntityListLiveData.value
@@ -363,7 +366,7 @@ class AssessmentReadingActivity : BaseActivity(), FormEventListener, View.OnClic
                             requestMap.remove(DefinedParams.BP_LOG)
                         }
                         requestMap.remove(Screening.DateOfBirth)
-                        requestMap.remove(DefinedParams.Gender)
+                        requestMap.remove(DefinedParams.GENDER)
 
                         viewModel.patientDetails?.let { details ->
                             bpViewModel.createBpLog(

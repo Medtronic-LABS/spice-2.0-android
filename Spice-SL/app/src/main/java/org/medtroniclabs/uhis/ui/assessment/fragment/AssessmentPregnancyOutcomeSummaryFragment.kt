@@ -599,10 +599,10 @@ class AssessmentPregnancyOutcomeSummaryFragment : BaseFragment(), View.OnClickLi
         val maternalDeath = currentMapData?.get(AssessmentDefinedParams.MATERNAL_DEATH) as? Map<String, Any?>
         val timeOfDeath = maternalDeath?.get(AssessmentDefinedParams.TIME_OF_DEATH)
         val hasTimeOfDeath = when (timeOfDeath) {
-            is String -> timeOfDeath.isNotBlank() && timeOfDeath != DefinedParams.DefaultID
+            is String -> timeOfDeath.isNotBlank() && timeOfDeath != DefinedParams.DEFAULT_ID
             is Map<*, *> -> {
                 val timeOfDeathId = timeOfDeath[DefinedParams.ID]?.toString()
-                !timeOfDeathId.isNullOrBlank() && timeOfDeathId != DefinedParams.DefaultID
+                !timeOfDeathId.isNullOrBlank() && timeOfDeathId != DefinedParams.DEFAULT_ID
             }
 
             else -> false

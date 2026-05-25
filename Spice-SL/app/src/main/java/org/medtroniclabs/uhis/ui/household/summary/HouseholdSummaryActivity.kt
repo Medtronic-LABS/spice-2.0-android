@@ -13,8 +13,8 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.common.DefinedParams
+import org.medtroniclabs.uhis.common.DefinedParams.IS_MEMBER_REGISTRATION
 import org.medtroniclabs.uhis.common.DefinedParams.TB
-import org.medtroniclabs.uhis.common.DefinedParams.isMemberRegistration
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberWithTb
 import org.medtroniclabs.uhis.databinding.ActivityHouseholdSummaryBinding
 import org.medtroniclabs.uhis.formgeneration.extension.capitalizeFirstChar
@@ -305,7 +305,7 @@ class HouseholdSummaryActivity : BaseActivity(), MemberSelectionListener, View.O
         if (householdSummaryViewModel.houseHoldId != -1L) {
             val intent =
                 Intent(this@HouseholdSummaryActivity, HouseholdActivity::class.java)
-            intent.putExtra(isMemberRegistration, true)
+            intent.putExtra(IS_MEMBER_REGISTRATION, true)
             intent.putExtra(DefinedParams.householdId, householdSummaryViewModel.houseHoldId)
             startActivity(intent)
         }
@@ -315,7 +315,7 @@ class HouseholdSummaryActivity : BaseActivity(), MemberSelectionListener, View.O
         if (householdSummaryViewModel.houseHoldId != -1L) {
             val intent =
                 Intent(this@HouseholdSummaryActivity, HouseholdActivity::class.java)
-            intent.putExtra(isMemberRegistration, false)
+            intent.putExtra(IS_MEMBER_REGISTRATION, false)
             intent.putExtra(DefinedParams.householdId, householdSummaryViewModel.houseHoldId)
             startActivity(intent)
         }

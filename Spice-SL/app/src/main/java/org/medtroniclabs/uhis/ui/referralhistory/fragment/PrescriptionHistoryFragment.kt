@@ -172,7 +172,7 @@ class PrescriptionHistoryFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
-    private fun showLoading() {
+    override fun showLoading() {
         binding.clLoaderProgress.visible()
         binding.loaderProgress.visible()
         binding.retryButtonBp.gone()
@@ -202,7 +202,7 @@ class PrescriptionHistoryFragment : BaseFragment(), View.OnClickListener {
             adapters.updateList(
                 listOf(
                     mapOf(
-                        label to requireContext().getString(R.string.date_of_prescription),
+                        LABEL to requireContext().getString(R.string.date_of_prescription),
                         this.Value to prescriptionData.dateOfReview?.let {
                             DateUtils.convertDateFormat(
                                 it,
@@ -212,7 +212,7 @@ class PrescriptionHistoryFragment : BaseFragment(), View.OnClickListener {
                         },
                     ),
                     mapOf(
-                        label to requireContext().getString(R.string.medication_prescribed),
+                        LABEL to requireContext().getString(R.string.medication_prescribed),
                         this.Value to createPrescription(prescriptionData.prescriptions),
                     ),
                 ),

@@ -144,16 +144,16 @@ class EligibilityFragment : BaseFragment() {
         val dropDownList = ArrayList<Map<String, Any>>()
         dropDownList.add(
             hashMapOf<String, Any>(
-                DefinedParams.NAME to DefinedParams.DefaultIDLabel,
-                DefinedParams.id to DefinedParams.DefaultID,
-                DefinedParams.Value to DefinedParams.DefaultIDLabel,
+                DefinedParams.NAME to DefinedParams.DEFAULT_ID_LABEL,
+                DefinedParams.ID to DefinedParams.DEFAULT_ID,
+                DefinedParams.Value to DefinedParams.DEFAULT_ID_LABEL,
             ),
         )
         for (item in costList) {
             dropDownList.add(
                 hashMapOf<String, Any>(
                     DefinedParams.NAME to item.name,
-                    DefinedParams.id to item.id.toString(),
+                    DefinedParams.ID to item.id.toString(),
                     DefinedParams.Value to (item.value ?: item.name),
                 ),
             )
@@ -186,7 +186,7 @@ class EligibilityFragment : BaseFragment() {
 
     fun handleHivTestDuration(testDuration: String) {
         val isHaveYouTakenHivTestBefore = hivViewModel.resultHashMap[HaveYouTakenHivTestBefore]
-        if (testDuration != DefinedParams.DefaultIDLabel) {
+        if (testDuration != DefinedParams.DEFAULT_ID_LABEL) {
             when (isHaveYouTakenHivTestBefore) {
                 getString(R.string.yes) -> {
                     hivViewModel.selectedLastTestForHIV = testDuration
@@ -279,12 +279,12 @@ class EligibilityFragment : BaseFragment() {
                 name = item.name,
                 value = item.value,
             )
-            val isMale = arguments?.getBoolean(DefinedParams.Gender) != true
+            val isMale = arguments?.getBoolean(DefinedParams.GENDER) != true
             val isExcludedForMale = item.name.equals(getString(R.string.pregnant_), ignoreCase = true) ||
                 item.name.equals(getString(R.string.female_sex_worker_fsw), ignoreCase = true)
             val isExcludedForAge = item.name.equals(getString(R.string.pregnant_), ignoreCase = true)
 
-            val isFemale = arguments?.getBoolean(DefinedParams.Gender) == true
+            val isFemale = arguments?.getBoolean(DefinedParams.GENDER) == true
 
             val isExcludedForFemale = item.name.equals(getString(R.string.men_having_sex_with_men_msm), ignoreCase = true)
             if (!(isMale && isExcludedForMale) && !(isFemale && isExcludedForFemale)) {

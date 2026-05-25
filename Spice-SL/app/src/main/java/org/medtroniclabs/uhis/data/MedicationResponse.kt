@@ -46,13 +46,13 @@ data class MedicationResponse(
     var isEdited: Boolean = false
     var isInstructionUpdated = false
     var enteredDosageUnitValue: String? = null
-    var dosage_form_name_entered: String? = null
+    var dosageFormNameEntered: String? = null
     var dosage_duration_name: String? = null
-    var dosage_unit_selected: Long? = null
-    var dosage_unit_name_entered: String? = null
-    var dosage_frequency_name_entered: String? = null
-    var dosage_frequency_entered: Long? = null
-    var instruction_entered: String? = null
+    var dosageUnitSelected: Long? = null
+    var dosageUnitNameEntered: String? = null
+    var dosageFrequencyNameEntered: String? = null
+    var dosageFrequencyEntered: Long? = null
+    var instructionEntered: String? = null
 }
 
 data class MedicationRequestObject(var medicationResponse: MedicationResponse)

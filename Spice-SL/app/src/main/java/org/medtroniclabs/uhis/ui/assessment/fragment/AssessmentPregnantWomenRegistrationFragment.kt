@@ -415,6 +415,9 @@ class AssessmentPregnantWomenRegistrationFragment :
     ) {
     }
 
+    override fun onQRScanRequested() {
+    }
+
     override fun onClick(view: View) {
         when (view.id) {
             binding.btnSubmit.id -> {

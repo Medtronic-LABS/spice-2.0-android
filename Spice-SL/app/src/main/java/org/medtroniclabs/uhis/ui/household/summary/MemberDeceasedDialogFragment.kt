@@ -105,8 +105,8 @@ class MemberDeceasedDialogFragment : DialogFragment(), View.OnClickListener {
         val dropDownList = ArrayList<MemberDetailsSpinnerModel>()
         dropDownList.add(
             MemberDetailsSpinnerModel(
-                id = DefinedParams.DefaultSelectID,
-                name = DefinedParams.DefaultIDLabel,
+                id = DefinedParams.DEFAULT_SELECT_ID,
+                name = DefinedParams.DEFAULT_ID_LABEL,
             ),
         )
         householdSummaryViewModel.householdMembersLiveData.value?.let { data ->
@@ -184,7 +184,7 @@ class MemberDeceasedDialogFragment : DialogFragment(), View.OnClickListener {
      */
     private fun onTypeOfDeathSelected(typeId: String) {
         when {
-            typeId.isBlank() || typeId == DefinedParams.DefaultID -> {
+            typeId.isBlank() || typeId == DefinedParams.DEFAULT_ID -> {
                 binding.tvReason.gone()
                 binding.tvReasonHint.gone()
                 binding.rvItems.gone()
@@ -280,7 +280,7 @@ class MemberDeceasedDialogFragment : DialogFragment(), View.OnClickListener {
     private fun withDefaultTypeOption(options: List<Map<String, Any>>): ArrayList<Map<String, Any>> =
         arrayListOf<Map<String, Any>>(
             mapOf(
-                DefinedParams.ID to DefinedParams.DefaultID,
+                DefinedParams.ID to DefinedParams.DEFAULT_ID,
                 DefinedParams.NAME to getString(R.string.please_select),
             ),
         ).apply {

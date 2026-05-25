@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="@dimen/_10sdp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_12sdp"
+        app:cardCornerRadius="@dimen/_10sdp"
+        app:cardElevation="@dimen/_4sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/lHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:paddingVertical="@dimen/_15sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/tvTestName"
+                    style="@style/MR_Header_Style"
+                    android:layout_width="@dimen/_0dp"
+                    android:text="@string/test_name"
+                    app:layout_constraintEnd_toStartOf="@+id/oneGuideline"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/oneGuideline"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.25" />
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/twoGuideline"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.40" />
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/threeGuideline"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.60" />
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/fourGuideline"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.80" />
+
+                <TextView
+                    android:id="@+id/tvRefOn"
+                    style="@style/MR_Header_Style"
+                    android:layout_width="@dimen/_0dp"
+                    android:paddingStart="@dimen/_0dp"
+                    android:paddingEnd="@dimen/_4sdp"
+                    android:text="@string/referred_on"
+                    app:layout_constraintEnd_toStartOf="@+id/twoGuideline"
+                    app:layout_constraintHorizontal_weight="0.4"
+                    app:layout_constraintStart_toEndOf="@+id/tvTestName"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvRefBy"
+                    style="@style/MR_Header_Style"
+                    android:layout_width="@dimen/_0dp"
+                    android:paddingStart="@dimen/_0dp"
+                    android:paddingEnd="@dimen/_4sdp"
+                    android:text="@string/referred_by"
+                    app:layout_constraintEnd_toStartOf="@+id/threeGuideline"
+                    app:layout_constraintHorizontal_weight="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/tvRefOn"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvTestedOn"
+                    style="@style/MR_Header_Style"
+                    android:layout_width="@dimen/_0dp"
+                    android:paddingStart="@dimen/_0dp"
+                    android:paddingEnd="@dimen/_4sdp"
+                    android:text="@string/tested_on"
+                    app:layout_constraintEnd_toStartOf="@+id/fourGuideline"
+                    app:layout_constraintHorizontal_weight="0.4"
+                    app:layout_constraintStart_toEndOf="@+id/tvRefBy"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvValueBy"
+                    style="@style/MR_Header_Style"
+                    android:layout_width="@dimen/_0dp"
+                    android:visibility="gone"
+                    android:text="@string/value"
+                    app:layout_constraintEnd_toStartOf="@+id/tvTxt"
+                    app:layout_constraintHorizontal_weight="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/tvTestedOn"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvTxt"
+                    style="@style/MR_Header_Style"
+                    android:layout_width="@dimen/_0dp"
+                    android:text=""
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_weight="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/tvValueBy"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:id="@+id/headerDivider"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_1sdp"
+                android:background="@color/divider_color" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvTestList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:visibility="visible" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNoData"
+                style="@style/MR_NoData_Style"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/no_investigation_referred"
+                android:textSize="@dimen/_14ssp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

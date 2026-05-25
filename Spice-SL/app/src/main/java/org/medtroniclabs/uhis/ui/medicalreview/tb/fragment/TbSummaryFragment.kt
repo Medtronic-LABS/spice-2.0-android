@@ -17,7 +17,7 @@ import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.SiteOfDisease
+import org.medtroniclabs.uhis.common.DefinedParams.SITE_OF_DISEASE
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.ViewUtils
 import org.medtroniclabs.uhis.data.model.TbHistory
@@ -113,7 +113,7 @@ class TbSummaryFragment : BaseFragment(), View.OnClickListener {
             val list = arrayListOf<Map<String, Any>>().apply {
                 add(
                     mapOf(
-                        DefinedParams.NAME to DefinedParams.DefaultIDLabel,
+                        DefinedParams.NAME to DefinedParams.DEFAULT_ID_LABEL,
                         DefinedParams.ID to -1L,
                     ),
                 )
@@ -122,7 +122,7 @@ class TbSummaryFragment : BaseFragment(), View.OnClickListener {
                     if (!item.value.equals(ReferralStatus.Died.name, true)) {
                         add(
                             mapOf(
-                                DefinedParams.id to item.id,
+                                DefinedParams.ID to item.id,
                                 DefinedParams.NAME to item.name,
                                 DefinedParams.Value to (item.value ?: item.name),
                             ),
@@ -182,7 +182,7 @@ class TbSummaryFragment : BaseFragment(), View.OnClickListener {
             tvDiagnosesText.text = diagnosisList
                 .filter {
                     it.diseaseCategory
-                        .equals(DefinedParams.OtherNotes, ignoreCase = true)
+                        .equals(DefinedParams.OTHER_NOTES, ignoreCase = true)
                         .not() &&
                         (it.type.equals(DefinedParams.TB, true) || it.type.isNullOrBlank())
                 }.map { it.diseaseCategory }
@@ -195,9 +195,9 @@ class TbSummaryFragment : BaseFragment(), View.OnClickListener {
             tvSiteText.text = diagnosisList
                 .filter {
                     it.diseaseCategory
-                        .equals(DefinedParams.OtherNotes, ignoreCase = true)
+                        .equals(DefinedParams.OTHER_NOTES, ignoreCase = true)
                         .not() &&
-                        it.type.equals(SiteOfDisease, true)
+                        it.type.equals(SITE_OF_DISEASE, true)
                 }.map { it.diseaseCategory }
                 .distinct()
                 .takeIf { it.isNotEmpty() }
@@ -345,7 +345,7 @@ class TbSummaryFragment : BaseFragment(), View.OnClickListener {
                 ) {
                     val selectedItem = adapterForTreatmentOutCome.getData(position = pos)
                     selectedItem?.let {
-                        val selectedId = (it[DefinedParams.id] as? Long) ?: -1L
+                        val selectedId = (it[DefinedParams.ID] as? Long) ?: -1L
                         val selectedTreatmentOutCome = it[DefinedParams.Value] as String?
                         if (selectedId != -1L) {
                             viewModel.treatmentOutCome = selectedTreatmentOutCome
@@ -397,7 +397,7 @@ class TbSummaryFragment : BaseFragment(), View.OnClickListener {
             val treatmentList = arrayListOf<Map<String, Any>>().apply {
                 add(
                     mapOf(
-                        DefinedParams.NAME to DefinedParams.DefaultIDLabel,
+                        DefinedParams.NAME to DefinedParams.DEFAULT_ID_LABEL,
                         DefinedParams.ID to -1L,
                     ),
                 )
@@ -406,7 +406,7 @@ class TbSummaryFragment : BaseFragment(), View.OnClickListener {
                     if (!item.value.equals(ReferralStatus.Died.name, true)) {
                         add(
                             mapOf(
-                                DefinedParams.id to item.id,
+                                DefinedParams.ID to item.id,
                                 DefinedParams.NAME to item.name,
                                 DefinedParams.Value to (item.value ?: item.name),
                             ),
@@ -427,14 +427,14 @@ class TbSummaryFragment : BaseFragment(), View.OnClickListener {
             val treatmentList = arrayListOf<Map<String, Any>>().apply {
                 add(
                     mapOf(
-                        DefinedParams.NAME to DefinedParams.DefaultIDLabel,
+                        DefinedParams.NAME to DefinedParams.DEFAULT_ID_LABEL,
                         DefinedParams.ID to -1L,
                     ),
                 )
                 viewModel.getTreatmentOutComeLiveData.value?.forEach { item ->
                     add(
                         mapOf(
-                            DefinedParams.id to item.id,
+                            DefinedParams.ID to item.id,
                             DefinedParams.NAME to item.name,
                             DefinedParams.Value to (item.value ?: item.name),
                         ),

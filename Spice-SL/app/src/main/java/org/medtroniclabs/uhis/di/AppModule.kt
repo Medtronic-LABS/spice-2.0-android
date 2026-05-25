@@ -119,7 +119,7 @@ object AppModule {
             SecuredPreference
                 .getString(SecuredPreference.EnvironmentKey.TENANT_ID.toString())
                 ?.let { tenantId ->
-                    requestBuilder.header(DefinedParams.TenantId, tenantId)
+                    requestBuilder.header(DefinedParams.TENANT_ID, tenantId)
                 }
 
             request = requestBuilder.build()
@@ -143,7 +143,7 @@ object AppModule {
     }
 
     @Provides
-    fun provideBaseUrl(): String = BuildConfig.API_BASE_URL
+    fun provideBaseUrl(): String = "https://first-naturally-oarfish.ngrok-free.app/"
 
     @Singleton
     @Provides

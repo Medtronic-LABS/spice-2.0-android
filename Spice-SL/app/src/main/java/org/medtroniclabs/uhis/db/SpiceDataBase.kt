@@ -50,8 +50,13 @@ import org.medtroniclabs.uhis.db.entity.ChiefDomEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowConditionEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowEntity
 import org.medtroniclabs.uhis.db.entity.CommunityProfile
+import org.medtroniclabs.uhis.db.entity.ComorbidityEntity
+import org.medtroniclabs.uhis.db.entity.ComplaintsEntity
+import org.medtroniclabs.uhis.db.entity.ComplicationEntity
 import org.medtroniclabs.uhis.db.entity.ConsentEntity
 import org.medtroniclabs.uhis.db.entity.ConsentForm
+import org.medtroniclabs.uhis.db.entity.CurrentMedicationEntity
+import org.medtroniclabs.uhis.db.entity.DiagnosisEntity
 import org.medtroniclabs.uhis.db.entity.DistrictEntity
 import org.medtroniclabs.uhis.db.entity.DosageDurationEntity
 import org.medtroniclabs.uhis.db.entity.FollowUp
@@ -73,6 +78,7 @@ import org.medtroniclabs.uhis.db.entity.NCDDiagnosisEntity
 import org.medtroniclabs.uhis.db.entity.NCDFollowUp
 import org.medtroniclabs.uhis.db.entity.NCDMedicalReviewMetaEntity
 import org.medtroniclabs.uhis.db.entity.NCDPatientDetailsEntity
+import org.medtroniclabs.uhis.db.entity.PhysicalExaminationEntity
 import org.medtroniclabs.uhis.db.entity.PregnancyDetail
 import org.medtroniclabs.uhis.db.entity.RiskFactorEntity
 import org.medtroniclabs.uhis.db.entity.RxBuddyDetails
@@ -83,7 +89,9 @@ import org.medtroniclabs.uhis.db.entity.ShasthyaKormiLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
+import org.medtroniclabs.uhis.db.entity.SiteEntity
 import org.medtroniclabs.uhis.db.entity.SubVillageEntity
+import org.medtroniclabs.uhis.db.entity.SymptomEntity
 import org.medtroniclabs.uhis.db.entity.TreatmentDetailsEntity
 import org.medtroniclabs.uhis.db.entity.TreatmentPlanEntity
 import org.medtroniclabs.uhis.db.entity.UserProfileEntity
@@ -94,18 +102,24 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentNCDEntity
     entities = [
         HouseholdEntity::class, HouseholdMemberEntity::class, SignsAndSymptomsEntity::class, AssessmentEntity::class, MenuEntity::class,
         UserProfileEntity::class, VillageEntity::class, HealthFacilityEntity::class, ClinicalWorkflowEntity::class, FormEntity::class,
-        ClinicalWorkflowConditionEntity::class, MedicalReviewMetaItems::class, DiseaseCategoryItems::class, ExaminationListItems::class, LabourDeliveryMetaEntity::class,
+        ClinicalWorkflowConditionEntity::class, MedicalReviewMetaItems::class, DiseaseCategoryItems::class,
+        ExaminationListItems::class, LabourDeliveryMetaEntity::class,
         FollowUp::class, FollowUpCall::class, PregnancyDetail::class, FrequencyEntity::class, ConsentForm::class,
         LinkHouseholdMember::class, CallHistory::class, ProgramEntity::class, CulturesEntity::class, ConsentEntity::class,
         MentalHealthEntity::class, MedicalComplianceEntity::class, ChiefDomEntity::class, DistrictEntity::class, ScreeningEntity::class,
         RiskFactorEntity::class, LifestyleEntity::class, NCDMedicalReviewMetaEntity::class, AssessmentNCDEntity::class, UnitMetricEntity::class,
-        DosageFrequency::class, NCDDiagnosisEntity::class, TreatmentPlanEntity::class, ShortageReasonEntity::class, DosageDurationEntity::class, NCDFollowUp::class,
-        LinkedVillageEntity::class, NCDCallDetails::class, NCDPatientDetailsEntity::class, CommunityProfile::class, RxBuddyDetails::class, TreatmentDetailsEntity::class, RxBuddyFollowUpEntity::class,
+        DosageFrequency::class, NCDDiagnosisEntity::class, TreatmentPlanEntity::class,
+        ShortageReasonEntity::class, DosageDurationEntity::class, NCDFollowUp::class,
+        LinkedVillageEntity::class, NCDCallDetails::class, NCDPatientDetailsEntity::class,
+        CommunityProfile::class, RxBuddyDetails::class, TreatmentDetailsEntity::class,
+        RxBuddyFollowUpEntity::class,
         SubVillageEntity::class, ShasthyaShebikaEntity::class, ShasthyaShebikaLinkedVillageEntity::class,
-        ShasthyaKormiEntity::class, ShasthyaKormiLinkedVillageEntity::class,
-        MemberAssessmentHistoryEntity::class,
+        MemberAssessmentHistoryEntity::class, DiagnosisEntity::class,
+        SiteEntity::class, ComorbidityEntity::class,
+        ComplicationEntity::class, CurrentMedicationEntity::class, PhysicalExaminationEntity::class, ComplaintsEntity::class,
+        SymptomEntity::class, ShasthyaKormiEntity::class, ShasthyaKormiLinkedVillageEntity::class,
     ],
-    version = 5,
+    version = 6,
     autoMigrations = [
         AutoMigration(1, 2),
         AutoMigration(2, 3),
@@ -170,11 +184,11 @@ abstract class SpiceDataBase : RoomDatabase() {
         private const val DATABASE_NAME = "SpiceDataBase"
 
         @Volatile
-        private var INSTANCE: SpiceDataBase? = null
+        private var instance: SpiceDataBase? = null
 
         fun getInstance(context: Context): SpiceDataBase =
-            INSTANCE ?: synchronized(this) {
-                INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
+            instance ?: synchronized(this) {
+                instance ?: buildDatabase(context).also { instance = it }
             }
 
         private fun buildDatabase(context: Context): SpiceDataBase {

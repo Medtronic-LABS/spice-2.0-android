@@ -8,7 +8,10 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
+import android.text.Spannable
+import android.text.SpannableString
 import android.text.SpannableStringBuilder
+import android.text.style.ClickableSpan
 import android.view.View
 import android.view.WindowManager
 import androidx.core.view.ViewCompat
@@ -18,23 +21,32 @@ import androidx.core.view.updateLayoutParams
 import com.google.gson.Gson
 import com.google.gson.internal.LinkedTreeMap
 import okhttp3.ResponseBody
+import org.json.JSONObject
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.nullIfEmpty
 import org.medtroniclabs.uhis.common.DateUtils.calculateAge
 import org.medtroniclabs.uhis.common.RoleConstant.CHA
 import org.medtroniclabs.uhis.common.RoleConstant.CHWs
 import org.medtroniclabs.uhis.common.RoleConstant.COMMUNITY_HEALTH_ASSISTANT
+import org.medtroniclabs.uhis.common.RoleConstant.COMMUNITY_HEALTH_CARE_PROVIDER
 import org.medtroniclabs.uhis.common.RoleConstant.COMMUNITY_HEALTH_PROMOTER
+import org.medtroniclabs.uhis.common.RoleConstant.FIELD_ORGANIZER
 import org.medtroniclabs.uhis.common.RoleConstant.FO
+import org.medtroniclabs.uhis.common.RoleConstant.HEALTH_EDUCATOR
 import org.medtroniclabs.uhis.common.RoleConstant.HEALTH_SCREENER
 import org.medtroniclabs.uhis.common.RoleConstant.LAB_ASSISTANT
 import org.medtroniclabs.uhis.common.RoleConstant.MCHA
+import org.medtroniclabs.uhis.common.RoleConstant.MEDICAL_DOCTOR
 import org.medtroniclabs.uhis.common.RoleConstant.MID_WIFE
+import org.medtroniclabs.uhis.common.RoleConstant.PARAMEDIC
+import org.medtroniclabs.uhis.common.RoleConstant.PARA_COUNSELLOR
 import org.medtroniclabs.uhis.common.RoleConstant.PEER_SUPERVISOR
 import org.medtroniclabs.uhis.common.RoleConstant.PHARMACIST
 import org.medtroniclabs.uhis.common.RoleConstant.PHYSICIAN_PRESCRIBER
 import org.medtroniclabs.uhis.common.RoleConstant.PO
+import org.medtroniclabs.uhis.common.RoleConstant.PROGRAM_ORGANIZER
 import org.medtroniclabs.uhis.common.RoleConstant.PROVIDER
+import org.medtroniclabs.uhis.common.RoleConstant.PSYCHOLOGIST
 import org.medtroniclabs.uhis.common.RoleConstant.SECHN
 import org.medtroniclabs.uhis.common.RoleConstant.SRN
 import org.medtroniclabs.uhis.data.ErrorResponse
@@ -66,6 +78,7 @@ import org.medtroniclabs.uhis.mappingkey.Screening.lastMealTime
 import org.medtroniclabs.uhis.mappingkey.Screening.lastMealTypeDateSuffix
 import org.medtroniclabs.uhis.mappingkey.Screening.lastMealTypeMeridiem
 import org.medtroniclabs.uhis.mappingkey.Screening.mentalHealthScore
+import org.medtroniclabs.uhis.mappingkey.Screening.mmoll
 import org.medtroniclabs.uhis.mappingkey.Screening.otherType
 import org.medtroniclabs.uhis.mappingkey.Screening.siteId
 import org.medtroniclabs.uhis.mappingkey.Screening.substanceAbuse
@@ -990,7 +1003,7 @@ object CommonUtils {
                         if (actualValue != null &&
                             actualValue is String &&
                             actualValue.equals(
-                                DefinedParams.Yes,
+                                DefinedParams.YES,
                                 true,
                             )
                         ) {
@@ -1063,7 +1076,7 @@ object CommonUtils {
         }
         if (resultMapPair.second.containsKey(Screening.SuicidalIdeation) &&
             (resultMapPair.second[Screening.SuicidalIdeation] as String).equals(
-                DefinedParams.Yes,
+                DefinedParams.YES,
                 true,
             )
         ) {
@@ -1304,6 +1317,33 @@ object CommonUtils {
         return null
     }
 
+    fun parseRequest(
+        generalDetails: String,
+        screeningDetails: String,
+        isOffline: Boolean,
+    ): HashMap<String, Any>? {
+        val generalData: Map<String, Any>? =
+            StringConverter.convertStringToMap(generalDetails)
+        (StringConverter.convertStringToMap(screeningDetails))?.let { map ->
+            HashMap(map).let {
+                setType(it, generalData)
+
+                if (!it.containsKey(DefinedParams.UNIT_MEASUREMENT)) {
+                    it[DefinedParams.UNIT_MEASUREMENT] = DefinedParams.UNIT_MEASUREMENT_METRIC_TYPE
+                }
+                it[DefinedParams.IS_OFFLINE] = isOffline
+                if (!it.containsKey(DefinedParams.UNIT_MEASUREMENT_KEY)) {
+                    it[DefinedParams.UNIT_MEASUREMENT_KEY] = DefinedParams.UNIT_MEASUREMENT_METRIC_TYPE
+                }
+                handleBPLogs(it)
+                updateGlucoseData(it)
+                return it
+            }
+        }
+
+        return null
+    }
+
     private fun handlePregnancyAnc(givenMap: HashMap<String, Any>) {
         if (givenMap.containsKey(Screening.pregnancyAnc) && givenMap[Screening.pregnancyAnc] is Map<*, *>) {
             (givenMap[Screening.pregnancyAnc] as Map<*, *>?)?.let { ancMap ->
@@ -1466,8 +1506,8 @@ object CommonUtils {
             null
         }
 
-        val gender: String? = if (map.containsKey(DefinedParams.Gender)) {
-            val value = map[DefinedParams.Gender] as String
+        val gender: String? = if (map.containsKey(DefinedParams.GENDER)) {
+            val value = map[DefinedParams.GENDER] as String
             if (value.equals(Screening.Female, ignoreCase = true)) {
                 value
             } else {
@@ -1477,8 +1517,8 @@ object CommonUtils {
             null
         }
 
-        val smoker: Boolean? = if (map.containsKey(Screening.is_regular_smoker)) {
-            val tobaccoUsage = map[Screening.is_regular_smoker] as Boolean
+        val smoker: Boolean? = if (map.containsKey(Screening.IS_REGULAR_SMOKER)) {
+            val tobaccoUsage = map[Screening.IS_REGULAR_SMOKER] as Boolean
             tobaccoUsage
         } else {
             null
@@ -1627,6 +1667,18 @@ object CommonUtils {
         }
         return false
     }
+
+    fun cvdRiskColorCode(
+        score: Double,
+        context: Context,
+    ): Int =
+        when {
+            score < Screening.very_low_risk_limit -> context.getColor(R.color.very_low_risk_color)
+            score < Screening.low_risk_limit -> context.getColor(R.color.low_risk_color)
+            score < Screening.medium_risk_limit -> context.getColor(R.color.medium_risk_color)
+            score < Screening.medium_high_risk_limit -> context.getColor(R.color.medium_high_risk_color)
+            else -> context.getColor(R.color.high_risk_color)
+        }
 
     fun cvdRiskColorCode(
         score: Long,
@@ -1840,7 +1892,7 @@ object CommonUtils {
 
                 (map[Screening.bioMetrics] as? HashMap<*, *>)?.let { bioMetricMap ->
                     val isMale =
-                        bioMetricMap[DefinedParams.Gender]?.toString().equals(Screening.Male, true)
+                        bioMetricMap[DefinedParams.GENDER]?.toString().equals(Screening.Male, true)
                     if (isMale) {
                         map.remove(Screening.pregnancyAnc)
                     }
@@ -1879,8 +1931,8 @@ object CommonUtils {
 
     fun validationRequest(requestMap: HashMap<String, Any>): HashMap<String, Any> {
         requestMap[Screening.identityType] = Screening.nationalId
-        if (!requestMap.containsKey(DefinedParams.Country)) {
-            requestMap[DefinedParams.Country] = getCountryMap()
+        if (!requestMap.containsKey(DefinedParams.COUNTRY)) {
+            requestMap[DefinedParams.COUNTRY] = getCountryMap()
         }
         val map = requestMap.filterKeys {
             it == Screening.firstName ||
@@ -1888,7 +1940,7 @@ object CommonUtils {
                 it == Screening.phoneNumber ||
                 it == Screening.identityType ||
                 it == Screening.identityValue ||
-                it == DefinedParams.Country ||
+                it == DefinedParams.COUNTRY ||
                 it == AssessmentDefinedParams.memberReference
         }
         return HashMap(map)
@@ -2168,20 +2220,20 @@ object CommonUtils {
     fun parseUserLocale(): String {
         val preference = SecuredPreference.getCultureName()
         return when {
-            preference.contains(DefinedParams.EN_Locale, ignoreCase = true) ->
+            preference.contains(DefinedParams.EN_LOCALE, ignoreCase = true) ->
                 DefinedParams.EN
 
-            preference.contains(DefinedParams.SW_Locale, ignoreCase = true) ->
+            preference.contains(DefinedParams.SW_LOCALE, ignoreCase = true) ->
                 DefinedParams.SW
 
-            preference.contains(DefinedParams.BN_Locale, ignoreCase = true) ->
+            preference.contains(DefinedParams.BN_LOCALE, ignoreCase = true) ->
                 DefinedParams.BN
 
             else -> DefinedParams.EN
         }
     }
 
-    fun checkIfTranslationEnabled(name: String): Boolean = name.contains(DefinedParams.BN_Locale, ignoreCase = true)
+    fun checkIfTranslationEnabled(name: String): Boolean = name.contains(DefinedParams.BN_LOCALE, ignoreCase = true)
 
     fun getAgeInYearsByDOB(dob: String): Int {
         val formatter = DateTimeFormatter
@@ -2348,6 +2400,161 @@ object CommonUtils {
         }
     }
 
+    fun isProgramOrganizer(): Boolean {
+        val userRole = SecuredPreference.getUserDetails()?.roles?.joinToString { it.name }
+        if (userRole != null) {
+            return userRole.contains(PROGRAM_ORGANIZER)
+        }
+        return false
+    }
+
+    fun isFieldOrganizer(): Boolean {
+        val userRole = SecuredPreference.getUserDetails()?.roles?.joinToString { it.name }
+        if (userRole != null) {
+            return userRole.contains(FIELD_ORGANIZER)
+        }
+        return false
+    }
+
+    fun isParaCounselor(): Boolean {
+        val userRole = SecuredPreference.getUserDetails()?.roles?.joinToString { it.name }
+        if (userRole != null) {
+            return userRole.contains(PARA_COUNSELLOR) || isHealthScreener()
+        }
+        return false
+    }
+
+    fun isOnlyParaCounselor(): Boolean {
+        val userRole = SecuredPreference.getUserDetails()?.roles?.joinToString { it.name }
+        if (userRole != null) {
+            return userRole.contains(PARA_COUNSELLOR)
+        }
+        return false
+    }
+
+    fun isPsychologist(): Boolean {
+        val userRole = SecuredPreference.getUserDetails()?.roles?.joinToString { it.name }
+        if (userRole != null) {
+            return userRole.contains(PSYCHOLOGIST)
+        }
+        return false
+    }
+
+    fun isHealthEducator(): Boolean {
+        val userRole = SecuredPreference.getUserDetails()?.roles?.joinToString { it.name }
+        if (userRole != null) {
+            return userRole.contains(HEALTH_EDUCATOR)
+        }
+        return false
+    }
+
+    fun isParamedic(): Boolean {
+        val userRole = SecuredPreference.getUserDetails()?.roles?.joinToString { it.name }
+        if (userRole != null) {
+            return userRole.contains(PARAMEDIC)
+        }
+        return false
+    }
+
+    fun isMedicalDoctor(): Boolean {
+        val userRole = SecuredPreference.getUserDetails()?.roles?.joinToString { it.name }
+        if (userRole != null) {
+            return userRole.contains(MEDICAL_DOCTOR)
+        }
+        return false
+    }
+
+    fun isCHCP(): Boolean {
+        val userRole = SecuredPreference.getUserDetails()?.roles?.joinToString { it.name }
+        if (userRole != null) {
+            return userRole.contains(COMMUNITY_HEALTH_CARE_PROVIDER)
+        }
+        return false
+    }
+
+    fun getGenderConstant(gender: String?): String {
+        if (gender == null) {
+            return ""
+        }
+        return when (gender.lowercase()) {
+            DefinedParams.FEMALE.lowercase() -> "F"
+            DefinedParams.MALE.lowercase() -> "M"
+            else -> ""
+        }
+    }
+
+    fun addValuesInJSON(
+        jsonString: String,
+        key: String,
+        value: Any,
+        parentKey: String? = null,
+    ): String {
+        val jsonObject = JSONObject(jsonString)
+        // Get the parent JSON object (e.g., "bioData")
+        if (!parentKey.isNullOrEmpty()) {
+            if (jsonObject.has(parentKey)) {
+                val parentObject = jsonObject.getJSONObject(parentKey)
+                parentObject.put(key, value) // Add key-value inside parent object
+            }
+        } else {
+            jsonObject.put(key, value)
+        }
+        return jsonObject.toString() // Convert back to JSON string
+    }
+
+    fun getCallType(selectedTab: String?): String? = selectedTab
+
+    fun loadableUser(loadDefaultsFor: ArrayList<String>? = null): Boolean {
+        val role = SecuredPreference.getUserDetails()?.roles?.first() ?: ""
+        return loadDefaultsFor?.contains(role) != true
+    }
+
+    fun validUserUnionIds(unionIds: List<Long>?): List<Long> = unionIds.orEmpty()
+
+    fun getSpannableString(
+        clickableSpan: ClickableSpan,
+        text: String,
+        startIndex: Int = 0,
+    ): CharSequence {
+        val spannableString =
+            SpannableString(text)
+
+        spannableString.setSpan(
+            clickableSpan,
+            startIndex,
+            spannableString.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+        )
+
+        return spannableString
+    }
+
+    fun formatGlucoseData(
+        glucoseType: String?,
+        glucoseValue: Double?,
+        hba1c: Double?,
+        ogtt: Double?,
+        context: Context?,
+    ): String {
+        val result = StringBuilder()
+
+        glucoseValue?.let { result.append("$glucoseType-$it $mmoll, ") }
+        hba1c?.let { result.append("${DefinedParams.HBA1C}-$it %, ") }
+        ogtt?.let { result.append("OGTT-$it $mmoll, ") }
+
+        // Remove the last comma and space if there's any content
+        if (result.isNotEmpty()) {
+            result.setLength(result.length - 2)
+        }
+
+        return result.toString()
+    }
+
+    fun checkIsLargeTablet(context: Context): Boolean {
+        val res = context.resources?.getBoolean(R.bool.isLargeTablet)
+        return res ?: false
+    }
+
     /**
      * Formats count w.r.t to current locale.
      */
@@ -2356,6 +2563,14 @@ object CommonUtils {
             NumberFormat.getIntegerInstance(Locale.forLanguageTag("bn-BD")).format(count)
         } else {
             count.toString()
+        }
+
+    fun convertType(input: Any?): Long =
+        when (input) {
+            is Int -> input.toLong()
+            is Double -> input.toLong()
+            is Long -> input
+            else -> input.toString().toLong()
         }
 }
 

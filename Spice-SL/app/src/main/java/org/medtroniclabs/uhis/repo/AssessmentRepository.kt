@@ -210,8 +210,8 @@ class AssessmentRepository @Inject constructor(
             dropDownList.add(
                 hashMapOf<String, Any>(
                     DefinedParams.NAME to healthFacilityEntity.name,
-                    DefinedParams.id to healthFacilityEntity.fhirId.toString(),
-                    DefinedParams.isDefault to healthFacilityEntity.isDefault,
+                    DefinedParams.ID to healthFacilityEntity.fhirId.toString(),
+                    DefinedParams.IS_DEFAULT to healthFacilityEntity.isDefault,
                     DefinedParams.phoneNumber to (healthFacilityEntity.phoneNumber ?: ""),
                 ),
             )

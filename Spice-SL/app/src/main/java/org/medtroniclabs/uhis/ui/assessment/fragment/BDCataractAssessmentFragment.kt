@@ -197,4 +197,7 @@ class BDCataractAssessmentFragment() : BaseFragment(), FormEventListener {
         resultHashMap: HashMap<String, Any>,
     ) {
     }
+
+    override fun onQRScanRequested() {
+    }
 }

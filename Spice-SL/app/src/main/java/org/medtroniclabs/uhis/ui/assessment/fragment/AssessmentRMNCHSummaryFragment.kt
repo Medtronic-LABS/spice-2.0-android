@@ -329,25 +329,25 @@ class AssessmentRMNCHSummaryFragment : BaseFragment(), View.OnClickListener {
                 val bmi = CommonUtils.getDouble(medicalHistoryPhysicalExaminationMap?.get(AssessmentDefinedParams.BMI)).takeIf { it > 0 }
                 bmi?.let {
                     if (bmi < AssessmentDefinedParams.BMI_NORMAL_WEIGHT_THRESHOLD) {
-                        val option = options.firstOrNull { it[DefinedParams.id] == "underWeight" }
+                        val option = options.firstOrNull { it[DefinedParams.ID] == "underWeight" }
                         option?.let {
                             instructions.add(option[DefinedParams.NAME] as? String ?: "")
                             instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
                         }
                     } else if (bmi < AssessmentDefinedParams.BMI_OVER_WEIGHT_THRESHOLD) {
-                        val option = options.firstOrNull { it[DefinedParams.id] == "normalWeight" }
+                        val option = options.firstOrNull { it[DefinedParams.ID] == "normalWeight" }
                         option?.let {
                             instructions.add(option[DefinedParams.NAME] as? String ?: "")
                             instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
                         }
                     } else if (bmi < AssessmentDefinedParams.BMI_OBSESS_WEIGHT_THRESHOLD) {
-                        val option = options.firstOrNull { it[DefinedParams.id] == "overWeight" }
+                        val option = options.firstOrNull { it[DefinedParams.ID] == "overWeight" }
                         option?.let {
                             instructions.add(option[DefinedParams.NAME] as? String ?: "")
                             instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
                         }
                     } else {
-                        val option = options.firstOrNull { it[DefinedParams.id] == "obsess" }
+                        val option = options.firstOrNull { it[DefinedParams.ID] == "obsess" }
                         option?.let {
                             instructions.add(option[DefinedParams.NAME] as? String ?: "")
                             instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
@@ -358,19 +358,19 @@ class AssessmentRMNCHSummaryFragment : BaseFragment(), View.OnClickListener {
                 val hb = CommonUtils.getDouble(pointOfCareInvestigationMap?.get(AssessmentDefinedParams.HEMOGLOBIN)).takeIf { it > 0 }
                 hb?.let {
                     if (hb < AssessmentDefinedParams.HEMOGLOBIN_SEVERE_ANEMIA_THRESHOLD) {
-                        val option = options.firstOrNull { it[DefinedParams.id] == "severeAnemia" }
+                        val option = options.firstOrNull { it[DefinedParams.ID] == "severeAnemia" }
                         option?.let {
                             instructions.add(option[DefinedParams.NAME] as? String ?: "")
                             instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
                         }
                     } else if (hb < AssessmentDefinedParams.HEMOGLOBIN_MODERATE_ANEMIA_THRESHOLD) {
-                        val option = options.firstOrNull { it[DefinedParams.id] == "moderateAnemia" }
+                        val option = options.firstOrNull { it[DefinedParams.ID] == "moderateAnemia" }
                         option?.let {
                             instructions.add(option[DefinedParams.NAME] as? String ?: "")
                             instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
                         }
                     } else if (hb < AssessmentDefinedParams.HEMOGLOBIN_MILD_ANEMIA_THRESHOLD) {
-                        val option = options.firstOrNull { it[DefinedParams.id] == "mildAnemia" }
+                        val option = options.firstOrNull { it[DefinedParams.ID] == "mildAnemia" }
                         option?.let {
                             instructions.add(option[DefinedParams.NAME] as? String ?: "")
                             instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
@@ -384,7 +384,7 @@ class AssessmentRMNCHSummaryFragment : BaseFragment(), View.OnClickListener {
                 if ((fastingSugar != null && fastingSugar < AssessmentDefinedParams.LOW_SUGAR_THRESHOLD) ||
                     (randomSugar != null && randomSugar < AssessmentDefinedParams.LOW_SUGAR_THRESHOLD)
                 ) {
-                    val option = options.firstOrNull { it[DefinedParams.id] == "lowSugar" }
+                    val option = options.firstOrNull { it[DefinedParams.ID] == "lowSugar" }
                     option?.let {
                         instructions.add(option[DefinedParams.NAME] as? String ?: "")
                         instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
@@ -675,7 +675,7 @@ class AssessmentRMNCHSummaryFragment : BaseFragment(), View.OnClickListener {
         val siteList = ArrayList<Map<String, Any>>()
         optionsList.forEach { option ->
             val optionMap = HashMap<String, Any>()
-            optionMap[DefinedParams.id] = option[DefinedParams.id]?.toString() ?: ""
+            optionMap[DefinedParams.ID] = option[DefinedParams.ID]?.toString() ?: ""
             optionMap[DefinedParams.NAME] = option[DefinedParams.NAME]?.toString() ?: ""
             optionMap[DefinedParams.CULTURE_VALUE] = option[DefinedParams.CULTURE_VALUE]?.toString() ?: ""
             siteList.add(optionMap)
@@ -697,7 +697,7 @@ class AssessmentRMNCHSummaryFragment : BaseFragment(), View.OnClickListener {
                 ) {
                     val selectedItem = adapter.getData(position = pos)
                     selectedItem?.let {
-                        val selectedId = it[DefinedParams.id] as String?
+                        val selectedId = it[DefinedParams.ID] as String?
                         // Store the selected referral facility ID
                         viewModel.otherAssessmentDetails[AssessmentDefinedParams.ReferredPHUSiteID] =
                             selectedId ?: ""

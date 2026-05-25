@@ -62,14 +62,14 @@ class ToolsMenuFragment : BaseFragment(), MenuSelectionListener {
             val result = bundle.getString(WORKFLOW_NAME)
             startAssessmentActivity(MenuConstants.RMNCH_MENU_ID, result)
         }
-        viewModel.getMenuForClinicalWorkflows(requireArguments().getString(DefinedParams.Gender))
+        viewModel.getMenuForClinicalWorkflows(requireArguments().getString(DefinedParams.GENDER))
         attachObservers()
         if (getEncounterReference().isNotBlank()) {
             setTitle(requireContext().getString(R.string.home_title))
         }
 
         // Deeplink directly goes to Medical review
-        if (requireArguments().getBoolean(DefinedParams.IsDeepLink)) {
+        if (requireArguments().getBoolean(DefinedParams.IS_DEEP_LINK)) {
             if (getOrigin().equals(MenuConstants.MY_PATIENTS_MENU_ID, true)) {
                 val intent =
                     Intent(requireContext(), NCDMedicalReviewActivity::class.java).apply {

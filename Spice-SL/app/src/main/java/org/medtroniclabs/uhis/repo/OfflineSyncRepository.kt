@@ -22,12 +22,12 @@ import org.medtroniclabs.uhis.appextensions.postSuccess
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.CBS
 import org.medtroniclabs.uhis.common.DefinedParams.COMMUNITY_REGISTERED_DATE
-import org.medtroniclabs.uhis.common.DefinedParams.Description
+import org.medtroniclabs.uhis.common.DefinedParams.DESCRIPTION
 import org.medtroniclabs.uhis.common.DefinedParams.FollowUp
 import org.medtroniclabs.uhis.common.DefinedParams.Provenance
 import org.medtroniclabs.uhis.common.DefinedParams.ReferenceId
 import org.medtroniclabs.uhis.common.DefinedParams.UnAssigned
-import org.medtroniclabs.uhis.common.DefinedParams.VillageId
+import org.medtroniclabs.uhis.common.DefinedParams.VILLAGE_ID
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.StringConverter
 import org.medtroniclabs.uhis.data.offlinesync.model.Assessment
@@ -368,12 +368,12 @@ class OfflineSyncRepository @Inject constructor(
         // Save Community profiles
         requestInitialDownload.communityProfiles?.forEach { item ->
             val id = item.get(DefinedParams.ID).asString
-            val villageId = item.get(VillageId).asLong
-            val description = item.get(Description).asString
+            val villageId = item.get(VILLAGE_ID).asLong
+            val description = item.get(DESCRIPTION).asString
             val date = item.get(COMMUNITY_REGISTERED_DATE).asString
             item.remove(DefinedParams.ID)
-            item.remove(VillageId)
-            item.remove(Description)
+            item.remove(VILLAGE_ID)
+            item.remove(DESCRIPTION)
             item.remove(COMMUNITY_REGISTERED_DATE)
             val communityProfileEntity = CommunityProfile(id = 0, villageId, description, date, payload = item.toString())
             communityProfileEntity.fhirId = id
@@ -902,9 +902,9 @@ class OfflineSyncRepository @Inject constructor(
             community.fhirId?.let {
                 json.addProperty(DefinedParams.ID, it)
             }
-            json.addProperty(Description, community.communityDescription)
+            json.addProperty(DESCRIPTION, community.communityDescription)
             json.addProperty(COMMUNITY_REGISTERED_DATE, community.registeredDate)
-            json.addProperty(VillageId, community.villageId)
+            json.addProperty(VILLAGE_ID, community.villageId)
             json.addProperty(ReferenceId, community.id.toString())
             json.add(Provenance, Gson().toJsonTree(provenance))
             communityProfilesRequests.add(json)

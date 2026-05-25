@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvRegistrationDate"
+        style="@style/TextStyle_Medium_16_NoBG"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/registration_date"
+        android:textColor="@color/b_w_black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/registrationDateChipGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_2sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvRegistrationDate"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/todayRegistrationChip"
+            style="@style/ChipStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/today" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/yesterdayRegistrationChip"
+            style="@style/ChipStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/yesterday" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/weeklyRegistrationChip"
+            style="@style/ChipStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/this_week" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/monthlyRegistrationChip"
+            style="@style/ChipStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/this_month" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/customizeRegistrationChip"
+            style="@style/ChipStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/customize" />
+
+    </com.google.android.material.chip.ChipGroup>
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/clFromToDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="tvRegistrationFrom, tvRegistrationTo, tvRegistrationFromDate, tvRegistrationToDate" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvRegistrationFrom"
+        style="@style/TextStyle_Medium_16_NoBG"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/_10sdp"
+        android:paddingBottom="@dimen/_5sdp"
+        android:text="@string/from"
+        android:textColor="@color/b_w_black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/registrationDateChipGroup" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvRegistrationFromDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edittext_background"
+        android:drawableEnd="@drawable/ic_date_picker_calendar"
+        android:drawablePadding="@dimen/_12sdp"
+        android:gravity="start|center"
+        android:hint="@string/dd_mmm_yyyy"
+        android:paddingStart="@dimen/_12sdp"
+        android:paddingEnd="0dp"
+        android:textColor="@color/black"
+        android:textSize="@dimen/_16ssp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvRegistrationFrom" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvRegistrationTo"
+        style="@style/TextStyle_Medium_16_NoBG"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/_10sdp"
+        android:paddingTop="@dimen/_10sdp"
+        android:paddingBottom="@dimen/_5sdp"
+        android:text="@string/to"
+        android:textColor="@color/b_w_black"
+        app:layout_constraintStart_toStartOf="@id/tvRegistrationToDate"
+        app:layout_constraintTop_toBottomOf="@id/registrationDateChipGroup" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvRegistrationToDate"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edittext_background"
+        android:drawableEnd="@drawable/ic_date_picker_calendar"
+        android:drawablePadding="@dimen/_12sdp"
+        android:gravity="start|center"
+        android:hint="@string/dd_mmm_yyyy"
+        android:paddingStart="@dimen/_12sdp"
+        android:paddingEnd="@dimen/_0dp"
+        android:textColor="@color/black"
+        android:textSize="@dimen/_16ssp"
+        app:layout_constraintStart_toEndOf="@id/tvRegistrationFromDate"
+        app:layout_constraintTop_toBottomOf="@id/tvRegistrationTo" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -438,7 +438,7 @@ class AboveFiveYearsBaseActivity :
                 patientViewModel.patientDetailsLiveData.value?.data?.let { data ->
                     val intent = Intent(this, PrescriptionActivity::class.java)
                     intent.putExtra(DefinedParams.PatientId, data.patientId)
-                    intent.putExtra(DefinedParams.EncounterId, patientViewModel.encounterId)
+                    intent.putExtra(DefinedParams.ENCOUNTER_ID, patientViewModel.encounterId)
                     getResult.launch(intent)
                 }
             }
@@ -446,7 +446,7 @@ class AboveFiveYearsBaseActivity :
                 patientViewModel.patientDetailsLiveData.value?.data?.let { data ->
                     val intent = Intent(this, InvestigationActivity::class.java)
                     intent.putExtra(DefinedParams.PatientId, data.patientId)
-                    intent.putExtra(DefinedParams.EncounterId, patientViewModel.encounterId)
+                    intent.putExtra(DefinedParams.ENCOUNTER_ID, patientViewModel.encounterId)
                     getResult.launch(intent)
                 }
             }
@@ -574,7 +574,7 @@ class AboveFiveYearsBaseActivity :
             ActivityResultContracts.StartActivityForResult(),
         ) {
             if (it.resultCode == Activity.RESULT_OK) {
-                val value = it.data?.getStringExtra(DefinedParams.EncounterId)
+                val value = it.data?.getStringExtra(DefinedParams.ENCOUNTER_ID)
                 value?.let { valueString ->
                     patientViewModel.encounterId = valueString
                 }

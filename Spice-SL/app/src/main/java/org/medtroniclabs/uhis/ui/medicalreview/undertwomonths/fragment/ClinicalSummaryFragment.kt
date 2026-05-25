@@ -13,12 +13,12 @@ import org.medtroniclabs.uhis.appextensions.invisible
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils.getOptionMap
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.DefaultID
-import org.medtroniclabs.uhis.common.DefinedParams.DefaultIDLabel
+import org.medtroniclabs.uhis.common.DefinedParams.DEFAULT_ID
+import org.medtroniclabs.uhis.common.DefinedParams.DEFAULT_ID_LABEL
 import org.medtroniclabs.uhis.common.DefinedParams.ID
 import org.medtroniclabs.uhis.common.DefinedParams.NAME
 import org.medtroniclabs.uhis.common.DefinedParams.Value
-import org.medtroniclabs.uhis.common.DefinedParams.Yes
+import org.medtroniclabs.uhis.common.DefinedParams.YES
 import org.medtroniclabs.uhis.data.MedicalReviewMetaItems
 import org.medtroniclabs.uhis.databinding.FragmentClinicalSummaryBinding
 import org.medtroniclabs.uhis.formgeneration.extension.markMandatory
@@ -231,7 +231,7 @@ class ClinicalSummaryFragment : BaseFragment(), View.OnClickListener {
         }
 
     private fun enableExclusiveBreastFeeding(selectedID: Any?) {
-        if (selectedID == Yes) {
+        if (selectedID == YES) {
             binding.exclusiveBreastFeedingGroup.visible()
         } else {
             binding.exclusiveBreastFeedingGroup.gone()
@@ -264,15 +264,15 @@ class ClinicalSummaryFragment : BaseFragment(), View.OnClickListener {
         val dropDownList = ArrayList<Map<String, Any>>()
         dropDownList.add(
             hashMapOf<String, Any>(
-                NAME to DefaultIDLabel,
-                ID to DefaultID,
+                NAME to DEFAULT_ID_LABEL,
+                ID to DEFAULT_ID,
             ),
         )
         for (item in status) {
             dropDownList.add(
                 hashMapOf<String, Any>(
                     NAME to item.name,
-                    DefinedParams.id to item.id.toString(),
+                    DefinedParams.ID to item.id.toString(),
                     Value to (item.value ?: item.name),
                 ),
             )
@@ -297,7 +297,7 @@ class ClinicalSummaryFragment : BaseFragment(), View.OnClickListener {
                     selectedItem?.let {
                         val selectedId = it[ID] as String?
                         val selectedImmunisationStatus = it[Value] as String?
-                        if (selectedId != DefaultID) {
+                        if (selectedId != DEFAULT_ID) {
                             selectedImmunisationStatus?.let {
                                 viewModel.selectedImmunisationStatus = it
                                 viewModel.updateImmunisationStatus()
@@ -428,7 +428,7 @@ class ClinicalSummaryFragment : BaseFragment(), View.OnClickListener {
             if (arguments?.getInt(DefinedParams.Age)?.toString()?.toInt() in 0..60) {
                 val onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
                     if (!hasFocus) {
-                        val gender = arguments?.getString(DefinedParams.Gender)
+                        val gender = arguments?.getString(DefinedParams.GENDER)
                         val age = arguments?.getInt(DefinedParams.Age)?.toString()
                         val weight = etWeight.text?.toString()
                         val height = etHeight.text?.toString()

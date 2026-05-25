@@ -55,7 +55,7 @@ class RegistrationFormViewModel @Inject constructor(
     ) {
         viewModelScope.launch(dispatcherIO) {
             when (type) {
-                DefinedParams.Country -> {
+                DefinedParams.COUNTRY -> {
                     countrySpinnerLiveData.postLoading()
                     countrySpinnerLiveData.postValue(
                         registrationRepository.getCountries(tag),
@@ -71,7 +71,7 @@ class RegistrationFormViewModel @Inject constructor(
                     }
                 }
 
-                DefinedParams.Chiefdom -> {
+                DefinedParams.CHIEFDOM -> {
                     selectedParent?.let { parent ->
                         chiefdomSpinnerLiveData.postLoading()
                         chiefdomSpinnerLiveData.postValue(
@@ -80,7 +80,7 @@ class RegistrationFormViewModel @Inject constructor(
                     }
                 }
 
-                DefinedParams.Village -> {
+                DefinedParams.VILLAGE -> {
                     selectedParent?.let { parent ->
                         villageSpinnerLiveData.postLoading()
                         villageSpinnerLiveData.postValue(
@@ -89,7 +89,7 @@ class RegistrationFormViewModel @Inject constructor(
                     }
                 }
 
-                DefinedParams.Program -> {
+                DefinedParams.PROGRAM -> {
                     programsSpinnerLiveData.postLoading()
                     programsSpinnerLiveData.postValue(
                         registrationRepository.getAllPrograms(tag),
@@ -108,8 +108,8 @@ class RegistrationFormViewModel @Inject constructor(
         builder.setType(MultipartBody.FORM)
 
         hashMap.apply {
-            put(DefinedParams.TenantId, SecuredPreference.getTenantId())
-            put(DefinedParams.HealthFacilityId, SecuredPreference.getOrganizationId())
+            put(DefinedParams.TENANT_ID, SecuredPreference.getTenantId())
+            put(DefinedParams.HEALTH_FACILITY_ID, SecuredPreference.getOrganizationId())
             put(DefinedParams.HealthFacilityFhirId, SecuredPreference.getOrganizationFhirId())
             put(DefinedParams.Provenance, ProvanceDto())
         }

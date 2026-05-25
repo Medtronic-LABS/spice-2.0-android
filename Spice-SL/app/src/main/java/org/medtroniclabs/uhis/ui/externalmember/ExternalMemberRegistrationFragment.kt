@@ -177,7 +177,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                                                     0,
                                                     hashMapOf(
                                                         DefinedParams.NAME to getString(R.string.please_select),
-                                                        DefinedParams.ID to DefinedParams.DefaultID,
+                                                        DefinedParams.ID to DefinedParams.DEFAULT_ID,
                                                     ),
                                                 )
                                             }
@@ -539,7 +539,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                         val hasOnlyDefaultOption =
                             adapterCount == 1 &&
                                 (
-                                    it.getData(0)?.get(FormDefinedParams.ID) == DefinedParams.DefaultID ||
+                                    it.getData(0)?.get(FormDefinedParams.ID) == DefinedParams.DEFAULT_ID ||
                                         it.getData(0)?.get(FormDefinedParams.ID) == "-1"
                                 )
                         if (hasOnlyDefaultOption) return
@@ -688,6 +688,9 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
         serverData: List<FormLayout>?,
         resultHashMap: HashMap<String, Any>,
     ) {
+    }
+
+    override fun onQRScanRequested() {
     }
 
     override fun onClick(v: View?) {

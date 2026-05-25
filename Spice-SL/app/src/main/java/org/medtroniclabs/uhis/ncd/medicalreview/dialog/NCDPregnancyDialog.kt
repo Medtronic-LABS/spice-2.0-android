@@ -540,7 +540,7 @@ class NCDPregnancyDialog(private val callback: ((isPositiveResult: Boolean, mess
                     itemId: Long,
                 ) {
                     adapter.getData(pos)?.let {
-                        val selectedId = (it[DefinedParams.id] as? Long) ?: -1L
+                        val selectedId = (it[DefinedParams.ID] as? Long) ?: -1L
                         val selectedName = it[DefinedParams.NAME] as String?
                         val value = it[DefinedParams.Value] as String?
                         if (selectedId != -1L) {
@@ -736,8 +736,8 @@ class NCDPregnancyDialog(private val callback: ((isPositiveResult: Boolean, mess
     private fun loadSiteDetails(data: ArrayList<NCDDiagnosisEntity>) {
         val list = arrayListOf<Map<String, Any>>(
             hashMapOf(
-                DefinedParams.NAME to DefinedParams.DefaultIDLabel,
-                DefinedParams.ID to DefinedParams.DefaultSelectID,
+                DefinedParams.NAME to DefinedParams.DEFAULT_ID_LABEL,
+                DefinedParams.ID to DefinedParams.DEFAULT_SELECT_ID,
             ),
         )
         data.mapNotNullTo(list) { symptoms ->

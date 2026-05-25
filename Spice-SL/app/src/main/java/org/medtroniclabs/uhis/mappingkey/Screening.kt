@@ -154,14 +154,15 @@ object Screening {
     const val Facility = "Facility"
     const val Community = "Community"
     const val identityValue = "identityValue"
+
     const val CVD_Risk_Score = "cvdRiskScore"
     const val CVD_Risk_Level = "cvdRiskLevel"
     const val CVD_Risk_Score_Display = "cvdRiskScoreDisplay"
-    const val Age = "age"
+    const val AGE = "age"
 
     const val Female = "Female"
     const val Male = "Male"
-    const val is_regular_smoker = "isRegularSmoker"
+    const val IS_REGULAR_SMOKER = "isRegularSmoker"
 
     // CVD Risks
     const val very_low_risk_limit = 5
@@ -182,7 +183,7 @@ object Screening {
     const val RegistrationSignSuffix = "_registration_signature"
     const val ScreeningSignSuffix = "_screening_signature"
     const val Entity = "entity"
-    const val PatientDetails = "patientDetails"
+    const val PATIENT_DETAILS = "patientDetails"
     const val SSP16 = 16
 
     fun getEmptyBPReading(size: Int): ArrayList<BPModel> {
@@ -200,7 +201,9 @@ object Screening {
     const val NotAtAll = "Not at all"
     const val SeveralDays = "Several days"
     const val MoreThanHalfTheDays = "More than half the days"
-    const val NearlyEveryDay = "Nearly every day"
+    const val NEARLY_EVERY_DAY = "Nearly every day"
 
-    const val NoOfNeonates = "noOfNeonates"
+    const val NO_OF_NEONATES = "noOfNeonates"
+
+    const val FULL_NAME = "fullName"
 }

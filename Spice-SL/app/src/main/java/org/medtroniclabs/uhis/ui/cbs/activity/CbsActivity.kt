@@ -250,7 +250,7 @@ class CbsActivity : BaseActivity(), OnDialogDismissListener {
                             (
                                 (viewModel.assessmentMap[CBS.lowercase()] as? Map<String, Any>)
                                     ?.get(DefinedParams.surveillanceDetails) as? Map<String, Any>
-                            )?.get(DefinedParams.OtherNotifiableConditions) as? String
+                            )?.get(DefinedParams.OTHER_NOTIFIABLE_CONDITIONS) as? String
                         val cbsMap =
                             (viewModel.assessmentMap[CBS.lowercase()] as? MutableMap<String, Any>)
                                 ?: mutableMapOf()
@@ -262,13 +262,13 @@ class CbsActivity : BaseActivity(), OnDialogDismissListener {
                         viewModel.assessmentMap[CBS.lowercase()] = cbsMap
                         val index = rmnchText.indexOfFirst {
                             it.equals(
-                                DefinedParams.Other,
+                                DefinedParams.OTHER,
                                 ignoreCase = true,
                             )
                         }
 
                         if (index != -1 && !otherText.isNullOrBlank()) {
-                            rmnchText[index] = "${DefinedParams.Other} ($otherText)"
+                            rmnchText[index] = "${DefinedParams.OTHER} ($otherText)"
                         }
                         val finalText = rmnchText.joinToString(", ")
 
@@ -352,14 +352,14 @@ class CbsActivity : BaseActivity(), OnDialogDismissListener {
                     }.toMutableList()
 
                 // Check if "Other" exists, then append "Other(value)"
-                if (DefinedParams.Other in conditions) {
+                if (DefinedParams.OTHER in conditions) {
                     val otherValue =
                         surveillanceDetails
-                            .optString(DefinedParams.OtherNotifiableConditions, "")
+                            .optString(DefinedParams.OTHER_NOTIFIABLE_CONDITIONS, "")
                             .takeIf { it.isNotEmpty() }
                     if (otherValue != null) {
-                        conditions[conditions.indexOf(DefinedParams.Other)] =
-                            "${DefinedParams.Other}($otherValue)"
+                        conditions[conditions.indexOf(DefinedParams.OTHER)] =
+                            "${DefinedParams.OTHER}($otherValue)"
                     }
                 }
                 conditions.joinToString(", ")

@@ -10,8 +10,8 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.setVisible
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.No
-import org.medtroniclabs.uhis.common.DefinedParams.Yes
+import org.medtroniclabs.uhis.common.DefinedParams.NO
+import org.medtroniclabs.uhis.common.DefinedParams.YES
 import org.medtroniclabs.uhis.databinding.AssessmentSummaryLayoutBinding
 import org.medtroniclabs.uhis.databinding.TextLabelLayoutBinding
 import org.medtroniclabs.uhis.formgeneration.extension.px
@@ -42,7 +42,7 @@ object AssessmentCommonUtils {
                         return nestedMap[keys].toString()
                     }
                     if (nestedMap[keys] is Boolean) {
-                        return if (nestedMap[keys] == true) Yes else No
+                        return if (nestedMap[keys] == true) YES else NO
                     }
                     if (nestedMap[keys] is ArrayList<*>) {
                         val arrayListValue = nestedMap[keys] as ArrayList<*>

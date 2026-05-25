@@ -62,7 +62,7 @@ import org.medtroniclabs.uhis.common.DateUtils.DATE_ddMMyyyy
 import org.medtroniclabs.uhis.common.DateUtils.convertDateFormat
 import org.medtroniclabs.uhis.common.DefinedParams.BOLD
 import org.medtroniclabs.uhis.common.DefinedParams.BOLD_ITALIC
-import org.medtroniclabs.uhis.common.DefinedParams.DefaultID
+import org.medtroniclabs.uhis.common.DefinedParams.DEFAULT_ID
 import org.medtroniclabs.uhis.common.DefinedParams.GENDER_FEMALE
 import org.medtroniclabs.uhis.common.DefinedParams.ITALIC
 import org.medtroniclabs.uhis.common.SecuredPreference
@@ -79,6 +79,7 @@ import org.medtroniclabs.uhis.databinding.CustomSpinnerBinding
 import org.medtroniclabs.uhis.databinding.DatepickerLayoutBinding
 import org.medtroniclabs.uhis.databinding.EdittextAreaLayoutBinding
 import org.medtroniclabs.uhis.databinding.EdittextLayoutBinding
+import org.medtroniclabs.uhis.databinding.FormQrScanViewBinding
 import org.medtroniclabs.uhis.databinding.InstructionLayoutBinding
 import org.medtroniclabs.uhis.databinding.LayoutInformationLabelBinding
 import org.medtroniclabs.uhis.databinding.LayoutSingleSelectionBinding
@@ -95,13 +96,13 @@ import org.medtroniclabs.uhis.formgeneration.FormSupport.updateTitle
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.GONE
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.INVISIBLE
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.Month
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.OtherMethodSpecify
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.MONTH_KEY
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.OTHER_METHOD_SPECIFY
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.SSP16
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.VALUE
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.VISIBLE
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.Week
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.Year
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.value
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.WEEK_KEY
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.YEAR_KEY
 import org.medtroniclabs.uhis.formgeneration.config.EditTextOptionType
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_INFORMATION_LABEL
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_DIALOG_CHECKBOX
@@ -115,6 +116,7 @@ import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_EDIT
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_EDITTEXT_AREA
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_MULTISELECT_DATEPICKER
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_MULTI_SELECT_SPINNER
+import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_QR
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_RADIOGROUP
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_SPINNER
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_TEXTLABEL
@@ -166,6 +168,8 @@ import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlin.collections.get
+import kotlin.text.equals
 
 class FormGenerator(
     var context: Context,
@@ -183,9 +187,14 @@ class FormGenerator(
     private val tvKey = AssessmentDefinedParams.summaryKey
     private val tvValue = AssessmentDefinedParams.SUMMARY_VALUE
     private val rootSummary = AssessmentDefinedParams.SUMMARY_ROOT
+
+    private val scanDoneButtonSuffix = "scanDone"
+    private val scanImageView = "scanImageView"
+
+    private val innerRootSuffix = "innerRootView"
     private var editScreen: Boolean? = null
     private var focusNeeded: View? = null
-    private val infoSuffix = DefinedParams.Information
+    private val infoSuffix = DefinedParams.INFORMATION
     private val infoSuffixText = AssessmentDefinedParams.infoSuffixText
     private val generateNationalIdSuffix = "generateNationalId"
     private val diastolicSuffix = "DiastolicSuffix"
@@ -252,6 +261,7 @@ class FormGenerator(
                 VIEW_TYPE_FORM_DATEPICKER -> createDatePicker(formLayout)
                 VIEW_TYPE_FORM_BP -> createBPView(formLayout)
                 VIEW_TYPE_TIME -> createTimeView(formLayout)
+                VIEW_TYPE_FORM_QR -> addScannerView(formLayout)
                 VIEW_TYPE_FORM_MULTISELECT_DATEPICKER -> createMultiSelectDatePicker(formLayout)
             }
         }
@@ -582,26 +592,19 @@ class FormGenerator(
         }
     }
 
-    private fun generateNationalId() {
+    private fun generateNationalId(viewId: String) {
         var nationalId = ""
         var errorVisibility = View.GONE
-        val firstName = firstName(Screening.firstName)
-        firstName.first?.let {
+
+        // Full Name
+        val fullName = firstName(Screening.FULL_NAME)
+        fullName.first?.let {
             nationalId = it
         }
         focusNeeded = null
-        firstNameError(nationalId, Screening.firstName, firstName.second)
-        val lastName = lastName(nationalId)
-        lastName.let {
-            it.first?.let { nId ->
-                nationalId = nId
-            }
-            it.second?.let { errVisibility ->
-                errorVisibility = errVisibility
-            }
-        }
-        lastNameError(errorVisibility, lastName.third)
+        fullNameError(nationalId, Screening.FULL_NAME, fullName.second)
 
+        // Phone number
         phoneNumber(nationalId).let {
             it.first?.let { nId ->
                 nationalId = nId
@@ -613,12 +616,12 @@ class FormGenerator(
         phoneNumberError(errorVisibility)
 
         if (nationalId.isNotEmpty()) {
-            getViewByTag(Screening.identityValue)?.let { editText ->
+            getViewByTag(viewId)?.let { editText ->
                 if (editText is AppCompatEditText) {
                     editText.setText(nationalId.uppercase())
                     editText.isEnabled = false
                 }
-                getViewByTag("${Screening.identityValue}$errorSuffix")?.let { error ->
+                getViewByTag("${viewId}$errorSuffix")?.let { error ->
                     (error as TextView).apply {
                         gone()
                     }
@@ -646,7 +649,7 @@ class FormGenerator(
         }
     }
 
-    private fun firstNameError(
+    private fun fullNameError(
         nationalId: String,
         id: String,
         errorMessage: String,
@@ -781,21 +784,26 @@ class FormGenerator(
             ) {
                 val input = editText.text!!.trim().replace("\\s".toRegex(), "")
                 if (onlyAlphabet(id, input)) {
-                    nationalId =
-                        if (input.length >= 4) {
-                            input.substring(
-                                0,
-                                4,
-                            )
-                        } else {
-                            input
-                        }
+                    val input = if (input.length >= 4) {
+                        input.substring(
+                            0,
+                            4,
+                        )
+                    } else {
+                        input
+                    }
+                    nationalId = to4DigitHash(input)
                 } else {
                     errorMessage = getString(R.string.only_alphabets_validation)
                 }
             }
         }
         return Pair(nationalId, errorMessage)
+    }
+
+    private fun to4DigitHash(input: String): String {
+        val number = kotlin.math.abs(input.hashCode()) % 10000
+        return number.toString().padStart(4, '0')
     }
 
     private fun checkMinLength(
@@ -1026,6 +1034,55 @@ class FormGenerator(
         }
     }
 
+    private fun addScannerView(formLayout: FormLayout) {
+        formLayout.apply {
+            val binding = FormQrScanViewBinding.inflate(LayoutInflater.from(context))
+            binding.root.tag = id + rootSuffix
+            binding.tvTitle.tag = id + titleSuffix
+            binding.tvErrorMessage.tag = id + errorSuffix
+            binding.etQRCode.tag = id
+            binding.ivScanDone.visibility = View.GONE
+            binding.ivScanDone.tag = id + scanDoneButtonSuffix
+            binding.ivScan.tag = id + scanImageView
+            binding.tvTitle.text = CommonUtils.getTitle(formLayout, translate)
+            binding.tvNewScan.visibility = View.GONE
+            binding.tvNewScan.tag = id + innerRootSuffix
+            if (isMandatory) {
+                binding.tvTitle.markMandatory()
+            }
+            binding.ivScan.safeClickListener { listener.onQRScanRequested() }
+            binding.tvTitle.safeClickListener { listener.onQRScanRequested() }
+            binding.etQRCode.addTextChangedListener { editable ->
+                resultHashMap[id] = editable.toString()
+                binding.tvTitle.text = getString(R.string.qr_code_scanned)
+                binding.ivScan.safeClickListener(null)
+                binding.tvTitle.safeClickListener(null)
+                binding.ivScanDone.visibility = View.VISIBLE
+                binding.tvNewScan.visibility = View.VISIBLE
+            }
+
+            val clickableSpan = object : ClickableSpan() {
+                override fun onClick(mView: View) {
+                    listener.onQRScanRequested()
+                }
+
+                override fun updateDrawState(ds: TextPaint) {
+                    super.updateDrawState(ds)
+                    ds.isUnderlineText = false
+                }
+            }
+            binding.tvNewScan.text = CommonUtils.getSpannableString(
+                clickableSpan,
+                getString(R.string.scan_new_qr),
+            )
+            binding.tvNewScan.movementMethod = LinkMovementMethod.getInstance()
+
+            getFamilyView(family)?.addView(binding.root) ?: kotlin.run {
+                parentLayout.addView(binding.root)
+            }
+        }
+    }
+
     private var singleSelectionCallbackForDate: ((selectedID: Any?, elementId: Pair<String, String?>, formLayout: FormLayout, name: String?) -> Unit)? =
         { selectedId, elementID, formLayout, _ ->
             saveSelectedOptionValue(elementID, selectedId, formLayout)
@@ -1111,7 +1168,7 @@ class FormGenerator(
                 inputFilter.add(DigitsInputFilter())
             }
 
-            if (id == DefinedParams.NationalId) {
+            if (id == DefinedParams.NATIONAL_ID) {
                 inputFilter.add(InputFilter.AllCaps())
             }
 
@@ -1228,12 +1285,12 @@ class FormGenerator(
         formLayout.apply {
             if (isNeedAction) {
                 when (id) {
-                    Screening.identityValue -> {
+                    Screening.identityValue, Screening.nationalId -> {
                         binding.tvNationalIdAction.visibility = View.VISIBLE
                         val clickableSpan = object : ClickableSpan() {
                             override fun onClick(mView: View) {
                                 // action click
-                                generateNationalId()
+                                generateNationalId(id)
                             }
 
                             override fun updateDrawState(ds: TextPaint) {
@@ -1493,7 +1550,7 @@ class FormGenerator(
             dropDownList.add(
                 hashMapOf<String, Any>(
                     DefinedParams.NAME to getString(R.string.please_select),
-                    DefinedParams.ID to DefaultID,
+                    DefinedParams.ID to DEFAULT_ID,
                 ),
             )
             if (isMandatory) {
@@ -1685,7 +1742,7 @@ class FormGenerator(
             dropDownList.add(
                 hashMapOf<String, Any>(
                     DefinedParams.NAME to getString(R.string.please_select),
-                    DefinedParams.ID to DefaultID,
+                    DefinedParams.ID to DEFAULT_ID,
                 ),
             )
             (view.adapter as CustomSpinnerAdapter).setData(dropDownList)
@@ -1943,10 +2000,10 @@ class FormGenerator(
             binding.etYears.inputType = InputType.TYPE_CLASS_NUMBER
             binding.etMonths.inputType = InputType.TYPE_CLASS_NUMBER
             binding.etWeeks.inputType = InputType.TYPE_CLASS_NUMBER
-            binding.etYears.tag = id + Year
-            binding.etMonths.tag = id + Month
-            binding.etWeeks.tag = id + Week
-            binding.ageValue.tag = id + value
+            binding.etYears.tag = id + YEAR_KEY
+            binding.etMonths.tag = id + MONTH_KEY
+            binding.etWeeks.tag = id + WEEK_KEY
+            binding.ageValue.tag = id + VALUE
             binding.tvKey.text = updateTitle(title, translate, titleCulture, unitMeasurement)
             binding.tvErrorMessage.tag = id + errorSuffix
             binding.tvDateOfBirth.tag = id + titleSuffix
@@ -2057,9 +2114,9 @@ class FormGenerator(
                     }
                 },
             )
-            binding.etYears.tag = id + Year
-            binding.etMonths.tag = id + Month
-            binding.etDays.tag = id + DefinedParams.Days
+            binding.etYears.tag = id + YEAR_KEY
+            binding.etMonths.tag = id + MONTH_KEY
+            binding.etDays.tag = id + DefinedParams.DAYS
             binding.tvErrorMessage.tag = id + errorSuffix
             binding.tvDateOfBirth.tag = id + titleSuffix
             binding.tvTitle.text = updateTitle(title, translate, titleCulture, unitMeasurement)
@@ -2175,9 +2232,9 @@ class FormGenerator(
         isEnabled: Boolean,
         id: String,
     ) {
-        val yearView = getViewByTag(id + Year)
-        val monthView = getViewByTag(id + Month)
-        val dayView = getViewByTag(id + DefinedParams.Days)
+        val yearView = getViewByTag(id + YEAR_KEY)
+        val monthView = getViewByTag(id + MONTH_KEY)
+        val dayView = getViewByTag(id + DefinedParams.DAYS)
         if (yearView is AppCompatEditText && monthView is AppCompatEditText && dayView is AppCompatEditText) {
             removeWatcherYMD(yearView, monthView, dayView)
         }
@@ -2198,17 +2255,17 @@ class FormGenerator(
             yearMonthDays.years.let { year ->
                 yearView.setText(year.toString())
                 yearView.isEnabled = isEnabled
-                resultHashMap[Year] = year
+                resultHashMap[YEAR_KEY] = year
             }
             yearMonthDays.months.let { month ->
                 monthView.setText(month.toString())
                 monthView.isEnabled = isEnabled
-                resultHashMap[Month] = month
+                resultHashMap[MONTH_KEY] = month
             }
             yearMonthDays.days.let { day ->
                 dayView.setText(day.toString())
                 dayView.isEnabled = isEnabled
-                resultHashMap[DefinedParams.Days] = day
+                resultHashMap[DefinedParams.DAYS] = day
             }
             listener.onAgeCheckForPregnancy()
             addWatcherYMD(yearView, monthView, dayView)
@@ -2246,13 +2303,13 @@ class FormGenerator(
         if (years == 0 && months == 0 && days == 0) {
             etDateOfBirth.text = ""
             removeIfContains(id)
-            removeIfContains(Year)
-            removeIfContains(Month)
-            removeIfContains(DefinedParams.Days)
+            removeIfContains(YEAR_KEY)
+            removeIfContains(MONTH_KEY)
+            removeIfContains(DefinedParams.DAYS)
         } else {
-            resultHashMap[Year] = years
-            resultHashMap[Month] = months
-            resultHashMap[DefinedParams.Days] = days
+            resultHashMap[YEAR_KEY] = years
+            resultHashMap[MONTH_KEY] = months
+            resultHashMap[DefinedParams.DAYS] = days
 
             val calculatedBirthDate = DateUtils.calculateBirthDateYMD(years, months, days)
 
@@ -2647,9 +2704,9 @@ class FormGenerator(
         isEnabled: Boolean,
         id: String = DATE_OF_BIRTH,
     ) {
-        val yearView = getViewByTag(id + Year)
-        val monthView = getViewByTag(id + Month)
-        val weekView = getViewByTag(id + Week)
+        val yearView = getViewByTag(id + YEAR_KEY)
+        val monthView = getViewByTag(id + MONTH_KEY)
+        val weekView = getViewByTag(id + WEEK_KEY)
         if (yearView is AppCompatEditText && monthView is AppCompatEditText && weekView is AppCompatEditText) {
             removeWatcher(yearView, monthView, weekView)
         }
@@ -2670,17 +2727,17 @@ class FormGenerator(
             yearMonthWeeks.years.let { year ->
                 yearView.setText(year.toString())
                 yearView.isEnabled = isEnabled
-                resultHashMap[Year] = year
+                resultHashMap[YEAR_KEY] = year
             }
             yearMonthWeeks.months.let { month ->
                 monthView.setText(month.toString())
                 monthView.isEnabled = isEnabled
-                resultHashMap[Month] = month
+                resultHashMap[MONTH_KEY] = month
             }
             yearMonthWeeks.weeks.let { week ->
                 weekView.setText(week.toString())
                 weekView.isEnabled = isEnabled
-                resultHashMap[Week] = week
+                resultHashMap[WEEK_KEY] = week
             }
             listener.onAgeCheckForPregnancy()
             updateAgeView(id)
@@ -2719,13 +2776,13 @@ class FormGenerator(
         if (years == 0 && months == 0 && weeks == 0) {
             etDateOfBirth.text = ""
             removeIfContains(id)
-            removeIfContains(Year)
-            removeIfContains(Month)
-            removeIfContains(Week)
+            removeIfContains(YEAR_KEY)
+            removeIfContains(MONTH_KEY)
+            removeIfContains(WEEK_KEY)
         } else {
-            resultHashMap[Year] = years
-            resultHashMap[Month] = months
-            resultHashMap[Week] = weeks
+            resultHashMap[YEAR_KEY] = years
+            resultHashMap[MONTH_KEY] = months
+            resultHashMap[WEEK_KEY] = weeks
 
             val calculatedBirthDate = DateUtils.calculateBirthDate(years, months, weeks)
 
@@ -2741,7 +2798,7 @@ class FormGenerator(
 
     private fun updateAgeView(id: String) {
         val dobString = resultHashMap[id] as? String
-        val ageView = getViewByTag(id + value)
+        val ageView = getViewByTag(id + VALUE)
         dobString?.let { dob ->
             val age = displayAge(dob, context)
             ageView?.let { view ->
@@ -3875,6 +3932,18 @@ class FormGenerator(
                         isValid = false
                         requestFocusView(data)
                     }
+                } else if (data.viewType.equals(VIEW_TYPE_FORM_QR, true)) {
+                    if (isMandatory && !resultHashMap.containsKey(id)) {
+                        isValid = false
+                        getViewByTag(id + errorSuffix)?.let { view ->
+                            view as TextView
+                            view.visibility = View.VISIBLE
+                            view.text = errorMessage
+                                ?: getString(R.string.linking_qr_code_is_mandatory)
+                        }
+                    } else {
+                        getViewByTag(id + errorSuffix)?.visibility = View.GONE
+                    }
                 } else {
                     if (resultHashMap.containsKey(id) &&
                         data.viewType.equals(
@@ -3883,7 +3952,7 @@ class FormGenerator(
                         )
                     ) {
                         val actualValue = resultHashMap[id]
-                        if (id == Screening.NoOfNeonates && resultHashMap[id].toString().toIntOrNull() == 0) {
+                        if (id == Screening.NO_OF_NEONATES && resultHashMap[id].toString().toIntOrNull() == 0) {
                             isValid = false
                             requestFocusView(data)
                         } else {
@@ -4208,7 +4277,7 @@ class FormGenerator(
         // Prioritize 'value' (JSON id) over 'ID' (database id) for condition matching
         val selectedValues = ArrayList<String>()
         resultMap.forEach { item ->
-            val selectedId = item[value]?.toString()
+            val selectedId = item[VALUE]?.toString()
                 ?: item[DefinedParams.ID]?.toString()
             selectedId?.let { selectedValues.add(it) }
         }
@@ -4216,7 +4285,7 @@ class FormGenerator(
         if (isContainsOther(resultMap)) {
             setConditionalVisibility(
                 formLayout,
-                DefinedParams.Other,
+                DefinedParams.OTHER,
                 isCheckBox = true,
                 selectedValues = selectedValues,
             )
@@ -4238,7 +4307,7 @@ class FormGenerator(
         mapList.forEach { map ->
             if (map is HashMap<*, *>) {
                 val name = map[DefinedParams.NAME]
-                if (name is String && (name.equals(DefinedParams.Other, true) || name.equals(OtherMethodSpecify, true))) {
+                if (name is String && (name.equals(DefinedParams.OTHER, true) || name.equals(OTHER_METHOD_SPECIFY, true))) {
                     status = true
                     return@forEach
                 }
@@ -4352,7 +4421,7 @@ class FormGenerator(
     fun createDefaultMap(): Map<String, Any> =
         hashMapOf(
             DefinedParams.NAME to getString(R.string.please_select),
-            DefinedParams.ID to DefaultID,
+            DefinedParams.ID to DEFAULT_ID,
         )
 
     fun resetSingleSelection(id: String) {
@@ -4743,7 +4812,7 @@ class FormGenerator(
                         handleSelectedItem(
                             hashMapOf<String, Any>().apply {
                                 put(DefinedParams.ID, DefinedParams.DEFAULT_ID)
-                                put(DefinedParams.NAME, DefinedParams.DefaultIDLabel)
+                                put(DefinedParams.NAME, DefinedParams.DEFAULT_ID_LABEL)
                             },
                             id,
                             dependentID,
@@ -4930,6 +4999,234 @@ class FormGenerator(
             titleView?.markMandatory()
         } else {
             titleView?.markNonMandatory()
+        }
+    }
+
+    private fun defaultError(itemId: String): String {
+        val error: String? = if (SecuredPreference.getIsTranslationEnabled()) {
+            serverData?.firstOrNull { it.id == itemId }?.cultureErrorMessage
+        } else {
+            serverData?.firstOrNull { it.id == itemId }?.errorMessage
+        }
+        return if (error.isNullOrBlank()) getString(R.string.default_user_input_error) else error
+    }
+
+    private fun upazilaId(): Pair<Long, String> {
+        var upazilaId: Long = 0
+        val errorMessage: String = defaultError(DefinedParams.UPAZILA)
+        getViewByTag(DefinedParams.UPAZILA)?.let { view ->
+            if (view is Spinner) {
+                val adapter = view.adapter
+                if (adapter != null && adapter is CustomSpinnerAdapter) {
+                    val pos = view.selectedItemPosition
+                    if (pos > 0 && adapter.getData(pos) != null) {
+                        adapter.getData(pos)?.let {
+                            val id = it[DefinedParams.ID]
+                            if (id is Long) {
+                                upazilaId = id
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return Pair(upazilaId, errorMessage)
+    }
+
+    private fun upazilaIdError(
+        upazilaId: Long,
+        errorMessage: String,
+    ) {
+        getViewByTag(DefinedParams.UPAZILA + errorSuffix)?.let { tvError ->
+            (tvError as TextView).apply {
+                text = errorMessage
+                if (upazilaId > 0) {
+                    visibility = View.GONE
+                } else {
+                    visibility = View.VISIBLE
+                    focusNeeded = getViewByTag(DefinedParams.UPAZILA + titleSuffix) ?: this
+                }
+            }
+        }
+    }
+
+    private fun villageIdError(
+        villageId: Long,
+        errorMessage: String,
+    ) {
+        getViewByTag(DefinedParams.VILLAGE + errorSuffix)?.let { tvError ->
+            (tvError as TextView).apply {
+                text = errorMessage
+                if (villageId > 0) {
+                    visibility = View.GONE
+                } else {
+                    visibility = View.VISIBLE
+                    focusNeeded = getViewByTag(DefinedParams.VILLAGE + titleSuffix) ?: this
+                }
+            }
+        }
+    }
+
+    private fun villageId(): Pair<Long, String> {
+        var villageId: Long = 0
+        val errorMessage: String = defaultError(DefinedParams.VILLAGE)
+        getViewByTag(DefinedParams.VILLAGE)?.let { view ->
+            if (view is Spinner) {
+                val adapter = view.adapter
+                if (adapter != null && adapter is CustomSpinnerAdapter) {
+                    val pos = view.selectedItemPosition
+                    if (pos > 0 && adapter.getData(pos) != null) {
+                        adapter.getData(pos)?.let {
+                            val id = it[DefinedParams.ID]
+                            if (id is Long) {
+                                villageId = id
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return Pair(villageId, errorMessage)
+    }
+
+    private fun unionIdError(
+        unionId: Long,
+        errorMessage: String,
+    ) {
+        getViewByTag(DefinedParams.UNION + errorSuffix)?.let { tvError ->
+            (tvError as TextView).apply {
+                text = errorMessage
+                if (unionId > 0) {
+                    visibility = View.GONE
+                } else {
+                    visibility = View.VISIBLE
+                    focusNeeded = getViewByTag(DefinedParams.UNION + titleSuffix) ?: this
+                }
+            }
+        }
+    }
+
+    private fun unionId(): Pair<Long, String> {
+        var unionId: Long = 0
+        val errorMessage: String = defaultError(DefinedParams.UNION)
+        getViewByTag(DefinedParams.UNION)?.let { view ->
+            if (view is Spinner) {
+                val adapter = view.adapter
+                if (adapter != null && adapter is CustomSpinnerAdapter) {
+                    val pos = view.selectedItemPosition
+                    if (pos > 0 && adapter.getData(pos) != null) {
+                        adapter.getData(pos)?.let {
+                            val id = it[DefinedParams.ID]
+                            if (id is Long) {
+                                unionId = id
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return Pair(unionId, errorMessage)
+    }
+
+    fun generateUniqueNationalId(
+        postValue: Boolean,
+        level1SiteId: Long = 0,
+    ) {
+        val isParacounselorEnabled = false
+        var upazilaId: Long = 0
+        if (!isParacounselorEnabled) {
+            if (level1SiteId > 0) {
+                upazilaId = level1SiteId
+            } else {
+                val upazila = upazilaId()
+                upazila.first.let {
+                    upazilaId = it
+                }
+                focusNeeded = null
+                if (postValue) {
+                    upazilaIdError(upazilaId, upazila.second)
+                }
+            }
+        }
+
+        var unionId: Long
+        val union = unionId()
+        union.first.let {
+            unionId = it
+        }
+        focusNeeded = null
+        if (postValue) {
+            unionIdError(unionId, union.second)
+        }
+
+        var villageId: Long
+        val village = villageId()
+        village.first.let {
+            villageId = it
+        }
+        focusNeeded = null
+        if (postValue) {
+            villageIdError(villageId, village.second)
+        }
+
+        val upazilaCodeValidation = upazilaId > 0 || isParacounselorEnabled
+
+        if (upazilaCodeValidation && unionId > 0 && villageId > 0) { // listener.generateNationalID(Triple(upazilaId, unionId, villageId), postValue)
+        } else {
+            focusNeeded?.let { focusNeeded ->
+                scrollView?.let { scrollView ->
+                    scrollToView(scrollView, focusNeeded)
+                }
+            }
+        }
+    }
+
+    fun showQRScannedText(
+        resultString: String,
+        tag: String,
+    ) {
+        getViewByTag(tag)?.let {
+            (it as? AppCompatEditText)?.apply {
+                setText(resultString)
+            }
+        }
+
+        getViewByTag(tag + errorSuffix)?.visibility = View.GONE
+    }
+
+    fun showErrorQRScanned(
+        tag: String,
+        message: String? = null,
+    ) {
+        val errorTextView = getViewByTag(tag + errorSuffix)
+        message?.let {
+            if (errorTextView is TextView) {
+                errorTextView.text = message
+            }
+        }
+        errorTextView?.visibility = View.VISIBLE
+        val modelList = serverData?.filter { it.id == tag }
+        resultHashMap.remove(tag)
+        getViewByTag(tag + titleSuffix)?.let { view ->
+            if (view is TextView && !modelList.isNullOrEmpty()) {
+                view.text = CommonUtils.getTitle(modelList[0], translate)
+                if (modelList[0].isMandatory) {
+                    view.markMandatory()
+                }
+                view.safeClickListener { listener.onQRScanRequested() }
+            }
+        }
+
+        getViewByTag(tag + scanImageView)?.let { view ->
+            view.safeClickListener { listener.onQRScanRequested() }
+        }
+
+        getViewByTag(tag + scanDoneButtonSuffix)?.let { view ->
+            view.visibility = View.GONE
+        }
+
+        getViewByTag(tag + innerRootSuffix)?.let { view ->
+            view.visibility = View.GONE
         }
     }
 }

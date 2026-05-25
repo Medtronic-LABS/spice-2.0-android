@@ -18,7 +18,7 @@ import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.FhirMemberID
 import org.medtroniclabs.uhis.common.DefinedParams.MEMBER_ID
-import org.medtroniclabs.uhis.common.DefinedParams.VillageId
+import org.medtroniclabs.uhis.common.DefinedParams.VILLAGE_ID
 import org.medtroniclabs.uhis.common.DefinedParams.isCreateHouseholdForPhu
 import org.medtroniclabs.uhis.databinding.DialogConsentSignatureBinding
 import org.medtroniclabs.uhis.signature.view.SignatureView
@@ -129,13 +129,13 @@ class ConsentSignatureDialogFragment : DialogFragment() {
         dismiss()
         requireActivity().finish()
         val intent = Intent(requireContext(), HouseholdActivity::class.java)
-        intent.putExtra(VillageId, arguments?.getLong(VillageId, -1L))
+        intent.putExtra(VILLAGE_ID, arguments?.getLong(VILLAGE_ID, -1L))
         intent.putExtra(MEMBER_ID, arguments?.getLong(MEMBER_ID, -1L))
         intent.putExtra(FhirMemberID, arguments?.getLong(FhirMemberID, -1L))
         intent.putExtra(IS_PHU_WALK_INS_FLOW, arguments?.getBoolean(IS_PHU_WALK_INS_FLOW, false))
         intent.putExtra(isCreateHouseholdForPhu, arguments?.getBoolean(isCreateHouseholdForPhu, false))
         intent.putExtra(DefinedParams.KeySignature, fileName)
-        intent.putExtra(DefinedParams.KeyInitial, initial)
+        intent.putExtra(DefinedParams.KEY_INITIAL, initial)
         startActivity(intent)
     }
 

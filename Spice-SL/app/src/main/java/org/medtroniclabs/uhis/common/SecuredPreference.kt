@@ -644,7 +644,7 @@ object SecuredPreference {
 
     fun getIsTranslationEnabled() = getCulturePreference()?.isTranslationEnabled ?: false
 
-    fun getCultureName() = getCulturePreference()?.name ?: DefinedParams.EN_Locale
+    fun getCultureName() = getCulturePreference()?.name ?: DefinedParams.EN_LOCALE
 
     private fun saveCulturePreference(model: CulturePreference) {
         val culture = Gson().toJson(model)
@@ -684,4 +684,6 @@ object SecuredPreference {
     fun removePeerSupervisorToken() {
         remove(EnvironmentKey.PEER_SUPERVISOR_NOTIFICATION_TOKEN.name)
     }
+
+    fun canDoRegistration(): Boolean = true
 }

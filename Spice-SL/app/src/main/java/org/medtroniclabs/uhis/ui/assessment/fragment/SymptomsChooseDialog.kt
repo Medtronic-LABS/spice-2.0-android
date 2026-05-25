@@ -9,7 +9,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import org.medtroniclabs.uhis.R
-import org.medtroniclabs.uhis.common.DefinedParams.DefaultID
+import org.medtroniclabs.uhis.common.DefinedParams.DEFAULT_ID
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.model.SymptomModel
 import org.medtroniclabs.uhis.databinding.LayoutChooseSymptomsBinding
@@ -74,7 +74,7 @@ class SymptomsChooseDialog : DialogFragment(), View.OnClickListener {
         val list = ArrayList<SymptomModel>()
         list.add(
             SymptomModel(
-                DefaultID.toLong(),
+                DEFAULT_ID.toLong(),
                 "",
                 false,
                 getString(R.string.hypertension),
@@ -91,7 +91,7 @@ class SymptomsChooseDialog : DialogFragment(), View.OnClickListener {
         )
         list.add(
             SymptomModel(
-                DefaultID.toLong(),
+                DEFAULT_ID.toLong(),
                 "",
                 false,
                 getString(R.string.diabetes),

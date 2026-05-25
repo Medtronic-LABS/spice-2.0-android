@@ -14,10 +14,10 @@ import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.ANC_CBS
 import org.medtroniclabs.uhis.common.DefinedParams.ASSESSMENT_ID
+import org.medtroniclabs.uhis.common.DefinedParams.BIRTH
 import org.medtroniclabs.uhis.common.DefinedParams.CBS
 import org.medtroniclabs.uhis.common.DefinedParams.CbsNotifiableCondition
 import org.medtroniclabs.uhis.common.DefinedParams.RmnchNotifiableCondition
-import org.medtroniclabs.uhis.common.DefinedParams.birth
 import org.medtroniclabs.uhis.common.DefinedParams.surveillanceDetails
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
 import org.medtroniclabs.uhis.databinding.FragmentAssessmentBinding
@@ -112,17 +112,17 @@ class CbsFragment : BaseFragment(), FormEventListener, View.OnClickListener {
                     (map[RmnchNotifiableCondition] as? ArrayList<Map<String, String>>)
                         ?.firstOrNull { it[DefinedParams.Value].equals(DEATH_OF_NEWBORN, true) }
                         .let { filteredValue ->
-                            val isStillBirth = (map[birth] as? String).equals(DefinedParams.still_birth, true)
+                            val isStillBirth = (map[BIRTH] as? String).equals(DefinedParams.still_birth, true)
                             if (filteredValue == null && isStillBirth) {
-                                map.remove(birth)
+                                map.remove(BIRTH)
                             }
-                            singleSelectValueOption(DefinedParams.still_birth, birth, filteredValue != null)
+                            singleSelectValueOption(DefinedParams.still_birth, BIRTH, filteredValue != null)
                             binding.btnSubmit.text = getString(if (filteredValue != null) R.string.submit else R.string.next)
                         }
                 }
 
-                birth -> {
-                    (map[birth] as? String)?.takeIf { it.equals(DefinedParams.still_birth, true) }?.let {
+                BIRTH -> {
+                    (map[BIRTH] as? String)?.takeIf { it.equals(DefinedParams.still_birth, true) }?.let {
                         showInCheckBox((map[RmnchNotifiableCondition] as? ArrayList<*>) ?: arrayListOf<Any>())
                     } ?: run {
                         (map[RmnchNotifiableCondition] as? ArrayList<*>)?.let { removeInCheckBox(it) }
@@ -202,7 +202,7 @@ class CbsFragment : BaseFragment(), FormEventListener, View.OnClickListener {
                         org.medtroniclabs.uhis.formgeneration.config.DefinedParams.NAME to symptom.symptom,
                     ).apply {
                         symptom.displayValue?.let { put(org.medtroniclabs.uhis.formgeneration.config.DefinedParams.CULTURE_VALUE, it) }
-                        symptom.value?.let { put(org.medtroniclabs.uhis.formgeneration.config.DefinedParams.value, it) }
+                        symptom.value?.let { put(org.medtroniclabs.uhis.formgeneration.config.DefinedParams.VALUE, it) }
                     }
                     if (selectedSymptoms.isEmpty()) {
                         viewModel.formLayoutsLiveData.value
@@ -224,7 +224,7 @@ class CbsFragment : BaseFragment(), FormEventListener, View.OnClickListener {
                     hideProgress()
                     resourceState.data?.let { data ->
                         if (arguments?.getBoolean(DEATH_OF_NEWBORN) == true) {
-                            formGenerator.populateViews(data.formLayout.filter { it.id != birth })
+                            formGenerator.populateViews(data.formLayout.filter { it.id != BIRTH })
                         } else {
                             formGenerator.populateViews(data.formLayout)
                         }
@@ -409,7 +409,7 @@ class CbsFragment : BaseFragment(), FormEventListener, View.OnClickListener {
 
                                         cbs.remove(CbsNotifiableCondition)
                                         cbs.remove(RmnchNotifiableCondition)
-                                        cbs[DefinedParams.NotifiableConditions] = conditions
+                                        cbs[DefinedParams.NOTIFIABLE_CONDITIONS] = conditions
 
                                         assessmentDetailsMap[CBS.lowercase()] = cbs
                                     }
@@ -420,7 +420,7 @@ class CbsFragment : BaseFragment(), FormEventListener, View.OnClickListener {
                         val birth = (
                             (resultValue[CBS.lowercase()] as? Map<String, Any>)
                                 ?.get(surveillanceDetails) as? Map<String, Any>
-                        )?.get(birth) as? String
+                        )?.get(BIRTH) as? String
                         if (!birth.isNullOrBlank() && !birth.equals(DefinedParams.still_birth, true)) {
                             // If the birth value is "boy" or "girl," the data will not be saved in the database but only in the ViewModel.
                             // Once the member is saved in the CBS activity, all data will be stored in the database(In cbsActivity).
@@ -455,7 +455,7 @@ class CbsFragment : BaseFragment(), FormEventListener, View.OnClickListener {
                     val birth = (
                         (resultValue[CBS.lowercase()] as? Map<String, Any>)
                             ?.get(surveillanceDetails) as? Map<String, Any>
-                    )?.get(birth) as? String
+                    )?.get(BIRTH) as? String
                     if (!birth.isNullOrBlank() && !birth.equals(DefinedParams.still_birth, true)) {
                         viewModel.setBirth(
                             resultValue,
@@ -485,12 +485,12 @@ class CbsFragment : BaseFragment(), FormEventListener, View.OnClickListener {
                     val otherText = (
                         (viewModel.assessmentMap[CBS.lowercase()] as? Map<String, Any>)
                             ?.get(surveillanceDetails) as? Map<String, Any>
-                    )?.get(DefinedParams.OtherNotifiableConditions) as? String
+                    )?.get(DefinedParams.OTHER_NOTIFIABLE_CONDITIONS) as? String
 
-                    val index = rmnchText.indexOfFirst { it.equals(DefinedParams.Other, ignoreCase = true) }
+                    val index = rmnchText.indexOfFirst { it.equals(DefinedParams.OTHER, ignoreCase = true) }
 
                     if (index != -1 && !otherText.isNullOrBlank()) {
-                        rmnchText[index] = "${DefinedParams.Other} ($otherText)"
+                        rmnchText[index] = "${DefinedParams.OTHER} ($otherText)"
                     }
                     val finalText = rmnchText.joinToString(", ")
                     if (isDelete) {
@@ -556,5 +556,8 @@ class CbsFragment : BaseFragment(), FormEventListener, View.OnClickListener {
         serverData: List<FormLayout>?,
         resultHashMap: HashMap<String, Any>,
     ) {
+    }
+
+    override fun onQRScanRequested() {
     }
 }

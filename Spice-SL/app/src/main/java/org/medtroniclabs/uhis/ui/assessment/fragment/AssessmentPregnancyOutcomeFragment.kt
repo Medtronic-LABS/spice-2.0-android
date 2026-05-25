@@ -706,6 +706,9 @@ class AssessmentPregnancyOutcomeFragment :
     ) {
     }
 
+    override fun onQRScanRequested() {
+    }
+
     override fun onClick(view: View) {
         when (view.id) {
             binding.btnSubmit.id -> {
@@ -772,21 +775,13 @@ class AssessmentPregnancyOutcomeFragment :
             // Option 4: "obstructedLabor" - Hide when death is before/after delivery
             if (optionId == AssessmentDefinedParams.CAUSE_OF_DEATH_OBSTRUCTED_LABOR) {
                 if (timeOfDeathValue == AssessmentDefinedParams.TIME_OF_DEATH_DURING_CHILDBIRTH) {
-                    // Show only when death is during childbirth
                     addOptionToInputData(it, index, dialogKey, inputData)
                 }
-                // Hide for "beforeDelivery" and "within42DaysAfterDelivery"
-            }
-            // Option 6: "unsafeAbortion" - Hide when death is during/after delivery
-            else if (optionId == AssessmentDefinedParams.CAUSE_OF_DEATH_UNSAFE_ABORTION) {
+            } else if (optionId == AssessmentDefinedParams.CAUSE_OF_DEATH_UNSAFE_ABORTION) {
                 if (timeOfDeathValue == AssessmentDefinedParams.TIME_OF_DEATH_BEFORE_DELIVERY) {
-                    // Show only when death is before delivery
                     addOptionToInputData(it, index, dialogKey, inputData)
                 }
-                // Hide for "duringChildbirth" and "within42DaysAfterDelivery"
-            }
-            // All other options are always shown
-            else {
+            } else {
                 addOptionToInputData(it, index, dialogKey, inputData)
             }
         }
@@ -825,7 +820,7 @@ class AssessmentPregnancyOutcomeFragment :
             is Map<*, *> -> {
                 // If it's a Map, extract the "id" value
                 timeOfDeathResult[DefinedParams.ID]?.toString()
-                    ?: timeOfDeathResult[DefinedParams.id]?.toString()
+                    ?: timeOfDeathResult[DefinedParams.ID]?.toString()
             }
             is String -> timeOfDeathResult
             else -> null
@@ -850,25 +845,18 @@ class AssessmentPregnancyOutcomeFragment :
 
         resultList.forEach { selectedItem ->
             val optionId = selectedItem[DefinedParams.ID]?.toString()
-                ?: selectedItem[DefinedParams.id]?.toString()
+                ?: selectedItem[DefinedParams.ID]?.toString()
                 ?: selectedItem[DefinedParams.Value]?.toString()
 
-            // Option 4: "obstructedLabor" - Only valid when death is during childbirth
             if (optionId == AssessmentDefinedParams.CAUSE_OF_DEATH_OBSTRUCTED_LABOR) {
                 if (timeOfDeathValue == AssessmentDefinedParams.TIME_OF_DEATH_DURING_CHILDBIRTH) {
                     validatedList.add(selectedItem)
                 }
-                // Remove if death is before/after delivery
-            }
-            // Option 6: "unsafeAbortion" - Only valid when death is before delivery
-            else if (optionId == AssessmentDefinedParams.CAUSE_OF_DEATH_UNSAFE_ABORTION) {
+            } else if (optionId == AssessmentDefinedParams.CAUSE_OF_DEATH_UNSAFE_ABORTION) {
                 if (timeOfDeathValue == AssessmentDefinedParams.TIME_OF_DEATH_BEFORE_DELIVERY) {
                     validatedList.add(selectedItem)
                 }
-                // Remove if death is during/after delivery
-            }
-            // All other options are always valid
-            else {
+            } else {
                 validatedList.add(selectedItem)
             }
         }

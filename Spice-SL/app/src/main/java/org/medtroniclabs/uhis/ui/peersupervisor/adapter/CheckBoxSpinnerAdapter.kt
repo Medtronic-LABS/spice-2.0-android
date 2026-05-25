@@ -10,7 +10,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.DefaultIDLabel
+import org.medtroniclabs.uhis.common.DefinedParams.DEFAULT_ID_LABEL
 import org.medtroniclabs.uhis.data.performance.CheckBoxSpinnerData
 
 class CheckBoxSpinnerAdapter(
@@ -57,7 +57,7 @@ class CheckBoxSpinnerAdapter(
     override fun getCount(): Int = if (items.isEmpty()) 1 else super.getCount()
 
     override fun getItem(position: Int): CheckBoxSpinnerData? =
-        if (items.isEmpty()) CheckBoxSpinnerData(-1L, DefaultIDLabel, false) else super.getItem(position)
+        if (items.isEmpty()) CheckBoxSpinnerData(-1L, DEFAULT_ID_LABEL, false) else super.getItem(position)
 
     override fun isEnabled(position: Int): Boolean = false
 
@@ -106,7 +106,7 @@ class CheckBoxSpinnerAdapter(
             val selectedItems = getSelectedItems()
 
             if (selectedItems.isEmpty()) {
-                textView.text = DefinedParams.DefaultIDLabel
+                textView.text = DefinedParams.DEFAULT_ID_LABEL
             } else if (selectedItems[0].id == 0L && selectedItems[0].isSelected) {
                 textView.text = selectedItems[0].name
             } else {

@@ -2,7 +2,7 @@ package org.medtroniclabs.uhis.ui.medicalreview.familyplan
 
 import android.location.Location
 import org.medtroniclabs.uhis.common.DateUtils
-import org.medtroniclabs.uhis.common.DefinedParams.DefaultID
+import org.medtroniclabs.uhis.common.DefinedParams.DEFAULT_ID
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.AboveFiveYearsSummaryRequest
 import org.medtroniclabs.uhis.data.MedicalReviewMetaItems
@@ -155,7 +155,7 @@ class FamilyPlanningRepository @Inject constructor(
             ),
             contraceptive = Contraceptive(
                 occupation = occupation?.takeIf { it.isNotBlank() },
-                maritalStatus = maritalStatus.takeIf { !(it.equals(DefaultID)) },
+                maritalStatus = maritalStatus.takeIf { !(it.equals(DEFAULT_ID)) },
                 clientType = (resultMap[ClientType] as? String)?.takeIf { it.isNotEmpty() },
                 postPartum = (resultMap[PostPartum] as? String)?.takeIf { it.isNotEmpty() },
                 combinedOralContraceptive = (resultMap[CombineOralContraceptive] as? String)?.takeIf { it.isNotEmpty() },

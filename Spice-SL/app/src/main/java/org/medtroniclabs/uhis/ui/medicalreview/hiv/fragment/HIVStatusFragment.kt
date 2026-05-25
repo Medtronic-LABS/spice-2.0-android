@@ -150,8 +150,8 @@ class HIVStatusFragment : BaseFragment() {
         val dropDownList = buildList {
             add(
                 mapOf(
-                    DefinedParams.NAME to DefinedParams.DefaultIDLabel,
-                    DefinedParams.Value to DefinedParams.DefaultID,
+                    DefinedParams.NAME to DefinedParams.DEFAULT_ID_LABEL,
+                    DefinedParams.Value to DefinedParams.DEFAULT_ID,
                 ),
             )
             addAll(
@@ -248,16 +248,16 @@ class HIVStatusFragment : BaseFragment() {
             binding.expectedDateGroup.setVisible(true)
         } else if (patientViewModel
                 .getPregnancyBreastFeedStatus()
-                ?.equals(DefinedParams.no, true) == true
+                ?.equals(DefinedParams.NO, true) == true
         ) {
             viewModel.resultPregnantStatus[MedicalReviewTypeEnums.hivPreganancyBreastFeedingStatus.name] =
-                DefinedParams.no
+                DefinedParams.NO
         } else if (patientViewModel
                 .getPregnancyBreastFeedStatus()
-                ?.equals(DefinedParams.not_applicable, true) == true
+                ?.equals(DefinedParams.NOT_APPLICABLE, true) == true
         ) {
             viewModel.resultPregnantStatus[MedicalReviewTypeEnums.hivPreganancyBreastFeedingStatus.name] =
-                DefinedParams.not_applicable
+                DefinedParams.NOT_APPLICABLE
         }
 
         patientViewModel
@@ -437,7 +437,7 @@ class HIVStatusFragment : BaseFragment() {
                     viewModel.selectModel =
                         if (!selectedModel.isNullOrEmpty() &&
                             !selectedModel.equals(
-                                DefinedParams.DefaultID,
+                                DefinedParams.DEFAULT_ID,
                                 ignoreCase = true,
                             )
                         ) {
@@ -467,8 +467,8 @@ class HIVStatusFragment : BaseFragment() {
             .toString()
             .trim()
             .isNotBlank()
-        val isSelectModel = viewModel.selectModel != DefinedParams.DefaultID && viewModel.selectModel != null
-        val isTBStatus = viewModel.tbStatus != DefinedParams.DefaultID && viewModel.tbStatus != null
+        val isSelectModel = viewModel.selectModel != DefinedParams.DEFAULT_ID && viewModel.selectModel != null
+        val isTBStatus = viewModel.tbStatus != DefinedParams.DEFAULT_ID && viewModel.tbStatus != null
         return isValidPregnantStatus || isValidAHD || isValidDSD || isLMB || isSelectModel || isTBStatus
     }
 
@@ -514,8 +514,8 @@ class HIVStatusFragment : BaseFragment() {
         val dropDownList = ArrayList<Map<String, Any>>()
         dropDownList.add(
             mapOf(
-                DefinedParams.NAME to DefinedParams.DefaultIDLabel,
-                DefinedParams.Value to DefinedParams.DefaultID,
+                DefinedParams.NAME to DefinedParams.DEFAULT_ID_LABEL,
+                DefinedParams.Value to DefinedParams.DEFAULT_ID,
             ),
         )
         dropDownList.addAll(
@@ -546,7 +546,7 @@ class HIVStatusFragment : BaseFragment() {
                         val selectedItem = adapter.getData(position = pos)
                         selectedItem?.let {
                             var selectedModel = it[DefinedParams.Value] as String?
-                            if (selectedModel == DefinedParams.DefaultID) {
+                            if (selectedModel == DefinedParams.DEFAULT_ID) {
                                 selectedModel = null
                             }
                             selectedModel?.let {

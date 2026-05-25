@@ -53,8 +53,8 @@ class CommunityProfileRepository @Inject constructor(
             dropDownList.add(
                 hashMapOf<String, Any>(
                     DefinedParams.NAME to healthFacilityEntity.name,
-                    DefinedParams.id to healthFacilityEntity.fhirId.toString(),
-                    DefinedParams.isDefault to (
+                    DefinedParams.ID to healthFacilityEntity.fhirId.toString(),
+                    DefinedParams.IS_DEFAULT to (
                         villageEntity?.healthFacilityId?.let { it == healthFacilityEntity.id }
                             ?: healthFacilityEntity.isDefault
                     ),

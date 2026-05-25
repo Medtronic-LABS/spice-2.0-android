@@ -111,7 +111,7 @@ class BirthDetailsFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
-    private fun showLoading() {
+    override fun showLoading() {
         binding.clLoaderProgress.visible()
         binding.loaderProgress.visible()
         binding.retryButtonBp.gone()
@@ -159,35 +159,35 @@ class BirthDetailsFragment : BaseFragment(), View.OnClickListener {
     private fun createMedicalReview(birthDetails: BirthDetails): List<Map<String, String?>> {
         val history = listOf(
             mapOf(
-                DefinedParams.label to requireContext().getString(R.string.neonate_outcome),
+                DefinedParams.LABEL to requireContext().getString(R.string.neonate_outcome),
                 DefinedParams.Value to (
                     birthDetails.neonateOutcome?.takeIf { it.isNotBlank() }
                         ?: getString(R.string.separator_double_hyphen)
                 ),
             ),
             mapOf(
-                DefinedParams.label to requireContext().getString(R.string.birth_weight),
+                DefinedParams.LABEL to requireContext().getString(R.string.birth_weight),
                 DefinedParams.Value to (
                     birthDetails.birthWeight?.let { "$it " + requireContext().getString(R.string.kg) }
                         ?: getString(R.string.separator_double_hyphen)
                 ),
             ),
             mapOf(
-                DefinedParams.label to requireContext().getString(R.string.stateOfBaby),
+                DefinedParams.LABEL to requireContext().getString(R.string.stateOfBaby),
                 DefinedParams.Value to (
                     birthDetails.stateOfBaby?.takeIf { it.isNotBlank() }
                         ?: getString(R.string.separator_double_hyphen)
                 ),
             ),
             mapOf(
-                DefinedParams.label to requireContext().getString(R.string.gestational_period),
+                DefinedParams.LABEL to requireContext().getString(R.string.gestational_period),
                 DefinedParams.Value to (
                     birthDetails.gestationalAge?.let { it + " " + requireContext().getString(R.string.weeks) }
                         ?: getString(R.string.separator_double_hyphen)
                 ),
             ),
             mapOf(
-                DefinedParams.label to requireContext().getString(R.string.apgar_score),
+                DefinedParams.LABEL to requireContext().getString(R.string.apgar_score),
                 DefinedParams.Value to
                     (
                         birthDetails.apgarScoreFiveMinuteDTO?.fiveMinuteTotalScore?.let { "$it" + requireContext().getString(R.string.five_minutes) }
@@ -195,14 +195,14 @@ class BirthDetailsFragment : BaseFragment(), View.OnClickListener {
                     ),
             ),
             mapOf(
-                DefinedParams.label to requireContext().getString(R.string.signs_symptoms_observed),
+                DefinedParams.LABEL to requireContext().getString(R.string.signs_symptoms_observed),
                 DefinedParams.Value to (
                     birthDetails.signs?.joinToString(", ")
                         ?: getString(R.string.separator_double_hyphen)
                 ),
             ),
             mapOf(
-                DefinedParams.label to requireContext().getString(R.string.patient_status),
+                DefinedParams.LABEL to requireContext().getString(R.string.patient_status),
                 DefinedParams.Value to (
                     birthDetails.patientStatus?.takeIf { it.isNotBlank() }
                         ?: getString(R.string.separator_double_hyphen)

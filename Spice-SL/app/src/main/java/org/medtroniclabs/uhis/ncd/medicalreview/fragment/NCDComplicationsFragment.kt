@@ -95,7 +95,7 @@ class NCDComplicationsFragment : BaseFragment() {
     private fun showNotes() {
         if (viewModel.chips.firstOrNull {
                 it.name.equals(
-                    DefinedParams.Other,
+                    DefinedParams.OTHER,
                     ignoreCase = true,
                 )
             } != null

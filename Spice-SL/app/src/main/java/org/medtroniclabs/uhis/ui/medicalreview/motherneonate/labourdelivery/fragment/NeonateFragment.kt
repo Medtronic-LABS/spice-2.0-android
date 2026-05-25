@@ -182,7 +182,7 @@ class NeonateFragment : BaseFragment() {
                 it,
                 SecuredPreference.getIsTranslationEnabled(),
                 viewModel.genderFlow,
-                Pair(DefinedParams.Gender, null),
+                Pair(DefinedParams.GENDER, null),
                 FormLayout(viewType = "", id = "", title = "", visibility = "", optionsList = null),
                 genderSingleSelectionCallback,
             )
@@ -192,7 +192,7 @@ class NeonateFragment : BaseFragment() {
 
     private var genderSingleSelectionCallback: ((selectedID: Any?, elementId: Pair<String, String?>, formLayout: FormLayout, name: String?) -> Unit)? =
         { selectedID, _, _, _ ->
-            viewModel.genderFlow[DefinedParams.Gender] = selectedID as String
+            viewModel.genderFlow[DefinedParams.GENDER] = selectedID as String
             viewModel.validateSubmitButtonState()
         }
 
@@ -393,7 +393,7 @@ class NeonateFragment : BaseFragment() {
         var isValid = true
 
         // Validate Gender
-        if (viewModel.genderFlow[DefinedParams.Gender] == null) {
+        if (viewModel.genderFlow[DefinedParams.GENDER] == null) {
             if (viewModel.neonateOutcome == MedicalReviewDefinedParams.FreshStillBirth ||
                 viewModel.neonateOutcome == MedicalReviewDefinedParams.MaceratedStillBirth ||
                 viewModel.neonateOutcome.isNullOrEmpty()

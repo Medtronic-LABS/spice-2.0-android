@@ -29,6 +29,8 @@ import org.medtroniclabs.uhis.ui.followup.FollowUpMyPatientActivity
 import org.medtroniclabs.uhis.ui.home.adapter.DashboardMenuItemsAdapter
 import org.medtroniclabs.uhis.ui.household.HouseholdSearchActivity
 import org.medtroniclabs.uhis.ui.landing.viewmodel.LandingViewModel
+import org.medtroniclabs.uhis.ui.patient.AdvancedSearchActivity
+import org.medtroniclabs.uhis.ui.patient.NurseDashboardActivity
 import org.medtroniclabs.uhis.ui.peersupervisor.PerformanceMonitoringActivity
 import org.medtroniclabs.uhis.ui.services.ServicesActivity
 
@@ -65,7 +67,7 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
     override fun onResume() {
         super.onResume()
         viewModel.setUserJourney(getString(R.string.home))
-        isDeeplink(arguments?.getBoolean(DefinedParams.IsDeepLink, false))
+        isDeeplink(arguments?.getBoolean(DefinedParams.IS_DEEP_LINK, false))
     }
 
     private fun attachObservers() {
@@ -111,26 +113,57 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
                 startActivity(Intent(requireContext(), HouseholdSearchActivity::class.java))
             }
 
-            MenuConstants.MY_PATIENTS_MENU_ID -> {
-                val bundle = Bundle().apply {
-                    putString(DefinedParams.ORIGIN, MenuConstants.MY_PATIENTS_MENU_ID)
-                }
-                val intent = if (CommonUtils.isCommunity()) {
-                    Intent(
-                        requireContext(),
-                        FollowUpMyPatientActivity::class.java,
-                    )
-                } else {
-                    Intent(requireContext(), PatientSearchActivity::class.java)
-                }
-
-                intent.putExtras(bundle)
-                if (CommonUtils.isCommunity()) {
+            MenuConstants.REGISTRATION -> {
+                withNetworkAvailability(online = {
+                    val bundle = Bundle().apply {
+                        putString(DefinedParams.ORIGIN, MenuConstants.ENROLLMENT.lowercase())
+                    }
+                    val intent = Intent(requireContext(), AdvancedSearchActivity::class.java)
+                    intent.putExtras(bundle)
                     startActivity(intent)
-                } else {
+                })
+            }
+
+            MenuConstants.DISPENSE -> {
+                val bundle = Bundle().apply {
+                    putString(DefinedParams.ORIGIN, MenuConstants.DISPENSE.lowercase())
+                }
+                val intent = Intent(requireContext(), AdvancedSearchActivity::class.java)
+                intent.putExtras(bundle)
+                startActivity(intent)
+            }
+
+            MenuConstants.MY_PATIENTS_MENU_ID -> {
+                if (CommonUtils.isNurse()) {
+                    val bundle = Bundle().apply {
+                        putString(DefinedParams.ORIGIN, MenuConstants.MY_PATIENTS_MENU_ID.lowercase())
+                    }
+                    val intent = Intent(requireContext(), AdvancedSearchActivity::class.java)
+                    intent.putExtras(bundle)
                     withNetworkAvailability(online = {
                         startActivity(intent)
                     })
+                } else {
+                    val bundle = Bundle().apply {
+                        putString(DefinedParams.ORIGIN, MenuConstants.MY_PATIENTS_MENU_ID)
+                    }
+                    val intent = if (CommonUtils.isCommunity()) {
+                        Intent(
+                            requireContext(),
+                            FollowUpMyPatientActivity::class.java,
+                        )
+                    } else {
+                        Intent(requireContext(), PatientSearchActivity::class.java)
+                    }
+
+                    intent.putExtras(bundle)
+                    if (CommonUtils.isCommunity()) {
+                        startActivity(intent)
+                    } else {
+                        withNetworkAvailability(online = {
+                            startActivity(intent)
+                        })
+                    }
                 }
             }
 
@@ -156,17 +189,6 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
                 startActivity(Intent(requireContext(), ScreeningActivity::class.java))
             }
 
-            MenuConstants.REGISTRATION -> {
-                withNetworkAvailability(online = {
-                    val bundle = Bundle().apply {
-                        putString(DefinedParams.ORIGIN, MenuConstants.REGISTRATION.lowercase())
-                    }
-                    val intent = Intent(requireContext(), PatientSearchActivity::class.java)
-                    intent.putExtras(bundle)
-                    startActivity(intent)
-                })
-            }
-
             MenuConstants.ASSESSMENT -> {
                 val bundle = Bundle().apply {
                     putString(DefinedParams.ORIGIN, MenuConstants.ASSESSMENT.lowercase())
@@ -176,18 +198,14 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
                 startActivity(intent)
             }
 
-            MenuConstants.DISPENSE -> {
-                val bundle = Bundle().apply {
-                    putString(DefinedParams.ORIGIN, MenuConstants.DISPENSE.lowercase())
-                }
-                val intent = Intent(requireContext(), PatientSearchActivity::class.java)
-                intent.putExtras(bundle)
-                startActivity(intent)
-            }
-
             MenuConstants.DASHBOARD -> {
-                val intent = Intent(requireContext(), NCDDashboardViewActivity::class.java)
-                startActivity(intent)
+                if (CommonUtils.isNURSE()) {
+                    val intent = Intent(requireContext(), NurseDashboardActivity::class.java)
+                    startActivity(intent)
+                } else {
+                    val intent = Intent(requireContext(), NCDDashboardViewActivity::class.java)
+                    startActivity(intent)
+                }
             }
 
             MenuConstants.LIFESTYLE -> {

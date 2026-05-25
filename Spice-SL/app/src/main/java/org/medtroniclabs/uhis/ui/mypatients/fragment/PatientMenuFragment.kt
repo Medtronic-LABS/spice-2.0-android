@@ -15,15 +15,15 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.ChildPatientId
+import org.medtroniclabs.uhis.common.DefinedParams.CHILD_PATIENT_ID
 import org.medtroniclabs.uhis.common.DefinedParams.DOB
 import org.medtroniclabs.uhis.common.DefinedParams.DateOfDelivery
+import org.medtroniclabs.uhis.common.DefinedParams.GENDER
 import org.medtroniclabs.uhis.common.DefinedParams.GENDER_FEMALE
 import org.medtroniclabs.uhis.common.DefinedParams.GENDER_MALE
-import org.medtroniclabs.uhis.common.DefinedParams.Gender
 import org.medtroniclabs.uhis.common.DefinedParams.ID
 import org.medtroniclabs.uhis.common.DefinedParams.MEMBER_ID
-import org.medtroniclabs.uhis.common.DefinedParams.NeonateOutcome
+import org.medtroniclabs.uhis.common.DefinedParams.NEONATE_OUTCOME
 import org.medtroniclabs.uhis.common.DefinedParams.PatientId
 import org.medtroniclabs.uhis.common.DefinedParams.villageId
 import org.medtroniclabs.uhis.databinding.FragmentPatientMenuBinding
@@ -102,7 +102,7 @@ class PatientMenuFragment : BaseFragment(), MenuSelectionListener {
             val layoutManager = GridLayoutManager(context, 2)
             binding.rvActivitiesList.layoutManager = layoutManager
         }
-        val gender = arguments?.getString(Gender, "")
+        val gender = arguments?.getString(GENDER, "")
         val dob = arguments?.getString(DOB, "")
         // Get the menu items list
 
@@ -182,16 +182,16 @@ class PatientMenuFragment : BaseFragment(), MenuSelectionListener {
             bundle.putString(PatientId, patientId)
             bundle.putString(ID, id)
             bundle.putString(MEMBER_ID, memberId)
-            bundle.putString(Gender, gender)
+            bundle.putString(GENDER, gender)
             bundle.putString(DOB, dob)
-            bundle.putString(ChildPatientId, childPatientId)
+            bundle.putString(CHILD_PATIENT_ID, childPatientId)
             bundle.putString(DateOfDelivery, dateOfDelivery)
-            bundle.putString(NeonateOutcome, neonateOutcome)
+            bundle.putString(NEONATE_OUTCOME, neonateOutcome)
             bundle.putString(DefinedParams.householdId, householdId)
             bundle.putString(DefinedParams.villageId, villageId)
             bundle.putBoolean(DefinedParams.isPregnant, isPregnant)
             bundle.putBoolean(DefinedParams.EMTCT, isEMTCTFlow)
-            bundle.putBoolean(DefinedParams.hivTestedPositive, hivTestedPositive)
+            bundle.putBoolean(DefinedParams.HIV_TESTED_POSITIVE, hivTestedPositive)
             fragment.arguments = bundle
             return fragment
         }
@@ -224,12 +224,12 @@ class PatientMenuFragment : BaseFragment(), MenuSelectionListener {
                 withNetworkAvailability(online = {
                     val patientId = arguments?.getString(PatientId, "")
                     val id = arguments?.getString(ID, "")
-                    val childPatientId = arguments?.getString(ChildPatientId, "")
+                    val childPatientId = arguments?.getString(CHILD_PATIENT_ID, "")
                     val dateOfDelivery = arguments?.getString(DateOfDelivery, "")
-                    val neonateOutcome = arguments?.getString(NeonateOutcome, "")
+                    val neonateOutcome = arguments?.getString(NEONATE_OUTCOME, "")
                     val isEmtctFlow = arguments?.getBoolean(DefinedParams.EMTCT, false)
                     val hivTestedPositive =
-                        arguments?.getBoolean(DefinedParams.hivTestedPositive, false)
+                        arguments?.getBoolean(DefinedParams.HIV_TESTED_POSITIVE, false)
                     if (patientId?.isNotBlank() == true) {
                         SelectFlowDialog
                             .newInstance(
@@ -288,7 +288,7 @@ class PatientMenuFragment : BaseFragment(), MenuSelectionListener {
             }
 
             MenuConstants.HIV -> {
-                if (arguments?.getBoolean(DefinedParams.hivTestedPositive, false) == true) {
+                if (arguments?.getBoolean(DefinedParams.HIV_TESTED_POSITIVE, false) == true) {
                     val patientId = arguments?.getString(PatientId, "")
                     val id = arguments?.getString(ID, "")
                     val intent =

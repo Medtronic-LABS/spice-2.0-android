@@ -11,7 +11,7 @@ import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
 
 class CustomSpinnerAdapter(context: Context, val translate: Boolean = false) :
     ArrayAdapter<String>(context, R.layout.spinner_drop_down_item) {
-    private var itemList = ArrayList<Map<String, Any>>()
+    var itemList = ArrayList<Map<String, Any>>()
     private var emptyLayoutResourceId: Int = R.layout.spinner_drop_down_item
 
     override fun getCount(): Int = itemList.size

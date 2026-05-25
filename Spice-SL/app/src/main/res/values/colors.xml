@@ -131,4 +131,10 @@
     <color name="bg_gaps_color">#F5F5FF</color>
     <color name="tailwind_stone_50">#FAFAF9</color>
     <color name="base_muted_foreground">#71717A</color>
+    <color name="bg_title">#2A2A2A</color>
+
+    <color name="night_ink">#2A2A2A</color>
+    <color name="gray_black">#4C4C4C</color>
+    <color name="cultured_color">#f5f2fa</color>
+    <color name="night_rider">#2C2C2C</color>
 </resources>

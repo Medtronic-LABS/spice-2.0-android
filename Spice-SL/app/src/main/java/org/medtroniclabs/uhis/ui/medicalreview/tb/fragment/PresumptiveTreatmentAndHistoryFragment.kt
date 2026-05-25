@@ -128,7 +128,7 @@ class PresumptiveTreatmentAndHistoryFragment : BaseFragment(), View.OnClickListe
             if (history.tbInvestigationStatus.equals(AssessmentDefinedParams.NA, true)) {
                 binding.tvUpdateInv.visible()
                 binding.tvUpdateInv.text = getString(R.string.add_inv_result)
-            } else if (history.tbInvestigationStatus.equals(DefinedParams.No, true)) {
+            } else if (history.tbInvestigationStatus.equals(DefinedParams.NO, true)) {
                 binding.tvUpdateInv.visible()
                 binding.tvUpdateInv.text = getString(R.string.update_inv_result)
             } else {

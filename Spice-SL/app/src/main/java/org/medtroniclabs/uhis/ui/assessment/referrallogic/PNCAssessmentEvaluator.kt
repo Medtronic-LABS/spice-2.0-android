@@ -64,9 +64,9 @@ object PNCAssessmentEvaluator {
             val systolic = CommonUtils.getInteger(maternalAssessment[AssessmentDefinedParams.SYSTOLIC])
             val diastolic = CommonUtils.getInteger(maternalAssessment[AssessmentDefinedParams.DIASTOLIC])
             val isBpHigh = isHighBp(systolic, diastolic)
-            val isKnownHtn = isValueEquals(maternalAssessment[RMNCH.ID_KNOWN_HTN], DefinedParams.Yes)
-            val isEclampsia = isValueEquals(maternalAssessment[RMNCH.ID_ECLAMPSIA], DefinedParams.Yes)
-            val isOnTreatmentHtn = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_HTN_ECLAMPSIA], DefinedParams.Yes)
+            val isKnownHtn = isValueEquals(maternalAssessment[RMNCH.ID_KNOWN_HTN], DefinedParams.YES)
+            val isEclampsia = isValueEquals(maternalAssessment[RMNCH.ID_ECLAMPSIA], DefinedParams.YES)
+            val isOnTreatmentHtn = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_HTN_ECLAMPSIA], DefinedParams.YES)
             val isEdemaPresent = isValueEquals(maternalAssessment[RMNCH.ID_EDEMA])
             val isUrineAlbuminPresent = isValueEquals(maternalAssessment[RMNCH.ID_URINARY_ALBUMIN])
 
@@ -118,9 +118,9 @@ object PNCAssessmentEvaluator {
             }
 
             // 14. Known DM/GDM patient not on treatment
-            val dmPatient = isValueEquals(maternalAssessment[RMNCH.ID_DM_PATIENT], DefinedParams.Yes)
-            val gdmPatient = isValueEquals(maternalAssessment[RMNCH.ID_GDM_PATIENT], DefinedParams.Yes)
-            val isOnTreatmentDm = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_DM_GDM], DefinedParams.Yes)
+            val dmPatient = isValueEquals(maternalAssessment[RMNCH.ID_DM_PATIENT], DefinedParams.YES)
+            val gdmPatient = isValueEquals(maternalAssessment[RMNCH.ID_GDM_PATIENT], DefinedParams.YES)
+            val isOnTreatmentDm = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_DM_GDM], DefinedParams.YES)
             if ((dmPatient || gdmPatient) && !isOnTreatmentDm) {
                 urgentReferral.add(PNCUrgentReferrals.DM_GDM_NOT_ON_TREATMENT.value + "::" + PNCUrgentReferrals.DM_GDM_NOT_ON_TREATMENT.cultureValue)
             }
@@ -180,9 +180,9 @@ object PNCAssessmentEvaluator {
                 }
             }
 
-            val isKnownHtn = isValueEquals(maternalAssessment[RMNCH.ID_KNOWN_HTN], DefinedParams.Yes)
-            val isEclampsia = isValueEquals(maternalAssessment[RMNCH.ID_ECLAMPSIA], DefinedParams.Yes)
-            val isOnTreatmentHtn = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_HTN_ECLAMPSIA], DefinedParams.Yes)
+            val isKnownHtn = isValueEquals(maternalAssessment[RMNCH.ID_KNOWN_HTN], DefinedParams.YES)
+            val isEclampsia = isValueEquals(maternalAssessment[RMNCH.ID_ECLAMPSIA], DefinedParams.YES)
+            val isOnTreatmentHtn = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_HTN_ECLAMPSIA], DefinedParams.YES)
 
             // 5. On treatment for HTN or Pre-eclampsia / Eclampsia
             if ((isKnownHtn || isEclampsia) && isOnTreatmentHtn) {
@@ -193,7 +193,7 @@ object PNCAssessmentEvaluator {
 
             val dmPatient = isValueEquals(maternalAssessment[RMNCH.ID_DM_PATIENT], DefinedParams.yes)
             val gdmPatient = isValueEquals(maternalAssessment[RMNCH.ID_GDM_PATIENT], DefinedParams.yes)
-            val onTreatmentDmGdm = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_DM_GDM], DefinedParams.Yes)
+            val onTreatmentDmGdm = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_DM_GDM], DefinedParams.YES)
 
             // 6. On treatment for DM/GDM
             if ((dmPatient || gdmPatient) && onTreatmentDmGdm) {
@@ -234,7 +234,7 @@ object PNCAssessmentEvaluator {
 
             // 1. Supplementation (Vitamin A, IFA, Calcium)
             // Vitamin A
-            if (!isValueEquals(maternalAssessment[RMNCH.ID_VITAMIN_A_CONSUMED], DefinedParams.Yes)) {
+            if (!isValueEquals(maternalAssessment[RMNCH.ID_VITAMIN_A_CONSUMED], DefinedParams.YES)) {
                 hasSupplementationGaps = true
                 supplementationGaps.add(PNCSupplementation.VITAMIN_A.value)
                 cultureSupplementationGaps.add(PNCSupplementation.VITAMIN_A.cultureValue)

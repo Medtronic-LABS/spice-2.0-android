@@ -1,0 +1,357 @@
+package org.medtroniclabs.uhis.ui.patient.fragment
+
+import android.app.Activity
+import android.os.Bundle
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import org.medtroniclabs.uhis.R
+import org.medtroniclabs.uhis.common.CommonUtils
+import org.medtroniclabs.uhis.common.DateUtils
+import org.medtroniclabs.uhis.common.StringConverter
+import org.medtroniclabs.uhis.data.registration.PatientDetailsModel
+import org.medtroniclabs.uhis.data.registration.PatientHistoryModel
+import org.medtroniclabs.uhis.databinding.FragmentNurseBioDataBinding
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
+import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
+import org.medtroniclabs.uhis.network.resource.ResourceState
+import org.medtroniclabs.uhis.ui.BaseFragment
+import org.medtroniclabs.uhis.ui.patient.util.CommonDialogInterface
+import org.medtroniclabs.uhis.ui.patient.viewmodel.MedicalReviewBaseViewModel
+import org.medtroniclabs.uhis.ui.patient.viewmodel.NurseBioDataViewModel
+import org.medtroniclabs.uhis.ui.patient.viewmodel.NurseMedicalReviewViewModel
+import java.util.ArrayList
+import kotlin.getValue
+
+class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
+    private lateinit var binding: FragmentNurseBioDataBinding
+
+    private val nurseBioDataViewModel: NurseBioDataViewModel by viewModels()
+    private val medicalReviewBaseViewModel: MedicalReviewBaseViewModel by activityViewModels()
+    private val nurseViewModel: NurseMedicalReviewViewModel by activityViewModels()
+
+    companion object {
+        const val TAG = "BioDataFragment"
+
+        fun newInstance(isSummary: Boolean = false): NurseBioDataFragment {
+            val args = Bundle()
+            args.putBoolean(DefinedParams.IS_SUMMARY, isSummary)
+            val fragment = NurseBioDataFragment()
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View {
+        binding = FragmentNurseBioDataBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+        initView()
+        attachObserver()
+    }
+
+    private fun initView() {
+        nurseBioDataViewModel.isSummary = arguments?.getBoolean(DefinedParams.IS_SUMMARY) == true
+        if (nurseBioDataViewModel.isSummary) {
+            binding.editGroup.visibility = View.GONE
+        }
+
+        binding.ivEdit.safeClickListener(this)
+        binding.tvEdit.safeClickListener(this)
+
+        if (!medicalReviewBaseViewModel.initialReview) {
+            val parentLayout = binding.tvDiagnosesLabel.parent as ConstraintLayout
+            val parentLayoutSep = binding.tvDiagnosesSeparator.parent as ConstraintLayout
+            val constraintSet = ConstraintSet()
+            constraintSet.clone(parentLayout)
+            constraintSet.clone(parentLayoutSep)
+
+// Set bottom constraint for another TextView (e.g., tvAnother) with a margin of 20px
+            constraintSet.connect(
+                binding.tvDiagnosesLabel.id,
+                ConstraintSet.BOTTOM,
+                ConstraintLayout.LayoutParams.PARENT_ID,
+                ConstraintSet.BOTTOM,
+                20,
+            )
+
+// Set bottom constraint for another TextView (e.g., tvLast) with a margin of 30px
+            constraintSet.connect(
+                binding.tvDiagnosesSeparator.id,
+                ConstraintSet.BOTTOM,
+                ConstraintLayout.LayoutParams.PARENT_ID,
+                ConstraintSet.BOTTOM,
+                20,
+            )
+
+// Apply the new constraints
+            constraintSet.applyTo(parentLayout)
+            constraintSet.applyTo(parentLayoutSep)
+
+            binding.bioGroup.visibility = View.GONE
+        } else {
+            binding.bioGroup.visibility = View.VISIBLE
+        }
+    }
+
+    override fun onClick(view: View?) {
+        when (view?.id) {
+            R.id.tvEdit, R.id.ivEdit -> {
+//                val intent = Intent(requireContext(), PatientEditActivity::class.java)
+//                intent.putExtra(DefinedParams.PATIENT_ID, nurseViewModel.newPatientId)
+//                intent.putExtra(DefinedParams.PatientTrackId, nurseViewModel.patientTrackId)
+//                intent.putExtra(DefinedParams.fromMedicalReview, true)
+//                patientEditLauncher.launch(intent)
+            }
+        }
+    }
+
+    private fun attachObserver() {
+        nurseViewModel.patientDetailsValue?.let { data ->
+            nurseViewModel.newPatientId = data.patientId
+            showBioData(data)
+        }
+        nurseViewModel.latestConfirmDiagnosesList.observe(viewLifecycleOwner) { resourceState ->
+            when (resourceState.state) {
+                ResourceState.LOADING -> showLoading()
+                ResourceState.SUCCESS -> {
+                    hideLoading()
+                    resourceState.data?.confirmDiagnosis?.let {
+                        confirmedDiagnosis(it)
+                    }
+                }
+
+                ResourceState.ERROR -> {
+                    hideLoading()
+                }
+            }
+        }
+        nurseViewModel.patientDetailsDiagnosisResponse.observe(viewLifecycleOwner) { resourceState ->
+            when (resourceState.state) {
+                ResourceState.LOADING -> showLoading()
+                ResourceState.SUCCESS -> {
+                    hideLoading()
+                    resourceState.data?.let {
+                        openConfirmDiagnosisDialog()
+                    }
+                }
+
+                ResourceState.ERROR -> {
+                    hideLoading()
+                }
+            }
+        }
+
+        nurseBioDataViewModel.patientDetailsResponse.observe(viewLifecycleOwner) { resourceState ->
+            when (resourceState.state) {
+                ResourceState.LOADING -> showLoading()
+                ResourceState.SUCCESS -> {
+                    hideLoading()
+                    resourceState.data?.let {
+                        it.firstName?.let { firstName ->
+                            val text =
+                                StringConverter.appendTexts(firstText = firstName, it.lastName)
+                            setTitle(
+                                StringConverter.appendTexts(
+                                    firstText = CommonUtils.capitalize(text),
+                                    it.age?.toInt().toString(),
+                                    it.gender,
+                                    separator = "-",
+                                ),
+                            )
+                        }
+                        showBioData(it)
+                        openConfirmDiagnosisDialog()
+                    }
+                }
+
+                ResourceState.ERROR -> {
+                    hideLoading()
+                }
+            }
+        }
+    }
+
+    private fun openConfirmDiagnosisDialog() {
+        if (nurseViewModel.isConfirmDiagnosis) {
+            ConfirmDiagnosisDialog
+                .newInstance(true, commonDialogInterface)
+                .show(childFragmentManager, ConfirmDiagnosisDialog.TAG)
+            nurseViewModel.isConfirmDiagnosis = false
+        }
+    }
+
+    private val commonDialogInterface = object : CommonDialogInterface {
+        override fun onSuccess() {
+            val request = nurseViewModel.patientId?.let {
+                PatientDetailsModel(
+                    it,
+                    isAssessmentDataRequired = false,
+                )
+            }
+            if (request != null) {
+                nurseViewModel.getLatestDiagnoses(requireContext(), request)
+            }
+        }
+    }
+
+    private fun showBioData(data: PatientDetailsModel) {
+        with(binding) {
+            medicalReviewBaseViewModel.confirmDiagnosis = data.confirmDiagnosis
+
+            tvNationalId.text = data.nationalId ?: getString(R.string.hyphen_symbol)
+            tvMobileNumber.text = data.phoneNumber ?: getString(
+                R.string.hyphen_symbol,
+            )
+            tvDateOfRegistration.text = data.enrollmentAt?.let {
+                DateUtils.convertDateTimeToDate(
+                    it,
+                    DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
+                    DateUtils.DATE_DD_MMM_YYYY,
+                )
+            } ?: getString(R.string.hyphen_symbol)
+
+            tvProgramId.text = data.programId.toString().takeIf { data.programId != null }
+                ?: getString(R.string.hyphen_symbol)
+            tvPatientStatus.text =
+                data.ncdStatus?.let { getPatientType(it) } ?: getString(R.string.hyphen_symbol)
+
+            confirmedDiagnosis(data.confirmDiagnosis)
+
+            nextFollowupDate.text = data.nextMedicalReviewDate?.let {
+                DateUtils.convertDateTimeToDate(
+                    it,
+                    DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
+                    DateUtils.DATE_DD_MMM_YYYY,
+                )
+            } ?: getString(R.string.hyphen_symbol)
+
+            tvCvdRisk.text = data.cvdRiskScore?.let {
+                StringConverter.appendTexts(
+                    "$it%",
+                    data.cvdRiskLevel,
+                    separator = "-",
+                )
+            } ?: getString(R.string.hyphen_symbol)
+
+            tvDateOfLastVisit.text = data.lastReviewDate?.let {
+                DateUtils.convertDateTimeToDate(
+                    it,
+                    DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
+                    DateUtils.DATE_DD_MMM_YYYY,
+                )
+            } ?: getString(R.string.hyphen_symbol)
+
+            val textColor =
+                data.cvdRiskScore?.let { CommonUtils.cvdRiskColorCode(it, requireContext()) }
+            if (textColor != null) {
+                binding.tvCvdRisk.setTextColor(textColor)
+            }
+
+            val bmi = CommonUtils.getBMIInformation(requireContext(), data.bmi)
+            bmi?.second?.let { tvBmi.setTextColor(it) }
+            tvBmi.text = bmi?.first ?: getString(R.string.hyphen_symbol)
+
+            tvHealthHistory.text = data.patientHealthHistory?.let { generateConditionString(it) }
+                ?: getString(R.string.hyphen_symbol)
+        }
+    }
+
+    private fun confirmedDiagnosis(confirmDiagnosis: ArrayList<String>?) {
+        var savedDiagnosis: String
+        confirmDiagnosis.let {
+            savedDiagnosis = it?.joinToString(", ") ?: getString(R.string.hyphen_symbol)
+        }
+        if (nurseBioDataViewModel.isSummary) {
+            binding.tvDiagnosesText.text = savedDiagnosis
+        } else {
+            val clickableSpan = object : ClickableSpan() {
+                override fun onClick(mView: View) {
+                    nurseViewModel.isConfirmDiagnosis = true
+
+                    val request = nurseViewModel.patientId?.let {
+                        PatientDetailsModel(
+                            it,
+                            isAssessmentDataRequired = false,
+                        )
+                    }
+                    if (request != null) {
+                        context?.let { nurseViewModel.getPatientDetailsDiagnosis(it, request) }
+                    }
+                }
+            }
+            val subText = " ${getString(R.string.edit_diagnosis)}"
+            val text = "$savedDiagnosis$subText"
+            var index = text.length - subText.length
+            index = if (index >= 0) index + 1 else 0
+            binding.tvDiagnosesText.text = CommonUtils.getSpannableString(
+                clickableSpan,
+                text,
+                index,
+            )
+            binding.tvDiagnosesText.movementMethod = LinkMovementMethod.getInstance()
+        }
+    }
+
+    private fun getPatientType(it: String?): String =
+        when (it) {
+            DefinedParams.CONTROLLED -> getString(R.string.controlled)
+            DefinedParams.UN_CONTROLLED -> getString(R.string.un_controlled)
+            else -> getString(R.string.hyphen_symbol)
+        }
+
+    private fun generateConditionString(patientHistory: PatientHistoryModel?): String {
+        val conditions = mutableListOf<String>()
+
+        DefinedParams.HEART_ATTACK
+        if (patientHistory?.heartAttack.equals("yes", ignoreCase = true)) {
+            conditions.add(DefinedParams.HEART_ATTACK)
+        }
+        if (patientHistory?.stroke.equals("yes", ignoreCase = true)) {
+            conditions.add(DefinedParams.STROKE)
+        }
+        if (patientHistory?.kidneyDisease.equals("yes", ignoreCase = true)) {
+            conditions.add(DefinedParams.KIDNEY_DISEASE)
+        }
+        if (patientHistory?.copd.equals("yes", ignoreCase = true)) {
+            conditions.add(DefinedParams.COPD)
+        }
+
+        return if (conditions.isEmpty()) {
+            getString(R.string.hyphen_symbol)
+        } else {
+            conditions.joinToString(
+                ", ",
+            )
+        }
+    }
+
+    private val patientEditLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                nurseViewModel.patientId?.let {
+                    nurseBioDataViewModel.getPatientDetails(
+                        requireContext(),
+                        PatientDetailsModel(it, isAssessmentDataRequired = false),
+                    )
+                }
+            }
+        }
+}

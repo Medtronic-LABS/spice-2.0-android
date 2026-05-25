@@ -376,7 +376,7 @@ class LabourDeliveryViewModel @Inject constructor(
         val village = patientDetailModel?.village.takeIf { it != null }
         val villageId = patientDetailModel?.villageId.takeIf { it != null }
 
-        val genderValue = genderFlow[DefinedParams.Gender]?.toString()?.takeIf { it != null }
+        val genderValue = genderFlow[DefinedParams.GENDER]?.toString()?.takeIf { it != null }
 
         return Child(
             name = childName,
@@ -401,7 +401,7 @@ class LabourDeliveryViewModel @Inject constructor(
         val apgarScoreOneMinute = createOneMinuteApgarScore()
         val apgarScoreFiveMinute = createFiveMinuteApgarScore()
         val apgarScoreTenMinute = createTenMinuteApgarScore()
-        val genderValue = genderFlow[DefinedParams.Gender]?.toString()?.takeIf { it != "null" }
+        val genderValue = genderFlow[DefinedParams.GENDER]?.toString()?.takeIf { it != "null" }
 
         return NeonateDTO(
             neonateOutcome = neonateOutcome.takeIf { it != null },
@@ -523,7 +523,7 @@ class LabourDeliveryViewModel @Inject constructor(
         val dateOfDelivery = this.dateOfDelivery ?: return null
         val timeOfDeliveryInHourInt = timeOfDeliveryInHour?.toInt() ?: 0
         val timeOfDeliveryInMinutesInt = timeOfDeliveryInMinute?.toInt() ?: 0
-        val timeOfDeliveryMap = this.timeOfDeliveryMap[DefinedParams.TimeOfDelivery] as String
+        val timeOfDeliveryMap = this.timeOfDeliveryMap[DefinedParams.TIME_OF_DELIVERY] as String
         val year = dateOfDelivery.first
         val month = dateOfDelivery.second
         val day = dateOfDelivery.third
@@ -553,7 +553,7 @@ class LabourDeliveryViewModel @Inject constructor(
         val timeOfLabourOnSetInHourInt = timeOfLabourOnSetInHour?.toInt() ?: 0
         val timeOfLabourOnSetInMinuteInt = timeOfLabourOnSetInMinutes?.toInt() ?: 0
         val timeOfLabourOnSetMap =
-            this.timeOfLabourOnsetMap[DefinedParams.TimeOfLabourOnset] as String
+            this.timeOfLabourOnsetMap[DefinedParams.TIME_OF_LABOUR_ONSET] as String
         val year = dateOfLabourOnset.first
         val month = dateOfLabourOnset.second
         val day = dateOfLabourOnset.third

@@ -218,6 +218,9 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
          */
     }
 
+    override fun onQRScanRequested() {
+    }
+
     override fun onPopulate(targetId: String) {
         /**
          * this method is not used

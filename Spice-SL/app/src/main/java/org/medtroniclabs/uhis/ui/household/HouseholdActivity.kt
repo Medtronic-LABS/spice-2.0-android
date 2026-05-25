@@ -11,9 +11,9 @@ import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.appextensions.startBackgroundOfflineSync
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.FhirMemberID
-import org.medtroniclabs.uhis.common.DefinedParams.VillageId
+import org.medtroniclabs.uhis.common.DefinedParams.IS_MEMBER_REGISTRATION
+import org.medtroniclabs.uhis.common.DefinedParams.VILLAGE_ID
 import org.medtroniclabs.uhis.common.DefinedParams.isCreateHouseholdForPhu
-import org.medtroniclabs.uhis.common.DefinedParams.isMemberRegistration
 import org.medtroniclabs.uhis.common.SpiceLocationManager
 import org.medtroniclabs.uhis.databinding.ActivityHouseholdRegistrationBinding
 import org.medtroniclabs.uhis.network.resource.ResourceState
@@ -51,7 +51,7 @@ class HouseholdActivity : BaseActivity(), OnDialogDismissListener {
             householdRegistrationViewModel.signatureFilename = it
         }
 
-        intent.getStringExtra(DefinedParams.KeyInitial)?.let {
+        intent.getStringExtra(DefinedParams.KEY_INITIAL)?.let {
             householdRegistrationViewModel.initialValue = it
         }
 
@@ -103,7 +103,7 @@ class HouseholdActivity : BaseActivity(), OnDialogDismissListener {
 
     private fun initializeView() {
         val householdId = intent.getLongExtra(DefinedParams.householdId, -1L)
-        val isMemberRegistration = intent.getBooleanExtra(isMemberRegistration, false)
+        val isMemberRegistration = intent.getBooleanExtra(IS_MEMBER_REGISTRATION, false)
         val memberId = intent.getLongExtra(DefinedParams.MEMBER_ID, -1L)
         val memberFhirId = intent.getLongExtra(FhirMemberID, -1L)
         val isCreateHouseholdForPhu = intent.getBooleanExtra(isCreateHouseholdForPhu, false)
@@ -117,9 +117,9 @@ class HouseholdActivity : BaseActivity(), OnDialogDismissListener {
 
         if (isCreateHouseholdForPhu) {
             val arguments = Bundle()
-            val vId = intent.getLongExtra(VillageId, -1L)
+            val vId = intent.getLongExtra(VILLAGE_ID, -1L)
             if (vId != -1L) {
-                arguments.putLong(VillageId, vId)
+                arguments.putLong(VILLAGE_ID, vId)
             }
             launchHouseholdRegistration(arguments)
         } else if (isMemberRegistration || memberId != -1L) {

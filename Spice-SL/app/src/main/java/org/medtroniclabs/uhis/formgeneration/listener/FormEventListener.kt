@@ -54,4 +54,6 @@ interface FormEventListener {
         serverData: List<FormLayout>? = null,
         resultHashMap: HashMap<String, Any>,
     )
+
+    fun onQRScanRequested()
 }

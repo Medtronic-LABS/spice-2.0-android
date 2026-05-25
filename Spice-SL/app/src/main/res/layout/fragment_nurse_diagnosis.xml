@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/CardView_Style"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardCornerRadius="@dimen/_8sdp"
+    app:cardElevation="@dimen/_2sdp"
+    app:cardUseCompatPadding="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/_20sdp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/cardTitle"
+            style="@style/Form_Header_Style"
+            android:background="@color/card_background"
+            android:layout_width="@dimen/_0dp"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/_10sdp"
+            android:paddingVertical="@dimen/_10sdp"
+            android:text="@string/lifestyle_modification"
+            android:textSize="@dimen/_16ssp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_20sdp"
+            app:layout_constraintTop_toBottomOf="@+id/cardTitle">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNewNcdLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:text="@string/new_ncd"
+                android:fontFamily="@font/inter_regular"
+                android:textSize="@dimen/_16ssp"
+                android:textColor="@color/table_title"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/etNewNcd"
+                style="@style/Form_Spinner_Style"
+                android:layout_width="match_parent"
+                android:visibility="gone"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:minHeight="@dimen/_40sdp"
+                app:layout_constraintTop_toBottomOf="@+id/tvNewNcdLabel"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNcdErrorMessage"
+                style="@style/TextStyle_Error_14"
+                android:visibility="gone"
+                android:layout_marginTop="@dimen/_8sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                android:text="@string/error_message_spinner"
+                app:layout_constraintTop_toBottomOf="@+id/etNewNcd" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSelfCareLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_20sdp"
+                android:text="@string/self_care"
+                android:fontFamily="@font/inter_regular"
+                android:textSize="@dimen/_16ssp"
+                android:textColor="@color/table_title"
+                app:layout_constraintTop_toBottomOf="@+id/tvNcdErrorMessage" />
+
+            <LinearLayout
+                android:id="@+id/llSelfCare"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="@dimen/_8sdp"
+                app:layout_constraintTop_toBottomOf="@+id/tvSelfCareLabel"
+                app:layout_constraintStart_toStartOf="@+id/tvSelfCareLabel"
+                app:layout_constraintEnd_toEndOf="@+id/tvSelfCareLabel">
+
+            </LinearLayout>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSelfCareErrorMessage"
+                style="@style/TextStyle_Error_14"
+                android:visibility="gone"
+                android:layout_marginTop="@dimen/_8sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                android:text="@string/error_message_spinner"
+                app:layout_constraintTop_toBottomOf="@+id/llSelfCare" />
+
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</com.google.android.material.card.MaterialCardView>

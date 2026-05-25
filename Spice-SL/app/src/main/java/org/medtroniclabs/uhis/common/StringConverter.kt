@@ -9,6 +9,8 @@ import com.google.gson.reflect.TypeToken
 import okhttp3.ResponseBody
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.data.ErrorResponse
+import org.medtroniclabs.uhis.data.registration.DuplicationNudgeModel
+import org.medtroniclabs.uhis.data.registration.PatientModel
 import org.medtroniclabs.uhis.mappingkey.Screening
 import java.lang.reflect.Type
 
@@ -152,8 +154,8 @@ object StringConverter {
                 val errorResponse = Gson().fromJson(err.string(), Map::class.java)
                 if (errorResponse.containsKey(Screening.Entity)) {
                     errorResponse[Screening.Entity]?.let { entity ->
-                        if (entity is Map<*, *> && entity.contains(Screening.PatientDetails)) {
-                            entity[Screening.PatientDetails]?.let { details ->
+                        if (entity is Map<*, *> && entity.contains(Screening.PATIENT_DETAILS)) {
+                            entity[Screening.PATIENT_DETAILS]?.let { details ->
                                 (details as? Map<String, Any>)?.let { map ->
                                     returnMap = HashMap(map.toMutableMap())
                                 }
@@ -203,4 +205,34 @@ object StringConverter {
         } catch (_: Exception) {
             emptyList()
         }
+
+    fun getFormattedData(
+        context: Context,
+        errorBody: ResponseBody?,
+        isFromEnrollment: Boolean?,
+    ): Pair<String, PatientModel?>? {
+        if (errorBody == null) {
+            return null
+        }
+        return try {
+            val data = Gson().fromJson(
+                errorBody.string(),
+                DuplicationNudgeModel::class.java,
+            )
+            val message = data.message ?: context.getString(R.string.duplicate_record_found)
+            val myEntity = data.entity
+            val patientModel = if (isFromEnrollment == true) {
+                myEntity?.enrollment?.copy(
+                    operatingUnitId = myEntity.operatingUnitId,
+                    accountId = myEntity.accountId,
+                )
+            } else {
+                myEntity
+            }
+            Pair(message, patientModel)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
 }

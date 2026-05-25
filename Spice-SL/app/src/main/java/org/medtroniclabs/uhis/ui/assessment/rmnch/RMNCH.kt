@@ -339,7 +339,7 @@ object RMNCH {
                             englishName
                         }
                     if (displayLabel != null) {
-                        if (englishName?.equals(DefinedParams.Other, true) == true) {
+                        if (englishName?.equals(DefinedParams.OTHER, true) == true) {
                             if (actualMap.containsKey(otherPncNeonateSigns)) {
                                 val otherSignValue = actualMap[otherPncNeonateSigns]
                                 result.add("$displayLabel - $otherSignValue")

@@ -93,12 +93,12 @@ class PhysicalExaminationFragment : BaseFragment() {
     private fun initializeCongenitalDetect() {
         getCongenitalDetectFlowData().let {
             val view = SingleSelectionCustomView(binding.root.context)
-            view.tag = DefinedParams.CongenitalDetect
+            view.tag = DefinedParams.CONGENITAL_DETECT
             view.addViewElements(
                 it,
                 SecuredPreference.getIsTranslationEnabled(),
                 viewModel.congenitalDefectMap,
-                Pair(DefinedParams.CongenitalDetect, null),
+                Pair(DefinedParams.CONGENITAL_DETECT, null),
                 FormLayout(viewType = "", id = "", title = "", visibility = "", optionsList = null),
                 congenitalDetectSelectionCallback,
             )
@@ -108,9 +108,9 @@ class PhysicalExaminationFragment : BaseFragment() {
 
     private var congenitalDetectSelectionCallback: ((selectedID: Any?, elementId: Pair<String, String?>, formLayout: FormLayout, name: String?) -> Unit)? =
         { selectedID, _, _, _ ->
-            viewModel.congenitalDefectMap[DefinedParams.CongenitalDetect] = selectedID as String
+            viewModel.congenitalDefectMap[DefinedParams.CONGENITAL_DETECT] = selectedID as String
             val flowValue =
-                viewModel.congenitalDefectMap[DefinedParams.CongenitalDetect] as? String
+                viewModel.congenitalDefectMap[DefinedParams.CONGENITAL_DETECT] as? String
             viewModel.congenitalDefect =
                 flowValue?.equals(HouseHoldRegistration.YES, ignoreCase = true) ?: false
         }
@@ -125,12 +125,12 @@ class PhysicalExaminationFragment : BaseFragment() {
     private fun initializeCordExamination() {
         getCordExaminationFlowData().let {
             val view = SingleSelectionCustomView(binding.root.context)
-            view.tag = DefinedParams.CordExamination
+            view.tag = DefinedParams.CORD_EXAMINATION
             view.addViewElements(
                 it,
                 SecuredPreference.getIsTranslationEnabled(),
                 viewModel.cordExaminationMap,
-                Pair(DefinedParams.CordExamination, null),
+                Pair(DefinedParams.CORD_EXAMINATION, null),
                 FormLayout(viewType = "", id = "", title = "", visibility = "", optionsList = null),
                 cordExaminationSelectionCallback,
             )
@@ -140,7 +140,7 @@ class PhysicalExaminationFragment : BaseFragment() {
 
     private var cordExaminationSelectionCallback: ((selectedID: Any?, elementId: Pair<String, String?>, formLayout: FormLayout, name: String?) -> Unit)? =
         { selectedID, _, _, _ ->
-            viewModel.cordExaminationMap[DefinedParams.CordExamination] = selectedID as String
+            viewModel.cordExaminationMap[DefinedParams.CORD_EXAMINATION] = selectedID as String
         }
 
     private fun getCordExaminationFlowData(): ArrayList<Map<String, Any>> {
@@ -169,12 +169,12 @@ class PhysicalExaminationFragment : BaseFragment() {
     private fun initializeBreastCondition() {
         getBreastConditionFlowData().let {
             val view = SingleSelectionCustomView(binding.root.context)
-            view.tag = DefinedParams.BreastCondition
+            view.tag = DefinedParams.BREAST_CONDITION
             view.addViewElements(
                 it,
                 SecuredPreference.getIsTranslationEnabled(),
                 viewModel.breastCondition,
-                Pair(DefinedParams.BreastCondition, null),
+                Pair(DefinedParams.BREAST_CONDITION, null),
                 FormLayout(viewType = "", id = "", title = "", visibility = "", optionsList = null),
                 breastConditionSelectionCallback,
             )
@@ -184,16 +184,16 @@ class PhysicalExaminationFragment : BaseFragment() {
 
     private var breastConditionSelectionCallback: ((selectedID: Any?, elementId: Pair<String, String?>, formLayout: FormLayout, name: String?) -> Unit)? =
         { selectedID, _, _, _ ->
-            viewModel.breastCondition[DefinedParams.BreastCondition] = selectedID as String
+            viewModel.breastCondition[DefinedParams.BREAST_CONDITION] = selectedID as String
             val flowValue =
-                viewModel.breastCondition[DefinedParams.BreastCondition] as? String
+                viewModel.breastCondition[DefinedParams.BREAST_CONDITION] as? String
             viewModel.breastFeeding =
                 flowValue?.equals(HouseHoldRegistration.YES, ignoreCase = true) ?: false
             if (selectedID == getString(R.string.yes)) {
                 binding.BreastFeedingGroup.visible()
             } else {
                 binding.BreastFeedingGroup.gone()
-                resetSelectionViews(DefinedParams.ExclusiveBreastCondition)
+                resetSelectionViews(DefinedParams.EXCLUSIVE_BREAST_CONDITION)
             }
         }
 
@@ -207,12 +207,12 @@ class PhysicalExaminationFragment : BaseFragment() {
     private fun initializeExclusiveBreastCondition() {
         getExclusiveBreastConditionFlowData().let {
             val view = SingleSelectionCustomView(binding.root.context)
-            view.tag = DefinedParams.ExclusiveBreastCondition
+            view.tag = DefinedParams.EXCLUSIVE_BREAST_CONDITION
             view.addViewElements(
                 it,
                 SecuredPreference.getIsTranslationEnabled(),
                 viewModel.exclusiveBreastCondition,
-                Pair(DefinedParams.ExclusiveBreastCondition, null),
+                Pair(DefinedParams.EXCLUSIVE_BREAST_CONDITION, null),
                 FormLayout(viewType = "", id = "", title = "", visibility = "", optionsList = null),
                 exclusiveBreastConditionSelectionCallback,
             )
@@ -223,10 +223,10 @@ class PhysicalExaminationFragment : BaseFragment() {
     private var exclusiveBreastConditionSelectionCallback:
         ((selectedID: Any?, elementId: Pair<String, String?>, formLayout: FormLayout, name: String?) -> Unit)? =
         { selectedID, _, _, _ ->
-            viewModel.exclusiveBreastCondition[DefinedParams.ExclusiveBreastCondition] =
+            viewModel.exclusiveBreastCondition[DefinedParams.EXCLUSIVE_BREAST_CONDITION] =
                 selectedID as String
             val flowValue =
-                viewModel.exclusiveBreastCondition[DefinedParams.ExclusiveBreastCondition] as? String
+                viewModel.exclusiveBreastCondition[DefinedParams.EXCLUSIVE_BREAST_CONDITION] as? String
             viewModel.exclusiveBreastFeeding =
                 flowValue?.equals(HouseHoldRegistration.YES, ignoreCase = true) ?: false
         }
@@ -252,10 +252,10 @@ class PhysicalExaminationFragment : BaseFragment() {
         viewModel.exclusiveBreastFeeding = null
         viewModel.congenitalDefect = null
         viewModel.cordExaminationMap.clear()
-        resetSelectionViews(DefinedParams.CongenitalDetect)
-        resetSelectionViews(DefinedParams.CordExamination)
-        resetSelectionViews(DefinedParams.ExclusiveBreastCondition)
-        resetSelectionViews(DefinedParams.BreastCondition)
+        resetSelectionViews(DefinedParams.CONGENITAL_DETECT)
+        resetSelectionViews(DefinedParams.CORD_EXAMINATION)
+        resetSelectionViews(DefinedParams.EXCLUSIVE_BREAST_CONDITION)
+        resetSelectionViews(DefinedParams.BREAST_CONDITION)
         binding.BreastFeedingGroup.gone()
     }
 }

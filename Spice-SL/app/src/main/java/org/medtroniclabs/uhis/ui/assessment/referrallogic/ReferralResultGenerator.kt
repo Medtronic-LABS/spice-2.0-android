@@ -6,7 +6,7 @@ import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams.CBS_Referral
 import org.medtroniclabs.uhis.common.DefinedParams.Referred_NCD
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.NoSymptoms
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.NO_SYMPTOMS
 import org.medtroniclabs.uhis.mappingkey.Screening
 import org.medtroniclabs.uhis.model.assessment.AssessmentMemberDetails
 import org.medtroniclabs.uhis.ncd.screening.utils.ReferredReason
@@ -565,7 +565,7 @@ class ReferralResultGenerator {
                 }
             }
         }
-        if (!selectedSignsList.contains(NoSymptoms.lowercase())) {
+        if (!selectedSignsList.contains(NO_SYMPTOMS.lowercase())) {
             addResultMap(referralKey, ReferralStatus.Referred.name)
             addReferralReason(referedReason)
         }

@@ -854,11 +854,11 @@ class AssessmentRMNCHFragment :
                 htnView?.let {
                     formGenerator.disableView(htnView)
                     (htnView.findViewWithTag(DefinedParams.yes) as? RadioButton)?.isEnabled = false
-                    (htnView.findViewWithTag(DefinedParams.no) as? RadioButton)?.isEnabled = false
+                    (htnView.findViewWithTag(DefinedParams.NO_SMALL) as? RadioButton)?.isEnabled = false
                     if (details?.pregnantWomanExistingIllness?.contains("HTN", true) == true) {
                         (htnView.findViewWithTag(DefinedParams.yes) as? RadioButton)?.isChecked = true
                     } else {
-                        (htnView.findViewWithTag(DefinedParams.no) as? RadioButton)?.isChecked = true
+                        (htnView.findViewWithTag(DefinedParams.NO_SMALL) as? RadioButton)?.isChecked = true
                     }
                 }
 
@@ -867,11 +867,11 @@ class AssessmentRMNCHFragment :
                 eclampsiaView?.let {
                     formGenerator.disableView(eclampsiaView)
                     (eclampsiaView.findViewWithTag(DefinedParams.yes) as? RadioButton)?.isEnabled = false
-                    (eclampsiaView.findViewWithTag(DefinedParams.no) as? RadioButton)?.isEnabled = false
+                    (eclampsiaView.findViewWithTag(DefinedParams.NO_SMALL) as? RadioButton)?.isEnabled = false
                     if (details?.highRiskPregnantWoman?.contains("Eclampsia", true) == true) {
                         (eclampsiaView.findViewWithTag(DefinedParams.yes) as? RadioButton)?.isChecked = true
                     } else {
-                        (eclampsiaView.findViewWithTag(DefinedParams.no) as? RadioButton)?.isChecked = true
+                        (eclampsiaView.findViewWithTag(DefinedParams.NO_SMALL) as? RadioButton)?.isChecked = true
                     }
                 }
 
@@ -880,14 +880,14 @@ class AssessmentRMNCHFragment :
                 dmView?.let {
                     formGenerator.disableView(dmView)
                     (dmView.findViewWithTag(DefinedParams.yes) as? RadioButton)?.isEnabled = false
-                    (dmView.findViewWithTag(DefinedParams.no) as? RadioButton)?.isEnabled = false
+                    (dmView.findViewWithTag(DefinedParams.NO_SMALL) as? RadioButton)?.isEnabled = false
                     if (details?.pregnantWomanExistingIllness?.contains("DM", true) == true) {
                         // Mandatory during 1st PNC visit in case of
                         // Woman had GDM or was a known DM patient
                         bloodSugarMandatory = true
                         (dmView.findViewWithTag(DefinedParams.yes) as? RadioButton)?.isChecked = true
                     } else {
-                        (dmView.findViewWithTag(DefinedParams.no) as? RadioButton)?.isChecked = true
+                        (dmView.findViewWithTag(DefinedParams.NO_SMALL) as? RadioButton)?.isChecked = true
                     }
                 }
 
@@ -895,7 +895,7 @@ class AssessmentRMNCHFragment :
                 val gdmView = formGenerator.getViewByTag(RMNCH.ID_GDM_PATIENT + formGenerator.rootSuffix)
                 gdmView?.let {
                     (gdmView.findViewWithTag(DefinedParams.yes) as? RadioButton)?.isEnabled = false
-                    (gdmView.findViewWithTag(DefinedParams.no) as? RadioButton)?.isEnabled = false
+                    (gdmView.findViewWithTag(DefinedParams.NO_SMALL) as? RadioButton)?.isEnabled = false
                     formGenerator.disableView(gdmView)
                     if (details?.highRiskPregnantWoman?.contains("GDM", true) == true) {
                         // Mandatory during 1st PNC visit in case of
@@ -903,7 +903,7 @@ class AssessmentRMNCHFragment :
                         bloodSugarMandatory = true
                         (gdmView.findViewWithTag(DefinedParams.yes) as? RadioButton)?.isChecked = true
                     } else {
-                        (gdmView.findViewWithTag(DefinedParams.no) as? RadioButton)?.isChecked = true
+                        (gdmView.findViewWithTag(DefinedParams.NO_SMALL) as? RadioButton)?.isChecked = true
                     }
                 }
 
@@ -982,14 +982,14 @@ class AssessmentRMNCHFragment :
             val congenitalView = formGenerator.getViewByTag(AssessmentDefinedParams.ID_CONGENITAL_DEFECT + formGenerator.rootSuffix)
             congenitalView?.let {
                 (congenitalView.findViewWithTag("${DefinedParams.yes}_${AssessmentDefinedParams.ID_CONGENITAL_DEFECT}") as? View)?.isEnabled = false
-                (congenitalView.findViewWithTag("${DefinedParams.no}_${AssessmentDefinedParams.ID_CONGENITAL_DEFECT}") as? View)?.isEnabled = false
+                (congenitalView.findViewWithTag("${DefinedParams.NO_SMALL}_${AssessmentDefinedParams.ID_CONGENITAL_DEFECT}") as? View)?.isEnabled = false
                 formGenerator.disableView(congenitalView)
                 if (isValueEquals(details?.childCongenitalDefect, DefinedParams.yes)) {
                     formGenerator.getResultMap()[AssessmentDefinedParams.ID_CONGENITAL_DEFECT] = details?.childCongenitalDefect ?: ""
                     (congenitalView.findViewWithTag("${DefinedParams.yes}_${AssessmentDefinedParams.ID_CONGENITAL_DEFECT}") as? View)?.isSelected = true
-                } else if (isValueEquals(details?.childCongenitalDefect, DefinedParams.no)) {
+                } else if (isValueEquals(details?.childCongenitalDefect, DefinedParams.NO_SMALL)) {
                     formGenerator.getResultMap()[AssessmentDefinedParams.ID_CONGENITAL_DEFECT] = details?.childCongenitalDefect ?: ""
-                    (congenitalView.findViewWithTag("${DefinedParams.no}_${AssessmentDefinedParams.ID_CONGENITAL_DEFECT}") as? View)?.isSelected = true
+                    (congenitalView.findViewWithTag("${DefinedParams.NO_SMALL}_${AssessmentDefinedParams.ID_CONGENITAL_DEFECT}") as? View)?.isSelected = true
                 } else {
                     congenitalView.gone()
                 }
@@ -1007,7 +1007,7 @@ class AssessmentRMNCHFragment :
                 val summaryKeyTag = muacStatus + summaryKey
                 val muacStatusTag = muacStatus
 
-                if (selectedId is String && selectedId != DefinedParams.DefaultID) {
+                if (selectedId is String && selectedId != DefinedParams.DEFAULT_ID) {
                     formGenerator.getViewByTag(rootSuffixTag)?.visibility = View.VISIBLE
 
                     (formGenerator.getViewByTag(summaryKeyTag) as? TextView)?.text =
@@ -1062,6 +1062,9 @@ class AssessmentRMNCHFragment :
         /*
        Never used
          */
+    }
+
+    override fun onQRScanRequested() {
     }
 
     fun getCurrentAnsweredStatus(): Boolean = formGenerator.getResultMap().isNotEmpty()
@@ -1245,7 +1248,7 @@ class AssessmentRMNCHFragment :
             }
 
             RMNCH.ID_VITAMIN_A_CONSUMED -> {
-                if (isValueEquals(value, DefinedParams.Yes)) {
+                if (isValueEquals(value, DefinedParams.YES)) {
                     null
                 } else {
                     AssessmentDefinedParams.STATUS_GAP to AssessmentDefinedParams.BN_STATUS_GAP
@@ -1292,7 +1295,7 @@ class AssessmentRMNCHFragment :
             RMNCH.ID_GDM_PATIENT,
             RMNCH.ID_DM_PATIENT,
             -> {
-                if (isValueEquals(value, DefinedParams.Yes)) {
+                if (isValueEquals(value, DefinedParams.YES)) {
                     AssessmentDefinedParams.STATUS_HIGH_RISK to AssessmentDefinedParams.BN_STATUS_HIGH_RISK
                 } else {
                     null
@@ -2183,8 +2186,8 @@ class AssessmentRMNCHFragment :
                                 val name = item[DefinedParams.NAME]?.toString() ?: ""
                                 val culturalValue = item[DefinedParams.CULTURE_VALUE]?.toString() ?: ""
                                 // Check if "other" option is selected, then don't add other to the list
-                                if (DefinedParams.Other.equals(value, true) ||
-                                    DefinedParams.Other.equals(name, true)
+                                if (DefinedParams.OTHER.equals(value, true) ||
+                                    DefinedParams.OTHER.equals(name, true)
                                 ) {
                                     hasOtherSelected = true
                                 } else if (!(

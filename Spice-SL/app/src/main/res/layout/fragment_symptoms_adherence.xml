@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardCornerRadius="@dimen/_8sdp"
+    app:cardElevation="@dimen/_2sdp"
+    app:cardUseCompatPadding="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/card_background"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/bioDataCardTitle"
+                style="@style/Form_Header_Style"
+                android:layout_width="@dimen/_0dp"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_16sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                android:text="@string/symptoms_adherence"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_20sdp"
+            android:paddingBottom="@dimen/_20sdp"
+            app:layout_constraintTop_toBottomOf="@+id/clTitle">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvWorseningSymptoms"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/worsening_symptoms"
+                android:textColor="@color/b_w_black"
+                android:textSize="@dimen/_16ssp"
+                app:fontFamily="@font/inter_regular"
+                android:layout_marginTop="@dimen/_20sdp"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/llWorseningSymptoms"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvWorseningSymptoms"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvWorseningSymptomsErrorMessage"
+                style="@style/TextStyle_Error_14"
+                android:visibility="gone"
+                android:layout_marginTop="@dimen/_8sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                android:text="@string/default_user_input_error"
+                app:layout_constraintTop_toBottomOf="@+id/llWorseningSymptoms" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSelectSymptoms"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_20sdp"
+                android:text="@string/select_symptoms"
+                android:visibility="gone"
+                android:textColor="@color/b_w_black"
+                android:textSize="@dimen/_16ssp"
+                app:fontFamily="@font/inter_regular"
+                app:layout_constraintTop_toBottomOf="@+id/tvWorseningSymptomsErrorMessage" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/symptomsSpinner"
+                android:visibility="gone"
+                style="@style/Form_Input_Style_BG"
+                android:layout_marginVertical="@dimen/_8sdp"
+                android:drawableEnd="@drawable/ic_spinner_arrow_down"
+                android:hint="@string/please_select"
+                android:padding="@dimen/_8sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvSelectSymptoms"
+                />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvErrorMessage"
+                style="@style/TextStyle_Error_14"
+                android:visibility="gone"
+                android:layout_marginTop="@dimen/_8sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                android:text="@string/error_message_spinner"
+                app:layout_constraintTop_toBottomOf="@+id/symptomsSpinner" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/gNewOrWorsening"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="tvNewOrWorsening,etNewOrWorsening"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNewOrWorsening"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_20sdp"
+                android:text="@string/new_or_worsening_symptoms"
+                android:textColor="@color/b_w_black"
+                android:textSize="@dimen/_16ssp"
+                app:fontFamily="@font/inter_regular"
+                app:layout_constraintTop_toBottomOf="@+id/tvErrorMessage" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/etNewOrWorsening"
+                style="@style/Form_Input_Style_BG"
+                android:layout_width="match_parent"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:hint="@string/type_your_comments"
+                android:maxLines="1"
+                android:padding="@dimen/_10sdp"
+                app:layout_constraintTop_toBottomOf="@+id/tvNewOrWorsening" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNewOrWorseningErrorMessage"
+                style="@style/TextStyle_Error_14"
+                android:visibility="gone"
+                android:layout_marginTop="@dimen/_8sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                android:text="@string/please_enter_details"
+                app:layout_constraintTop_toBottomOf="@+id/etNewOrWorsening" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvTakingMedication"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_20sdp"
+                android:text="@string/taking_medication"
+                android:textColor="@color/b_w_black"
+                android:textSize="@dimen/_16ssp"
+                app:fontFamily="@font/inter_regular"
+                app:layout_constraintTop_toBottomOf="@+id/tvNewOrWorseningErrorMessage" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/spinnerMedication"
+                style="@style/Form_Spinner_Style"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:minHeight="@dimen/_40sdp"
+                android:autofillHints="Select"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvTakingMedication" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvMedicationErrorMessage"
+                style="@style/TextStyle_Error_14"
+                android:visibility="gone"
+                android:layout_marginTop="@dimen/_8sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                android:text="@string/please_enter_details"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerMedication" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvTakenMedications"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:text="@string/taken_medication"
+                android:textColor="@color/b_w_black"
+                android:textSize="@dimen/_16ssp"
+                app:fontFamily="@font/inter_regular"
+                android:layout_marginTop="@dimen/_20sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvMedicationErrorMessage" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/etTakenMedication"
+                style="@style/Form_Input_Style_BG"
+                android:layout_width="match_parent"
+                android:visibility="gone"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:hint="@string/enter"
+                android:inputType="number"
+                android:maxLines="1"
+                android:padding="@dimen/_10sdp"
+                app:layout_constraintTop_toBottomOf="@+id/tvTakenMedications" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvTakenMedicationErrorMessage"
+                style="@style/TextStyle_Error_14"
+                android:visibility="gone"
+                android:layout_marginTop="@dimen/_8sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                android:text="@string/please_enter_details"
+                app:layout_constraintTop_toBottomOf="@+id/etTakenMedication" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvNewNcdLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_20sdp"
+                android:text="@string/new_ncd"
+                android:fontFamily="@font/inter_regular"
+                android:textSize="@dimen/_16ssp"
+                android:textColor="@color/table_title"
+                app:layout_constraintTop_toBottomOf="@+id/tvTakenMedicationErrorMessage"  />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/etNewNcd"
+                style="@style/Form_Spinner_Style"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:minHeight="@dimen/_40sdp"
+                app:layout_constraintTop_toBottomOf="@+id/tvNewNcdLabel"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

@@ -249,12 +249,12 @@ class PatientSearchFragment : BaseFragment(), PatientSelectionListener, View.OnC
                                     )
                                     putExtra(DefinedParams.ORIGIN, patientListViewModel.origin)
                                     putExtra(
-                                        DefinedParams.Gender,
+                                        DefinedParams.GENDER,
                                         patientListViewModel.selectedPatientDetails?.gender,
                                     )
                                     putExtra(
-                                        DefinedParams.IsDeepLink,
-                                        arguments?.getBoolean(DefinedParams.IsDeepLink),
+                                        DefinedParams.IS_DEEP_LINK,
+                                        arguments?.getBoolean(DefinedParams.IS_DEEP_LINK),
                                     )
                                 }
                             startActivity(intent)
@@ -290,11 +290,11 @@ class PatientSearchFragment : BaseFragment(), PatientSelectionListener, View.OnC
         }
 
         // Deeplink for directly goes to MR
-        if (arguments?.getBoolean(DefinedParams.IsDeepLink) == true) {
+        if (arguments?.getBoolean(DefinedParams.IS_DEEP_LINK) == true) {
             if (arguments?.getString(DefinedParams.PatientId) != null) {
                 var patientId = arguments?.getString(DefinedParams.PatientId)
-                val id = arguments?.getString(DefinedParams.id)
-                val gender = arguments?.getString(DefinedParams.Gender)
+                val id = arguments?.getString(DefinedParams.ID)
+                val gender = arguments?.getString(DefinedParams.GENDER)
                 val item = PatientListRespModel(patientId = patientId, id = id, gender = gender)
                 autoPatientSelect(item)
             }
@@ -358,7 +358,7 @@ class PatientSearchFragment : BaseFragment(), PatientSelectionListener, View.OnC
             intent.putExtra(DefinedParams.FhirId, item.id)
             intent.putExtra(DefinedParams.PatientId, item.patientId)
             intent.putExtra(DefinedParams.ORIGIN, patientListViewModel.origin)
-            intent.putExtra(DefinedParams.Gender, item.gender)
+            intent.putExtra(DefinedParams.GENDER, item.gender)
             startActivity(intent)
         }
     }
@@ -431,7 +431,7 @@ class PatientSearchFragment : BaseFragment(), PatientSelectionListener, View.OnC
             if (CommonUtils.isCommunity()) {
                 val intent = Intent(requireActivity(), ReferralHistoryActivity::class.java)
                 intent.putExtra(DefinedParams.PatientId, item.patientId)
-                intent.putExtra(DefinedParams.Gender, item.gender)
+                intent.putExtra(DefinedParams.GENDER, item.gender)
                 intent.putExtra(DefinedParams.DOB, item.birthDate)
                 intent.putExtra(DefinedParams.FhirId, item.id)
                 intent.putExtra(DefinedParams.ORIGIN, patientListViewModel.origin)
@@ -473,7 +473,7 @@ class PatientSearchFragment : BaseFragment(), PatientSelectionListener, View.OnC
                     intent.putExtra(DefinedParams.FhirId, item.id)
                     intent.putExtra(DefinedParams.PatientId, item.patientId)
                     intent.putExtra(DefinedParams.ORIGIN, patientListViewModel.origin)
-                    intent.putExtra(DefinedParams.Gender, item.gender)
+                    intent.putExtra(DefinedParams.GENDER, item.gender)
                     startActivity(intent)
                 }
             }
@@ -574,14 +574,14 @@ class PatientSearchFragment : BaseFragment(), PatientSelectionListener, View.OnC
         })
     }
 
-    private fun showLoading() {
+    override fun showLoading() {
         binding.loadingProgress.visible()
         binding.loaderImage.apply {
             loadAsGif(R.drawable.ic_rotating_uhis_logo)
         }
     }
 
-    private fun hideLoading() {
+    override fun hideLoading() {
         binding.loadingProgress.gone()
         binding.loaderImage.apply {
             resetImageView()

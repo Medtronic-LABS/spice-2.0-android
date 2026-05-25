@@ -39,8 +39,8 @@ import org.medtroniclabs.uhis.common.DefinedParams.GENDER_FEMALE
 import org.medtroniclabs.uhis.common.DefinedParams.GENDER_MALE
 import org.medtroniclabs.uhis.common.DefinedParams.GENDER_OTHER
 import org.medtroniclabs.uhis.common.DefinedParams.HOUSEHOLD_MEMBER_REGISTRATION
+import org.medtroniclabs.uhis.common.DefinedParams.IS_MEMBER_REGISTRATION
 import org.medtroniclabs.uhis.common.DefinedParams.MEMBER_ID
-import org.medtroniclabs.uhis.common.DefinedParams.isMemberRegistration
 import org.medtroniclabs.uhis.common.EntityMapper.getResultSpinnerMapList
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
@@ -52,6 +52,7 @@ import org.medtroniclabs.uhis.formgeneration.extension.markMandatory
 import org.medtroniclabs.uhis.formgeneration.listener.FormEventListener
 import org.medtroniclabs.uhis.formgeneration.model.FormLayout
 import org.medtroniclabs.uhis.formgeneration.model.FormResponse
+import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration
 import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.VILLAGE_ID
 import org.medtroniclabs.uhis.mappingkey.MemberRegistration
 import org.medtroniclabs.uhis.mappingkey.MemberRegistration.isValidMinAge
@@ -593,7 +594,7 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
                 if (householdRegistrationViewModel.householdId != -1L) {
                     val intent =
                         Intent(requireActivity(), HouseholdActivity::class.java)
-                    intent.putExtra(isMemberRegistration, true)
+                    intent.putExtra(IS_MEMBER_REGISTRATION, true)
                     intent.putExtra(DefinedParams.householdId, householdRegistrationViewModel.householdId)
                     startActivity(intent)
                     requireActivity().finish()
@@ -748,7 +749,7 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
     }
 
     override fun onRenderingComplete() {
-        val view = formGenerator.getViewByTag(VILLAGE_ID + formGenerator.rootSuffix)
+        val view = formGenerator.getViewByTag(HouseHoldRegistration.VILLAGE_ID + formGenerator.rootSuffix)
         val relationSipView =
             formGenerator.getViewByTag(MedicalReviewDefinedParams.HH_RELATIONSHIP + formGenerator.rootSuffix)
         if (memberRegistrationViewModel.medicalReviewFlow) {
@@ -792,6 +793,9 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
         /*
        Never used
          */
+    }
+
+    override fun onQRScanRequested() {
     }
 
     override fun onClick(v: View?) {

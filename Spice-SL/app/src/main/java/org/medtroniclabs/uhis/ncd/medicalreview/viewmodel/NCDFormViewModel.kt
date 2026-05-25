@@ -43,7 +43,7 @@ class NCDFormViewModel @Inject constructor(
                                         val hasVs =
                                             viewScreens.any { it.toString().equals(type, true) }
                                         if (hasVs) {
-                                            val id = (listItem[DefinedParams.id] as? Double)
+                                            val id = (listItem[DefinedParams.ID] as? Double)
                                             (listItem[DefinedParams.FormInput] as? String)?.let { responseStr ->
                                                 gson
                                                     .fromJson(responseStr, FormResponse::class.java)

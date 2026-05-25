@@ -63,8 +63,8 @@ class MemberEditDialogFragment() : DialogFragment(), View.OnClickListener {
         val dropDownList = ArrayList<MemberDetailsSpinnerModel>()
         dropDownList.add(
             MemberDetailsSpinnerModel(
-                id = DefinedParams.DefaultSelectID,
-                name = DefinedParams.DefaultIDLabel,
+                id = DefinedParams.DEFAULT_SELECT_ID,
+                name = DefinedParams.DEFAULT_ID_LABEL,
             ),
         )
         householdSummaryViewModel.householdMembersLiveData.value?.let { data ->

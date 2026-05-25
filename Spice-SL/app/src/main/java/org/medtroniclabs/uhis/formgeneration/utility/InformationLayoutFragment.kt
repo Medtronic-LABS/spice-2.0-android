@@ -50,7 +50,7 @@ class InformationLayoutFragment : DialogFragment(), View.OnClickListener {
             val fragment = InformationLayoutFragment()
             fragment.arguments = Bundle().apply {
                 putString(DefinedParams.ID, id)
-                putString(DefinedParams.Title, title)
+                putString(DefinedParams.TITLE, title)
                 customInformation?.let { putString(KEY_CUSTOM_INFORMATION, it) }
                 customInformationList?.let { putStringArrayList(KEY_CUSTOM_INFORMATION_LIST, it) }
             }
@@ -80,7 +80,7 @@ class InformationLayoutFragment : DialogFragment(), View.OnClickListener {
     }
 
     private fun initializeViews() {
-        binding.tvTitle.text = arguments?.getString(DefinedParams.Title) ?: getString(R.string.instructions)
+        binding.tvTitle.text = arguments?.getString(DefinedParams.TITLE) ?: getString(R.string.instructions)
         arguments?.getString(ID)?.let { informationType ->
             viewModel.setUserJourney("$informationType  ${AnalyticsDefinedParams.INSTRUCTIONDIALOGUE}")
         }

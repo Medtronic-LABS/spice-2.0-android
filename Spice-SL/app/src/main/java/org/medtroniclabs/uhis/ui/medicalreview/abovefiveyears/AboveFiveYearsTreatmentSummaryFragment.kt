@@ -19,7 +19,7 @@ import org.medtroniclabs.uhis.common.CommonUtils.createInvestigation
 import org.medtroniclabs.uhis.common.CommonUtils.createPrescription
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.OtherNotes
+import org.medtroniclabs.uhis.common.DefinedParams.OTHER_NOTES
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.ViewUtils.showDatePicker
 import org.medtroniclabs.uhis.data.AboveFiveYearsSummaryDetails
@@ -138,7 +138,7 @@ class AboveFiveYearsTreatmentSummaryFragment : BaseFragment(), View.OnClickListe
                     binding.tvDiagnosisText.setTextColor(ContextCompat.getColor(requireContext(), R.color.a_red_error))
                 }
                 convertListToString(
-                    ArrayList(list.filter { it.diseaseCategory.lowercase() != OtherNotes.lowercase() }.map { it.diseaseCategory }.distinct()),
+                    ArrayList(list.filter { it.diseaseCategory.lowercase() != OTHER_NOTES.lowercase() }.map { it.diseaseCategory }.distinct()),
                 )
             } ?: requireContext().getString(R.string.hyphen_symbol)
         binding.tvPresentingComplaintsText.text = presentingComplaintsViewModel.selectedPresentingComplaints.map { it.name }.let {
@@ -153,7 +153,7 @@ class AboveFiveYearsTreatmentSummaryFragment : BaseFragment(), View.OnClickListe
                 convertListToString(
                     ArrayList(
                         list
-                            .filter { it.diseaseCategory.lowercase() != OtherNotes.lowercase() }
+                            .filter { it.diseaseCategory.lowercase() != OTHER_NOTES.lowercase() }
                             .map { it.diseaseCategory }
                             .distinct(),
                     ),
@@ -164,7 +164,7 @@ class AboveFiveYearsTreatmentSummaryFragment : BaseFragment(), View.OnClickListe
                 convertListToString(
                     ArrayList(
                         list
-                            .filter { it.diseaseCategory.lowercase() != OtherNotes.lowercase() }
+                            .filter { it.diseaseCategory.lowercase() != OTHER_NOTES.lowercase() }
                             .mapNotNull { it.diseaseCondition },
                     ),
                 )
@@ -267,16 +267,16 @@ class AboveFiveYearsTreatmentSummaryFragment : BaseFragment(), View.OnClickListe
         val dropDownList = ArrayList<Map<String, Any>>()
         dropDownList.add(
             hashMapOf<String, Any>(
-                DefinedParams.NAME to DefinedParams.DefaultIDLabel,
-                DefinedParams.id to DefinedParams.DefaultID,
-                DefinedParams.Value to DefinedParams.DefaultIDLabel,
+                DefinedParams.NAME to DefinedParams.DEFAULT_ID_LABEL,
+                DefinedParams.ID to DefinedParams.DEFAULT_ID,
+                DefinedParams.Value to DefinedParams.DEFAULT_ID_LABEL,
             ),
         )
         for (item in costList) {
             dropDownList.add(
                 hashMapOf<String, Any>(
                     DefinedParams.NAME to item.name,
-                    DefinedParams.id to item.id.toString(),
+                    DefinedParams.ID to item.id.toString(),
                     DefinedParams.Value to (item.value ?: item.name),
                 ),
             )
@@ -296,7 +296,7 @@ class AboveFiveYearsTreatmentSummaryFragment : BaseFragment(), View.OnClickListe
                     val selectedItem = adapter.getData(position = pos)
                     selectedItem?.let {
                         val selectedName = it[DefinedParams.NAME] as String?
-                        if (selectedName != DefinedParams.DefaultIDLabel) {
+                        if (selectedName != DefinedParams.DEFAULT_ID_LABEL) {
                             viewModel.selectedCostItem = it[DefinedParams.Value] as String
                         } else {
                             viewModel.selectedCostItem = null

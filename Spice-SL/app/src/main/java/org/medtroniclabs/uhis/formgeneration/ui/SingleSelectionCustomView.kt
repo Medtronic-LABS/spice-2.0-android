@@ -101,6 +101,60 @@ class SingleSelectionCustomView : LinearLayout {
         }
     }
 
+    fun addViewElements(
+        optionList: ArrayList<Map<String, Any>>,
+        translate: Boolean,
+        resultMap: HashMap<String, Any>,
+        elementID: String,
+        serverViewModel: FormLayout,
+        callback: ((SelectedID: Any?, elementID: String, serverViewModel: FormLayout, name: String?) -> Unit?)?,
+    ) {
+        removeAllViews()
+        this.optionList = optionList
+        this.optionList?.forEachIndexed { index, optionValue ->
+            val name = optionValue[DefinedParams.NAME]
+            val idValue = optionValue[DefinedParams.ID]
+            val translatedName = optionValue[DefinedParams.CULTURE_VALUE]
+            val textView = TextView(viewContext, null, 0, R.style.Form_MH_Style_with_padding)
+            val param = LayoutParams(
+                0,
+                LayoutParams.MATCH_PARENT,
+                1.0f,
+            )
+            val selectedValue = resultMap[elementID]
+            textView.isSelected = selectedValue != null && selectedValue == idValue
+            textView.layoutParams = param
+            if (translate && translatedName != null && translatedName is String) {
+                textView.text = translatedName
+            } else if (name != null && name is String) {
+                textView.text = name
+            } else {
+                textView.text = ""
+            }
+
+            textView.tag = name
+            serverViewModel.enableSingleSelection?.let { enableStatus ->
+                textView.isEnabled = enableStatus
+            }
+            getBackgroundDrawable(index, optionList)?.let {
+                textView.background = it
+            }
+
+            textView.safeClickListener {
+                callback?.invoke(optionValue[DefinedParams.ID], elementID, serverViewModel, (name as String?))
+                addViewElements(
+                    optionList,
+                    translate,
+                    resultMap,
+                    elementID,
+                    serverViewModel,
+                    callback,
+                )
+            }
+            addView(textView)
+        }
+    }
+
     private fun getBackgroundDrawable(
         index: Int,
         list: ArrayList<Map<String, Any>>,

@@ -1641,6 +1641,29 @@
     <string name="emergency_referral">⚠️ জরুরি ভিত্তিতে রেফার করুন</string>
     <string name="non_emergency_referral">ⓘ নিয়মিত চেকআপের পরামর্শ</string>
     <string name="assessment_result">মূল্যায়নের ফলাফল</string>
+    <string name="missed_visit">মিসড ভিজিট</string>
+    <string name="ltf">লস্ট টু ফলোআপ</string>
+    <string name="enter_patient_search">নাম/আইডি/মোবাইল নম্বর লিখুন</string>
+    <string name="overdue_days">%1$s দিন অতিবাহিত হয়েছে</string>
+    <string name="referred_to">রেফার হয়েছে %1$s</string>
+    <string name="high_bg">উচ্চ (বিজি)</string>
+    <string name="high_bp">উচ্চ (বিপি)</string>
+    <string name="high_both">উচ্চ (বিজি), উচ্চ (বিপি)</string>
+    <string name="days_due_at_mr">%1$s দিন বাকী</string>
+    <string name="day_due_at_mr">%1$s দিন বাকী</string>
+    <string name="day_due_at">%2$s এ যাওয়ার %1$s দিন বাকি হয়ে গেছে</string>
+    <string name="days_due_at">%2$s এ যাওয়ার %1$s দিন বাকি হয়ে গেছে</string>
+    <string name="one_patient_found">1 রোগী পাওয়া গেছে</string>
+    <string name="sort_with_count">সাজান%1$s</string>
+    <string name="filter_with_count">ফিল্টার%1$s</string>
+    <string name="patient_already_enrolled">রোগী ইতিমধ্যে নথিভুক্ত করা হয়েছে</string>
+    <string name="patient_already_enrolled_with_program_id">রোগী ইতিমধ্যেই প্রোগ্রাম আইডি দিয়ে নথিভুক্ত হয়েছে&#160;</string>
+    <string name="terms_condition"><![CDATA[শর্তাবলী]]></string>
+
+    <string name="gps_enabled">আপনার জিপিএস বন্ধ হয়ে গেছে বলে মনে হচ্ছে, আপনি কি এটি শুরু করতে চান?</string>
+    <string name="invalid_qr">ভুল কিউআর কোড</string>
+    <string name="scan_valid_qr">একটি সঠিক কিউআর কোড স্ক্যান করুন</string>
+    <string name="duplicate_record_found">ডুপ্লিকেট রেকর্ড পাওয়া গেছে</string>
 
     <string name="external_member">বহিরাগত সদস্য</string>
     <string name="external_member_registration">বহিরাগত সদস্য নিবন্ধন</string>
@@ -1680,4 +1703,87 @@
     <string name="upcoming_in_days">%1$s দিনের মধ্যে আসছে</string>
     <string name="day_overdue">%1$s দিন, বকেয়া</string>
     <string name="days_overdue">%1$s দিন, মেয়াদোত্তীর্ণ</string>
+    <string name="treatment_plan_success_message">চিকিত্সা পরিকল্পনা সফলভাবে জমা দেওয়া হয়েছে৷</string>
+    <string name="gestational_diabetes_gdm">জেস্টেশনাল ডাবেটিস</string>
+    <string name="scan_qr">QR কোড স্ক্যান করুন</string>
+    <string name="scan_new_qr">নতুন QR কোড স্ক্যান করুন?</string>
+    <string name="linking_qr_code_is_mandatory">QR কোড লিঙ্ক করা বাধ্যতামূলক</string>
+    <string name="qr_code_scanned">QR কোড সফলভাবে লিঙ্ক করা হয়েছে৷</string>
+
+    <string name="symptoms_adherence">লক্ষণ এবং আনুগত্য</string>
+    <string name="worsening_symptoms">রোগীর কি কোনও নতুন বা খারাপ লক্ষণ দেখা দিয়েছে?</string>
+    <string name="taking_medication">আপনি কি নিয়মিত ঔষধ খাচ্ছেন?</string>
+    <string name="taken_medication">গত ৩০ দিনে আপনি কত দিন ঔষধ গ্রহণ করেছেন?</string>
+
+    //BG
+    <string name="add_today_bg">আজকের BG এর তথ্য যোগ করুন</string>
+    <string name="previous_bg_reading">পূর্ববর্তী BG রিডিং</string>
+
+
+    <string name="select_investigation">পরীক্ষা নির্বাচন করুন</string>
+    <string name="investigation_date">পরীক্ষার তারিখ</string>
+    <string name="ddMmYyyy">dd/mm/yyyy</string>
+    <string name="enter_reading">মান লিখুন</string>
+
+    //prescription
+    <string name="previous_prescription_history">পূর্বের প্রেসক্রিপশনের তথ্য</string>
+    <string name="today_prescription">আজকের প্রেসক্রিপশন</string>
+    <string name="recommended_medication">প্রস্তাবিত ঔষধ</string>
+    <string name="search_medication">ঔষধ খুঁজুন</string>
+    <string name="prescribe_medication">ঔষধ লিখুন</string>
+    <string name="repeat_prescription"> একই প্রেসক্রিপশন আবারো দিন</string>
+    <string name="duration_caps">দিন</string>
+    <string name="duration">দিন</string>
+    <string name="new_ncd">নতুন কোন অসংক্রামক রোগ হয়েছে কিনা?</string>
+    <string name="_1_symptom_selected">১টি লক্ষণ নির্বাচিত</string>
+    <string name="program_id">প্রোগ্রাম আইডি</string>
+    <string name="health_history">স্বাস্থ্য তথ্য</string>
+    <string name="family_history">পরিবারের তথ্য</string>
+    <string name="controlled">নিয়ন্ত্রিত</string>
+    <string name="un_controlled">অনিয়ন্ত্রিত</string>
+
+    <string name="systolicMmhg">সিস্টোলিক (mmHg)</string>
+    <string name="diastolicMmhg">ডায়াস্টোলিক (mmHg)</string>
+    <string name="add_today_bp">আজকের BP রিডিং যোগ করুন</string>
+    <string name="previous_bp_reading">পূর্ববর্তী রক্তচাপ রিডিং</string>
+    <string name="view_less">কম রিডিং দেখুন</string>
+    <string name="view_more">আরো তথ্য দেখুন</string>
+    <string name="while_messauring">রক্তচাপ পরিমাপ করার সময়</string>
+    <string name="blood_glucode_mmol_l">ব্লাড গ্লুকোজ (mmol/L)</string>
+    <string name="hba1c_percentage">এইচ বি এ ১সি (%)</string>
+    <string name="medication_prescribed_colon">নির্ধারিত ওষুধ:</string>
+    <string name="instructions_caps">নির্দেশনা</string>
+    <string name="referred_on">কবে করতে বলা হয়েছে</string>
+    <string name="referred_by">ডাক্তার বা নার্সের নাম</string>
+    <string name="value">মান সন্নিবেশিত</string>
+    <string name="please_enter_details_prefix">এর জন্য একটি বৈধ মান লিখুন দয়া করে</string>
+    <string name="previous_investingation_history">পূর্ববর্তী পরীক্ষার তথ্য</string>
+    <string name="recommended_investigation">প্রস্তাবিত পরীক্ষা সমূহ</string>
+    <string name="today_s_investigation">আজকের টেস্টের তালিকা</string>
+    <string name="select_tested_on_date">তারিখে পরীক্ষিত নির্বাচন করুন</string>
+
+    <string name="lab_test_saved_successfully">ল্যাবটেস্ট সফলভাবে সংরক্ষিত হয়েছে৷</string>
+    <string name="have_you_observed_to_confirm_the_test_values_and_comments_uploaded_by_the_lab_technician">আপনি ল্যাব টেকনিশিয়ান দ্বারা আপলোড করা পরীক্ষার মান এবং মন্তব্য নিশ্চিত করতে পর্যবেক্ষণ করেছেন?</string>
+
+    <string name="lifestyle_modification">জীবন আচরণ পরিবর্তন</string>
+    <string name="self_care">জীবনধারা পরিবর্তন এবং স্ব-যত্ন সম্পর্কে পরামর্শ দেয়া হয়েছে কি?</string>
+    <string name="next_follow_up">পরবর্তী অনুসরণ করুন</string>
+    <string name="next_follow_up_day">%d দিন পরে</string>
+    <string name="next_follow_up_days">%d দিন পরে</string>
+    <string name="follow_up_date_manually">অন্য কোন ফলোআপের তারিখ নির্বাচন করুন</string>
+    <string name="days_error">দিনের সংখ্যা ন্যূনতম ১ দিন হতে হবে</string>
+    <string name="years_error">ফলোআপের সময়সীমা ২ বছরের কম হতে হবে</string>
+    <string name="community_clinic">কমিউনিটি ক্লিনিক</string>
+    <string name="medication_prescribed_">ঔষধ\nনির্ধারিত</string>
+    <string name="prescribed_quantity">নির্ধারিত দিন</string>
+    <string name="reason_for_qulaipharm">কোয়ালিফার্ম রেসপন্স</string>
+    <string name="start_treatment">ট্রিটমেন্ট শুরু করুন</string>
+    <string name="village_town_city_name">গ্রাম/শহর/শহরের নাম</string>
+
+    <string name="linked_to_care">লিংক টু কেয়ার</string>
+
+    <string name="health_condition">রোগীর অবস্থা</string>
+    <string name="both_lower_case">উভয়</string>
+    <string name="union">ইউনিয়ন/ওয়ার্ড</string>
+
 </resources>

@@ -166,7 +166,7 @@ class ReferralTicketFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
-    private fun showLoading() {
+    override fun showLoading() {
         binding.clLoaderProgress.visible()
         binding.loaderProgress.visible()
         binding.retryButtonBp.gone()
@@ -204,24 +204,24 @@ class ReferralTicketFragment : BaseFragment(), View.OnClickListener {
             adapters.updateList(
                 listOf(
                     mapOf(
-                        label to requireContext().getString(R.string.patient_status),
+                        LABEL to requireContext().getString(R.string.patient_status),
                         this.Value to referralData.patientStatus,
                     ),
                     mapOf(
-                        label to requireContext().getString(R.string.referral_by),
+                        LABEL to requireContext().getString(R.string.referral_by),
                         this.Value to referredBy,
                     ),
                     mapOf(
-                        label to requireContext().getString(R.string.referral_to),
+                        LABEL to requireContext().getString(R.string.referral_to),
                         this.Value to referralData.referredTo,
                     ),
                     mapOf(
-                        label to requireContext().getString(R.string.referral_reason),
+                        LABEL to requireContext().getString(R.string.referral_reason),
                         this.Value to getReferralReason(referralData.referredReason),
                         valueColor to R.color.red_risk_moderate,
                     ),
                     mapOf(
-                        label to requireContext().getString(R.string.date_of_onset),
+                        LABEL to requireContext().getString(R.string.date_of_onset),
                         this.Value to referralData.dateOfOnset?.let {
                             DateUtils.convertDateFormat(
                                 it,
@@ -231,7 +231,7 @@ class ReferralTicketFragment : BaseFragment(), View.OnClickListener {
                         },
                     ),
                     mapOf(
-                        label to requireContext().getString(R.string.referral_date),
+                        LABEL to requireContext().getString(R.string.referral_date),
                         this.Value to referralData.referredDate?.let {
                             DateUtils.convertDateFormat(
                                 it,

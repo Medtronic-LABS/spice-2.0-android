@@ -22,12 +22,12 @@ import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.DefinedParams.FhirMemberID
 import org.medtroniclabs.uhis.common.DefinedParams.HIV
 import org.medtroniclabs.uhis.common.DefinedParams.ID
+import org.medtroniclabs.uhis.common.DefinedParams.IS_HOUSE_HOLD
+import org.medtroniclabs.uhis.common.DefinedParams.IS_MEMBER_REGISTRATION
 import org.medtroniclabs.uhis.common.DefinedParams.MEMBER_ID
 import org.medtroniclabs.uhis.common.DefinedParams.PatientId
-import org.medtroniclabs.uhis.common.DefinedParams.VillageId
+import org.medtroniclabs.uhis.common.DefinedParams.VILLAGE_ID
 import org.medtroniclabs.uhis.common.DefinedParams.isCreateHouseholdForPhu
-import org.medtroniclabs.uhis.common.DefinedParams.isHouseHold
-import org.medtroniclabs.uhis.common.DefinedParams.isMemberRegistration
 import org.medtroniclabs.uhis.common.DefinedParams.villageId
 import org.medtroniclabs.uhis.databinding.ActivityConsentFormBinding
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
@@ -45,7 +45,7 @@ class ConsentFormActivity : BaseActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.isHivFlow = intent.getBooleanExtra(HIV, false)
-        viewModel.isHouseHoldFlow = intent.getBooleanExtra(isHouseHold, false)
+        viewModel.isHouseHoldFlow = intent.getBooleanExtra(IS_HOUSE_HOLD, false)
 
         binding = ActivityConsentFormBinding.inflate(layoutInflater)
         setMainContentView(
@@ -88,15 +88,15 @@ class ConsentFormActivity : BaseActivity(), View.OnClickListener {
         binding.btnSignature.setOnClickListener {
             val dialog = ConsentSignatureDialogFragment().apply {
                 arguments = Bundle().apply {
-                    putLong(VillageId, intent.getLongExtra(VillageId, -1L))
+                    putLong(VILLAGE_ID, intent.getLongExtra(VILLAGE_ID, -1L))
                     putBoolean(IS_PHU_WALK_INS_FLOW, intent.getBooleanExtra(IS_PHU_WALK_INS_FLOW, false))
                     putBoolean(isCreateHouseholdForPhu, intent.getBooleanExtra(isCreateHouseholdForPhu, false))
-                    putBoolean(isHouseHold, intent.getBooleanExtra(isHouseHold, false))
+                    putBoolean(IS_HOUSE_HOLD, intent.getBooleanExtra(IS_HOUSE_HOLD, false))
                     putLong(MEMBER_ID, intent.getLongExtra(MEMBER_ID, -1L))
                     putLong(FhirMemberID, intent.getLongExtra(FhirMemberID, -1L))
                     putBoolean(
-                        isMemberRegistration,
-                        intent.getBooleanExtra(isMemberRegistration, false),
+                        IS_MEMBER_REGISTRATION,
+                        intent.getBooleanExtra(IS_MEMBER_REGISTRATION, false),
                     )
                 }
             }
@@ -193,7 +193,7 @@ class ConsentFormActivity : BaseActivity(), View.OnClickListener {
             binding.btnAccept -> {
                 if (viewModel.isHouseHoldFlow) {
                     val intent = Intent(this, HouseholdActivity::class.java)
-                    intent.putExtra(VillageId, intent.getLongExtra(VillageId, -1L))
+                    intent.putExtra(VILLAGE_ID, intent.getLongExtra(VILLAGE_ID, -1L))
                     intent.putExtra(FhirMemberID, intent.getLongExtra(FhirMemberID, -1L))
                     intent.putExtra(IS_PHU_WALK_INS_FLOW, intent.getBooleanExtra(IS_PHU_WALK_INS_FLOW, false))
                     intent.putExtra(isCreateHouseholdForPhu, intent.getBooleanExtra(isCreateHouseholdForPhu, false))

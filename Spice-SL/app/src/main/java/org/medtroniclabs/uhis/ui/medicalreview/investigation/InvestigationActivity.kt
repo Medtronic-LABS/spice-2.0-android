@@ -12,9 +12,9 @@ import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.Gene_Expert
+import org.medtroniclabs.uhis.common.DefinedParams.GENE_EXPERT
 import org.medtroniclabs.uhis.common.DefinedParams.MTB_Detected
-import org.medtroniclabs.uhis.common.DefinedParams.RIF_Resistance
+import org.medtroniclabs.uhis.common.DefinedParams.RIF_RESISTANCE
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.offlinesync.model.ProvanceDto
 import org.medtroniclabs.uhis.databinding.ActivityInvestigationBinding
@@ -186,10 +186,10 @@ class InvestigationActivity :
                         hideLoading()
 
                         val intent = Intent()
-                        if (map.containsKey(DefinedParams.EncounterId)) {
-                            val value = map[DefinedParams.EncounterId]
+                        if (map.containsKey(DefinedParams.ENCOUNTER_ID)) {
+                            val value = map[DefinedParams.ENCOUNTER_ID]
                             if (value is String) {
-                                intent.putExtra(DefinedParams.EncounterId, value)
+                                intent.putExtra(DefinedParams.ENCOUNTER_ID, value)
                                 intent.putExtra(DefinedParams.Investigation, true)
                             }
                         }
@@ -325,7 +325,7 @@ class InvestigationActivity :
         patientViewModel.setUserJourney(AnalyticsDefinedParams.INVESTIGATIONSCREEN)
         investigationViewModel.patientReference = intent.getStringExtra(DefinedParams.PatientReference)
         investigationViewModel.patientId = intent.getStringExtra(DefinedParams.PatientId)
-        investigationViewModel.encounterId = intent.getStringExtra(DefinedParams.EncounterId)
+        investigationViewModel.encounterId = intent.getStringExtra(DefinedParams.ENCOUNTER_ID)
         investigationViewModel.visitId = intent.getStringExtra(NCDMRUtil.EncounterReference)
         investigationViewModel.origin = intent.getStringExtra(DefinedParams.ORIGIN)
         investigationGenerator = InvestigationGenerator(
@@ -388,7 +388,7 @@ class InvestigationActivity :
                         val requestMap = HashMap<String, Any>()
                         requestMap[DefinedParams.Provenance] = ProvanceDto()
                         id?.let { requestMap[DefinedParams.ID] = it }
-                        comments?.let { requestMap[DefinedParams.Comments] = it }
+                        comments?.let { requestMap[DefinedParams.COMMENTS] = it }
                         investigationViewModel.markAsReviewed(requestMap)
                     }
                 }
@@ -408,8 +408,8 @@ class InvestigationActivity :
                         val resultMap = payload.resultHashMap
 
                         resultMap?.containsKey(MTB_Detected) == true &&
-                            resultMap.containsKey(RIF_Resistance) &&
-                            payload.testName.contains(Gene_Expert, true) &&
+                            resultMap.containsKey(RIF_RESISTANCE) &&
+                            payload.testName.contains(GENE_EXPERT, true) &&
                             (payload.resultHashMap?.get(MTB_Detected)?.equals(RdtPositive) == true)
                     } == true
 

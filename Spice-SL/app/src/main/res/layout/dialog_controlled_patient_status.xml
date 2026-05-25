@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/llRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/_10sdp"
+        android:animateLayoutChanges="true"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/CardView_Style"
+            android:layout_height="match_parent"
+            android:layout_marginVertical="@dimen/_6sdp"
+            app:cardUseCompatPadding="true">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:id="@+id/titleCard"
+                    android:layout_width="@dimen/_0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <org.medtroniclabs.uhis.ui.DialogTitleFrameLayout
+                        android:id="@+id/labelHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:dialogTitle="@string/patient_type"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </LinearLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/contentCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/_15sdp"
+                    app:layout_constraintTop_toBottomOf="@id/titleCard">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvLbl"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_width="@dimen/_0dp"
+                        android:text="@string/current_status"
+                        app:layout_constraintBottom_toBottomOf="@id/tvValue"
+                        app:layout_constraintEnd_toStartOf="@id/tvSeparator"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/tvValue" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvSeparator"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/separator_colon"
+                        app:layout_constraintBottom_toBottomOf="@id/tvValue"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/tvValue" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvValue"
+                        style="@style/TextStyle_18_NavyBlue"
+                        android:layout_width="0dp"
+                        android:layout_marginStart="@dimen/_10sdp"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:text="@string/controlled"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/tvSeparator"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tvReasonLbl"
+                        style="@style/TextStyle_Regular_16"
+                        android:layout_marginTop="@dimen/_20sdp"
+                        android:text="@string/community_clinic"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvValue" />
+
+                    <androidx.appcompat.widget.AppCompatSpinner
+                        android:id="@+id/etSitesSpinner"
+                        style="@style/Form_Spinner_Style"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:minHeight="@dimen/_50sdp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tvReasonLbl" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:id="@+id/bottomDivider"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_1sdp"
+                    android:background="@color/edittext_stroke"
+                    app:layout_constraintBottom_toTopOf="@+id/clFooter" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/clFooter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/_15sdp"
+                    android:paddingVertical="@dimen/_10sdp"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnCancel"
+                        style="@style/Button_Style_cancel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/_14sdp"
+                        android:paddingHorizontal="@dimen/_15sdp"
+                        android:text="@string/cancel"
+                        android:visibility="gone"
+                        app:layout_constraintRight_toLeftOf="@id/btnSubmit"
+                        app:layout_constraintTop_toTopOf="@id/btnSubmit" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnSubmit"
+                        style="@style/Button_Style"
+                        android:layout_marginEnd="@dimen/_20sdp"
+                        android:background="@drawable/button_selector_cobalt"
+                        android:enabled="false"
+                        android:paddingHorizontal="@dimen/_22sdp"
+                        android:text="@string/submit"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/loadingProgress"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="@dimen/_0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/llRoot"
+        app:layout_constraintEnd_toEndOf="@id/llRoot"
+        app:layout_constraintStart_toStartOf="@id/llRoot"
+        app:layout_constraintTop_toTopOf="@id/llRoot">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/spin_kit"
+            android:layout_width="@dimen/_75sdp"
+            android:layout_height="@dimen/_75sdp"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/loader_spice" />
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

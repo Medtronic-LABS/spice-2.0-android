@@ -1,3 +1,5 @@
 package org.medtroniclabs.uhis.ncd.data
 
-data class ScreeningPatientResponse(var message: String, val entity: HashMap<String, Any>)
+import org.medtroniclabs.uhis.data.registration.PatientModel
+
+data class ScreeningPatientResponse(var message: String, val entity: PatientModel)

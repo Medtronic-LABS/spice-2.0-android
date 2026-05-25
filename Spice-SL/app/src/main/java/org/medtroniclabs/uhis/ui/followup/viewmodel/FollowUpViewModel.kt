@@ -160,7 +160,7 @@ class FollowUpViewModel @Inject constructor(
             selectedFollowUpDetail?.let {
                 addCallHistoryLiveData.postLoading()
                 val callStatus =
-                    getCallStatus(callResultHashMap[DefinedParams.CallResult] as String)
+                    getCallStatus(callResultHashMap[DefinedParams.CALL_RESULT] as String)
                 val patientStatus = getPatientStatus(callStatus)
                 val unSuccessfulReason = getUnSuccessfulReason(callStatus)
                 followUpRepository.addCallHistory(
@@ -194,7 +194,7 @@ class FollowUpViewModel @Inject constructor(
 
     private fun getPatientStatus(status: FollowUpCallStatus): String? {
         if (status == FollowUpCallStatus.SUCCESSFUL && patientStatusHashMap.isNotEmpty()) {
-            return (patientStatusHashMap[DefinedParams.PatientStatus] as String)
+            return (patientStatusHashMap[DefinedParams.PATIENT_STATUS] as String)
         }
 
         return null
@@ -202,7 +202,7 @@ class FollowUpViewModel @Inject constructor(
 
     private fun getUnSuccessfulReason(status: FollowUpCallStatus): String? {
         if (status == FollowUpCallStatus.UNSUCCESSFUL) {
-            return (unSuccessfulHashMap[DefinedParams.UnSuccessful] as String)
+            return (unSuccessfulHashMap[DefinedParams.UN_SUCCESSFUL] as String)
         }
         return null
     }

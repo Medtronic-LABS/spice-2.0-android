@@ -40,7 +40,7 @@ object CVDRiskCalculator {
 
     private fun getSmokerType(value: Any): Boolean =
         when (value) {
-            is String -> value == DefinedParams.Yes
+            is String -> value == DefinedParams.YES
             is Boolean -> value
             else -> false
         }

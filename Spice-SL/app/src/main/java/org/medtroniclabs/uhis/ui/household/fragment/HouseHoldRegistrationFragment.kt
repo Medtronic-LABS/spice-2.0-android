@@ -17,7 +17,6 @@ import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams.Househo
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.HOUSEHOLD_REGISTRATION
-import org.medtroniclabs.uhis.common.DefinedParams.VillageId
 import org.medtroniclabs.uhis.common.EntityMapper.getResultSpinnerMapList
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
@@ -32,7 +31,6 @@ import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration
 import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.NO_OF_PEOPLE
 import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.SUB_VILLAGE_ID
 import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.TOTAL_MEMBERS
-import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.VILLAGE_ID
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
 import org.medtroniclabs.uhis.ui.BaseFragment
@@ -117,15 +115,15 @@ class HouseHoldRegistrationFragment : BaseFragment(), View.OnClickListener, Form
                             val singleItem = data.response[0]
                             if (singleItem is Map<*, *>) {
                                 val id = singleItem[DefinedParams.ID]
-                                formGenerator.getViewByTag(VILLAGE_ID)?.let { view ->
+                                formGenerator.getViewByTag(HouseHoldRegistration.VILLAGE_ID)?.let { view ->
                                     formGenerator.setValueForView(id, view)
                                 }
                             }
                         }
 
-                        arguments?.getLong(VillageId)?.let {
+                        arguments?.getLong(DefinedParams.VILLAGE_ID)?.let {
                             if (it != 0L) {
-                                formGenerator.getViewByTag(VILLAGE_ID)?.let { view ->
+                                formGenerator.getViewByTag(HouseHoldRegistration.VILLAGE_ID)?.let { view ->
                                     view.isEnabled = false
                                     formGenerator.setValueForView(it, view)
                                 }
@@ -240,7 +238,7 @@ class HouseHoldRegistrationFragment : BaseFragment(), View.OnClickListener, Form
     }
 
     private fun autoPopulateFormFields(details: HouseholdEntity) {
-        formGenerator.getViewByTag(VILLAGE_ID)?.let { view ->
+        formGenerator.getViewByTag(HouseHoldRegistration.VILLAGE_ID)?.let { view ->
             if (details.villageId != 0L) {
                 view.isEnabled = false
                 formGenerator.setValueForView(details.villageId, view)
@@ -495,9 +493,12 @@ class HouseHoldRegistrationFragment : BaseFragment(), View.OnClickListener, Form
         val subVillageId = CommonUtils.getLongOrNull(selectedId) ?: return
         if (subVillageId == 0L) return
         val parentVillageId = lastSubVillageList.find { it.id == subVillageId }?.villageId ?: return
-        formGenerator.getViewByTag(VILLAGE_ID)?.let { view ->
+        formGenerator.getViewByTag(HouseHoldRegistration.VILLAGE_ID)?.let { view ->
             formGenerator.setValueForView(parentVillageId, view)
         }
+    }
+
+    override fun onQRScanRequested() {
     }
 
     fun getHouseHoldEnteredInputs(): Boolean = formGenerator.getResultMap().isNotEmpty()

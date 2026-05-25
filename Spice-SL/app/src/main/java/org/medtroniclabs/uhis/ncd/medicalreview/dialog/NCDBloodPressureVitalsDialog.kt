@@ -547,12 +547,12 @@ class NCDBloodPressureVitalsDialog(private val callback: () -> Unit) : DialogFra
                 put(AssessmentDefinedParams.encounter, hashMapOf<String, Any?>(DefinedParams.Provenance to ProvanceDto()))
                 put(Screening.DateOfBirth, patientData.dateOfBirth ?: "")
                 put(AssessmentDefinedParams.assessmentType, Assessment)
-                put(DefinedParams.AssessmentOrganizationId, SecuredPreference.getOrganizationFhirId())
+                put(DefinedParams.ASSESSMENT_ORGANIZATION_ID, SecuredPreference.getOrganizationFhirId())
                 put(AssessmentDefinedParams.assessmentProcessType, CommonUtils.requestFrom())
-                patientData.isRegularSmoker?.let { put(Screening.is_regular_smoker, it) }
+                patientData.isRegularSmoker?.let { put(Screening.IS_REGULAR_SMOKER, it) }
                 // Check and set smoking status
                 if (binding.smokingGrp.visibility == View.VISIBLE) {
-                    put(Screening.is_regular_smoker, binding.btnYes.isChecked)
+                    put(Screening.IS_REGULAR_SMOKER, binding.btnYes.isChecked)
                 }
             }
         }

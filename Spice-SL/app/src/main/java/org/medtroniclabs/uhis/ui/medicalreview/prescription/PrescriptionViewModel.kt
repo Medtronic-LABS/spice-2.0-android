@@ -143,9 +143,9 @@ class PrescriptionViewModel @Inject constructor(
             val map = HashMap<String, Any>()
             map[DefinedParams.NAME] = data.name
             map[DefinedParams.ID] = data.id
-            map[DefinedParams.Frequency] = data.frequency ?: 1
-            map[DefinedParams.Description] = data.description ?: ""
-            map[DefinedParams.DisplayOrder] = data.displayOrder
+            map[DefinedParams.FREQUENCY] = data.frequency ?: 1
+            map[DefinedParams.DESCRIPTION] = data.description ?: ""
+            map[DefinedParams.DISPLAY_ORDER] = data.displayOrder
             mapList.add(map)
         }
 
@@ -155,10 +155,10 @@ class PrescriptionViewModel @Inject constructor(
     fun getInstructionMap(): ArrayList<Map<String, Any>> {
         val mapList = ArrayList<Map<String, Any>>()
         val defaultMap = hashMapOf<String, Any>(
-            DefinedParams.ID to DefinedParams.DefaultSelectID,
-            DefinedParams.NAME to DefinedParams.DefaultIDLabel,
-            DefinedParams.Value to DefinedParams.DefaultIDLabel,
-            DefinedParams.DisplayOrder to 0,
+            DefinedParams.ID to DefinedParams.DEFAULT_SELECT_ID,
+            DefinedParams.NAME to DefinedParams.DEFAULT_ID_LABEL,
+            DefinedParams.Value to DefinedParams.DEFAULT_ID_LABEL,
+            DefinedParams.DISPLAY_ORDER to 0,
         )
         mapList.add(defaultMap)
         instructionListLiveDate.value?.data?.forEach { data ->
@@ -167,7 +167,7 @@ class PrescriptionViewModel @Inject constructor(
                 map[DefinedParams.NAME] = data.name
                 map[DefinedParams.ID] = data.id
                 map[DefinedParams.Value] = fhirValue
-                map[DefinedParams.DisplayOrder] = data.displayOrder
+                map[DefinedParams.DISPLAY_ORDER] = data.displayOrder
                 mapList.add(map)
             }
         }
@@ -298,7 +298,7 @@ class PrescriptionViewModel @Inject constructor(
         }
     }
 
-    private fun getMedicationFrequency(data: MedicationRequestObject): Int = data.medicationResponse.selectedMap?.get(DefinedParams.Frequency) as? Int? ?: 0
+    private fun getMedicationFrequency(data: MedicationRequestObject): Int = data.medicationResponse.selectedMap?.get(DefinedParams.FREQUENCY) as? Int? ?: 0
 
     private fun getMedicationFrequencyName(data: MedicationRequestObject): String =
         data.medicationResponse.selectedMap?.get(DefinedParams.NAME) as? String? ?: ""

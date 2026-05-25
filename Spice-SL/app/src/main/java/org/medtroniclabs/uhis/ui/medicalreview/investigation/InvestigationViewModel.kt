@@ -248,8 +248,8 @@ class InvestigationViewModel @Inject constructor(
             if (resultMap.containsKey(formData.id)) {
                 val actualValue = resultMap[formData.id]
                 var unitValue: String? = null
-                if (resultMap.containsKey(formData.id + DefinedParams.Unit)) {
-                    val unitValueAny = resultMap[formData.id + DefinedParams.Unit]
+                if (resultMap.containsKey(formData.id + DefinedParams.UNIT)) {
+                    val unitValueAny = resultMap[formData.id + DefinedParams.UNIT]
                     if (unitValueAny is String) {
                         unitValue = unitValueAny
                     }

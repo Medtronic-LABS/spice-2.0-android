@@ -116,14 +116,14 @@ class PrivacyPolicyFragment : BaseFragment() {
 
     fun goBack() = binding.webView.goBack()
 
-    private fun showLoading() {
+    override fun showLoading() {
         binding.loadingProgress.visibility = View.VISIBLE
         binding.loaderImage.apply {
             loadAsGif(R.drawable.ic_rotating_uhis_logo)
         }
     }
 
-    private fun hideLoading() {
+    override fun hideLoading() {
         binding.loadingProgress.visibility = View.GONE
         binding.loaderImage.apply {
             resetImageView()

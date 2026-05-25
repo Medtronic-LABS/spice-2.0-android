@@ -63,8 +63,13 @@ import org.medtroniclabs.uhis.db.entity.ChiefDomEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowConditionEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowEntity
 import org.medtroniclabs.uhis.db.entity.CommunityProfile
+import org.medtroniclabs.uhis.db.entity.ComorbidityEntity
+import org.medtroniclabs.uhis.db.entity.ComplaintsEntity
+import org.medtroniclabs.uhis.db.entity.ComplicationEntity
 import org.medtroniclabs.uhis.db.entity.ConsentEntity
 import org.medtroniclabs.uhis.db.entity.ConsentForm
+import org.medtroniclabs.uhis.db.entity.CurrentMedicationEntity
+import org.medtroniclabs.uhis.db.entity.DiagnosisEntity
 import org.medtroniclabs.uhis.db.entity.DistrictEntity
 import org.medtroniclabs.uhis.db.entity.DosageDurationEntity
 import org.medtroniclabs.uhis.db.entity.EntitiesName
@@ -89,6 +94,7 @@ import org.medtroniclabs.uhis.db.entity.NCDDiagnosisEntity
 import org.medtroniclabs.uhis.db.entity.NCDFollowUp
 import org.medtroniclabs.uhis.db.entity.NCDMedicalReviewMetaEntity
 import org.medtroniclabs.uhis.db.entity.NCDPatientDetailsEntity
+import org.medtroniclabs.uhis.db.entity.PhysicalExaminationEntity
 import org.medtroniclabs.uhis.db.entity.PregnancyDetail
 import org.medtroniclabs.uhis.db.entity.RiskFactorEntity
 import org.medtroniclabs.uhis.db.entity.RxBuddyDetails
@@ -99,7 +105,9 @@ import org.medtroniclabs.uhis.db.entity.ShasthyaKormiLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
+import org.medtroniclabs.uhis.db.entity.SiteEntity
 import org.medtroniclabs.uhis.db.entity.SubVillageEntity
+import org.medtroniclabs.uhis.db.entity.SymptomEntity
 import org.medtroniclabs.uhis.db.entity.TreatmentDetailsEntity
 import org.medtroniclabs.uhis.db.entity.TreatmentPlanEntity
 import org.medtroniclabs.uhis.db.entity.UserProfileEntity
@@ -542,6 +550,8 @@ class RoomHelperImpl @Inject constructor(
 
     override suspend fun getDiagnosisList(diagnosisType: String): List<DiseaseCategoryItems> = diagnosisDAO.getDiagnosisList(diagnosisType)
 
+    override suspend fun getDiagnosisList(): List<DiagnosisEntity> = metaDataDAO.getDiagnosisList()
+
     override suspend fun insertFollowUp(followUp: FollowUp): Long = followUpDao.insertFollowUp(followUp)
 
     override suspend fun deleteAllFollowUps() {
@@ -762,6 +772,8 @@ class RoomHelperImpl @Inject constructor(
 
     override fun getConsent(formType: String): LiveData<String> = metaDataDAO.getConsent(formType)
 
+    override suspend fun getConsentString(formType: String): String = metaDataDAO.getConsentString(formType)
+
     override suspend fun deleteConsent() = metaDataDAO.deleteConsent()
 
     override suspend fun saveModelQuestions(mentalHealthEntity: List<MentalHealthEntity>) = metaDataDAO.insertModelQuestions(mentalHealthEntity)
@@ -956,6 +968,8 @@ class RoomHelperImpl @Inject constructor(
     override suspend fun insertLifestyle(items: List<LifestyleEntity>) = ncdMedicalReviewDao.insertLifestyle(items)
 
     override fun getLifeStyle(): LiveData<List<LifestyleEntity>> = ncdMedicalReviewDao.getLifeStyle()
+
+    override suspend fun getLifeStyleList(): List<LifestyleEntity> = ncdMedicalReviewDao.getLifeStyleList()
 
     override fun getAssessmentFormData(
         formTypes: List<String>,
@@ -1429,4 +1443,147 @@ class RoomHelperImpl @Inject constructor(
     override suspend fun deleteDuplicateAssessmentHistory(date: String) {
         memberAssessmentHistoryDao.deleteDuplicateRecords(date)
     }
+
+    override suspend fun getFormBasedOnType(
+        formTypeOne: String,
+        formTypeTwo: String,
+    ): List<FormEntity> = metaDataDAO.getFormBasedOnType(formTypeOne, formTypeTwo)
+
+    override suspend fun getVillageList(selectedParent: Long): List<VillageEntity> = metaDataDAO.getVillageList()
+
+    override suspend fun getOtherVillage(): VillageEntity = metaDataDAO.getOtherVillage()
+
+    override suspend fun getProgramList(site: String): Any = metaDataDAO.getProgramList()
+
+    override suspend fun getProgramList(
+        selectedParent: Long,
+        site: String,
+    ): Any = metaDataDAO.getProgramList(selectedParent)
+
+    override suspend fun getUpazilaListByDistrict(districtID: Long): List<SiteEntity> = metaDataDAO.getUpazilaListByDistrict(districtID)
+
+    override suspend fun getUpazilaList(): Any = metaDataDAO.getUpazilaList()
+
+    override suspend fun updateSequenceCode(
+        villageId: Long,
+        newSequenceCode: Long,
+    ) {
+    }
+
+    override suspend fun getScreeningRecordById(id: Long): ScreeningEntity = screeningDAO.getScreeningById(id)
+
+    override suspend fun getAccountSiteList(userId: Long): List<SiteEntity> = metaDataDAO.getAccountSiteList(userId)
+
+    override suspend fun getAccountSiteListByLevel(
+        userId: Long,
+        level: String,
+    ): List<SiteEntity> = metaDataDAO.getAccountSiteListByLevel(userId, level)
+
+    override suspend fun getUpazilaListEyeCareOnly(): Any = metaDataDAO.getUpazilaListEyeCareOnly()
+
+    override suspend fun getUpazilaListCataractOnly(): Any = metaDataDAO.getUpazilaListCataractOnly()
+
+    override suspend fun getSiteEntity(
+        userSite: Boolean,
+        userId: Long,
+    ): List<SiteEntity> = metaDataDAO.getSiteEntityList(userSite, userId)
+
+    override suspend fun getUpazilaById(upazilaId: Long): SiteEntity = metaDataDAO.getUpazilaById(upazilaId)
+
+    override suspend fun getVillageById(villageId: Long): VillageEntity = metaDataDAO.getVillageById(villageId)
+
+    override suspend fun getTreatmentPlanData(): List<TreatmentPlanEntity> = metaDataDAO.getTreatmentPlanData()
+
+    override suspend fun getShortageReason(type: String): List<ShortageReasonEntity> = metaDataDAO.getShortageEntries(type)
+
+    override suspend fun getComorbidityBasedOnWorkflow(workflowList: ArrayList<String>): List<ComorbidityEntity> =
+        metaDataDAO.getComorbidityBasedOnWorkflow(workflowList)
+
+    override suspend fun saveComorbidity(list: ArrayList<ComorbidityEntity>) {
+        metaDataDAO.saveComorbidity(list)
+    }
+
+    override suspend fun getComorbidity(): List<ComorbidityEntity> = metaDataDAO.getComorbidity()
+
+    override suspend fun deleteComorbidity() {
+        metaDataDAO.deleteComorbidity()
+    }
+
+    override suspend fun saveComplication(list: ArrayList<ComplicationEntity>) {
+        metaDataDAO.saveComplication(list)
+    }
+
+    override suspend fun deleteComplication() {
+        metaDataDAO.deleteComplication()
+    }
+
+    override suspend fun getComplication(): List<ComplicationEntity> = metaDataDAO.getComplication()
+
+    override suspend fun saveCurrentMedication(list: ArrayList<CurrentMedicationEntity>) {
+        metaDataDAO.saveCurrentMedication(list)
+    }
+
+    override suspend fun deleteCurrentMedication() {
+        metaDataDAO.deleteCurrentMedication()
+    }
+
+    override suspend fun getCurrentMedicationList(): List<CurrentMedicationEntity> = metaDataDAO.getCurrentMedicationList()
+
+    override suspend fun getCurrentMedicationList(type: String): List<CurrentMedicationEntity> = metaDataDAO.getCurrentMedicationList(type)
+
+    override suspend fun savePhysicalExamination(list: ArrayList<PhysicalExaminationEntity>) {
+        metaDataDAO.savePhysicalExamination(list)
+    }
+
+    override suspend fun deletePhysicalExamination() {
+        metaDataDAO.deletePhysicalExamination()
+    }
+
+    override suspend fun getPhysicalExaminationList(workFlowList: ArrayList<String>): List<PhysicalExaminationEntity> =
+        metaDataDAO.getPhysicalExaminationList(workFlowList)
+
+    override suspend fun saveCompliants(list: ArrayList<ComplaintsEntity>) {
+        metaDataDAO.saveComplaints(list)
+    }
+
+    override suspend fun deleteCompliants() {
+        metaDataDAO.deleteComplaints()
+    }
+
+    override suspend fun getChiefComplaints(workflowList: ArrayList<String>): List<ComplaintsEntity> = metaDataDAO.getChiefComplaints(workflowList)
+
+    override suspend fun getDiagnosis(
+        gender: ArrayList<String>,
+        type: ArrayList<String>,
+    ): List<DiagnosisEntity> = metaDataDAO.getDiagnosis(gender, type)
+
+    override suspend fun saveSymptomList(symptoms: List<SymptomEntity>) {
+        metaDataDAO.insertSymptomsList(symptoms)
+    }
+
+    override suspend fun deleteSymptoms() {
+        metaDataDAO.deleteSymptomList()
+    }
+
+    override suspend fun getSymptomsList(): List<SymptomEntity> = metaDataDAO.getSymptomList()
+
+    override suspend fun getSymptomsListByType(type: String): List<SymptomEntity> = metaDataDAO.getSymptomsListByType(type)
+
+    override suspend fun getOperatingUnitSites(): List<SiteEntity> = metaDataDAO.getOperatingUnitSites()
+
+    override suspend fun saveDiagnosis(diseaseEntityList: ArrayList<DiagnosisEntity>) {
+        metaDataDAO.saveDiagnosis(diseaseEntityList)
+    }
+
+    override suspend fun deleteDiagnosisList() {
+        metaDataDAO.deleteDiagnosisList()
+    }
+
+    override suspend fun deleteAllSiteCache() = metaDataDAO.deleteSiteList()
+
+    override suspend fun saveSiteList(siteEntity: List<SiteEntity>) = metaDataDAO.insertSiteDetails(siteEntity)
+
+    override suspend fun getAllChiefDoms(): List<ChiefDomEntity> = metaDataDAO.getAllChiefDoms()
+
+    override suspend fun getSubVillage(villageId: Long): List<SubVillageEntity> = metaDataDAO.getSubVillage(villageId)
 }

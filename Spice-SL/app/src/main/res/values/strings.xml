@@ -1746,8 +1746,120 @@
     <string name="follow_up_visit">Follow up Visit</string>
     <string name="disabled_account">Disabled Account</string>
     <string name="account_locked_multiple_attempts">Account locked due to multiple invalid login attempts.</string>
+    <string name="treatment_plan_success_message">Treatment plan submitted successfully</string>
+    <string name="gestational_diabetes_gdm">Gestational Diabetes(GDM)</string>
+    <string name="scan_qr">Scan QR Code</string>
+    <string name="scan_new_qr">Scan New QR Code?</string>
+    <string name="linking_qr_code_is_mandatory">Linking QR code is mandatory</string>
+    <string name="qr_code_scanned">QR code linked successfully</string>
+
+    <string name="missed_visit">Missed Visit</string>
+    <string name="ltf">LTF</string>
+    <string name="enter_patient_search">Enter Name / ID / Mobile Number</string>
+    <string name="overdue_days">%1$s days overdue</string>
+    <string name="referred_to">Referred to %1$s</string>
+    <string name="high_bg">High(BG)</string>
+    <string name="high_bp">High(BP)</string>
+    <string name="high_both">High(BG), High(BP)</string>
+    <string name="days_due_at_mr">%1$s days due</string>
+    <string name="day_due_at_mr">%1$s day due</string>
+    <string name="day_due_at">%1$s day due at %2$s</string>
+    <string name="days_due_at">%1$s days due at %2$s</string>
+    <string name="one_patient_found">1 Patient Found</string>
+    <string name="sort_with_count">Sort%1$s</string>
+    <string name="filter_with_count">Filter%1$s</string>
+    <string name="patient_already_enrolled">The patient is already enrolled</string>
+    <string name="patient_already_enrolled_with_program_id">The patient is already enrolled with Program ID&#160;</string>
+   <string name="terms_condition"><![CDATA[Terms & Condition]]></string>
+    <string name="gps_enabled">Your GPS seems to be disabled, do you want to enable it?</string>
+    <string name="invalid_qr">Invalid QR</string>
+    <string name="scan_valid_qr">Please scan a valid QR</string>
+    <string name="duplicate_record_found">Duplicate Record Found</string>
+
+    <string name="symptoms_adherence">Symptoms &amp; Adherence</string>
+    <string name="worsening_symptoms">Has the patient had any new or worsening symptoms?</string>
+    <string name="taking_medication">Are you taking medication regularly?</string>
+    <string name="taken_medication">In last 30 days how many days you have taken medicines?</string>
+
+    //BG
+    <string name="add_today_bg">Add Today\'s BG Reading</string>
+    <string name="previous_bg_reading">Previous Blood Glucose Readings</string>
+
+    <string name="select_investigation">Select Investigation</string>
+    <string name="investigation_date">Investigation Date</string>
+    <string name="ddMmYyyy">dd/mm/yyyy</string>
+    <string name="enter_reading">Enter Reading</string>
+
+    //prescription
+    <string name="previous_prescription_history">Previous Prescription History</string>
+    <string name="today_prescription">Today\'s Prescription</string>
+    <string name="recommended_medication">Recommended Medication</string>
+    <string name="search_medication">Search Medication</string>
+    <string name="prescribe_medication">Prescribe Medication</string>
+    <string name="repeat_prescription">Repeat Same Prescription Today ?</string>
+    <string name="duration_caps">DURATION</string>
+    <string name="duration">Duration</string>
+
+    <string name="new_ncd">Is there a development of new NCD?</string>
+    <string name="_1_symptom_selected">1 Symptom Selected</string>
+    <string name="program_id">Program ID</string>
+    <string name="health_history">Health History</string>
+    <string name="family_history">Family History</string>
+    <string name="controlled">Controlled</string>
+    <string name="un_controlled">Uncontrolled</string>
+
+    //bp
+    <string name="systolicMmhg">Systolic (mmHg)</string>
+    <string name="diastolicMmhg">Diastolic (mmHg)</string>
+    <string name="expand" translatable="false">expand</string>
+    <string name="add_today_bp">Add Today\'s BP Reading</string>
+    <string name="previous_bp_reading">Previous Blood Pressure Readings</string>
+    <string name="view_less">View Less Readings</string>
+    <string name="view_more">View More Readings</string>
+    <string name="while_messauring">While measuring blood pressure</string>
+
+    <string name="blood_glucode_mmol_l">Blood Glucose (mmol/L)</string>
+    <string name="hba1c_percentage">HBA1c (%)</string>
+    <string name="ogtt_mmol" translatable="false">OGTT (mmol/L) </string>
+    <string name="ogtt" translatable="false">OGTT </string>
+    <string name="medication_prescribed_colon">Medication Prescribed :</string>
+
+    <string name="please_enter_details_prefix">"Please enter a valid value for"</string>
+    <string name="instructions_caps">INSTRUCTIONS</string>
+    <string name="referred_on">Ordered Date</string>
+    <string name="referred_by">Ordered by</string>
+    <string name="value">Value Entered By</string>
+    <string name="previous_investingation_history">Previous Investigation History</string>
+    <string name="recommended_investigation">Recommended Investigation</string>
+    <string name="today_s_investigation">Today’s Investigation</string>
+    <string name="select_tested_on_date">Please select Tested on date</string>
+
+    <string name="lab_test_saved_successfully">LabTest saved successfully</string>
+    <string name="have_you_observed_to_confirm_the_test_values_and_comments_uploaded_by_the_lab_technician">Have you observed to confirm the test values and comments uploaded by the lab technician?</string>
+
+    <string name="lifestyle_modification">Lifestyle Modification</string>
+    <string name="self_care">Counselling on lifestyle modification and self care done?</string>
+    <string name="next_follow_up">Next Follow Up</string>
+    <string name="decrease" translatable="false"> Decrease the days</string>
+    <string name="increase" translatable="false"> Increase the days</string>
+    <string name="next_follow_up_day">After %d day</string>
+    <string name="next_follow_up_days">After %d days</string>
+    <string name="follow_up_date_manually">Select Follow Up Date Manually</string>
+    <string name="days_error">Day should not be less than one day</string>
+    <string name="years_error" >Follow up days should be less than 2 years</string>
+    <string name="community_clinic">Community Clinic</string>
+    <string name="medication_prescribed_">Medication\nPrescribed</string>
+    <string name="start_treatment">Start Treatment</string>
+    <string name="prescribed_quantity">Prescribed Days</string>
+    <string name="reason_for_qulaipharm">Qualipharm Response</string>
+    <string name="village_town_city_name">Village/Town/City Name</string>
+
     <string name="string_slash_string" translatable="false">%1$s/%2$s</string>
     <string name="upcoming_in_days">Upcoming in %1$s days</string>
     <string name="day_overdue">%1$s day, Overdue</string>
     <string name="days_overdue">%1$s days, Overdue</string>
+    <string name="health_condition">Health Condition</string>
+    <string name="both_lower_case">Both</string>
+    <string name="union">Union/Ward</string>
+    <string name="linked_to_care">Linked to Care</string>
 </resources>

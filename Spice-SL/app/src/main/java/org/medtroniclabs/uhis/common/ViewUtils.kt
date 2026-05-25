@@ -1,10 +1,14 @@
 package org.medtroniclabs.uhis.common
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
+import android.location.LocationManager
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
 import android.widget.DatePicker
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.CommonUtils.getMaxDateLimit
@@ -75,5 +79,33 @@ object ViewUtils {
         }
 
         return dialog
+    }
+
+    fun statusCheck(context: Context) {
+        val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
+        manager?.let { locationManager ->
+            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                buildAlertMessageNoGps(context)
+            }
+        }
+    }
+
+    private fun buildAlertMessageNoGps(context: Context) {
+        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        builder
+            .setMessage(context.getString(R.string.gps_enabled))
+            .setCancelable(false)
+            .setPositiveButton(
+                context.getText(R.string.yes),
+            ) { dialog, _ ->
+                context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                dialog.cancel()
+            }.setNegativeButton(
+                context.getText(R.string.no),
+            ) { dialog, _ ->
+                dialog.cancel()
+            }
+        val alert = builder.create()
+        alert.show()
     }
 }

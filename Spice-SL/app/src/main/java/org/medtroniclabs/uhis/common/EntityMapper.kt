@@ -10,6 +10,7 @@ import org.medtroniclabs.uhis.db.entity.HouseholdMemberEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaKormiEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaEntity
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
+import org.medtroniclabs.uhis.db.entity.SiteEntity
 import org.medtroniclabs.uhis.db.entity.SubVillageEntity
 import org.medtroniclabs.uhis.db.entity.VillageEntity
 
@@ -32,7 +33,19 @@ object EntityMapper {
         map: HashMap<String, Any>,
     ) {
         when (properties) {
+            is SiteEntity -> {
+                updateMapsIdName(map, properties.id, properties.name)
+            }
+
+            is ChiefDomEntity -> {
+                updateMapsIdName(map, properties.id, properties.name)
+            }
+
             is VillageEntity -> {
+                updateMapsIdName(map, properties.id, properties.name)
+            }
+
+            is SubVillageEntity -> {
                 updateMapsIdName(map, properties.id, properties.name)
             }
 
@@ -116,7 +129,7 @@ object EntityMapper {
                     symptom = it[DefinedParams.NAME] as String,
                     type = it[DefinedParams.type] as? String ?: type,
                     value = it[DefinedParams.Value] as? String,
-                    displayOrder = it[DefinedParams.DisplayOrder] as? Int,
+                    displayOrder = it[DefinedParams.DISPLAY_ORDER] as? Int,
                     displayValue = it[DefinedParams.CULTURE_VALUE] as? String,
                 ),
             )

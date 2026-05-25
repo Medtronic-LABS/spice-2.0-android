@@ -11,7 +11,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
-import org.medtroniclabs.uhis.common.DefinedParams.passwordRegexPattern
+import org.medtroniclabs.uhis.common.DefinedParams.PASSWORD_REGEX_PATTERN
 import org.medtroniclabs.uhis.databinding.FragmentConfirmPasswordBinding
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.ui.BaseFragment
@@ -97,7 +97,7 @@ class ConfirmPasswordFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun isPasswordValid(password: String): Boolean {
-        val passwordRegex = passwordRegexPattern
+        val passwordRegex = PASSWORD_REGEX_PATTERN
         val regex = Regex(passwordRegex)
         return regex.matches(password)
     }

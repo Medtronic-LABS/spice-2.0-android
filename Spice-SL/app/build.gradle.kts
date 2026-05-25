@@ -349,6 +349,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose")
     implementation("androidx.compose.runtime:runtime-livedata")
 
+    implementation("com.github.yuriy-budiyev:code-scanner:2.3.2")
+
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.28.0")
 
     // Debug / Test for Compose

@@ -277,7 +277,7 @@ class NCDBloodGlucoseReadingDialog(private val callback: () -> Unit) : DialogFra
                     mapOf(
                         AssessmentDefinedParams.encounter to hashMapOf<String, Any?>(DefinedParams.Provenance to ProvanceDto()),
                         AssessmentDefinedParams.assessmentType to DefinedParams.Assessment,
-                        DefinedParams.AssessmentOrganizationId to SecuredPreference.getOrganizationFhirId(),
+                        DefinedParams.ASSESSMENT_ORGANIZATION_ID to SecuredPreference.getOrganizationFhirId(),
                         AssessmentDefinedParams.assessmentProcessType to CommonUtils.requestFrom(),
                         AssessmentDefinedParams.assessmentTakenOn to assessmentDate,
                     ),

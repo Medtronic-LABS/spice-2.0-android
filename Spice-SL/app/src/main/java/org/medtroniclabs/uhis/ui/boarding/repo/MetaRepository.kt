@@ -23,12 +23,14 @@ import org.medtroniclabs.uhis.data.HealthFacility
 import org.medtroniclabs.uhis.data.MedicalReviewMetaItems
 import org.medtroniclabs.uhis.data.Menu
 import org.medtroniclabs.uhis.data.MenuDetail
+import org.medtroniclabs.uhis.data.MetaDataResponse
 import org.medtroniclabs.uhis.data.ModelQuestion
 import org.medtroniclabs.uhis.data.ProgramEntity
 import org.medtroniclabs.uhis.data.UserProfile
 import org.medtroniclabs.uhis.data.model.ShasthyaKormi
 import org.medtroniclabs.uhis.data.model.ShasthyaShebika
 import org.medtroniclabs.uhis.data.model.SubVillage
+import org.medtroniclabs.uhis.data.registration.SiteResponse
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowConditionEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowEntity
 import org.medtroniclabs.uhis.db.entity.ConsentEntity
@@ -48,6 +50,7 @@ import org.medtroniclabs.uhis.db.entity.ShasthyaKormiLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
+import org.medtroniclabs.uhis.db.entity.SiteEntity
 import org.medtroniclabs.uhis.db.entity.SubVillageEntity
 import org.medtroniclabs.uhis.db.entity.UserProfileEntity
 import org.medtroniclabs.uhis.db.entity.VillageEntity
@@ -74,6 +77,8 @@ import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
 import org.medtroniclabs.uhis.ui.boarding.ResourceLoadingSyncProgress
 import org.medtroniclabs.uhis.ui.medicalreview.motherneonate.anc.MotherNeonateUtil
 import org.medtroniclabs.uhis.ui.medicalreview.utils.MedicalReviewTypeEnums
+import org.medtroniclabs.uhis.ui.patient.UIConstants.ENROLLMENT_UNIQUE_ID
+import org.medtroniclabs.uhis.ui.patient.UIConstants.SCREENING_UNIQUE_ID
 import java.lang.reflect.Type
 import java.util.Locale
 import javax.inject.Inject
@@ -151,10 +156,21 @@ class MetaRepository @Inject constructor(
                                 SecuredPreference.EnvironmentKey.DEFAULT_SITE_ID.name,
                                 defaultHealthFacility.fhirId,
                             )
+
+                            chiefdoms?.let { chiefdomList ->
+                                roomHelper.deleteChiefDoms()
+                                roomHelper.saveChiefDoms(chiefdomList)
+                            }
+
                             deleteAllVillages()
                             saveVillage(modifiedVillages(villages, userProfile.villages))
-                            // Save SubVillages which are linked to shasthya shebikas
-                            saveSubVillages(shasthyaShebikas?.flatMap { it.subVillages ?: emptyList() })
+                            if (CommonUtils.isNurse()) {
+                                // Save SubVillages which are linked to Nurse
+                                saveSubVillages(subVillages)
+                            } else {
+                                // Save SubVillages which are linked to shasthya shebikas
+                                saveSubVillages(shasthyaShebikas?.flatMap { it.subVillages ?: emptyList() })
+                            }
                             // Save ShasthyaShebikas (includes saving linked subVillages)
                             saveShasthyaShebikas(shasthyaShebikas)
                             saveShasthyaKormisFromMeta(shasthyaKormis)
@@ -196,10 +212,7 @@ class MetaRepository @Inject constructor(
                                 roomHelper.deleteDistricts()
                                 roomHelper.saveDistricts(districtList)
                             }
-                            chiefdoms?.let { chiefdomList ->
-                                roomHelper.deleteChiefDoms()
-                                roomHelper.saveChiefDoms(chiefdomList)
-                            }
+
                             programs?.let {
                                 roomHelper.deletePrograms()
                                 val list = ArrayList<ProgramEntity>()
@@ -250,6 +263,24 @@ class MetaRepository @Inject constructor(
                                         saveFormsInDb(it)
                                     } ?: run {
                                         return@with Resource(state = ResourceState.ERROR)
+                                    }
+
+                                    enrollment?.let {
+                                        roomHelper.insertConsentForm(
+                                            ConsentForm(
+                                                type = ENROLLMENT_UNIQUE_ID,
+                                                content = it.consentForm,
+                                            ),
+                                        )
+                                    }
+
+                                    screening?.let {
+                                        roomHelper.insertConsentForm(
+                                            ConsentForm(
+                                                type = SCREENING_UNIQUE_ID,
+                                                content = it.consentForm,
+                                            ),
+                                        )
                                     }
                                 }
                                 if (CommonUtils.isNonCommunity()) {
@@ -346,8 +377,8 @@ class MetaRepository @Inject constructor(
                                     }
 
                                     res.diagnosis?.let {
-                                        roomHelper.deleteNCDDiagnosisList()
-                                        roomHelper.saveNCDDiagnosisList(it)
+                                        roomHelper.deleteDiagnosisList()
+                                        roomHelper.saveDiagnosis(it)
                                     }
 
                                     res.reasons?.let {
@@ -419,6 +450,47 @@ class MetaRepository @Inject constructor(
         }
     }
 
+    private fun updateSiteResponse(
+        fromOs: SiteResponse?,
+        siteResponse: SiteResponse,
+        list: ArrayList<SiteEntity>,
+        name: String,
+        responseBody: MetaDataResponse,
+    ) {
+        if (siteResponse.roleName.isNotEmpty() &&
+            (siteResponse.roleDisplayName?.isNotEmpty() == true)
+        ) {
+            SecuredPreference.getUserId()?.let { userId ->
+                list.add(
+                    SiteEntity(
+                        id = siteResponse._id,
+                        name = name,
+                        userSite = true,
+                        role = siteResponse.roleName[0],
+                        roleName = siteResponse.roleDisplayName[0],
+                        userId = userId,
+                        tenantId = siteResponse.tenantId,
+                        countyId = siteResponse.countyId,
+                        accountId = siteResponse.accountId,
+                        subCountyId = siteResponse.subCountyId,
+                        isDefault = siteResponse._id == responseBody.defaultHealthFacility.id,
+                        isQualipharmEnabledSite = siteResponse.isQualipharmEnabledSite,
+                        siteLevel = siteResponse.siteLevel,
+                        bpLog = fromOs?.workflows?.bpLog == true,
+                        glucoseLog = fromOs?.workflows?.glucoseLog == true,
+                        phq4 = fromOs?.workflows?.phq4 == true,
+                        cataract = fromOs?.workflows?.cataract == true,
+                        eyeCare = fromOs?.workflows?.eyeCare == true,
+                        countyName = siteResponse.countyName,
+                        subCountyName = siteResponse.subCountyName,
+                        countryName = siteResponse.countryName,
+                        code = siteResponse.code,
+                    ),
+                )
+            }
+        }
+    }
+
     private fun insertPrescriptionInstruction(items: List<String>): List<MedicalReviewMetaItems> {
         var itemId = 1L
         val resultList = ArrayList<MedicalReviewMetaItems>()
@@ -444,7 +516,7 @@ class MetaRepository @Inject constructor(
         val currentLocaleId = SecuredPreference.getCultureId()
         for (i in 0 until cultureList.size) {
             if (currentLocaleId <= 0) {
-                if (cultureList[i].name.contains(DefinedParams.EN_Locale, ignoreCase = true)) {
+                if (cultureList[i].name.contains(DefinedParams.EN_LOCALE, ignoreCase = true)) {
                     SecuredPreference.setUserPreference(
                         cultureList[i].id,
                         cultureList[i].name,
@@ -479,13 +551,13 @@ class MetaRepository @Inject constructor(
     }
 
     private fun modifiedVillages(
-        allVillages: List<VillageEntity>,
+        allVillages: List<VillageEntity>?,
         userVillages: List<VillageEntity>?,
     ): List<VillageEntity> {
-        allVillages.forEach { root ->
+        allVillages?.forEach { root ->
             root.isUserVillage = userVillages?.firstOrNull { it.id == root.id } != null
         }
-        if (allVillages.isNotEmpty()) {
+        if (allVillages != null && allVillages.isNotEmpty()) {
             val storedVillages = SecuredPreference.getLongList(SecuredPreference.EnvironmentKey.LINKED_VILLAGE_IDS.name)
             val newVillages = allVillages.filter { it.isUserVillage }.map { it.id }
             val hasChanges = storedVillages.isEmpty() || storedVillages.toSet() != newVillages.toSet()
@@ -496,7 +568,12 @@ class MetaRepository @Inject constructor(
                 SecuredPreference.saveLongList(SecuredPreference.EnvironmentKey.LINKED_VILLAGE_IDS.name, newVillages)
             }
         }
-        return allVillages
+
+        if (allVillages != null) {
+            return allVillages
+        } else {
+            return emptyList()
+        }
     }
 
     private suspend fun saveUserLinkedVillages(userHealthFacilities: List<HealthFacility>?) {
@@ -1426,6 +1503,11 @@ class MetaRepository @Inject constructor(
             }
         }
     }
+
+    suspend fun getConsentHtmlRawString(
+        formType: String,
+        userId: Long,
+    ) = roomHelper.getConsentFormByType(formType)
 
     suspend fun riskFactorListing() = roomHelper.getAllRiskFactorEntityList()
 

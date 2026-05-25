@@ -64,7 +64,7 @@ class NCDPregnancyViewModel @Inject constructor(
     fun ncdPregnancyDetails(id: String) {
         viewModelScope.launch(dispatcherIO) {
             val request = HashMap<String, Any>().apply {
-                put(DefinedParams.id, id)
+                put(DefinedParams.ID, id)
             }
             ncdPregnancyDetailsResponse.postLoading()
             ncdPregnancyDetailsResponse.postValue(

@@ -438,7 +438,7 @@ class NCDMedicalReviewCMRActivity : BaseActivity(), View.OnClickListener, AncVis
                     intent.putExtra(DefinedParams.FhirId, getFhirId())
                     intent.putExtra(DefinedParams.PatientId, getPatientId())
                     intent.putExtra(DefinedParams.ORIGIN, getOrigin())
-                    intent.putExtra(DefinedParams.Gender, getGender())
+                    intent.putExtra(DefinedParams.GENDER, getGender())
                     intent.putExtra(EncounterReference, getEncounterReference())
                     startActivity(intent)
                 }
@@ -494,12 +494,12 @@ class NCDMedicalReviewCMRActivity : BaseActivity(), View.OnClickListener, AncVis
             binding.btnLayout.ivPrescriptionImgView.id -> {
                 withNetworkAvailability(online = {
                     val intent = Intent(this, NCDPrescriptionActivity::class.java)
-                    intent.putExtra(ORIGIN, DefinedParams.MedicalReview)
+                    intent.putExtra(ORIGIN, DefinedParams.MEDICAL_REVIEW)
                     intent.putExtra(DefinedParams.EnrollmentType, patientDetailViewModel.getEnrollmentType())
                     intent.putExtra(Screening.identityValue, patientDetailViewModel.getIdentityValue())
                     intent.putExtra(DefinedParams.PatientId, patientDetailViewModel.getPatientId())
-                    intent.putExtra(DefinedParams.id, patientDetailViewModel.getPatientFHIRId())
-                    intent.putExtra(DefinedParams.PatientVisitId, getEncounterReference())
+                    intent.putExtra(DefinedParams.ID, patientDetailViewModel.getPatientFHIRId())
+                    intent.putExtra(DefinedParams.PATIENT_VISIT_ID, getEncounterReference())
                     getResult.launch(intent)
                 })
             }
@@ -532,7 +532,7 @@ class NCDMedicalReviewCMRActivity : BaseActivity(), View.OnClickListener, AncVis
 
     private fun getOrigin(): String? = intent.getStringExtra(DefinedParams.ORIGIN)
 
-    private fun getGender(): String? = intent.getStringExtra(DefinedParams.Gender)
+    private fun getGender(): String? = intent.getStringExtra(DefinedParams.GENDER)
 
     private fun getEncounterReference(): String? = intent.getStringExtra(EncounterReference)
 

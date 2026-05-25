@@ -509,7 +509,7 @@ class NCDMedicalReviewActivity :
             putExtra(DefinedParams.FhirId, patientDetailViewModel.getPatientFHIRId())
             putExtra(DefinedParams.PatientId, patientDetailViewModel.getPatientId())
             putExtra(ORIGIN, MenuConstants.REGISTRATION.lowercase())
-            putExtra(DefinedParams.Gender, patientDetailViewModel.getGender())
+            putExtra(DefinedParams.GENDER, patientDetailViewModel.getGender())
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         startActivity(intent)
@@ -835,12 +835,12 @@ class NCDMedicalReviewActivity :
     fun showPrescription() {
         withNetworkAvailability(online = {
             val intent = Intent(this, NCDPrescriptionActivity::class.java)
-            intent.putExtra(ORIGIN, DefinedParams.MedicalReview)
+            intent.putExtra(ORIGIN, DefinedParams.MEDICAL_REVIEW)
             intent.putExtra(DefinedParams.EnrollmentType, patientDetailViewModel.getEnrollmentType())
             intent.putExtra(Screening.identityValue, patientDetailViewModel.getIdentityValue())
             intent.putExtra(DefinedParams.PatientId, patientDetailViewModel.getPatientId())
-            intent.putExtra(DefinedParams.id, patientDetailViewModel.getPatientFHIRId())
-            intent.putExtra(DefinedParams.PatientVisitId, getEncounterReference())
+            intent.putExtra(DefinedParams.ID, patientDetailViewModel.getPatientFHIRId())
+            intent.putExtra(DefinedParams.PATIENT_VISIT_ID, getEncounterReference())
             getResult.launch(intent)
         })
     }
@@ -1006,7 +1006,7 @@ class NCDMedicalReviewActivity :
                                 id = chip.id,
                                 name = chip.name,
                                 value = if (chip.name.equals(
-                                        DefinedParams.Other,
+                                        DefinedParams.OTHER,
                                         true,
                                     )
                                 ) {
@@ -1016,7 +1016,7 @@ class NCDMedicalReviewActivity :
                                 } else {
                                     chip.value
                                 },
-                                other = chip.name.equals(DefinedParams.Other, true),
+                                other = chip.name.equals(DefinedParams.OTHER, true),
                             )
                         },
                         drugAllergies = currentMedicationViewModel.drugAllergies,
@@ -1030,7 +1030,7 @@ class NCDMedicalReviewActivity :
                         id = chip.id,
                         name = chip.name,
                         value = if (chip.name.equals(
-                                DefinedParams.Other,
+                                DefinedParams.OTHER,
                                 true,
                             )
                         ) {
@@ -1040,7 +1040,7 @@ class NCDMedicalReviewActivity :
                         } else {
                             chip.value
                         },
-                        other = chip.name.equals(DefinedParams.Other, true),
+                        other = chip.name.equals(DefinedParams.OTHER, true),
                     )
                 }
 
@@ -1049,7 +1049,7 @@ class NCDMedicalReviewActivity :
                         id = chip.id,
                         name = chip.name,
                         value = if (chip.name.equals(
-                                DefinedParams.Other,
+                                DefinedParams.OTHER,
                                 true,
                             )
                         ) {
@@ -1059,7 +1059,7 @@ class NCDMedicalReviewActivity :
                         } else {
                             chip.value
                         },
-                        other = chip.name.equals(DefinedParams.Other, true),
+                        other = chip.name.equals(DefinedParams.OTHER, true),
                     )
                 }
 
@@ -1093,7 +1093,7 @@ class NCDMedicalReviewActivity :
                         id = chip.id,
                         name = chip.name,
                         value = chip.value,
-                        other = chip.name.equals(DefinedParams.Other, true),
+                        other = chip.name.equals(DefinedParams.OTHER, true),
                     )
                 },
                 clinicalNote = clinicalNotesViewModel.comments.trim().takeIf { it.isNotBlank() },
@@ -1102,7 +1102,7 @@ class NCDMedicalReviewActivity :
                         id = chip.id,
                         name = chip.name,
                         value = chip.value,
-                        other = chip.name.equals(DefinedParams.Other, true),
+                        other = chip.name.equals(DefinedParams.OTHER, true),
                     )
                 },
                 physicalExamComments = obstetricExaminationViewModel.comments

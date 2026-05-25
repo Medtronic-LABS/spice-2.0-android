@@ -51,7 +51,7 @@ class ImmunisationSummaryFragment : BaseFragment() {
             val bundle = Bundle()
             bundle.putString(DefinedParams.PatientId, patientId)
             bundle.putString(DefinedParams.DOB, dateOfBirth)
-            bundle.putString(DefinedParams.EncounterId, encounterId)
+            bundle.putString(DefinedParams.ENCOUNTER_ID, encounterId)
             fragment.arguments = bundle
             return fragment
         }
@@ -78,7 +78,7 @@ class ImmunisationSummaryFragment : BaseFragment() {
 
     private fun initView() {
         viewModel.getLastVaccineScheduleDateAndVaccinationDate()
-        arguments?.getString(DefinedParams.EncounterId)?.let { encounterId ->
+        arguments?.getString(DefinedParams.ENCOUNTER_ID)?.let { encounterId ->
             viewModel.getImmunisationSummaryDetails(encounterId)
         }
 

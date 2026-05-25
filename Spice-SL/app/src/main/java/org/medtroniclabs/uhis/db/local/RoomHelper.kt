@@ -31,8 +31,13 @@ import org.medtroniclabs.uhis.db.entity.ChiefDomEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowConditionEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowEntity
 import org.medtroniclabs.uhis.db.entity.CommunityProfile
+import org.medtroniclabs.uhis.db.entity.ComorbidityEntity
+import org.medtroniclabs.uhis.db.entity.ComplaintsEntity
+import org.medtroniclabs.uhis.db.entity.ComplicationEntity
 import org.medtroniclabs.uhis.db.entity.ConsentEntity
 import org.medtroniclabs.uhis.db.entity.ConsentForm
+import org.medtroniclabs.uhis.db.entity.CurrentMedicationEntity
+import org.medtroniclabs.uhis.db.entity.DiagnosisEntity
 import org.medtroniclabs.uhis.db.entity.DistrictEntity
 import org.medtroniclabs.uhis.db.entity.DosageDurationEntity
 import org.medtroniclabs.uhis.db.entity.FollowUp
@@ -56,6 +61,7 @@ import org.medtroniclabs.uhis.db.entity.NCDDiagnosisEntity
 import org.medtroniclabs.uhis.db.entity.NCDFollowUp
 import org.medtroniclabs.uhis.db.entity.NCDMedicalReviewMetaEntity
 import org.medtroniclabs.uhis.db.entity.NCDPatientDetailsEntity
+import org.medtroniclabs.uhis.db.entity.PhysicalExaminationEntity
 import org.medtroniclabs.uhis.db.entity.PregnancyDetail
 import org.medtroniclabs.uhis.db.entity.RiskFactorEntity
 import org.medtroniclabs.uhis.db.entity.RxBuddyDetails
@@ -66,7 +72,9 @@ import org.medtroniclabs.uhis.db.entity.ShasthyaKormiLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
+import org.medtroniclabs.uhis.db.entity.SiteEntity
 import org.medtroniclabs.uhis.db.entity.SubVillageEntity
+import org.medtroniclabs.uhis.db.entity.SymptomEntity
 import org.medtroniclabs.uhis.db.entity.TreatmentDetailsEntity
 import org.medtroniclabs.uhis.db.entity.TreatmentPlanEntity
 import org.medtroniclabs.uhis.db.entity.UserProfileEntity
@@ -348,6 +356,8 @@ interface RoomHelper {
 
     suspend fun getDiagnosisList(diagnosisType: String): List<DiseaseCategoryItems>
 
+    suspend fun getDiagnosisList(): List<DiagnosisEntity>
+
     suspend fun getExaminationQuestionsByWorkFlow(workFlowType: String): ExaminationListItems
 
     suspend fun insertFollowUp(followUp: FollowUp): Long
@@ -543,6 +553,8 @@ interface RoomHelper {
 
     fun getConsent(formType: String): LiveData<String>
 
+    suspend fun getConsentString(formType: String): String
+
     suspend fun deleteConsent()
 
     suspend fun saveModelQuestions(mentalHealthEntity: List<MentalHealthEntity>)
@@ -633,6 +645,8 @@ interface RoomHelper {
     ): LiveData<List<NCDMedicalReviewMetaEntity>>
 
     fun getLifeStyle(): LiveData<List<LifestyleEntity>>
+
+    suspend fun getLifeStyleList(): List<LifestyleEntity>
 
     fun getAssessmentFormData(
         formTypes: List<String>,
@@ -971,4 +985,116 @@ interface RoomHelper {
     )
 
     suspend fun deleteDuplicateAssessmentHistory(date: String)
+
+    suspend fun getFormBasedOnType(
+        formTypeOne: String,
+        formTypeTwo: String,
+    ): List<FormEntity>
+
+    suspend fun getVillageList(selectedParent: Long): List<VillageEntity>
+
+    suspend fun getOtherVillage(): VillageEntity
+
+    suspend fun getProgramList(site: String): Any
+
+    suspend fun getProgramList(
+        selectedParent: Long,
+        site: String,
+    ): Any
+
+    suspend fun getUpazilaListByDistrict(districtID: Long): List<SiteEntity>
+
+    suspend fun getUpazilaList(): Any
+
+    suspend fun updateSequenceCode(
+        villageId: Long,
+        newSequenceCode: Long,
+    )
+
+    suspend fun getScreeningRecordById(id: Long): ScreeningEntity
+
+    suspend fun getAccountSiteList(userId: Long): List<SiteEntity>
+
+    suspend fun getAccountSiteListByLevel(
+        userId: Long,
+        level: String,
+    ): List<SiteEntity>
+
+    suspend fun getUpazilaListEyeCareOnly(): Any
+
+    suspend fun getUpazilaListCataractOnly(): Any
+
+    suspend fun getSiteEntity(
+        userSite: Boolean,
+        userId: Long,
+    ): List<SiteEntity>
+
+    suspend fun getUpazilaById(upazilaId: Long): SiteEntity?
+
+    suspend fun getVillageById(villageId: Long): VillageEntity?
+
+    suspend fun getTreatmentPlanData(): List<TreatmentPlanEntity>
+
+    suspend fun getShortageReason(type: String): List<ShortageReasonEntity>
+
+    suspend fun getComorbidityBasedOnWorkflow(workflowList: ArrayList<String>): List<ComorbidityEntity>
+
+    suspend fun saveComorbidity(list: ArrayList<ComorbidityEntity>)
+
+    suspend fun deleteComorbidity()
+
+    suspend fun getComorbidity(): List<ComorbidityEntity>
+
+    suspend fun getComplication(): List<ComplicationEntity>
+
+    suspend fun saveComplication(list: ArrayList<ComplicationEntity>)
+
+    suspend fun deleteComplication()
+
+    suspend fun saveCurrentMedication(list: ArrayList<CurrentMedicationEntity>)
+
+    suspend fun deleteCurrentMedication()
+
+    suspend fun getCurrentMedicationList(): List<CurrentMedicationEntity>
+
+    suspend fun getCurrentMedicationList(type: String): List<CurrentMedicationEntity>
+
+    suspend fun savePhysicalExamination(list: ArrayList<PhysicalExaminationEntity>)
+
+    suspend fun deletePhysicalExamination()
+
+    suspend fun getPhysicalExaminationList(workFlowList: ArrayList<String>): List<PhysicalExaminationEntity>
+
+    suspend fun saveCompliants(list: ArrayList<ComplaintsEntity>)
+
+    suspend fun deleteCompliants()
+
+    suspend fun getChiefComplaints(workflowList: ArrayList<String>): List<ComplaintsEntity>
+
+    suspend fun getDiagnosis(
+        gender: ArrayList<String>,
+        type: ArrayList<String>,
+    ): List<DiagnosisEntity>
+
+    suspend fun saveSymptomList(symptoms: List<SymptomEntity>)
+
+    suspend fun deleteSymptoms()
+
+    suspend fun getSymptomsList(): List<SymptomEntity>
+
+    suspend fun getSymptomsListByType(type: String): List<SymptomEntity>
+
+    suspend fun getOperatingUnitSites(): List<SiteEntity>
+
+    suspend fun saveDiagnosis(diseaseEntityList: ArrayList<DiagnosisEntity>)
+
+    suspend fun deleteDiagnosisList()
+
+    suspend fun deleteAllSiteCache()
+
+    suspend fun saveSiteList(siteEntity: List<SiteEntity>)
+
+    suspend fun getAllChiefDoms(): List<ChiefDomEntity>
+
+    suspend fun getSubVillage(villageId: Long): List<SubVillageEntity>
 }

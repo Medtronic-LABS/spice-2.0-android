@@ -27,10 +27,10 @@ import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.CBS
 import org.medtroniclabs.uhis.common.DefinedParams.CONTACT_TRACING
 import org.medtroniclabs.uhis.common.DefinedParams.CbsNotifiableCondition
-import org.medtroniclabs.uhis.common.DefinedParams.IccmDiarrheaNotifiableCondition
-import org.medtroniclabs.uhis.common.DefinedParams.IccmFeverNotifiableCondition
-import org.medtroniclabs.uhis.common.DefinedParams.NotifiableConditions
-import org.medtroniclabs.uhis.common.DefinedParams.OtherNotifiableConditions
+import org.medtroniclabs.uhis.common.DefinedParams.ICCM_DIARRHEA_NOTIFIABLE_CONDITION
+import org.medtroniclabs.uhis.common.DefinedParams.ICCM_FEVER_NOTIFIABLE_CONDITION
+import org.medtroniclabs.uhis.common.DefinedParams.NOTIFIABLE_CONDITIONS
+import org.medtroniclabs.uhis.common.DefinedParams.OTHER_NOTIFIABLE_CONDITIONS
 import org.medtroniclabs.uhis.common.DefinedParams.OtherNotifiableConditionsForDiarrhoea
 import org.medtroniclabs.uhis.common.DefinedParams.OtherNotifiableConditionsForFever
 import org.medtroniclabs.uhis.common.DefinedParams.RmnchNotifiableCondition
@@ -471,10 +471,10 @@ class AssessmentViewModel @Inject constructor(
         val maternalDeath = pregnancyOutcomeMap[AssessmentDefinedParams.MATERNAL_DEATH] as? Map<String, Any?>
         val timeOfDeath = maternalDeath?.get(AssessmentDefinedParams.TIME_OF_DEATH)
         val hasTimeOfDeath = when (timeOfDeath) {
-            is String -> timeOfDeath.isNotBlank() && timeOfDeath != DefinedParams.DefaultID
+            is String -> timeOfDeath.isNotBlank() && timeOfDeath != DefinedParams.DEFAULT_ID
             is Map<*, *> -> {
                 val timeOfDeathId = timeOfDeath[DefinedParams.ID]?.toString()
-                !timeOfDeathId.isNullOrBlank() && timeOfDeathId != DefinedParams.DefaultID
+                !timeOfDeathId.isNullOrBlank() && timeOfDeathId != DefinedParams.DEFAULT_ID
             }
 
             else -> false
@@ -816,16 +816,16 @@ class AssessmentViewModel @Inject constructor(
             if (iccm.containsKey(Diarrhoea)) {
                 val diarrhoea = iccm[Diarrhoea] as HashMap<Any, Any>
 
-                if (diarrhoea.containsKey(IccmDiarrheaNotifiableCondition)) {
+                if (diarrhoea.containsKey(ICCM_DIARRHEA_NOTIFIABLE_CONDITION)) {
                     val cbsData = hashMapOf<String, Any>()
-                    diarrhoea[IccmDiarrheaNotifiableCondition]?.let {
-                        cbsData[NotifiableConditions] = it
+                    diarrhoea[ICCM_DIARRHEA_NOTIFIABLE_CONDITION]?.let {
+                        cbsData[NOTIFIABLE_CONDITIONS] = it
                     }
                     if (diarrhoea.containsKey(OtherNotifiableConditionsForDiarrhoea)) {
-                        cbsData[OtherNotifiableConditions] =
+                        cbsData[OTHER_NOTIFIABLE_CONDITIONS] =
                             diarrhoea[OtherNotifiableConditionsForDiarrhoea] as String
                     }
-                    diarrhoea.remove(IccmDiarrheaNotifiableCondition)
+                    diarrhoea.remove(ICCM_DIARRHEA_NOTIFIABLE_CONDITION)
                     diarrhoea.remove(OtherNotifiableConditionsForDiarrhoea)
                     diarrhoea[CBS.lowercase()] = cbsData
                 }
@@ -833,16 +833,16 @@ class AssessmentViewModel @Inject constructor(
 
             if (iccm.containsKey(fever.lowercase())) {
                 val fever = iccm[fever.lowercase()] as HashMap<Any, Any>
-                if (fever.containsKey(IccmFeverNotifiableCondition)) {
+                if (fever.containsKey(ICCM_FEVER_NOTIFIABLE_CONDITION)) {
                     val cbsData = hashMapOf<String, Any>()
-                    fever[IccmFeverNotifiableCondition]?.let {
-                        cbsData[NotifiableConditions] = it
+                    fever[ICCM_FEVER_NOTIFIABLE_CONDITION]?.let {
+                        cbsData[NOTIFIABLE_CONDITIONS] = it
                     }
                     if (fever.containsKey(OtherNotifiableConditionsForFever)) {
-                        cbsData[OtherNotifiableConditions] =
+                        cbsData[OTHER_NOTIFIABLE_CONDITIONS] =
                             fever[OtherNotifiableConditionsForFever] as String
                     }
-                    fever.remove(IccmFeverNotifiableCondition)
+                    fever.remove(ICCM_FEVER_NOTIFIABLE_CONDITION)
                     fever.remove(OtherNotifiableConditionsForFever)
                     fever[CBS.lowercase()] = cbsData
                 }
@@ -936,7 +936,7 @@ class AssessmentViewModel @Inject constructor(
 
                     cbs.remove(CbsNotifiableCondition)
                     cbs.remove(RmnchNotifiableCondition)
-                    cbs[NotifiableConditions] = conditions
+                    cbs[NOTIFIABLE_CONDITIONS] = conditions
 
                     map[CBS.lowercase()] = cbs
                 }
@@ -1052,7 +1052,7 @@ class AssessmentViewModel @Inject constructor(
 
     private fun getFlagTypeValue(value: Any): Boolean =
         when (value) {
-            is String -> value == DefinedParams.Yes
+            is String -> value == DefinedParams.YES
             is Boolean -> value
             else -> false
         }

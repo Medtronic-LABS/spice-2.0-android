@@ -216,15 +216,15 @@ class ReferralHistoryActivity : BaseActivity(), AncVisitCallBack {
         )
         intent.putExtra(DefinedParams.MEMBER_ID, patientDetailViewModel.getPatientMemberId())
         intent.putExtra(
-            DefinedParams.Gender,
-            this.intent.getStringExtra(DefinedParams.Gender),
+            DefinedParams.GENDER,
+            this.intent.getStringExtra(DefinedParams.GENDER),
         )
         intent.putExtra(
             DefinedParams.DOB,
             this.intent.getStringExtra(DefinedParams.DOB),
         )
         intent.putExtra(
-            DefinedParams.ChildPatientId,
+            DefinedParams.CHILD_PATIENT_ID,
             patientDetailViewModel.childPatientDetails,
         )
         intent.putExtra(
@@ -232,7 +232,7 @@ class ReferralHistoryActivity : BaseActivity(), AncVisitCallBack {
             patientDetailViewModel.dateOfDelivery,
         )
         intent.putExtra(
-            DefinedParams.NeonateOutcome,
+            DefinedParams.NEONATE_OUTCOME,
             patientDetailViewModel.neonateOutCome,
         )
         intent.putExtra(
@@ -252,7 +252,7 @@ class ReferralHistoryActivity : BaseActivity(), AncVisitCallBack {
             patientDetailViewModel.isEmtctFlow,
         )
         intent.putExtra(
-            DefinedParams.hivTestedPositive,
+            DefinedParams.HIV_TESTED_POSITIVE,
             patientDetailViewModel.hivTestedPositive,
         )
         startActivity(intent)

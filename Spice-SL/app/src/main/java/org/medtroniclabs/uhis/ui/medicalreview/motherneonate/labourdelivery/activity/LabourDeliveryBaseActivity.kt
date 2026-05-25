@@ -80,7 +80,7 @@ class LabourDeliveryBaseActivity :
         attachObserver()
         initializeListener()
         viewModel.patientId = intent.getStringExtra(DefinedParams.PatientId)
-        viewModel.isDirectPnc = intent.getBooleanExtra(DefinedParams.DirectPNCFlow, false)
+        viewModel.isDirectPnc = intent.getBooleanExtra(DefinedParams.DIRECT_PNC_FLOW, false)
         if (viewModel.isDirectPnc) {
             viewModel.setUserJourney(AnalyticsDefinedParams.MOTHERDIRECTPNC)
         } else {
@@ -299,11 +299,11 @@ class LabourDeliveryBaseActivity :
         val gson = Gson()
         val createLabourDeliveryRequestJson = gson.toJson(createLabourDeliveryRequest)
         val intent = Intent(this, MotherNeonatePncActivity::class.java).apply {
-            putExtra(DefinedParams.EncounterId, viewModel.encounterID)
+            putExtra(DefinedParams.ENCOUNTER_ID, viewModel.encounterID)
             putExtra(DefinedParams.PatientId, viewModel.patientId)
             putExtra(DefinedParams.ID, getStringExtra(DefinedParams.ID))
             putExtra(DefinedParams.LabourDeliveryData, createLabourDeliveryRequestJson)
-            putExtra(DefinedParams.DirectPNCFlow, true)
+            putExtra(DefinedParams.DIRECT_PNC_FLOW, true)
         }
         startActivity(intent)
     }
@@ -401,7 +401,7 @@ class LabourDeliveryBaseActivity :
         patientViewModel.patientDetailsLiveData.value?.data?.let { data ->
             val intent = Intent(this, InvestigationActivity::class.java)
             intent.putExtra(DefinedParams.PatientId, data.patientId)
-            intent.putExtra(DefinedParams.EncounterId, patientViewModel.encounterId)
+            intent.putExtra(DefinedParams.ENCOUNTER_ID, patientViewModel.encounterId)
             getResult.launch(intent)
         }
     }
@@ -476,7 +476,7 @@ class LabourDeliveryBaseActivity :
         patientViewModel.patientDetailsLiveData.value?.data?.let { data ->
             Intent(this, PrescriptionActivity::class.java).apply {
                 putExtra(DefinedParams.PatientId, data.patientId)
-                putExtra(DefinedParams.EncounterId, patientViewModel.encounterId)
+                putExtra(DefinedParams.ENCOUNTER_ID, patientViewModel.encounterId)
                 getResult.launch(this)
             }
         }
@@ -485,7 +485,7 @@ class LabourDeliveryBaseActivity :
     private val getResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.getStringExtra(DefinedParams.EncounterId)?.let { value ->
+                result.data?.getStringExtra(DefinedParams.ENCOUNTER_ID)?.let { value ->
                     patientViewModel.encounterId = value
                 }
             }

@@ -22,7 +22,7 @@ import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.COMMUNITY_ID
 import org.medtroniclabs.uhis.common.DefinedParams.COMMUNITY_NAME
 import org.medtroniclabs.uhis.common.DefinedParams.COMMUNITY_REGISTERED
-import org.medtroniclabs.uhis.common.DefinedParams.Other
+import org.medtroniclabs.uhis.common.DefinedParams.OTHER
 import org.medtroniclabs.uhis.common.DefinedParams.Value
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.StringConverter
@@ -257,7 +257,7 @@ class EditCommunityProfileFragment : BaseFragment(), FormEventListener, View.OnC
             val nearestPhuName = communityProfileViewModel.nearestPhu.takeIf { it.isNotBlank() }
                 ?: communityProfileViewModel.nearestHealthFacilityLiveData.value
                     ?.data
-                    ?.firstOrNull { (it[DefinedParams.isDefault] as? Boolean) == true }
+                    ?.firstOrNull { (it[DefinedParams.IS_DEFAULT] as? Boolean) == true }
                     ?.get(DefinedParams.NAME) ?: ""
 
             formGenerator.setValueForView(nearestPhuName, view)
@@ -635,6 +635,9 @@ class EditCommunityProfileFragment : BaseFragment(), FormEventListener, View.OnC
     ) {
     }
 
+    override fun onQRScanRequested() {
+    }
+
     fun getCurrentAnswerStatus(): Boolean = formGenerator.getResultMap().isNotEmpty()
 
     private fun validateCommunityDetails(): Boolean {
@@ -807,7 +810,7 @@ class EditCommunityProfileFragment : BaseFragment(), FormEventListener, View.OnC
 
         if (communityProfileViewModel.selectedNetworks.any {
                 it.first.equals(
-                    Other,
+                    OTHER,
                     true,
                 )
             }
