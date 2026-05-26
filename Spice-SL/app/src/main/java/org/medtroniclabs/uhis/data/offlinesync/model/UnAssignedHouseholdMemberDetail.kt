@@ -3,7 +3,7 @@ package org.medtroniclabs.uhis.data.offlinesync.model
 data class UnAssignedHouseholdMemberDetail(
     val memberId: String,
     val name: String,
-    val phoneNumber: String,
+    val phoneNumber: String?,
     val dateOfBirth: String,
     val gender: String,
     val villageId: Long,
