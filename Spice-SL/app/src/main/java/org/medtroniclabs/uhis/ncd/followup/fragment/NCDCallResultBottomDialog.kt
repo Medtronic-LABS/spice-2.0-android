@@ -380,7 +380,7 @@ class NCDCallResultBottomDialog : BottomSheetDialogFragment(), View.OnClickListe
             viewModel.callResultHashMap[DefinedParams.CALL_RESULT] = newSelection
             viewModel.unSuccessfulHashMap.clear()
             viewModel.patientStatusHashMap.clear()
-            if (newSelection == FollowUpCallStatus.UNSUCCESSFUL.name) {
+            if (newSelection == FollowUpCallStatus.UN_SUCCESSFUL.name) {
                 showUnsuccessfulReason()
                 enableForUnSuccessful()
                 binding.tvHealthFacilitySpinner.post {
@@ -462,7 +462,7 @@ class NCDCallResultBottomDialog : BottomSheetDialogFragment(), View.OnClickListe
         )
         flowList.add(
             getOptionMap(
-                FollowUpCallStatus.UNSUCCESSFUL.name,
+                FollowUpCallStatus.UN_SUCCESSFUL.name,
                 getString(R.string.un_successful),
             ),
         )

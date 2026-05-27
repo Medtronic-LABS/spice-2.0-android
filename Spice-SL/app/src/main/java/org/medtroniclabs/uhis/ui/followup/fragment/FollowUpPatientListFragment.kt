@@ -39,8 +39,9 @@ class FollowUpPatientListFragment : BaseFragment(), FollowUpDialogFragment.Follo
     private val dialerLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK || result.resultCode == RESULT_CANCELED) {
+                viewModel.callEndTime = System.currentTimeMillis()
                 CallResultDialogFragment
-                    .newInstance()
+                    .newInstance(DefinedParams.SCREENED)
                     .show(childFragmentManager, CallResultDialogFragment.TAG)
             }
         }
@@ -114,6 +115,7 @@ class FollowUpPatientListFragment : BaseFragment(), FollowUpDialogFragment.Follo
     }
 
     override fun onCallClicked() {
+        viewModel.callStartTime = System.currentTimeMillis()
         SecuredPreference.putString(DefinedParams.FollowUpStartTiming, AnalyticsUtils.getCurrentDateTimeInLocalTime())
         viewModel.selectedFollowUpDetail?.let { data ->
             data.phoneNumber?.let { phoneNumber ->

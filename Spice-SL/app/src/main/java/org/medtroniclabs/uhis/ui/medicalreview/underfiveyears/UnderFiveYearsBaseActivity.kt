@@ -407,7 +407,7 @@ class UnderFiveYearsBaseActivity :
         val ageInMonth = details.birthDate?.let { DateUtils.calculateAgeInMonths(it) }
         val bundle = Bundle().apply {
             putString(DefinedParams.GENDER, details.gender)
-            ageInMonth?.first?.let { putInt(DefinedParams.Age, it) }
+            ageInMonth?.first?.let { putInt(DefinedParams.AGE, it) }
         }
         replaceFragmentInId<ClinicalSummaryUnderFiveYearsFragment>(
             binding.clinicalSummaryContainer.id,

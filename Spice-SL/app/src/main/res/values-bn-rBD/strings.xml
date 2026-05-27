@@ -1788,4 +1788,23 @@
 
     <string name="both">উভয়</string>
     <string name="upazilla_health_complex">উপজেলা স্বাস্থ্য কমপ্লেক্স</string>
+    <string name="unsuccessful">ব্যার্থ</string>
+    <string name="willing_to_visit_uhc">উপজেলা স্বাস্থ্য কমপ্লেক্সে যেতে রাজি কিনা?</string>
+    <string name="other_reasons">Other Reasons</string>
+    <string-array name="call_failure_reason_for_sk">
+        <item>--Select--</item>
+        <item>অন্য কোন স্বাস্থ্যকেন্দ্র থেকে চিকিৎসা নেন</item>
+        <item>ওষুধ নাই</item>
+        <item>অনেক দূরত্ব</item>
+        <item>যাতায়াত ও ওষুধ ক্রয়ের অতিরিক্ত খরচ</item>
+        <item>দীর্ঘ সময় লাইনে দাঁড়িয়ে থাকা</item>
+        <item>অন্যত্র চলে গিয়েছেন</item>
+        <item>মারা গিয়েছেন</item>
+        <item>অন্যান্য </item>
+    </string-array>
+    <string-array name="call_unsuccessful_reasons">
+        <item>--Select--</item>
+        <item>ভুল নাম্বার</item>
+        <item>সংযোগ স্থাপন করা সম্ভব হয়নি</item>
+    </string-array>
 </resources>

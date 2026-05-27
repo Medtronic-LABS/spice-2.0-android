@@ -670,4 +670,13 @@
         <item name="android:paddingBottom">@dimen/_15sdp</item>
     </style>
 
+    <style name="AnswerTextView">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
 </resources>

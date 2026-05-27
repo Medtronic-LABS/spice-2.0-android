@@ -425,11 +425,11 @@ class ClinicalSummaryFragment : BaseFragment(), View.OnClickListener {
         binding.apply {
             etWAZ.isEnabled = false
             etWHZ.isEnabled = false
-            if (arguments?.getInt(DefinedParams.Age)?.toString()?.toInt() in 0..60) {
+            if (arguments?.getInt(DefinedParams.AGE)?.toString()?.toInt() in 0..60) {
                 val onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
                     if (!hasFocus) {
                         val gender = arguments?.getString(DefinedParams.GENDER)
-                        val age = arguments?.getInt(DefinedParams.Age)?.toString()
+                        val age = arguments?.getInt(DefinedParams.AGE)?.toString()
                         val weight = etWeight.text?.toString()
                         val height = etHeight.text?.toString()
 

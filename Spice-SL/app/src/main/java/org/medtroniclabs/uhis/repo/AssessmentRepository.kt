@@ -212,7 +212,7 @@ class AssessmentRepository @Inject constructor(
                     DefinedParams.NAME to healthFacilityEntity.name,
                     DefinedParams.ID to healthFacilityEntity.fhirId.toString(),
                     DefinedParams.IS_DEFAULT to healthFacilityEntity.isDefault,
-                    DefinedParams.phoneNumber to (healthFacilityEntity.phoneNumber ?: ""),
+                    DefinedParams.PHONE_NUMBER to (healthFacilityEntity.phoneNumber ?: ""),
                 ),
             )
         }

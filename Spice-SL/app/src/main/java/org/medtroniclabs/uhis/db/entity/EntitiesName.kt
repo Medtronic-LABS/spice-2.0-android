@@ -17,4 +17,6 @@ object EntitiesName {
     const val MEMBER_ASSESSMENT_HISTORY_ENTITY = "MemberAssessmentHistory"
 
     const val FOLLOW_UP_CALL = "FollowUpCall"
+
+    const val FOLLOW_UP = "FollowUp"
 }

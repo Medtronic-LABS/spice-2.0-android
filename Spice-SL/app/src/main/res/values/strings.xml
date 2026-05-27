@@ -1864,4 +1864,23 @@
     <string name="linked_to_care">Linked to Care</string>
     <string name="both">Both</string>
     <string name="upazilla_health_complex">Upazila Health Complex</string>
+    <string name="unsuccessful">Unsuccessful</string>
+    <string name="willing_to_visit_uhc">Willing to visit UHC?</string>
+    <string name="other_reasons">Other Reasons</string>
+    <string-array name="call_failure_reason_for_sk">
+        <item>--Select--</item>
+        <item>Treatment from other facility</item>
+        <item>No Medicine</item>
+        <item>Long Distance</item>
+        <item>Transportation and unsupplied medicine cost</item>
+        <item>Long waiting queue</item>
+        <item>Migrated to other places</item>
+        <item>Died</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="call_unsuccessful_reasons">
+        <item>--Select--</item>
+        <item>Wrong Number</item>
+        <item>Unreachable</item>
+    </string-array>
 </resources>

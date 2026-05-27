@@ -171,7 +171,7 @@ object DefinedParams {
 
     const val name = "name"
 
-    const val Age = "age"
+    const val AGE = "age"
 
     const val Landing = "landing"
     const val Screening = "screening"
@@ -281,7 +281,7 @@ object DefinedParams {
     const val COMMUNITY_REGISTERED = "community_registered"
     const val CBS = "CBS"
     const val IS_DEFAULT = "isDefault"
-    const val phoneNumber = "phoneNumber"
+    const val PHONE_NUMBER = "phoneNumber"
     const val surveillanceDetails = "surveillanceDetails"
     const val ASSESSMENT_ID = "AssessmentId"
     const val type = "type"
@@ -403,4 +403,30 @@ object DefinedParams {
     const val HBA1C = "HbA1c"
 
     const val IS_OFFLINE = "isOffline"
+
+    const val CALL_START_TIME = "call_start_time"
+
+    const val OVERDUE = "OVERDUE"
+    const val MISSEDVISIT = "MISSED_VISIT"
+    const val REDRISK = "RED_RISK"
+    const val LTF = "LTF"
+    const val CALL_TYPE = "Call_Type"
+
+    /**
+     * Unsuccessful call reason
+     */
+    const val WRONG_NUMBER = "Wrong Number"
+    const val UNREACHABLE = "Unreachable"
+
+    /**
+     * Not willing to visit reasons
+     */
+    const val TREATMENT_FROM_OTHER_FACILITY = "Treatment from other facility"
+    const val NO_MEDICINE = "No Medicine"
+    const val LONG_DISTANCE = "Long Distance"
+    const val TRANSPORTATION_AND_UNSUPPLIED_MEDICINE_COST = "Transportation and unsupplied medicine cost."
+    const val LONG_WAITING_QUEUE = "Long waiting queue"
+    const val MIGRATED_TO_OTHER_PLACE = "Migrated to other places"
+    const val DIED = "Died"
+    const val COMPLIANCE_TYPE_OTHER = "Other"
 }

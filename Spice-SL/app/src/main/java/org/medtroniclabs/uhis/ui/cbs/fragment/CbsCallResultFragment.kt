@@ -171,7 +171,7 @@ class CbsCallResultFragment : BottomSheetDialogFragment(), View.OnClickListener 
                         getString(if (isPsType) R.string.informed_ps else R.string.informed_phu),
                         true,
                     ) -> FollowUpCallStatus.SUCCESSFUL
-                else -> FollowUpCallStatus.UNSUCCESSFUL
+                else -> FollowUpCallStatus.UN_SUCCESSFUL
             }
 
             val psAttempts = callResults.followUpDetails.filter { it.reason == PEER_SUPERVISOR }.size + 1

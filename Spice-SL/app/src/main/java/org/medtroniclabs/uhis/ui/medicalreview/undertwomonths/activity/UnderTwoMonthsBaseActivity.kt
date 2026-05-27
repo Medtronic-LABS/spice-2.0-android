@@ -295,7 +295,7 @@ class UnderTwoMonthsBaseActivity :
         val ageInMonth = details.birthDate?.let { DateUtils.calculateAgeInMonths(it) }
         val bundle = Bundle().apply {
             putString(DefinedParams.GENDER, details.gender)
-            ageInMonth?.first?.let { putInt(DefinedParams.Age, it) }
+            ageInMonth?.first?.let { putInt(DefinedParams.AGE, it) }
         }
         replaceFragment<ClinicalSummaryFragment>(binding.clinicalSummaryContainer.id, tag = ClinicalSummaryFragment.TAG, bundle = bundle)
         replaceFragment<ExaminationCardFragment>(binding.examinationsContainer.id, tag = ExaminationCardFragment.TAG)

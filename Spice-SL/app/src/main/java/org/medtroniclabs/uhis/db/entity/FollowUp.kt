@@ -6,8 +6,9 @@ import androidx.room.PrimaryKey
 import org.medtroniclabs.uhis.appextensions.convertToUtcDateTime
 import org.medtroniclabs.uhis.data.offlinesync.model.ProvanceDto
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineSyncStatus
+import org.medtroniclabs.uhis.db.entity.EntitiesName.FOLLOW_UP
 
-@Entity(tableName = "FollowUp")
+@Entity(tableName = FOLLOW_UP)
 data class FollowUp(
     @PrimaryKey(autoGenerate = true)
     val referenceId: Long = 0,

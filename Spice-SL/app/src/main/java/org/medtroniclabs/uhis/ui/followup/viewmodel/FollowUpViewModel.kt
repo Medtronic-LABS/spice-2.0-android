@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.postLoading
 import org.medtroniclabs.uhis.appextensions.postSuccess
+import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.FollowUpPatientModel
@@ -29,6 +30,7 @@ import org.medtroniclabs.uhis.ui.followup.FollowUpDefinedParams
 import org.medtroniclabs.uhis.ui.followup.FollowUpDefinedParams.FU_TYPE_HH_VISIT
 import org.medtroniclabs.uhis.ui.followup.FollowUpDefinedParams.FU_TYPE_MEDICAL_REVIEW
 import org.medtroniclabs.uhis.ui.followup.FollowUpDefinedParams.FU_TYPE_REFERRED
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,9 +40,6 @@ class FollowUpViewModel @Inject constructor(
     private val followUpRepository: FollowUpRepository,
     override val metaRepository: MetaRepository,
 ) : BaseFilterViewModel(dispatcherIO, metaRepository) {
-    val callResultHashMap = HashMap<String, Any>()
-    val patientStatusHashMap = HashMap<String, Any>()
-    val unSuccessfulHashMap = HashMap<String, Any>()
     var selectedFollowUpDetail: FollowUpPatientModel? = null
 
     private val filterLiveData = MutableLiveData<FollowUpFilter>()
@@ -55,6 +54,16 @@ class FollowUpViewModel @Inject constructor(
     private var maxUnSuccessfulCallLimit: Int = 5
     val addCallHistoryLiveData = MutableLiveData<Resource<Boolean>>()
     var informedCallAttempts: Int = 5
+
+    var callType: String? = null
+    var isSuccessful: Boolean? = null
+    var callResultStatus: FollowUpCallStatus = FollowUpCallStatus.SUCCESSFUL
+    var visitRejectReason: String? = null
+    var otherVisitRejectReason: String? = null
+    var unSuccessfulCallReason: String? = null
+    var isWillingToVisitUHC: Boolean? = null
+    var callStartTime: Long? = null
+    var callEndTime: Long? = null
 
     init {
         SecuredPreference.getFollowUpCriteria()?.let { followUpCriteria ->
@@ -199,25 +208,31 @@ class FollowUpViewModel @Inject constructor(
         viewModelScope.launch(dispatcherIO) {
             selectedFollowUpDetail?.let {
                 addCallHistoryLiveData.postLoading()
-                val callStatus =
-                    getCallStatus(callResultHashMap[DefinedParams.CALL_RESULT] as String)
-                val patientStatus = getPatientStatus(callStatus)
-                val unSuccessfulReason = getUnSuccessfulReason(callStatus)
+                val wrongNumber = if (!CommonUtils.isHealthScreener()) {
+                    unSuccessfulCallReason?.equals(
+                        DefinedParams.WRONG_NUMBER,
+                        ignoreCase = true,
+                    ) == true
+                } else {
+                    callResultStatus == FollowUpCallStatus.WRONG_NUMBER
+                }
                 followUpRepository.addCallHistory(
-                    maxSuccessfulCallLimit,
-                    maxUnSuccessfulCallLimit,
-                    informedCallAttempts,
                     it.id,
-                    callStatus,
-                    patientStatus,
-                    unSuccessfulReason,
+                    callType,
+                    callResultStatus,
+                    isWillingToVisitUHC,
+                    visitRejectReason,
+                    otherVisitRejectReason,
+                    unSuccessfulCallReason,
+                    wrongNumber,
+                    calculateTotalTimeTaken(),
                 )
                 setAnalyticsFollowUpData(
                     it.id,
                     it.patientId,
-                    callStatus,
-                    patientStatus,
-                    unSuccessfulReason,
+                    callResultStatus,
+                    it.patientStatus,
+                    visitRejectReason ?: unSuccessfulCallReason,
                     SecuredPreference.getString(DefinedParams.FollowUpStartTiming),
                 )
                 addCallHistoryLiveData.postSuccess(true)
@@ -225,25 +240,13 @@ class FollowUpViewModel @Inject constructor(
         }
     }
 
-    private fun getCallStatus(status: String): FollowUpCallStatus {
-        if (status == FollowUpCallStatus.SUCCESSFUL.name) {
-            return FollowUpCallStatus.SUCCESSFUL
+    /**
+     * Calculate total time taken during the call in miutes
+     */
+    private fun calculateTotalTimeTaken(): Double? =
+        callStartTime?.let { startTime ->
+            val endTime = callEndTime ?: System.currentTimeMillis()
+            val durationInMillis = endTime - startTime
+            durationInMillis / TimeUnit.MINUTES.toMillis(1).toDouble()
         }
-        return FollowUpCallStatus.UNSUCCESSFUL
-    }
-
-    private fun getPatientStatus(status: FollowUpCallStatus): String? {
-        if (status == FollowUpCallStatus.SUCCESSFUL && patientStatusHashMap.isNotEmpty()) {
-            return (patientStatusHashMap[DefinedParams.PATIENT_STATUS] as String)
-        }
-
-        return null
-    }
-
-    private fun getUnSuccessfulReason(status: FollowUpCallStatus): String? {
-        if (status == FollowUpCallStatus.UNSUCCESSFUL) {
-            return (unSuccessfulHashMap[DefinedParams.UN_SUCCESSFUL] as String)
-        }
-        return null
-    }
 }

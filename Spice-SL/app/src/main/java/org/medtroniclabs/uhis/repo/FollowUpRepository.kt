@@ -12,7 +12,6 @@ import org.medtroniclabs.uhis.db.entity.FollowUp
 import org.medtroniclabs.uhis.db.entity.FollowUpCall
 import org.medtroniclabs.uhis.db.local.RoomHelper
 import org.medtroniclabs.uhis.model.followup.FollowUpFilter
-import org.medtroniclabs.uhis.ui.assessment.referrallogic.utils.ReferralStatus
 import org.medtroniclabs.uhis.ui.followup.FollowUpDefinedParams
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -135,13 +134,15 @@ class FollowUpRepository @Inject constructor(
     suspend fun getUnSyncedFollowUpCount(): Int = roomHelper.getUnSyncedFollowUpCount()
 
     suspend fun addCallHistory(
-        maxSuccessfulCallLimit: Int,
-        maxUnSuccessfulCallLimit: Int,
-        informedCallAttempts: Int,
         followUpId: Long,
-        callStatus: FollowUpCallStatus,
-        patientStatus: String? = null,
-        reason: String? = null,
+        callType: String?,
+        status: FollowUpCallStatus,
+        isWillingToVisitUHC: Boolean?,
+        visitRejectReason: String?,
+        otherVisitRejectReason: String?,
+        unSuccessfulCallReason: String?,
+        wrongNumber: Boolean,
+        totalTimeTaken: Double?,
     ) {
         val followUp = roomHelper.getFollowUpById(followUpId)
         followUp.syncStatus = OfflineSyncStatus.NotSynced
@@ -153,101 +154,41 @@ class FollowUpRepository @Inject constructor(
         val callDetail = FollowUpCall(
             followUpId = followUpId,
             callDate = System.currentTimeMillis().convertToUtcDateTime(),
-            duration = 0,
+            duration = totalTimeTaken,
             attempts = followUp.attempts,
-            status = callStatus,
+            status = status,
             latitude = lat,
             longitude = lng,
-            callType = "",
-            isWillingToVisitUHC = true,
-            visitRejectReason = "",
-            otherVisitRejectReason = "",
-            unSuccessfulCallReason = "",
+            callType = callType,
+            isWillingToVisitUHC = isWillingToVisitUHC,
+            visitRejectReason = visitRejectReason,
+            otherVisitRejectReason = otherVisitRejectReason,
+            unSuccessfulCallReason = unSuccessfulCallReason,
+            wrongNumber = wrongNumber,
         )
 
-        var newFollowUp: FollowUp? = null
         if (callDetail.status == FollowUpCallStatus.SUCCESSFUL) {
-            newFollowUp = handleSuccessCall(followUpId, followUp, callDetail, maxSuccessfulCallLimit, informedCallAttempts)
+            handleSuccessCall(followUp)
         } else {
-            handleUnSuccessfulCall(followUpId, followUp, callDetail, maxUnSuccessfulCallLimit)
+            handleUnSuccessfulCall(followUp, callDetail)
         }
 
-        roomHelper.addCallHistory(followUp, callDetail, newFollowUp)
+        roomHelper.addCallHistory(followUp, callDetail)
     }
 
-    private suspend fun handleSuccessCall(
-        id: Long,
-        followUp: FollowUp,
-        call: FollowUpCall,
-        maxSuccessfulCallLimit: Int,
-        informedCallAttempts: Int,
-    ): FollowUp? {
-        // Get All other followup with same reason
-//        call.patientStatus?.let {
-//            updatePatientStatus(it, id, followUp)
-//        }
-
+    private fun handleSuccessCall(followUp: FollowUp) {
         followUp.successfulAttempts += 1
-//        if (call.patientStatus == INFORMED || call.patientStatus == NOT_INFORMED) {
-//            if (followUp.successfulAttempts >= informedCallAttempts) {
-//                followUp.isCompleted = true
-//                roomHelper.updateOtherDuplicateTickets(id, followUp)
-//            }
-//        } else {
-//            if (followUp.successfulAttempts >= maxSuccessfulCallLimit) {
-//                followUp.isCompleted = true
-//                roomHelper.updateOtherDuplicateTickets(id, followUp)
-//            }
-//        }
-
-        return null
     }
 
-    private suspend fun updatePatientStatus(
-        status: String,
-        id: Long,
-        followUp: FollowUp,
-    ) {
-        followUp.currentPatientStatus = status
-        val currentTime = System.currentTimeMillis()
-        followUp.updatedAt = currentTime
-        followUp.calledAt = currentTime
-        when (status.lowercase()) {
-            ReferralStatus.Recovered.name.lowercase() -> {
-                followUp.isCompleted = true
-                roomHelper.updateDuplicateTicketsAsCompleted(id, followUp)
-            }
-
-            ReferralStatus.Referred.name.lowercase() -> {
-                if (followUp.type == FollowUpDefinedParams.FU_TYPE_REFERRED) {
-                    roomHelper.updateOnTreatmentStatus(id, followUp, currentTime)
-                } else {
-                    followUp.isCompleted = true
-                    roomHelper.updateDuplicateTicketsAsCompleted(id, followUp)
-                }
-            }
-
-            else -> {
-                roomHelper.updateOnTreatmentStatus(id, followUp, currentTime)
-            }
-        }
-    }
-
-    private suspend fun handleUnSuccessfulCall(
-        followUpId: Long,
+    private fun handleUnSuccessfulCall(
         followUp: FollowUp,
         call: FollowUpCall,
-        maxUnSuccessfulCallLimit: Int,
     ) {
         followUp.unsuccessfulAttempts += 1
-        if (followUp.unsuccessfulAttempts >= maxUnSuccessfulCallLimit) {
+
+        if (call.wrongNumber) {
+            followUp.isWrongNumber = true
             followUp.isCompleted = true
         }
-
-//        if (call.reason?.equals(FollowUpDefinedParams.WRONG_NUMBER, true) == true) {
-//            followUp.isWrongNumber = true
-//            followUp.isCompleted = followUp.type != FollowUpDefinedParams.FU_TYPE_HH_VISIT
-//            roomHelper.updateOtherFollowUpForWrongNumber(followUpId, followUp.memberId)
-//        }
     }
 }
