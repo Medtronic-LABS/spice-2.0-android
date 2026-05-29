@@ -239,10 +239,10 @@ class HIVStatusFragment : BaseFragment() {
     private fun autoPopulatePregnantDetails() {
         if (patientViewModel
                 .getPregnancyBreastFeedStatus()
-                ?.equals(DefinedParams.yes, true) == true
+                ?.equals(DefinedParams.YES_SMALL, true) == true
         ) {
             viewModel.resultPregnantStatus[MedicalReviewTypeEnums.hivPreganancyBreastFeedingStatus.name] =
-                DefinedParams.yes
+                DefinedParams.YES_SMALL
             binding.lmbGroup.setVisible(true)
             binding.gestationalAgeGroup.setVisible(true)
             binding.expectedDateGroup.setVisible(true)
@@ -300,7 +300,7 @@ class HIVStatusFragment : BaseFragment() {
         { selectedID, _, _, _ ->
             viewModel.resultPregnantStatus[MedicalReviewTypeEnums.hivPreganancyBreastFeedingStatus.name] =
                 selectedID as? String ?: ""
-            val isValid = (selectedID as? String).equals(DefinedParams.yes, ignoreCase = true)
+            val isValid = (selectedID as? String).equals(DefinedParams.YES_SMALL, ignoreCase = true)
             showPregnantRelatedViews(isValid)
             setFragmentResult(
                 MedicalReviewDefinedParams.HIV_STATUS,

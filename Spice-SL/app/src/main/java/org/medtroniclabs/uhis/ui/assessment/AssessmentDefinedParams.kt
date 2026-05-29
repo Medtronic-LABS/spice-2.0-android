@@ -376,7 +376,6 @@ object AssessmentDefinedParams {
     const val PARITY_HIGH_RISK_THRESHOLD = 4
     const val NUMBER_OF_LIVING_CHILDREN_THRESHOLD = 1
     const val AGE_OF_LAST_CHILD_HIGH_RISK_YEARS = 2
-    const val WEEKS_SINGULAR_THRESHOLD = 1.0
     const val MONTHS_FOR_YEARS_DISPLAY = 12
     const val MONTHS_YEARS_SINGULAR_THRESHOLD = 1
 

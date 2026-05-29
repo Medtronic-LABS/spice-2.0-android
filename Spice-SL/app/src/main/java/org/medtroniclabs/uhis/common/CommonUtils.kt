@@ -1096,7 +1096,7 @@ object CommonUtils {
             val matchedItem = hivQuestionList.firstOrNull { item ->
                 resultMapPair.second.containsKey(item) &&
                     resultMapPair.second[item] is String &&
-                    (resultMapPair.second[item] as String).equals(DefinedParams.yes, true)
+                    (resultMapPair.second[item] as String).equals(DefinedParams.YES_SMALL, true)
             }
             if (matchedItem != null) {
                 status = true

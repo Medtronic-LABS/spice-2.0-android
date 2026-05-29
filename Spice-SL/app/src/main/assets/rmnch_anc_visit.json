@@ -373,8 +373,8 @@
             "cultureErrorMessage": "অনুগ্রহ করে নাড়ির গতির বৈধ মান লিখুন",
             "visibility": "visible",
             "maxLength": 5,
-            "minValue": 30,
-            "maxValue": 200,
+            "minValue": 20,
+            "maxValue": 150,
             "naValue": 0,
             "unitMeasurement": "bpm"
         },
@@ -671,7 +671,7 @@
             "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ মান লিখুন",
             "visibility": "visible",
             "maxLength": 2,
-            "maxValue": "31"
+            "maxValue": "30"
         },
         {
             "family": "vaccinationAndSupplements",
@@ -724,7 +724,7 @@
             "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ মান লিখুন",
             "visibility": "visible",
             "maxLength": 2,
-            "maxValue": "31"
+            "maxValue": "60"
         },
         {
             "family": "vaccinationAndSupplements",
@@ -741,7 +741,8 @@
             "errorMessage": "Please enter a valid number",
             "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ মান লিখুন",
             "visibility": "visible",
-            "maxLength": 3
+            "maxLength": 3,
+            "maxValue": "100"
         },
         {
             "family": "vaccinationAndSupplements",
@@ -773,7 +774,7 @@
             "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ মান লিখুন",
             "visibility": "visible",
             "maxLength": 2,
-            "maxValue": "31"
+            "maxValue": "60"
         },
         {
             "family": "vaccinationAndSupplements",
@@ -790,7 +791,8 @@
             "errorMessage": "Please enter a valid number",
             "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ মান লিখুন",
             "visibility": "visible",
-            "maxLength": 3
+            "maxLength": 3,
+            "maxValue": "100"
         },
         {
             "familyOrder": 3,

@@ -470,9 +470,13 @@ class AssessmentRMNCHFragment :
             RMNCH.ID_URINARY_BILIRUBIN,
             RMNCH.ID_PULSE,
             RMNCH.ID_HEMOGLOBIN,
-            RMNCH.ID_ECLAMPSIA,
             -> {
                 handlePncFieldStatusUpdate(id)
+            }
+
+            RMNCH.ID_ECLAMPSIA -> {
+                handlePncFieldStatusUpdate(id)
+                handleOnTreatmentHtnEclampsiaVisibility(resultMap)
             }
 
             RMNCH.ID_EDEMA,
@@ -484,6 +488,7 @@ class AssessmentRMNCHFragment :
             RMNCH.ID_KNOWN_HTN -> {
                 handlePncFieldStatusUpdate(id)
                 handlePncBpHighRiskHighlight()
+                handleOnTreatmentHtnEclampsiaVisibility(resultMap)
             }
 
             RMNCH.ID_GDM_PATIENT,
@@ -491,6 +496,7 @@ class AssessmentRMNCHFragment :
             -> {
                 handlePncFieldStatusUpdate(id)
                 handlePncBloodSugarHighRiskHighlight()
+                handleOnTreatmentDmGdmVisibility(resultMap)
             }
 
             RMNCH.ID_FASTING_BLOOD_SUGAR,
@@ -503,6 +509,61 @@ class AssessmentRMNCHFragment :
             AssessmentDefinedParams.DIASTOLIC,
             -> {
                 handlePncBpHighRiskHighlight()
+            }
+        }
+    }
+
+    /**
+     * Updates visibility of HTN/Eclampsia on-treatment radio group.
+     *
+     * The on-treatment field is shown when either Known HTN or Eclampsia is selected as "yes".
+     * Otherwise, child values are reset and the field is hidden.
+     */
+    private fun handleOnTreatmentHtnEclampsiaVisibility(resultMap: HashMap<String, Any>) {
+        handleOnTreatmentVisibility(
+            resultMap = resultMap,
+            treatmentFieldId = RMNCH.ID_ON_TREATMENT_HTN_ECLAMPSIA,
+            conditionFieldIds = arrayOf(RMNCH.ID_KNOWN_HTN, RMNCH.ID_ECLAMPSIA),
+        )
+    }
+
+    /**
+     * Updates visibility of DM/GDM on-treatment radio group.
+     *
+     * The on-treatment field is shown when either DM or GDM is selected as "yes".
+     * Otherwise, child values are reset and the field is hidden.
+     */
+    private fun handleOnTreatmentDmGdmVisibility(resultMap: HashMap<String, Any>) {
+        handleOnTreatmentVisibility(
+            resultMap = resultMap,
+            treatmentFieldId = RMNCH.ID_ON_TREATMENT_DM_GDM,
+            conditionFieldIds = arrayOf(RMNCH.ID_DM_PATIENT, RMNCH.ID_GDM_PATIENT),
+        )
+    }
+
+    /**
+     * Generic helper to control visibility for an on-treatment field based on one or more
+     * related condition fields.
+     *
+     * @param resultMap Current form values keyed by field id.
+     * @param treatmentFieldId Field id of the on-treatment radio group to show/hide.
+     * @param conditionFieldIds Condition field ids checked for "yes" to decide visibility.
+     */
+    private fun handleOnTreatmentVisibility(
+        resultMap: HashMap<String, Any>,
+        treatmentFieldId: String,
+        conditionFieldIds: Array<String>,
+    ) {
+        val onTreatmentView = formGenerator.getViewByTag(treatmentFieldId + rootSuffix)
+        val shouldShowOnTreatment = conditionFieldIds.any { fieldId ->
+            isValueEquals(resultMap[fieldId], DefinedParams.YES_SMALL)
+        }
+        onTreatmentView?.let {
+            if (shouldShowOnTreatment) {
+                onTreatmentView.visible()
+            } else {
+                formGenerator.resetChildViews(onTreatmentView)
+                onTreatmentView.gone()
             }
         }
     }
@@ -851,60 +912,33 @@ class AssessmentRMNCHFragment :
             if (ancVisitCountForPnc > 0) {
                 // HTN
                 val htnView = formGenerator.getViewByTag(RMNCH.ID_KNOWN_HTN + formGenerator.rootSuffix)
-                htnView?.let {
-                    formGenerator.disableView(htnView)
-                    (htnView.findViewWithTag(DefinedParams.yes) as? RadioButton)?.isEnabled = false
-                    (htnView.findViewWithTag(DefinedParams.NO_SMALL) as? RadioButton)?.isEnabled = false
-                    if (details?.pregnantWomanExistingIllness?.contains("HTN", true) == true) {
-                        (htnView.findViewWithTag(DefinedParams.yes) as? RadioButton)?.isChecked = true
-                    } else {
-                        (htnView.findViewWithTag(DefinedParams.NO_SMALL) as? RadioButton)?.isChecked = true
-                    }
+                disablePncIllnessView(RMNCH.ID_KNOWN_HTN)
+                setPncIllnessValue(RMNCH.ID_KNOWN_HTN) {
+                    details?.pregnantWomanExistingIllness?.contains("HTN", true) == true
                 }
 
                 // Eclampsia
-                val eclampsiaView = formGenerator.getViewByTag(RMNCH.ID_ECLAMPSIA + formGenerator.rootSuffix)
-                eclampsiaView?.let {
-                    formGenerator.disableView(eclampsiaView)
-                    (eclampsiaView.findViewWithTag(DefinedParams.yes) as? RadioButton)?.isEnabled = false
-                    (eclampsiaView.findViewWithTag(DefinedParams.NO_SMALL) as? RadioButton)?.isEnabled = false
-                    if (details?.highRiskPregnantWoman?.contains("Eclampsia", true) == true) {
-                        (eclampsiaView.findViewWithTag(DefinedParams.yes) as? RadioButton)?.isChecked = true
-                    } else {
-                        (eclampsiaView.findViewWithTag(DefinedParams.NO_SMALL) as? RadioButton)?.isChecked = true
-                    }
+                disablePncIllnessView(RMNCH.ID_ECLAMPSIA)
+                setPncIllnessValue(RMNCH.ID_ECLAMPSIA) {
+                    details?.pregnantWomanExistingIllness?.contains("Eclampsia", true) == true
                 }
 
                 // DM
-                val dmView = formGenerator.getViewByTag(RMNCH.ID_DM_PATIENT + formGenerator.rootSuffix)
-                dmView?.let {
-                    formGenerator.disableView(dmView)
-                    (dmView.findViewWithTag(DefinedParams.yes) as? RadioButton)?.isEnabled = false
-                    (dmView.findViewWithTag(DefinedParams.NO_SMALL) as? RadioButton)?.isEnabled = false
-                    if (details?.pregnantWomanExistingIllness?.contains("DM", true) == true) {
-                        // Mandatory during 1st PNC visit in case of
-                        // Woman had GDM or was a known DM patient
-                        bloodSugarMandatory = true
-                        (dmView.findViewWithTag(DefinedParams.yes) as? RadioButton)?.isChecked = true
-                    } else {
-                        (dmView.findViewWithTag(DefinedParams.NO_SMALL) as? RadioButton)?.isChecked = true
-                    }
+                disablePncIllnessView(RMNCH.ID_DM_PATIENT)
+                setPncIllnessValue(RMNCH.ID_DM_PATIENT) {
+                    // Mandatory during 1st PNC visit in case of
+                    // Woman had GDM or was a known DM patient
+                    bloodSugarMandatory = details?.pregnantWomanExistingIllness?.contains("DM", true) == true
+                    bloodSugarMandatory
                 }
 
                 // GDM
-                val gdmView = formGenerator.getViewByTag(RMNCH.ID_GDM_PATIENT + formGenerator.rootSuffix)
-                gdmView?.let {
-                    (gdmView.findViewWithTag(DefinedParams.yes) as? RadioButton)?.isEnabled = false
-                    (gdmView.findViewWithTag(DefinedParams.NO_SMALL) as? RadioButton)?.isEnabled = false
-                    formGenerator.disableView(gdmView)
-                    if (details?.highRiskPregnantWoman?.contains("GDM", true) == true) {
-                        // Mandatory during 1st PNC visit in case of
-                        // Woman had GDM or was a known DM patient
-                        bloodSugarMandatory = true
-                        (gdmView.findViewWithTag(DefinedParams.yes) as? RadioButton)?.isChecked = true
-                    } else {
-                        (gdmView.findViewWithTag(DefinedParams.NO_SMALL) as? RadioButton)?.isChecked = true
-                    }
+                disablePncIllnessView(RMNCH.ID_GDM_PATIENT)
+                setPncIllnessValue(RMNCH.ID_GDM_PATIENT) {
+                    // Mandatory during 1st PNC visit in case of
+                    // Woman had GDM or was a known DM patient
+                    bloodSugarMandatory = details?.pregnantWomanExistingIllness?.contains("GDM", true) == true
+                    bloodSugarMandatory
                 }
 
                 if (details?.highRiskPregnantWoman?.contains("Anemia", true) == true) {
@@ -940,20 +974,30 @@ class AssessmentRMNCHFragment :
                 val pncIllnessObject = JsonParser.parseString(pncIllness).asJsonObject
                 val dmPatient = pncIllnessObject.get(RMNCH.ID_DM_PATIENT).asString
                 val gdmPatient = pncIllnessObject.get(RMNCH.ID_GDM_PATIENT).asString
+                val htnPatient = pncIllnessObject.get(RMNCH.ID_KNOWN_HTN).asString
+                val eclampsiaPatient = pncIllnessObject.get(RMNCH.ID_ECLAMPSIA).asString
                 val isHighBloodSugar = pncIllnessObject.get(RMNCH.ID_BLOOD_SUGAR).asBoolean
                 // Mandatory during subsequent PNC visit if -
                 // Woman who had GDM or was a known DM patient OR
                 // Blood Sugar values were higher than normal
-                if (dmPatient.equals(DefinedParams.yes, true) ||
-                    gdmPatient.equals(DefinedParams.yes, true) ||
+                if (dmPatient.equals(DefinedParams.YES_SMALL, true) ||
+                    gdmPatient.equals(DefinedParams.YES_SMALL, true) ||
                     isHighBloodSugar
                 ) {
                     bloodSugarMandatory = true
                 }
-                formGenerator.getResultMap()[RMNCH.ID_DM_PATIENT] = pncIllnessObject.get(RMNCH.ID_DM_PATIENT).asString
-                formGenerator.getResultMap()[RMNCH.ID_GDM_PATIENT] = pncIllnessObject.get(RMNCH.ID_GDM_PATIENT).asString
-                formGenerator.getResultMap()[RMNCH.ID_KNOWN_HTN] = pncIllnessObject.get(RMNCH.ID_KNOWN_HTN).asString
-                formGenerator.getResultMap()[RMNCH.ID_ECLAMPSIA] = pncIllnessObject.get(RMNCH.ID_ECLAMPSIA).asString
+                setPncIllnessValue(RMNCH.ID_DM_PATIENT) {
+                    isValueEquals(dmPatient, DefinedParams.YES_SMALL)
+                }
+                setPncIllnessValue(RMNCH.ID_GDM_PATIENT) {
+                    isValueEquals(gdmPatient, DefinedParams.YES_SMALL)
+                }
+                setPncIllnessValue(RMNCH.ID_KNOWN_HTN) {
+                    isValueEquals(htnPatient, DefinedParams.YES_SMALL)
+                }
+                setPncIllnessValue(RMNCH.ID_ECLAMPSIA) {
+                    isValueEquals(eclampsiaPatient, DefinedParams.YES_SMALL)
+                }
                 val anemiaLevel = try {
                     AnemiaLevel.valueOf(pncIllnessObject.get(RMNCH.ID_ANEMIA).asString)
                 } catch (_: Exception) {
@@ -973,6 +1017,33 @@ class AssessmentRMNCHFragment :
     }
 
     /**
+     * Sets radio button status and updates map for pnc illness's
+     * like dm, gdm, htn, eclampsia
+     */
+    private fun setPncIllnessValue(
+        id: String,
+        hasIllness: () -> Boolean,
+    ) {
+        val illnessView = formGenerator.getViewByTag(id + formGenerator.rootSuffix)
+        illnessView?.let {
+            if (hasIllness()) {
+                (illnessView.findViewWithTag(DefinedParams.YES_SMALL) as? RadioButton)?.isChecked = true
+            } else {
+                (illnessView.findViewWithTag(DefinedParams.NO_SMALL) as? RadioButton)?.isChecked = true
+            }
+        }
+    }
+
+    private fun disablePncIllnessView(id: String) {
+        val illnessView = formGenerator.getViewByTag(id + formGenerator.rootSuffix)
+        illnessView?.let {
+            illnessView.isEnabled = false
+            (illnessView.findViewWithTag(DefinedParams.YES_SMALL) as? RadioButton)?.isEnabled = false
+            (illnessView.findViewWithTag(DefinedParams.NO_SMALL) as? RadioButton)?.isEnabled = false
+        }
+    }
+
+    /**
      * Manipulates form based on pregnancy details
      */
     private fun manageChildFormBasedOnPregnancyDetail(details: PregnancyDetail?) {
@@ -981,12 +1052,12 @@ class AssessmentRMNCHFragment :
             // CongenitalDefect
             val congenitalView = formGenerator.getViewByTag(AssessmentDefinedParams.ID_CONGENITAL_DEFECT + formGenerator.rootSuffix)
             congenitalView?.let {
-                (congenitalView.findViewWithTag("${DefinedParams.yes}_${AssessmentDefinedParams.ID_CONGENITAL_DEFECT}") as? View)?.isEnabled = false
+                (congenitalView.findViewWithTag("${DefinedParams.YES_SMALL}_${AssessmentDefinedParams.ID_CONGENITAL_DEFECT}") as? View)?.isEnabled = false
                 (congenitalView.findViewWithTag("${DefinedParams.NO_SMALL}_${AssessmentDefinedParams.ID_CONGENITAL_DEFECT}") as? View)?.isEnabled = false
                 formGenerator.disableView(congenitalView)
-                if (isValueEquals(details?.childCongenitalDefect, DefinedParams.yes)) {
+                if (isValueEquals(details?.childCongenitalDefect, DefinedParams.YES_SMALL)) {
                     formGenerator.getResultMap()[AssessmentDefinedParams.ID_CONGENITAL_DEFECT] = details?.childCongenitalDefect ?: ""
-                    (congenitalView.findViewWithTag("${DefinedParams.yes}_${AssessmentDefinedParams.ID_CONGENITAL_DEFECT}") as? View)?.isSelected = true
+                    (congenitalView.findViewWithTag("${DefinedParams.YES_SMALL}_${AssessmentDefinedParams.ID_CONGENITAL_DEFECT}") as? View)?.isSelected = true
                 } else if (isValueEquals(details?.childCongenitalDefect, DefinedParams.NO_SMALL)) {
                     formGenerator.getResultMap()[AssessmentDefinedParams.ID_CONGENITAL_DEFECT] = details?.childCongenitalDefect ?: ""
                     (congenitalView.findViewWithTag("${DefinedParams.NO_SMALL}_${AssessmentDefinedParams.ID_CONGENITAL_DEFECT}") as? View)?.isSelected = true
@@ -1320,15 +1391,14 @@ class AssessmentRMNCHFragment :
     }
 
     /**
-     * Evaluates calcium tablets status, if consumption is less than (days since delivery + 1) then gap
+     * Evaluates calcium tablets status, if consumption is less than (days since delivery i.e, from next day of delivery) then gap
      */
     private fun evaluateCalciumTabletStatus(): Pair<String, String?>? {
         val daysSinceDelivery = getDaysSinceDelivery()
         return daysSinceDelivery?.let {
-            val expectedTablets = daysSinceDelivery + 1
             val resultMap = formGenerator.getResultMap()
             val calciumConsumed = CommonUtils.getInteger(resultMap[RMNCH.ID_CALCIUM_TABLETS_CONSUMED])
-            if (calciumConsumed < expectedTablets) {
+            if (calciumConsumed < daysSinceDelivery) {
                 AssessmentDefinedParams.STATUS_GAP to AssessmentDefinedParams.BN_STATUS_GAP
             } else {
                 null
@@ -1339,15 +1409,14 @@ class AssessmentRMNCHFragment :
     }
 
     /**
-     * Evaluates ifa tablets status, if consumption is less than (days since delivery + 1) then gap
+     * Evaluates ifa tablets status, if consumption is less than (days since delivery i.e, from next day of delivery) then gap
      */
     private fun evaluateIfaTabletsStatus(): Pair<String, String?>? {
         val daysSinceDelivery = getDaysSinceDelivery()
         return daysSinceDelivery?.let {
-            val expectedTablets = daysSinceDelivery + 1
             val resultMap = formGenerator.getResultMap()
             val ifaConsumed = CommonUtils.getInteger(resultMap[RMNCH.ID_IFA_TABLETS_CONSUMED])
-            if (ifaConsumed < expectedTablets) {
+            if (ifaConsumed < daysSinceDelivery) {
                 AssessmentDefinedParams.STATUS_GAP to AssessmentDefinedParams.BN_STATUS_GAP
             } else {
                 null
@@ -1459,6 +1528,7 @@ class AssessmentRMNCHFragment :
                 AssessmentDefinedParams.STATUS_HIGH_FEVER,
                 AssessmentDefinedParams.BN_STATUS_HIGH_FEVER,
             )
+
             temp >= AssessmentDefinedParams.TEMP_FEVER_MIN_THRESHOLD && temp <= AssessmentDefinedParams.TEMP_FEVER_MAX_THRESHOLD -> Pair(
                 AssessmentDefinedParams.STATUS_FEVER,
                 AssessmentDefinedParams.BN_STATUS_FEVER,
@@ -1513,14 +1583,17 @@ class AssessmentRMNCHFragment :
                 AssessmentDefinedParams.STATUS_SEVERE_ANEMIA,
                 AssessmentDefinedParams.BN_STATUS_SEVERE_ANEMIA,
             )
+
             hb < AssessmentDefinedParams.HEMOGLOBIN_MODERATE_ANEMIA_THRESHOLD -> Pair(
                 AssessmentDefinedParams.STATUS_MODERATE_ANEMIA,
                 AssessmentDefinedParams.BN_STATUS_MODERATE_ANEMIA,
             )
+
             hb < AssessmentDefinedParams.HEMOGLOBIN_MILD_ANEMIA_THRESHOLD -> Pair(
                 AssessmentDefinedParams.STATUS_MILD_ANEMIA,
                 AssessmentDefinedParams.BN_STATUS_MILD_ANEMIA,
             )
+
             else -> null
         }
     }

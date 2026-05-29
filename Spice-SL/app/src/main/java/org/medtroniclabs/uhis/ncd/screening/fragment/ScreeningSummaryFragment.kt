@@ -214,7 +214,7 @@ class ScreeningSummaryFragment : BaseFragment(), View.OnClickListener {
                         val summaryValue = ArrayList<HivSummaryModel>()
                         for ((key, value) in map) {
                             value?.let { result ->
-                                if (result is String && result.equals(DefinedParams.yes, true) && key is String) {
+                                if (result is String && result.equals(DefinedParams.YES_SMALL, true) && key is String) {
                                     serverData.filter { it.id == key }[0].let { listForm ->
                                         listForm.orderId?.let { orderIndex ->
                                             summaryValue.add(

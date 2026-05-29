@@ -132,7 +132,7 @@ class ReferralResultGenerator {
             updateVisitCount(map, RMNCH.ANC)
         } else if (map.containsKey(RMNCH.ChildHoodVisit)) {
             val childVisitMap = map[RMNCH.ChildHoodVisit] as Map<String, Any>
-            if (CommonDefinedParams.yes
+            if (CommonDefinedParams.YES_SMALL
                     .equals(childVisitMap[AssessmentDefinedParams.ID_CHILD_REFERRAL] as? String, true)
             ) {
                 addResultMap(ReferralReasons.aliasOf(ReferralReasons.childhoodVisitSigns), ReferralStatus.Referred.name)

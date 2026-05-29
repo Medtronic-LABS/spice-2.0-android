@@ -538,7 +538,7 @@ class AssessmentViewModel @Inject constructor(
                 if (babyData is Map<*, *>) {
                     val isBabyAlive = babyData[AssessmentDefinedParams.IS_BABY_ALIVE]?.toString()
                     // Only create members for live babies
-                    if (isBabyAlive.equals(DefinedParams.yes, ignoreCase = true)) {
+                    if (isBabyAlive.equals(DefinedParams.YES_SMALL, ignoreCase = true)) {
                         val babyNumber = index + 1
                         val babyMap = HashMap<String, Any>()
                         babyMap[MemberRegistration.NAME] = "Baby $babyNumber of ${details.name}"

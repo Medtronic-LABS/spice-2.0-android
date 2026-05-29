@@ -97,7 +97,7 @@ object AssessmentStatusGenerator {
                         if (liveBirthNumbers > 0) {
                             val newbornDetailsList = AssessmentUtil.findNewbornDetailsFromMap(map)
                             val isAnyBabyDead = newbornDetailsList?.any { babyData ->
-                                babyData is Map<*, *> && !(DefinedParams.yes.equals(babyData[AssessmentDefinedParams.IS_BABY_ALIVE]?.toString(), true))
+                                babyData is Map<*, *> && !(DefinedParams.YES_SMALL.equals(babyData[AssessmentDefinedParams.IS_BABY_ALIVE]?.toString(), true))
                             }
                             if (isAnyBabyDead == true) {
                                 statusList.add(AssessmentStatus.NEONATAL_DEATH)

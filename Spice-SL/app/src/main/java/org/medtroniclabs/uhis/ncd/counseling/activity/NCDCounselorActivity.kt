@@ -185,7 +185,7 @@ class NCDCounselorActivity : BaseActivity(), View.OnClickListener {
             data.suicidalIdeation?.let { si ->
                 tvSuicidal.text = si.textOrHyphen().capitalizeFirstChar()
                 val color = if (si.equals(
-                        DefinedParams.yes,
+                        DefinedParams.YES_SMALL,
                         true,
                     )
                 ) {

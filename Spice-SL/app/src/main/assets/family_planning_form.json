@@ -47,7 +47,9 @@
       "title": "Age of last child",
       "hideDob": true,
       "titleCulture": "সবচেয়ে ছোট সন্তানের বয়স কত?",
-      "viewType": "AgeYMD",
+      "hint": "DD/MM/YYYY",
+      "hintCulture": "দিন/মাস/বছর",
+      "viewType": "AgeOrDob",
       "orderId": 2,
       "visibility": "gone"
     },

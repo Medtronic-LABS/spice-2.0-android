@@ -782,4 +782,6 @@ class AssessmentActivity : BaseActivity() {
         super.onResume()
         getCurrentLocation()
     }
+
+    override fun consumeImeInsets() = true
 }

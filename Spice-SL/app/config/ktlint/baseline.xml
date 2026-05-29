@@ -16,7 +16,6 @@
     <file name="src/main/java/org/medtroniclabs/uhis/common/DefinedParams.kt">
         <error line="16" column="15" source="standard:property-naming" />
         <error line="26" column="15" source="standard:property-naming" />
-        <error line="32" column="15" source="standard:property-naming" />
         <error line="51" column="15" source="standard:property-naming" />
         <error line="52" column="15" source="standard:property-naming" />
         <error line="53" column="15" source="standard:property-naming" />
@@ -67,7 +66,6 @@
         <error line="168" column="15" source="standard:property-naming" />
         <error line="170" column="15" source="standard:property-naming" />
         <error line="172" column="15" source="standard:property-naming" />
-        <error line="174" column="15" source="standard:property-naming" />
         <error line="176" column="15" source="standard:property-naming" />
         <error line="177" column="15" source="standard:property-naming" />
         <error line="178" column="15" source="standard:property-naming" />
@@ -92,7 +90,6 @@
         <error line="242" column="15" source="standard:property-naming" />
         <error line="243" column="15" source="standard:property-naming" />
         <error line="247" column="15" source="standard:property-naming" />
-        <error line="284" column="15" source="standard:property-naming" />
         <error line="285" column="15" source="standard:property-naming" />
         <error line="287" column="15" source="standard:property-naming" />
         <error line="288" column="15" source="standard:property-naming" />

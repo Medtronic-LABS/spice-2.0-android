@@ -29,7 +29,7 @@ object DefinedParams {
     const val TB_SCREENING = "tbScreening"
     const val NO = "No"
     const val YES = "Yes"
-    const val yes = "yes"
+    const val YES_SMALL = "yes"
     const val OTHER = "Other"
     const val ENABLED = "enabled"
     const val USERNAME = "username"

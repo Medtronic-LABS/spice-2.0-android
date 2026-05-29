@@ -788,7 +788,7 @@ class AssessmentRMNCHSummaryFragment : BaseFragment(), View.OnClickListener {
                 )
             }
         }
-        if (DefinedParams.yes.equals(pncChildMap[AssessmentDefinedParams.ID_CONGENITAL_DEFECT] as String?, true)) {
+        if (DefinedParams.YES_SMALL.equals(pncChildMap[AssessmentDefinedParams.ID_CONGENITAL_DEFECT] as String?, true)) {
             val congenitalChoiceId = pncChildMap[AssessmentDefinedParams.ID_CONGENITAL_DEFECT]?.toString()
             val congenitalDefectForm =
                 viewModel.formLayoutsLiveData.value
@@ -820,7 +820,7 @@ class AssessmentRMNCHSummaryFragment : BaseFragment(), View.OnClickListener {
         }
         if (pncChildMap.containsKey(AssessmentDefinedParams.ID_RECEIVED_VACCINE)) {
             val vaccinationStatus = pncChildMap[AssessmentDefinedParams.ID_RECEIVED_VACCINE]
-            val vaccinationStatusDisplay = if (DefinedParams.yes.equals(vaccinationStatus as String?, true)) {
+            val vaccinationStatusDisplay = if (DefinedParams.YES_SMALL.equals(vaccinationStatus as String?, true)) {
                 getString(R.string.taken)
             } else {
                 getString(R.string.not_taken)

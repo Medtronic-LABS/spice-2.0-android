@@ -191,8 +191,8 @@ object PNCAssessmentEvaluator {
                 )
             }
 
-            val dmPatient = isValueEquals(maternalAssessment[RMNCH.ID_DM_PATIENT], DefinedParams.yes)
-            val gdmPatient = isValueEquals(maternalAssessment[RMNCH.ID_GDM_PATIENT], DefinedParams.yes)
+            val dmPatient = isValueEquals(maternalAssessment[RMNCH.ID_DM_PATIENT], DefinedParams.YES_SMALL)
+            val gdmPatient = isValueEquals(maternalAssessment[RMNCH.ID_GDM_PATIENT], DefinedParams.YES_SMALL)
             val onTreatmentDmGdm = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_DM_GDM], DefinedParams.YES)
 
             // 6. On treatment for DM/GDM
