@@ -9,6 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -101,7 +102,8 @@ open class BaseFilterViewModel(
         onSearch: suspend (String) -> Unit,
     ): Job =
         searchQuery
-            .map { it?.trim().orEmpty() }
+            .map { it?.trim() }
+            .filterNotNull()
             .distinctUntilChanged()
             .flatMapLatest { query ->
                 when {

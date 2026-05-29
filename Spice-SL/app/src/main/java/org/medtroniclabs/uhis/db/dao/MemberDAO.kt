@@ -18,7 +18,6 @@ import org.medtroniclabs.uhis.db.entity.HouseholdMemberEntity
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
 import org.medtroniclabs.uhis.model.MemberDobGenderModel
 import org.medtroniclabs.uhis.model.assessment.AssessmentMemberDetails
-import org.medtroniclabs.uhis.model.services.ServiceMemberCounts
 import org.medtroniclabs.uhis.model.services.ServiceStaticFilter
 
 @Dao
@@ -485,208 +484,30 @@ interface MemberDAO {
     }
 
     /**
-     * Internal raw-query entry point for all counts. Use [getAllServiceMemberCounts] instead.
-     *
-     * The query should project all aliases required by [ServiceMemberCounts].
+     * Internal raw-query entry point for a single filter count. Use [getServiceMemberCountForFilter].
      */
     @RawQuery(observedEntities = [HouseholdEntity::class, HouseholdMemberEntity::class, MemberAssessmentHistoryEntity::class])
-    suspend fun getAllServiceMemberCountsRaw(query: SimpleSQLiteQuery): ServiceMemberCounts
+    suspend fun getServiceMemberCountRaw(query: SimpleSQLiteQuery): Int
 
     /**
-     * Returns counts for all service static filters in a single optimized query.
-     *
-     * Uses conditional aggregation (SUM/CASE WHEN) to compute all counts in one database pass.
-     * Dynamic filters are applied consistently with [getServiceMembers].
-     *
-     * **Filters** (all optional):
-     * @param searchInput match against member name or phone number; blank = no filter
-     * @param filterBySs whitelist of Shasthya Shebika IDs; empty = no filter
-     * @param filterBySubVillages whitelist of sub-village IDs; empty = no filter
-     *
-     * @return [ServiceMemberCounts] containing counts for each filter
+     * Returns the member count for one static service filter.
+     * Dynamic filters match [getServiceMembers].
      */
-    suspend fun getAllServiceMemberCounts(
+    suspend fun getServiceMemberCountForFilter(
+        staticFilter: ServiceStaticFilter,
         searchInput: String = "",
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
-        /** FO/PO: include members with null household_id using member-level area filters. */
-        allowNullHousehold: Boolean = false,
-    ): ServiceMemberCounts {
-        val args = mutableListOf<Any>()
-        val globalArgs = mutableListOf<Any>()
-        val globalConditions = mutableListOf<String>()
-
-        if (searchInput.isNotBlank()) {
-            globalConditions += "(hhm.name LIKE ? OR hhm.phone_number LIKE ?)"
-            val pattern = "%${searchInput.trim()}%"
-            globalArgs += pattern
-            globalArgs += pattern
-        }
-
-        val globalWhereClause = if (globalConditions.isEmpty()) "" else "WHERE ${globalConditions.joinToString(" AND ")}"
-
-        val placeHolders =
-            if (filterBySubVillages.isNotEmpty()) {
-                filterBySubVillages.joinToString(",") { "?" }
-            } else if (filterBySs.isNotEmpty()) {
-                filterBySs.joinToString(",") { "?" }
-            } else {
-                ""
-            }
-
-        val householdSubVillageFilters = mutableListOf<String>()
-        val householdFilterArgs = mutableListOf<Any>()
-        if (filterBySubVillages.isNotEmpty()) {
-            householdSubVillageFilters += "hh.sub_village_id IN ($placeHolders)"
-            householdFilterArgs.addAll(filterBySubVillages)
-        } else if (filterBySs.isNotEmpty()) {
-            householdSubVillageFilters +=
-                """
-                hh.sub_village_id IN (
-                    SELECT DISTINCT sslv.subVillageId
-                    FROM ShasthyaShebikaLinkedVillageEntity AS sslv
-                    WHERE sslv.shasthyaShebikaId IN ($placeHolders)
-                )
-                """.trimIndent()
-            householdFilterArgs.addAll(filterBySs)
-        }
-        val householdAreaFilter = if (householdSubVillageFilters.isNotEmpty()) {
-            "AND (${householdSubVillageFilters.joinToString(" OR ")})"
-        } else {
-            ""
-        }
-
-        val externalSubVillageFilters = mutableListOf<String>()
-        val externalFilterArgs = mutableListOf<Any>()
-        if (filterBySubVillages.isNotEmpty()) {
-            externalSubVillageFilters += "hhm.sub_village_id IN ($placeHolders)"
-            externalFilterArgs.addAll(filterBySubVillages)
-        } else if (filterBySs.isNotEmpty()) {
-            externalSubVillageFilters +=
-                """
-                hhm.sub_village_id IN (
-                    SELECT DISTINCT sslv.subVillageId
-                    FROM ShasthyaShebikaLinkedVillageEntity AS sslv
-                    WHERE sslv.shasthyaShebikaId IN ($placeHolders)
-                )
-                """.trimIndent()
-            externalFilterArgs.addAll(filterBySs)
-        }
-        val externalAreaFilter = if (externalSubVillageFilters.isNotEmpty()) {
-            "AND (${externalSubVillageFilters.joinToString(" OR ")})"
-        } else {
-            ""
-        }
-
-        val memberListScope =
-            if (allowNullHousehold) {
-                "1=1"
-            } else {
-                ServiceFilterConditions.HAS_HOUSEHOLD
-            }
-        val memberListAreaFilter = if (allowNullHousehold) externalAreaFilter else householdAreaFilter
-        val memberListAreaArgs = if (allowNullHousehold) externalFilterArgs else householdFilterArgs
-
-        val query =
-            """
-            SELECT
-                SUM(CASE WHEN
-                    $memberListScope
-                    $memberListAreaFilter
-                THEN 1 ELSE 0 END) AS all_members,
-
-                SUM(CASE WHEN
-                    ${ServiceFilterConditions.HAS_HOUSEHOLD}
-                    $householdAreaFilter
-                    AND ${ServiceFilterConditions.IS_ACTIVE}
-                    AND ${ServiceFilterConditions.FAMILY_PLANNING}
-                THEN 1 ELSE 0 END) AS family_planning,
-
-                SUM(CASE WHEN
-                    ${ServiceFilterConditions.HAS_HOUSEHOLD}
-                    $householdAreaFilter
-                    AND ${ServiceFilterConditions.IS_ACTIVE}
-                    AND ${ServiceFilterConditions.PREGNANT_WOMEN}
-                THEN 1 ELSE 0 END) AS pregnant_women,
-
-                SUM(CASE WHEN
-                    ${ServiceFilterConditions.HAS_HOUSEHOLD}
-                    $householdAreaFilter
-                    AND ${ServiceFilterConditions.IS_ACTIVE}
-                    AND ${ServiceFilterConditions.HIGH_RISK_PREGNANT_WOMEN}
-                THEN 1 ELSE 0 END) AS high_risk_pregnant,
-
-                SUM(CASE WHEN
-                    ${ServiceFilterConditions.HAS_HOUSEHOLD}
-                    $householdAreaFilter
-                    AND ${ServiceFilterConditions.IS_ACTIVE}
-                    AND ${ServiceFilterConditions.POSTNATAL_MOTHERS}
-                THEN 1 ELSE 0 END) AS postnatal_mothers,
-
-                SUM(CASE WHEN
-                    ${ServiceFilterConditions.HAS_HOUSEHOLD}
-                    $householdAreaFilter
-                    AND ${ServiceFilterConditions.CHILDREN_UNDER_TWO}
-                THEN 1 ELSE 0 END) AS children_under_two,
-
-                SUM(CASE WHEN
-                    ${ServiceFilterConditions.HAS_HOUSEHOLD}
-                    $householdAreaFilter
-                    AND ${ServiceFilterConditions.IS_ACTIVE}
-                    AND ${ServiceFilterConditions.EXPECTED_DELIVERIES}
-                THEN 1 ELSE 0 END) AS expected_deliveries,
-
-                SUM(CASE WHEN
-                    ${ServiceFilterConditions.HAS_HOUSEHOLD}
-                    $householdAreaFilter
-                    AND ${ServiceFilterConditions.IS_ACTIVE}
-                    AND ${ServiceFilterConditions.PENDING_DELIVERIES}
-                THEN 1 ELSE 0 END) AS pending_deliveries,
-
-                SUM(CASE WHEN
-                    ${ServiceFilterConditions.EXTERNAL_MEMBER}
-                    $externalAreaFilter
-                THEN 1 ELSE 0 END) AS external_members,
-
-                SUM(CASE WHEN
-                    ${ServiceFilterConditions.EXTERNAL_MEMBER}
-                    $externalAreaFilter
-                    AND ${ServiceFilterConditions.IS_ACTIVE}
-                    AND ${ServiceFilterConditions.PREGNANT_WOMEN}
-                THEN 1 ELSE 0 END) AS external_pregnant,
-
-                SUM(CASE WHEN
-                    $memberListScope
-                    $memberListAreaFilter
-                    AND ${ServiceFilterConditions.IS_ACTIVE}
-                    AND ${ServiceFilterConditions.HAS_NCD_SERVICE_HISTORY}
-                THEN 1 ELSE 0 END) AS ncd_services,
-
-                SUM(CASE WHEN
-                    $memberListScope
-                    $memberListAreaFilter
-                    AND ${ServiceFilterConditions.IS_ACTIVE}
-                    AND ${ServiceFilterConditions.HAS_CATARACT_SCREENING_HISTORY}
-                THEN 1 ELSE 0 END) AS cataract_screening,
-
-                SUM(CASE WHEN
-                    $memberListScope
-                    $memberListAreaFilter
-                    AND ${ServiceFilterConditions.IS_ACTIVE}
-                    AND ${ServiceFilterConditions.HAS_EYE_SCREENING_HISTORY}
-                THEN 1 ELSE 0 END) AS eye_screening
-            FROM householdmember AS hhm
-            LEFT JOIN Household AS hh ON hh.id = hhm.household_id
-            $globalWhereClause
-            """.trimIndent()
-
-        // Placeholder order in SELECT is:
-        // member-list area filter x11 (household- or member-scoped), external filter x2, then global WHERE args.
-        repeat(11) { args.addAll(memberListAreaArgs) }
-        repeat(2) { args.addAll(externalFilterArgs) }
-        args.addAll(globalArgs)
-
-        return getAllServiceMemberCountsRaw(SimpleSQLiteQuery(query, args.toTypedArray()))
+        allowNullHousehold: Boolean,
+    ): Int {
+        val query = ServiceMemberCountQueryBuilder.buildCountQuery(
+            staticFilter = staticFilter,
+            searchInput = searchInput,
+            filterBySs = filterBySs,
+            filterBySubVillages = filterBySubVillages,
+            allowNullHousehold = allowNullHousehold,
+        )
+        return getServiceMemberCountRaw(query)
     }
 
     /**

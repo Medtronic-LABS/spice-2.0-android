@@ -15,7 +15,6 @@ import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberWithTb
 import org.medtroniclabs.uhis.di.IoDispatcher
 import org.medtroniclabs.uhis.model.household.HouseHoldFilterUiData
-import org.medtroniclabs.uhis.model.services.ServiceMemberCounts
 import org.medtroniclabs.uhis.model.services.ServiceStaticFilter
 import org.medtroniclabs.uhis.model.services.ServicesSearchFilter
 import org.medtroniclabs.uhis.network.resource.Resource
@@ -24,7 +23,9 @@ import org.medtroniclabs.uhis.repo.HouseHoldRepository
 import org.medtroniclabs.uhis.repo.HouseholdMemberRepository
 import org.medtroniclabs.uhis.ui.BaseFilterViewModel
 import org.medtroniclabs.uhis.ui.boarding.repo.MetaRepository
+import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.measureTimedValue
 
 @HiltViewModel
 class ServicesViewModel @Inject constructor(
@@ -41,15 +42,26 @@ class ServicesViewModel @Inject constructor(
      */
     data class FilteredMembersUiData(
         val members: List<HouseholdMemberWithTb>,
-        val counts: ServiceMemberCounts,
+        val counts: Map<ServiceStaticFilter, Int>,
     )
 
     var filterUiData = MutableLiveData<Resource<HouseHoldFilterUiData>>()
 
+    /**
+     * Live data holding filter data
+     */
     private val filterLiveData = MutableLiveData<ServicesSearchFilter>()
 
+    /**
+     * Boolean holding whether user role is FO/PO
+     */
     var isFoPo = CommonUtils.isFoOrPo()
         private set
+
+    /**
+     * Static filters enabled for the flow/user
+     */
+    private val staticFilters = mutableListOf<ServiceStaticFilter>()
 
     /**
      * Single stream for filtered list + counts.
@@ -72,14 +84,17 @@ class ServicesViewModel @Inject constructor(
                         state = ResourceState.LOADING,
                     ),
                 )
-                val counts =
-                    memberRepository.getAllServiceMemberCounts(
+                val counts = measureTimedValue {
+                    memberRepository.getServiceMemberCounts(
+                        filters = staticFilters.toList(),
                         searchInput = filter.searchInput,
                         filterBySs = ssFilter,
                         filterBySubVillages = filter.filterBySubVillages.map { it.id!! },
                         allowNullHousehold = isFoPo,
                     )
-                emitSource(
+                }
+                Timber.tag("bug_n_bug").d("Time taken for count in seconds : " + counts.duration.inWholeSeconds)
+                val members = measureTimedValue {
                     memberRepository
                         .getServiceMembers(
                             filter.searchInput,
@@ -87,24 +102,80 @@ class ServicesViewModel @Inject constructor(
                             filter.filterBySubVillages.map { it.id!! },
                             filter.staticFilter,
                             allowNullHousehold = isFoPo,
-                        ).map { members ->
-                            Resource(
-                                state = ResourceState.SUCCESS,
-                                FilteredMembersUiData(
-                                    members = members,
-                                    counts = counts,
-                                ),
-                            )
-                        },
+                        )
+                }
+                Timber.tag("bug_n_bug").d("Time taken for filtered data in seconds : " + members.duration.inWholeSeconds)
+                emitSource(
+                    members.value.map { members ->
+                        Resource(
+                            state = ResourceState.SUCCESS,
+                            FilteredMembersUiData(
+                                members = members,
+                                counts = counts.value,
+                            ),
+                        )
+                    },
                 )
             }
         }
 
     init {
-        filterLiveData.value = ServicesSearchFilter()
         observeSearch {
-            setFilterLiveData(it)
+            setFilterLiveData(search = it)
         }
+    }
+
+    /**
+     * Populates [staticFilters] with the member-type options shown in the services dropdown.
+     *
+     * - FO/PO: all members, NCD, cataract, and eye screening
+     * - Other roles: all members plus RMNCH and related cohort filters
+     *
+     * When [isExternalMember] is true, no filters are added because the screen is scoped
+     * to external members only and the dropdown is hidden.
+     */
+    fun initializeAllowedDropdown(isExternalMember: Boolean = false) {
+        if (!isExternalMember) {
+            if (isFoPo) {
+                staticFilters.add(ServiceStaticFilter.ALL_MEMBERS)
+                staticFilters.add(ServiceStaticFilter.NCD_SERVICES)
+                staticFilters.add(ServiceStaticFilter.CATARACT_SCREENING)
+                staticFilters.add(ServiceStaticFilter.EYE_SCREENING)
+            } else {
+                staticFilters.add(ServiceStaticFilter.ALL_MEMBERS)
+                staticFilters.add(ServiceStaticFilter.EXTERNAL_MEMBERS)
+                staticFilters.add(ServiceStaticFilter.CHILDREN_UNDER_TWO_YEARS)
+                staticFilters.add(ServiceStaticFilter.PREGNANT_WOMEN)
+                staticFilters.add(ServiceStaticFilter.EXTERNAL_PREGNANT_WOMEN)
+                staticFilters.add(ServiceStaticFilter.HIGH_RISK_PREGNANT_WOMEN)
+                staticFilters.add(ServiceStaticFilter.FAMILY_PLANNING_COUNSELLING_ELIGIBLE)
+                staticFilters.add(ServiceStaticFilter.POSTNATAL_CARE_MOTHERS)
+                staticFilters.add(ServiceStaticFilter.EXPECTED_DELIVERIES)
+                staticFilters.add(ServiceStaticFilter.PENDING_DELIVERIES)
+            }
+        }
+    }
+
+    /**
+     * Applies the initial filter once so [filteredMembersLiveData] is not recomputed twice
+     * (e.g. default [ServiceStaticFilter.ALL_MEMBERS] then external-members override).
+     */
+    fun initializeFilter(
+        isExternalMember: Boolean = false,
+        ssFilter: List<ChipViewItemModel> = emptyList(),
+        subVillagesFilter: List<ChipViewItemModel> = emptyList(),
+        staticFilter: ServiceStaticFilter? = null,
+    ) {
+        val initialStaticFilter = when {
+            isExternalMember -> ServiceStaticFilter.EXTERNAL_MEMBERS
+            staticFilter != null -> staticFilter
+            else -> ServiceStaticFilter.ALL_MEMBERS
+        }
+        filterLiveData.value = ServicesSearchFilter(
+            filterBySs = ssFilter,
+            filterBySubVillages = subVillagesFilter,
+            staticFilter = initialStaticFilter,
+        )
     }
 
     fun setFilterLiveData(
@@ -162,4 +233,6 @@ class ServicesViewModel @Inject constructor(
             filterUiData.postValue(houseHoldRepository.getHouseHoldFilterUiDataForShasthyaKormi(kormiId))
         }
     }
+
+    fun getStaticFilters() = staticFilters
 }

@@ -97,6 +97,7 @@ import org.medtroniclabs.uhis.ui.patientTransfer.NCDApproveRejectListener
 import org.medtroniclabs.uhis.ui.patientTransfer.adapter.NCDIncomingRequestAdapter
 import org.medtroniclabs.uhis.ui.patientTransfer.adapter.NCDInformationMessageAdapter
 import org.medtroniclabs.uhis.ui.patientTransfer.dialog.NCDPatientDetailDialogue
+import org.medtroniclabs.uhis.ui.services.ServicesActivity
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -799,8 +800,8 @@ class LandingActivity :
 
             R.id.external_member -> {
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
-                val intent = Intent(this, org.medtroniclabs.uhis.ui.services.ServicesActivity::class.java)
-                intent.putExtra("isExternalMember", true)
+                val intent = Intent(this, ServicesActivity::class.java)
+                intent.putExtra(ServicesActivity.IS_EXTERNAL_MEMBER, true)
                 startActivity(intent)
                 return true
             }

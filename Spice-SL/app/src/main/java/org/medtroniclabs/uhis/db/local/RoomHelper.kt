@@ -86,7 +86,6 @@ import org.medtroniclabs.uhis.db.response.MemberAssessmentHistoryResponse
 import org.medtroniclabs.uhis.model.MemberDobGenderModel
 import org.medtroniclabs.uhis.model.assessment.AssessmentDetails
 import org.medtroniclabs.uhis.model.assessment.AssessmentMemberDetails
-import org.medtroniclabs.uhis.model.services.ServiceMemberCounts
 import org.medtroniclabs.uhis.model.services.ServiceStaticFilter
 import org.medtroniclabs.uhis.ui.assessment.AssessmentNCDEntity
 
@@ -946,16 +945,16 @@ interface RoomHelper {
     ): LiveData<List<HouseholdMemberWithTb>>
 
     /**
-     * Returns aggregated counts for all service static filters in one pass.
-     *
-     * Dynamic filters are identical to [getServiceMembers] so list and counters stay aligned.
+     * Returns the count for one static service filter.
+     * Dynamic filters match [getServiceMembers].
      */
-    suspend fun getAllServiceMemberCounts(
+    suspend fun getServiceMemberCountForFilter(
+        staticFilter: ServiceStaticFilter,
         searchInput: String = "",
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
         allowNullHousehold: Boolean = false,
-    ): ServiceMemberCounts
+    ): Int
 
     suspend fun getMemberAssessmentHistory(
         memberFhirId: String?,

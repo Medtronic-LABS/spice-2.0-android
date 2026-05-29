@@ -5,7 +5,7 @@ import org.medtroniclabs.uhis.mappingkey.MemberRegistration
 
 /**
  * SQL condition fragments for service member filters.
- * Used by both [MemberDAO.getServiceMembers] and [MemberDAO.getAllServiceMemberCounts].
+ * Used by [MemberDAO.getServiceMembers] and [ServiceMemberCountQueryBuilder].
  */
 object ServiceFilterConditions {
     /**

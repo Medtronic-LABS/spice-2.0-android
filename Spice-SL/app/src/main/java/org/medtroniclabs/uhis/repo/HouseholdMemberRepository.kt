@@ -2,6 +2,11 @@ package org.medtroniclabs.uhis.repo
 
 import android.location.Location
 import androidx.lifecycle.LiveData
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.CommonUtils.getStringOrEmptyString
 import org.medtroniclabs.uhis.common.DefinedParams.CHIEF_DOM_CODE_LENGTH
@@ -22,7 +27,6 @@ import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration
 import org.medtroniclabs.uhis.mappingkey.MemberRegistration
 import org.medtroniclabs.uhis.mappingkey.MemberRegistration.ID_MARITAL_STATUS
 import org.medtroniclabs.uhis.model.assessment.AssessmentMemberDetails
-import org.medtroniclabs.uhis.model.services.ServiceMemberCounts
 import org.medtroniclabs.uhis.model.services.ServiceStaticFilter
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.resource.ResourceState
@@ -458,14 +462,37 @@ class HouseholdMemberRepository @Inject constructor(
     ) = roomHelper.getServiceMembers(searchInput, filterBySs, filterBySubVillages, staticFilter, allowNullHousehold)
 
     /**
-     * Fetches all service static-filter counts using the same dynamic filters as [getServiceMembers].
+     * Fetches counts for the given static filters using capped parallel COUNT queries.
+     * Dynamic filters match [getServiceMembers].
      */
-    suspend fun getAllServiceMemberCounts(
+    suspend fun getServiceMemberCounts(
+        filters: List<ServiceStaticFilter>,
         searchInput: String = "",
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
         allowNullHousehold: Boolean = false,
-    ): ServiceMemberCounts = roomHelper.getAllServiceMemberCounts(searchInput, filterBySs, filterBySubVillages, allowNullHousehold)
+    ): Map<ServiceStaticFilter, Int> {
+        if (filters.isEmpty()) return emptyMap()
+        val semaphore = Semaphore(SERVICE_MEMBER_COUNT_PARALLELISM)
+        return coroutineScope {
+            filters
+                .map { filter ->
+                    async {
+                        semaphore.withPermit {
+                            filter to
+                                roomHelper.getServiceMemberCountForFilter(
+                                    staticFilter = filter,
+                                    searchInput = searchInput,
+                                    filterBySs = filterBySs,
+                                    filterBySubVillages = filterBySubVillages,
+                                    allowNullHousehold = allowNullHousehold,
+                                )
+                        }
+                    }
+                }.awaitAll()
+                .toMap()
+        }
+    }
 
     /**
      * Retrieves all National IDs for the specified ID type from the Room database.
@@ -476,4 +503,9 @@ class HouseholdMemberRepository @Inject constructor(
     suspend fun getAllNationalIds(idType: String): List<String> = roomHelper.getAllNationalIds(idType)
 
     suspend fun getPregnancyDetails(id: Long) = roomHelper.getPregnancyDetailByPatientId(id)
+
+    companion object {
+        /** Max concurrent COUNT queries (tuned for low-end devices). */
+        private const val SERVICE_MEMBER_COUNT_PARALLELISM = 4
+    }
 }

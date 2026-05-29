@@ -725,7 +725,7 @@ class AssessmentActivity : BaseActivity() {
                 } else if (isExternalMember) {
                     Intent(this, ServicesActivity::class.java).apply {
                         if (!CommonUtils.isFoOrPo()) {
-                            putExtra("isExternalMember", true)
+                            putExtra(ServicesActivity.IS_EXTERNAL_MEMBER, true)
                         }
                     }
                 } else {

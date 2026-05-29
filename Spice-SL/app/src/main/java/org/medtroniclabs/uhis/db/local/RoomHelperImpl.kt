@@ -119,7 +119,6 @@ import org.medtroniclabs.uhis.db.response.MemberAssessmentHistoryResponse
 import org.medtroniclabs.uhis.model.MemberDobGenderModel
 import org.medtroniclabs.uhis.model.assessment.AssessmentDetails
 import org.medtroniclabs.uhis.model.assessment.AssessmentMemberDetails
-import org.medtroniclabs.uhis.model.services.ServiceMemberCounts
 import org.medtroniclabs.uhis.model.services.ServiceStaticFilter
 import org.medtroniclabs.uhis.ui.assessment.AssessmentNCDEntity
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
@@ -1344,15 +1343,20 @@ class RoomHelperImpl @Inject constructor(
         allowNullHousehold: Boolean,
     ) = memberDAO.getServiceMembers(searchInput, filterBySs, filterBySubVillages, staticFilter, allowNullHousehold)
 
-    /**
-     * Delegates service-member count aggregation to [MemberDAO].
-     */
-    override suspend fun getAllServiceMemberCounts(
+    override suspend fun getServiceMemberCountForFilter(
+        staticFilter: ServiceStaticFilter,
         searchInput: String,
         filterBySs: List<Long>,
         filterBySubVillages: List<Long>,
         allowNullHousehold: Boolean,
-    ): ServiceMemberCounts = memberDAO.getAllServiceMemberCounts(searchInput, filterBySs, filterBySubVillages, allowNullHousehold)
+    ): Int =
+        memberDAO.getServiceMemberCountForFilter(
+            staticFilter = staticFilter,
+            searchInput = searchInput,
+            filterBySs = filterBySs,
+            filterBySubVillages = filterBySubVillages,
+            allowNullHousehold = allowNullHousehold,
+        )
 
     override suspend fun getMemberAssessmentHistory(
         memberFhirId: String?,
