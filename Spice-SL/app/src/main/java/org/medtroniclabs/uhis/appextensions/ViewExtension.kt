@@ -298,3 +298,21 @@ fun RecyclerView.navigateToNext(): Int {
     }
     return RecyclerView.NO_POSITION
 }
+
+/**
+ * Measures the provided child [view] and applies its measured height to this RecyclerView.
+ * Useful for horizontal paged lists where each page can have a different height.
+ */
+fun RecyclerView.adjustHeightToView(view: View) {
+    view.post {
+        val wMeasureSpec = View.MeasureSpec.makeMeasureSpec(view.width, View.MeasureSpec.EXACTLY)
+        val hMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        view.measure(wMeasureSpec, hMeasureSpec)
+
+        if (layoutParams.height != view.measuredHeight) {
+            layoutParams.height = view.measuredHeight
+            invalidate()
+            requestLayout() // Forces the parent to re-layout with new dimensions
+        }
+    }
+}

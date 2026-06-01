@@ -46,6 +46,7 @@ class MemberAssessmentHistoryAdapter(
     class ViewHolder(private val view: LinearLayout) : RecyclerView.ViewHolder(view) {
         fun bindData(history: MemberAssessmentHistoryEntity) {
             val context = view.context
+            view.removeAllViews()
             addSummaryView(
                 context.getString(R.string.service_name),
                 AssessmentUtil.mapServiceToServiceName(history.serviceProvided ?: "", context),
