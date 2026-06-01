@@ -19,7 +19,6 @@ import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.RelativeSizeSpan
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -161,6 +160,7 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.CAMP_DATE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.MUAC
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.muacCode
+import timber.log.Timber
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.Period
@@ -229,8 +229,7 @@ class FormGenerator(
                 else -> "${current.javaClass.simpleName}: ${current.toString().take(120)}"
             }
         val reason = message ?: formLayout.errorMessage ?: formLayout.cultureErrorMessage ?: "validation failed"
-        Log.w(
-            TAG_VALIDATE,
+        Timber.tag(TAG_VALIDATE).w(
             "Invalid field id=\"$id\" title=\"${formLayout.title}\" viewType=${formLayout.viewType} " +
                 "mandatory=${formLayout.isMandatory} visible=${isViewVisible(id)} enabled=${isViewEnabled(id)} " +
                 "value=$valueStr reason=$reason",
@@ -558,6 +557,7 @@ class FormGenerator(
                         }
                         setConditionalVisibility(formLayout, null)
                         resultHashMap.remove(id + Screening.unitMeasurement_KEY)
+                        binding.tvErrorMessage.gone()
                     }
 
                     else -> {
@@ -580,6 +580,7 @@ class FormGenerator(
                         unitMeasurement?.let {
                             it.also { resultHashMap[id + Screening.unitMeasurement_KEY] = it }
                         }
+                        validateInputs(formLayout.id)
                     }
                 }
                 callback?.invoke(resultHashMap, id)
@@ -3738,259 +3739,262 @@ class FormGenerator(
         getDeepChildOffset(mainParent, parentGroup.parent, parentGroup, accumulatedOffset)
     }
 
-    fun validateInputs(): Boolean {
+    fun validateInputs(fieldId: String? = null): Boolean {
         var isValid = true
         focusNeeded = null
         serverData?.forEach { data ->
-            data.apply {
-                if ((
-                        isMandatory &&
-                            !resultHashMap.containsKey(id) &&
-                            isViewVisible(id) &&
-                            isViewEnabled(id)
-                    ) ||
-                    (
-                        isMandatory &&
-                            resultHashMap.containsKey(id) &&
-                            resultHashMap[id] is String &&
-                            (resultHashMap[id] as String).isEmpty()
-                    )
-                ) {
-                    isValid = false
-                    requestFocusView(data)
-                } else if (viewType == VIEW_TYPE_FORM_EDITTEXT && isPhoneNumberField(id)) {
-                    val actualValue = if (resultHashMap.containsKey(id)) {
-                        resultHashMap[id] as? String
-                    } else {
-                        null
-                    }
-                    if (isMandatory && actualValue == null) {
+            if (fieldId == null || fieldId == data.id) {
+                data.apply {
+                    if ((
+                            isMandatory &&
+                                !resultHashMap.containsKey(id) &&
+                                isViewVisible(id) &&
+                                isViewEnabled(id)
+                        ) ||
+                        (
+                            isMandatory &&
+                                resultHashMap.containsKey(id) &&
+                                resultHashMap[id] is String &&
+                                (resultHashMap[id] as String).isEmpty()
+                        )
+                    ) {
                         isValid = false
                         requestFocusView(data)
-                    } else {
-                        actualValue?.let {
-                            if (naValue == actualValue.toDoubleOrNull()) {
-                                hideValidationField(data)
-                            } else if (!startsWith.isNullOrEmpty() &&
-                                !checkPhoneNumberValidOrNot(
-                                    it,
-                                    startsWith,
-                                )
-                            ) {
-                                isValid = false
-                                requestFocusView(
-                                    data,
-                                    getString(
-                                        R.string.start_with_validation,
-                                        startsWith?.joinToString(separator = " ${getString(R.string.or)} ")
-                                            ?: "",
-                                    ),
-                                )
-                            } else if (!phoneNumberContainMaxLength(
-                                    contentLength ?: maxLength,
-                                    it,
-                                )
-                            ) {
-                                isValid = false
-                                requestFocusView(data)
-                            } else if (!FormFieldValidator.isValidMobileNumber(it)) {
-                                isValid = false
-                                requestFocusView(
-                                    data,
-                                    getString(
-                                        R.string.phone_number_invalid,
-                                    ),
-                                )
-                            } else {
-                                hideValidationField(data)
-                            }
-                        }
-                    }
-                } else if ((id == DATE_OF_BIRTH || id == DateOfBirth) &&
-                    !data.viewType.equals(VIEW_TYPE_FORM_AGE_OR_DOB, true) &&
-                    isMandatory &&
-                    resultHashMap.containsKey(id)
-                ) {
-                    val actualValue = resultHashMap[id] as? String
-                    maxAge?.let { ageLimit ->
-                        val isValidAge = actualValue?.let {
-                            val dob = DateUtils.getV2YearMonthAndWeek(it)
-                            dob.years < ageLimit || (dob.years == ageLimit && dob.months == 0 && dob.weeks == 0 && dob.days == 0)
-                        } ?: false
-
-                        if (!isValidAge) {
-                            isValid = false
-                            requestFocusView(data, getString(R.string.dob_invalid, maxAge))
+                    } else if (viewType == VIEW_TYPE_FORM_EDITTEXT && isPhoneNumberField(id)) {
+                        val actualValue = if (resultHashMap.containsKey(id)) {
+                            resultHashMap[id] as? String
                         } else {
-                            hideValidationField(data)
+                            null
                         }
-                    } ?: run {
-                        actualValue?.let {
-                            hideValidationField(data)
-                        } ?: run {
+                        if (isMandatory && actualValue == null) {
                             isValid = false
                             requestFocusView(data)
-                        }
-                    }
-                } else if (data.viewType.equals(VIEW_TYPE_FORM_AGE_OR_DOB, true) && isMandatory) {
-                    // AgeOrDob component validation - check if DOB exists
-                    val actualValue = resultHashMap[id] as? String
-                    if (actualValue.isNullOrBlank()) {
-                        isValid = false
-                        requestFocusView(data)
-                    } else {
-                        // AgeOrDob component already validates maxAge in its own logic
-                        hideValidationField(data)
-                    }
-                } else if (data.viewType.equals(VIEW_TYPE_FORM_BP, true)) {
-                    if (getViewByTag(AssessmentDefinedParams.BP_LOG + rootSuffix)?.visibility == View.VISIBLE) {
-                        val list = resultHashMap[id] as ArrayList<BPModel>
-                        val validationBPResultModel = Validator.checkValidBPInput(
-                            context,
-                            list,
-                            data,
-                        )
-                        if (validationBPResultModel.status) {
-                            hideValidationField(data)
                         } else {
-                            isValid = false
-                            requestFocusView(data, validationBPResultModel.message)
-                        }
-                    }
-                } else if (data.viewType.equals(VIEW_TYPE_TIME, true)) {
-                    val dateKey = id + lastMealTypeDateSuffix
-                    val timeKey = id + lastMealTypeMeridiem
-                    if (resultHashMap.containsKey(Screening.BloodGlucoseID) && resultHashMap[Screening.BloodGlucoseID] != null) {
-                        if (resultHashMap[dateKey] != null) {
-                            val result = resultHashMap[id] as? MutableMap<*, *>
-                            val hour = (result?.get(Hour) as? String)?.toIntOrNull()
-                            val minute = (result?.get(Minute) as? String)?.toIntOrNull()
-                            if (hour != null && minute != null && hour != 0 && resultHashMap[timeKey] != null) {
-                                val minHour = data.minValueForHour
-                                val maxHour = data.maxValueForHour
-                                val minMinute = data.minValueForMinute
-                                val maxMinute = data.maxValueForMinute
-
-                                val isValidHour =
-                                    minHour != null && maxHour != null && hour in minHour..maxHour
-                                val isValidMinute =
-                                    minMinute != null && maxMinute != null && minute in minMinute..maxMinute
-
-                                if (((!(minHour != null && maxHour != null)) && (!(minMinute != null && maxMinute != null))) ||
-                                    (isValidHour && isValidMinute)
+                            actualValue?.let {
+                                if (naValue == actualValue.toDoubleOrNull()) {
+                                    hideValidationField(data)
+                                } else if (!startsWith.isNullOrEmpty() &&
+                                    !checkPhoneNumberValidOrNot(
+                                        it,
+                                        startsWith,
+                                    )
                                 ) {
-                                    val res = (resultHashMap[dateKey] as? String)?.let { date ->
-                                        if (date.equals(Screening.Today, ignoreCase = true) &&
-                                            resultHashMap[timeKey] != null
-                                        ) {
-                                            DateUtils.isValidTimeForLastMealTime(
-                                                hour,
-                                                minute,
-                                                resultHashMap[timeKey] as String,
-                                            )
-                                        } else {
-                                            true
-                                        }
-                                    } ?: false
-                                    if (res) {
-                                        hideValidationField(data)
-                                    } else {
-                                        isValid = false
-                                        requestFocusView(data)
-                                    }
-                                } else {
                                     isValid = false
                                     requestFocusView(
                                         data,
                                         getString(
-                                            R.string.time_meal_error,
-                                            minHour,
-                                            maxHour,
-                                            minMinute,
-                                            maxMinute,
+                                            R.string.start_with_validation,
+                                            startsWith?.joinToString(separator = " ${getString(R.string.or)} ")
+                                                ?: "",
                                         ),
                                     )
+                                } else if (!phoneNumberContainMaxLength(
+                                        contentLength ?: maxLength,
+                                        it,
+                                    )
+                                ) {
+                                    isValid = false
+                                    requestFocusView(data)
+                                } else if (!FormFieldValidator.isValidMobileNumber(it)) {
+                                    isValid = false
+                                    requestFocusView(
+                                        data,
+                                        getString(
+                                            R.string.phone_number_invalid,
+                                        ),
+                                    )
+                                } else {
+                                    hideValidationField(data)
+                                }
+                            }
+                        }
+                    } else if ((id == DATE_OF_BIRTH || id == DateOfBirth) &&
+                        !data.viewType.equals(VIEW_TYPE_FORM_AGE_OR_DOB, true) &&
+                        isMandatory &&
+                        resultHashMap.containsKey(id)
+                    ) {
+                        val actualValue = resultHashMap[id] as? String
+                        maxAge?.let { ageLimit ->
+                            val isValidAge = actualValue?.let {
+                                val dob = DateUtils.getV2YearMonthAndWeek(it)
+                                dob.years < ageLimit || (dob.years == ageLimit && dob.months == 0 && dob.weeks == 0 && dob.days == 0)
+                            } ?: false
+
+                            if (!isValidAge) {
+                                isValid = false
+                                requestFocusView(data, getString(R.string.dob_invalid, maxAge))
+                            } else {
+                                hideValidationField(data)
+                            }
+                        } ?: run {
+                            actualValue?.let {
+                                hideValidationField(data)
+                            } ?: run {
+                                isValid = false
+                                requestFocusView(data)
+                            }
+                        }
+                    } else if (data.viewType.equals(VIEW_TYPE_FORM_AGE_OR_DOB, true) && isMandatory) {
+                        // AgeOrDob component validation - check if DOB exists
+                        val actualValue = resultHashMap[id] as? String
+                        if (actualValue.isNullOrBlank()) {
+                            isValid = false
+                            requestFocusView(data)
+                        } else {
+                            // AgeOrDob component already validates maxAge in its own logic
+                            hideValidationField(data)
+                        }
+                    } else if (data.viewType.equals(VIEW_TYPE_FORM_BP, true)) {
+                        if (getViewByTag(AssessmentDefinedParams.BP_LOG + rootSuffix)?.visibility == View.VISIBLE) {
+                            val list = resultHashMap[id] as ArrayList<BPModel>
+                            val validationBPResultModel = Validator.checkValidBPInput(
+                                context,
+                                list,
+                                data,
+                            )
+                            if (validationBPResultModel.status) {
+                                hideValidationField(data)
+                            } else {
+                                isValid = false
+                                requestFocusView(data, validationBPResultModel.message)
+                            }
+                        }
+                    } else if (data.viewType.equals(VIEW_TYPE_TIME, true)) {
+                        val dateKey = id + lastMealTypeDateSuffix
+                        val timeKey = id + lastMealTypeMeridiem
+                        if (resultHashMap.containsKey(Screening.BloodGlucoseID) && resultHashMap[Screening.BloodGlucoseID] != null) {
+                            if (resultHashMap[dateKey] != null) {
+                                val result = resultHashMap[id] as? MutableMap<*, *>
+                                val hour = (result?.get(Hour) as? String)?.toIntOrNull()
+                                val minute = (result?.get(Minute) as? String)?.toIntOrNull()
+                                if (hour != null && minute != null && hour != 0 && resultHashMap[timeKey] != null) {
+                                    val minHour = data.minValueForHour
+                                    val maxHour = data.maxValueForHour
+                                    val minMinute = data.minValueForMinute
+                                    val maxMinute = data.maxValueForMinute
+
+                                    val isValidHour =
+                                        minHour != null && maxHour != null && hour in minHour..maxHour
+                                    val isValidMinute =
+                                        minMinute != null && maxMinute != null && minute in minMinute..maxMinute
+
+                                    if (((!(minHour != null && maxHour != null)) && (!(minMinute != null && maxMinute != null))) ||
+                                        (isValidHour && isValidMinute)
+                                    ) {
+                                        val res = (resultHashMap[dateKey] as? String)?.let { date ->
+                                            if (date.equals(Screening.Today, ignoreCase = true) &&
+                                                resultHashMap[timeKey] != null
+                                            ) {
+                                                DateUtils.isValidTimeForLastMealTime(
+                                                    hour,
+                                                    minute,
+                                                    resultHashMap[timeKey] as String,
+                                                )
+                                            } else {
+                                                true
+                                            }
+                                        } ?: false
+                                        if (res) {
+                                            hideValidationField(data)
+                                        } else {
+                                            isValid = false
+                                            requestFocusView(data)
+                                        }
+                                    } else {
+                                        isValid = false
+                                        requestFocusView(
+                                            data,
+                                            getString(
+                                                R.string.time_meal_error,
+                                                minHour,
+                                                maxHour,
+                                                minMinute,
+                                                maxMinute,
+                                            ),
+                                        )
+                                    }
+                                } else {
+                                    isValid = false
+                                    requestFocusView(data)
                                 }
                             } else {
                                 isValid = false
                                 requestFocusView(data)
                             }
-                        } else {
+                        }
+                    } else if (id == MemberRegistration.ID_GUARDIAN &&
+                        resultHashMap.containsKey(id) &&
+                        isViewVisible(id) &&
+                        isViewEnabled(id)
+                    ) {
+                        val id = CommonUtils.getLongOrNull(resultHashMap[id]) ?: 0
+                        // For guardian if the selected id is less than 0,
+                        // that means either the user selected --Select-- or + Add guardian
+                        if (id < 0) {
                             isValid = false
                             requestFocusView(data)
                         }
-                    }
-                } else if (id == MemberRegistration.ID_GUARDIAN &&
-                    resultHashMap.containsKey(id) &&
-                    isViewVisible(id) &&
-                    isViewEnabled(id)
-                ) {
-                    val id = CommonUtils.getLongOrNull(resultHashMap[id]) ?: 0
-                    // For guardian if the selected id is less than 0,
-                    // that means either the user selected --Select-- or + Add guardian
-                    if (id < 0) {
-                        isValid = false
-                        requestFocusView(data)
-                    }
-                } else if (data.viewType.equals(VIEW_TYPE_FORM_QR, true)) {
-                    if (isMandatory && !resultHashMap.containsKey(id)) {
-                        isValid = false
-                        getViewByTag(id + errorSuffix)?.let { view ->
-                            view as TextView
-                            view.visibility = View.VISIBLE
-                            view.text = errorMessage
-                                ?: getString(R.string.linking_qr_code_is_mandatory)
+                    } else if (data.viewType.equals(VIEW_TYPE_FORM_QR, true)) {
+                        if (isMandatory && !resultHashMap.containsKey(id)) {
+                            isValid = false
+                            getViewByTag(id + errorSuffix)?.let { view ->
+                                view as TextView
+                                view.visibility = View.VISIBLE
+                                view.text = errorMessage
+                                    ?: getString(R.string.linking_qr_code_is_mandatory)
+                            }
+                        } else {
+                            getViewByTag(id + errorSuffix)?.visibility = View.GONE
                         }
                     } else {
-                        getViewByTag(id + errorSuffix)?.visibility = View.GONE
-                    }
-                } else {
-                    if (resultHashMap.containsKey(id) &&
-                        data.viewType.equals(
-                            VIEW_TYPE_FORM_EDITTEXT,
-                            true,
-                        )
-                    ) {
-                        val actualValue = resultHashMap[id]
-                        if (id == Screening.NO_OF_NEONATES && resultHashMap[id].toString().toIntOrNull() == 0) {
-                            isValid = false
-                            requestFocusView(data)
-                        } else {
-                            isValid = validateMinMaxLength(
-                                actualValue,
-                                isValid,
-                                data,
+                        if (resultHashMap.containsKey(id) &&
+                            data.viewType.equals(
+                                VIEW_TYPE_FORM_EDITTEXT,
+                                true,
                             )
-                            if (isValid && data.onlyAlphabets == true) {
-                                isValid = checkOnlyAlphabets(
+                        ) {
+                            val actualValue = resultHashMap[id]
+                            if (id == Screening.NO_OF_NEONATES && resultHashMap[id].toString().toIntOrNull() == 0) {
+                                isValid = false
+                                requestFocusView(data)
+                            } else {
+                                isValid = validateMinMaxLength(
                                     actualValue,
                                     isValid,
                                     data,
                                 )
-                            } else if (isValid && data.optionType == EditTextOptionType.PERSON_NAME) {
-                                val validationRegex = Regex(PersonNameFilter.VALIDATION_PATTERN)
-                                isValid = validationRegex.matches((resultHashMap[id] as? String) ?: "")
-                                if (isValid) {
-                                    hideValidationField(data)
-                                } else {
-                                    requestFocusView(data, context.getString(R.string.error_person_name))
-                                }
-                            }
-                        }
-                    } else {
-                        when (data.viewType) {
-                            VIEW_TYPE_MENTAL_HEALTH -> {
-                                if (isViewVisible(id)) {
-                                    if (checkValidMentalHealth(this, id)) {
+                                if (isValid && data.onlyAlphabets == true) {
+                                    isValid = checkOnlyAlphabets(
+                                        actualValue,
+                                        isValid,
+                                        data,
+                                    )
+                                } else if (isValid && data.optionType == EditTextOptionType.PERSON_NAME) {
+                                    val validationRegex = Regex(PersonNameFilter.VALIDATION_PATTERN)
+                                    isValid = validationRegex.matches((resultHashMap[id] as? String) ?: "")
+                                    if (isValid) {
                                         hideValidationField(data)
                                     } else {
-                                        isValid = false
-                                        requestFocusView(data)
+                                        requestFocusView(data, context.getString(R.string.error_person_name))
                                     }
                                 }
                             }
-                            else -> {
-                                hideValidationField(data)
+                        } else {
+                            when (data.viewType) {
+                                VIEW_TYPE_MENTAL_HEALTH -> {
+                                    if (isViewVisible(id)) {
+                                        if (checkValidMentalHealth(this, id)) {
+                                            hideValidationField(data)
+                                        } else {
+                                            isValid = false
+                                            requestFocusView(data)
+                                        }
+                                    }
+                                }
+
+                                else -> {
+                                    hideValidationField(data)
+                                }
                             }
                         }
                     }
@@ -3998,8 +4002,7 @@ class FormGenerator(
             }
         }
         if (!isValid && BuildConfig.DEBUG) {
-            Log.w(
-                TAG_VALIDATE,
+            Timber.tag(TAG_VALIDATE).w(
                 "validateInputs(): submit blocked — one or more fields failed (see \"Invalid field\" lines above; first field is scrolled into view).",
             )
         }
