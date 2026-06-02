@@ -91,6 +91,7 @@ class ServicesViewModel @Inject constructor(
                         filterBySs = ssFilter,
                         filterBySubVillages = filter.filterBySubVillages.map { it.id!! },
                         allowNullHousehold = isFoPo,
+                        qrCode = filter.qrCode,
                     )
                 }
                 Timber.tag("bug_n_bug").d("Time taken for count in seconds : " + counts.duration.inWholeSeconds)
@@ -102,6 +103,7 @@ class ServicesViewModel @Inject constructor(
                             filter.filterBySubVillages.map { it.id!! },
                             filter.staticFilter,
                             allowNullHousehold = isFoPo,
+                            qrCode = filter.qrCode,
                         )
                 }
                 Timber.tag("bug_n_bug").d("Time taken for filtered data in seconds : " + members.duration.inWholeSeconds)
@@ -201,6 +203,9 @@ class ServicesViewModel @Inject constructor(
         filterSk?.let {
             filter.filterSk = filterSk
         }
+
+        filter.qrCode = null
+
         filterLiveData.postValue(filter)
     }
 
@@ -235,4 +240,11 @@ class ServicesViewModel @Inject constructor(
     }
 
     fun getStaticFilters() = staticFilters
+
+    fun filterMemberListByQr(qrCodeString: String) {
+        val filter = ServicesSearchFilter().apply {
+            qrCode = qrCodeString
+        }
+        filterLiveData.postValue(filter)
+    }
 }

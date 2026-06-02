@@ -1,11 +1,16 @@
 package org.medtroniclabs.uhis.ui.services
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.TextWatcher
 import android.view.View
 import android.widget.AdapterView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import dagger.hilt.android.AndroidEntryPoint
 import org.medtroniclabs.uhis.R
@@ -15,6 +20,9 @@ import org.medtroniclabs.uhis.appextensions.hideKeyboard
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.SecuredPreference
+import org.medtroniclabs.uhis.common.qrscanner.QRScanContract
+import org.medtroniclabs.uhis.common.qrscanner.QRScanResult
+import org.medtroniclabs.uhis.common.qrscanner.QRScannerActivity
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberWithTb
 import org.medtroniclabs.uhis.databinding.ActivityServicesBinding
@@ -28,6 +36,7 @@ import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants
 import org.medtroniclabs.uhis.ui.externalmember.ExternalMemberRegistrationActivity
 import org.medtroniclabs.uhis.ui.household.MemberSelectionListener
 import org.medtroniclabs.uhis.ui.household.summary.MemberSummaryActivity
+import org.medtroniclabs.uhis.ui.patient.UIConstants
 import org.medtroniclabs.uhis.ui.services.viewmodel.ServicesViewModel
 import org.medtroniclabs.uhis.common.DefinedParams as CommonDefinedParams
 
@@ -109,6 +118,7 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
     }
 
     private fun initViews() {
+        binding.llExactSearch.clBtnQrSearch.visible()
         binding.llFilter.btnFilter.text = getString(R.string.filter)
 
         // Update search hint for external members
@@ -216,6 +226,7 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
 
     private fun setListeners() {
         binding.llFilter.btnFilter.safeClickListener(this)
+        binding.llExactSearch.btnQrSearch.safeClickListener(this)
         textChange = binding.llExactSearch.etSearchTerm.doOnTextChanged { text, _, _, _ ->
             servicesViewModel.onTextChange(text?.toString())
         }
@@ -300,6 +311,13 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
                 }
             }
 
+            R.id.btnQrSearch -> {
+                withLocationCheck({
+                    servicesViewModel.setUserJourney(AnalyticsDefinedParams.SERVICES_QR_SEARCH_TRIGGERED)
+                    launchQrScanner()
+                })
+            }
+
             R.id.btnAddExternalMember -> {
                 withLocationCheck {
                     servicesViewModel.setUserJourney(
@@ -315,6 +333,43 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
             }
         }
     }
+
+    private fun launchQrScanner() {
+        try {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_DENIED
+            ) {
+                cameraPermission.launch(Manifest.permission.CAMERA)
+            } else {
+                startScanning()
+            }
+        } catch (e: Exception) {
+            // error block
+        }
+    }
+
+    private val cameraPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            startScanning()
+        } else {
+            // Camera permission denied
+        }
+    }
+
+    private fun startScanning() {
+        qrScanLauncher.launch(
+            Intent(this, QRScannerActivity::class.java).apply {
+                putExtra(QRScanResult.REQUEST_FROM, UIConstants.SCREENING_UNIQUE_ID)
+            },
+        )
+    }
+
+    private val qrScanLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(QRScanContract()) { result ->
+            if (result.resultString != null) {
+                servicesViewModel.filterMemberListByQr(result.resultString)
+            }
+        }
 
     override fun onMemberSelected(
         item: Long,

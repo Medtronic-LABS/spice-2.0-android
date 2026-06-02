@@ -86,7 +86,7 @@ class PatientsDataSource(
              */
             val isQrSearch = !searchModel.searchQRValue.isNullOrBlank()
             val isFollowUp = origin == UIConstants.FOLLOW_UP
-            val isExactSearch = !searchModel.searchId.isNullOrBlank()
+            val isExactSearch = !searchModel.searchText.isNullOrBlank()
 
             response = when {
                 isQrSearch -> {
@@ -118,7 +118,7 @@ class PatientsDataSource(
                     }
 
                     val payLoad = defaultRequest().copy(
-                        searchId = searchModel.searchId,
+                        searchText = searchModel.searchText,
                         firstName = searchModel.firstName,
                         lastName = searchModel.lastName,
                         phoneNumber = searchModel.phoneNumber,
@@ -139,16 +139,30 @@ class PatientsDataSource(
                 }
 
                 isExactSearch -> {
-                    val exactSearch = defaultRequest().copy(
-                        searchId = searchModel.searchId,
+                    val request = defaultRequest()
+
+                    val exactSearch = request.copy(
+                        searchText = searchModel.searchText,
                         isSearchUserOrgPatient = isSiteBasedSearch,
-                        globally = origin == UIConstants.ENROLLMENT_UNIQUE_ID || CommonUtils.isFieldOrganizer(),
+                        status = if (origin == UIConstants.ENROLLMENT_UNIQUE_ID) {
+                            request.patientFilter?.patientStatus
+                        } else {
+                            null
+                        },
+                        patientFilter = if (origin == UIConstants.ENROLLMENT_UNIQUE_ID) {
+                            null
+                        } else {
+                            request.patientFilter?.copy(patientStatus = null)
+                        },
                     )
+
                     apiHelper.searchPatientById(exactSearch)
                 }
 
                 else -> {
-                    apiHelper.patientsList(defaultRequest())
+                    val request = defaultRequest()
+                    request.patientFilter = request.patientFilter?.copy(patientStatus = null)
+                    apiHelper.patientsList(request)
                 }
             }
             // Request construction - Ends

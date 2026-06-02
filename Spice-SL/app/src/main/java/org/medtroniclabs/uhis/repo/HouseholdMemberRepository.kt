@@ -203,6 +203,11 @@ class HouseholdMemberRepository @Inject constructor(
             householdMemberEntity.disability = disability
         }
 
+        val qrCode = map[MemberRegistration.QR_CODE]
+        if (qrCode != null && qrCode is String) {
+            householdMemberEntity.qrCode = qrCode
+        }
+
         val guardianId = CommonUtils.getLongOrNull(map[MemberRegistration.ID_GUARDIAN])
         if (guardianId != null) {
             householdMemberEntity.guardianId = guardianId
@@ -459,7 +464,8 @@ class HouseholdMemberRepository @Inject constructor(
         filterBySubVillages: List<Long> = emptyList(),
         staticFilter: ServiceStaticFilter,
         allowNullHousehold: Boolean = false,
-    ) = roomHelper.getServiceMembers(searchInput, filterBySs, filterBySubVillages, staticFilter, allowNullHousehold)
+        qrCode: String? = null,
+    ) = roomHelper.getServiceMembers(searchInput, filterBySs, filterBySubVillages, staticFilter, allowNullHousehold, qrCode)
 
     /**
      * Fetches counts for the given static filters using capped parallel COUNT queries.
@@ -471,6 +477,7 @@ class HouseholdMemberRepository @Inject constructor(
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
         allowNullHousehold: Boolean = false,
+        qrCode: String? = null,
     ): Map<ServiceStaticFilter, Int> {
         if (filters.isEmpty()) return emptyMap()
         val semaphore = Semaphore(SERVICE_MEMBER_COUNT_PARALLELISM)
@@ -503,6 +510,8 @@ class HouseholdMemberRepository @Inject constructor(
     suspend fun getAllNationalIds(idType: String): List<String> = roomHelper.getAllNationalIds(idType)
 
     suspend fun getPregnancyDetails(id: Long) = roomHelper.getPregnancyDetailByPatientId(id)
+
+    suspend fun getMemberByQRCode(qrCode: String): List<HouseholdMemberEntity> = roomHelper.getMemberByQRCode(qrCode)
 
     companion object {
         /** Max concurrent COUNT queries (tuned for low-end devices). */

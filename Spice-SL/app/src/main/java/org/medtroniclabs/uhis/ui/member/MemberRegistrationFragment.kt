@@ -1,6 +1,8 @@
 package org.medtroniclabs.uhis.ui.member
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.text.InputFilter
@@ -11,7 +13,10 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.text.isDigitsOnly
 import androidx.core.view.isGone
@@ -43,6 +48,9 @@ import org.medtroniclabs.uhis.common.DefinedParams.IS_MEMBER_REGISTRATION
 import org.medtroniclabs.uhis.common.DefinedParams.MEMBER_ID
 import org.medtroniclabs.uhis.common.EntityMapper.getResultSpinnerMapList
 import org.medtroniclabs.uhis.common.SecuredPreference
+import org.medtroniclabs.uhis.common.qrscanner.QRScanContract
+import org.medtroniclabs.uhis.common.qrscanner.QRScanResult
+import org.medtroniclabs.uhis.common.qrscanner.QRScannerActivity
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
 import org.medtroniclabs.uhis.databinding.FragmentMemberRegistrationBinding
 import org.medtroniclabs.uhis.db.entity.HouseholdMemberEntity
@@ -53,7 +61,6 @@ import org.medtroniclabs.uhis.formgeneration.listener.FormEventListener
 import org.medtroniclabs.uhis.formgeneration.model.FormLayout
 import org.medtroniclabs.uhis.formgeneration.model.FormResponse
 import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration
-import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.VILLAGE_ID
 import org.medtroniclabs.uhis.mappingkey.MemberRegistration
 import org.medtroniclabs.uhis.mappingkey.MemberRegistration.isValidMinAge
 import org.medtroniclabs.uhis.network.resource.ResourceState
@@ -66,8 +73,10 @@ import org.medtroniclabs.uhis.ui.household.HouseholdDefinedParams
 import org.medtroniclabs.uhis.ui.household.summary.HouseholdSummaryActivity
 import org.medtroniclabs.uhis.ui.household.viewmodel.HouseRegistrationViewModel
 import org.medtroniclabs.uhis.ui.medicalreview.utils.MedicalReviewDefinedParams
+import org.medtroniclabs.uhis.ui.patient.UIConstants
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams as FormDefinedParams
 
 @AndroidEntryPoint
 class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnClickListener {
@@ -342,6 +351,21 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
                 ResourceState.ERROR -> {
                     (activity as BaseActivity?)?.hideLoading()
                 }
+            }
+        }
+
+        memberRegistrationViewModel.isValidQRLiveData.observe(viewLifecycleOwner) { resourceState ->
+            when (resourceState.state) {
+                ResourceState.SUCCESS -> {
+                    resourceState.data?.let {
+                        if (it.first) {
+                            formGenerator.showQRScannedText(it.second, FormDefinedParams.QR_CODE)
+                        } else {
+                            formGenerator.showErrorQRScanned(FormDefinedParams.QR_CODE)
+                        }
+                    }
+                }
+                else -> {}
             }
         }
     }
@@ -796,7 +820,41 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
     }
 
     override fun onQRScanRequested() {
+        try {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_DENIED
+            ) {
+                cameraPermission.launch(Manifest.permission.CAMERA)
+            } else {
+                startScanning()
+            }
+        } catch (e: Exception) {
+            // error block
+        }
     }
+
+    private val cameraPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            startScanning()
+        } else {
+            // Camera permission denied
+        }
+    }
+
+    private fun startScanning() {
+        qrScanLauncher.launch(
+            Intent(requireContext(), QRScannerActivity::class.java).apply {
+                putExtra(QRScanResult.REQUEST_FROM, UIConstants.SCREENING_UNIQUE_ID)
+            },
+        )
+    }
+
+    private val qrScanLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(QRScanContract()) { result ->
+            if (result.resultString != null) {
+                memberRegistrationViewModel.validateQRCodeLocally(result.resultString)
+            }
+        }
 
     override fun onClick(v: View?) {
         when (v?.id) {

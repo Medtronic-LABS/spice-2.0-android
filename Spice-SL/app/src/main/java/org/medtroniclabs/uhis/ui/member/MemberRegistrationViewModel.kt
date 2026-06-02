@@ -210,4 +210,18 @@ class MemberRegistrationViewModel @Inject constructor(
             nationalIdsSet.addAll(ids)
         }
     }
+
+    val isValidQRLiveData = MutableLiveData<Resource<Pair<Boolean, String>>>()
+
+    fun validateQRCodeLocally(qrCode: String) {
+        viewModelScope.launch(dispatcherIO) {
+            isValidQRLiveData.postLoading()
+            val list = memberRegistrationRepository.getMemberByQRCode(qrCode)
+            if (list.isNotEmpty()) {
+                isValidQRLiveData.postSuccess(Pair(false, qrCode))
+            } else {
+                isValidQRLiveData.postSuccess(Pair(true, qrCode))
+            }
+        }
+    }
 }

@@ -226,7 +226,7 @@ class DashboardMenuItemsAdapter(
                 R.drawable.ic_screening,
             )
 
-            MenuConstants.REGISTRATION -> ContextCompat.getDrawable(
+            MenuConstants.REGISTRATION, MenuConstants.CONFIRM_DIAGNOSIS -> ContextCompat.getDrawable(
                 context,
                 R.drawable.ic_registration,
             )

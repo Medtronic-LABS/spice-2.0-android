@@ -307,6 +307,7 @@ interface MemberDAO {
         staticFilter: ServiceStaticFilter,
         /** FO/PO: members may have no household; use member-level joins and sub-village like external flow. */
         allowNullHousehold: Boolean = false,
+        qrCode: String? = null,
     ): LiveData<List<HouseholdMemberWithTb>> {
         val args = mutableListOf<Any>()
         val conditions = mutableListOf<String>()
@@ -330,6 +331,14 @@ interface MemberDAO {
             val pattern = "%${searchInput.trim()}%"
             args += pattern
             args += pattern
+        }
+
+        // Search by QR code
+        if (!qrCode.isNullOrBlank()) {
+            conditions += "hhm.qr_code LIKE ?"
+
+            val qrPattern = "%${qrCode.trim()}%"
+            args += qrPattern
         }
 
         if (filterBySubVillages.isNotEmpty() || filterBySs.isNotEmpty()) {
@@ -520,4 +529,7 @@ interface MemberDAO {
     @Transaction
     @Query("SELECT * FROM HouseHoldMember AS hhm LEFT JOIN memberassessmenthistory AS mah ON hhm.id = mah.memberId WHERE hhm.id = :memberId ORDER BY mah.visitDate DESC")
     fun getMemberWithAssessmentHistory(memberId: Long): LiveData<Map<HouseholdMemberEntity, List<MemberAssessmentHistoryEntity>>?>
+
+    @Query("SELECT * FROM HouseHoldMember WHERE qr_code = :qrCode")
+    suspend fun getMemberByQRCode(qrCode: String): List<HouseholdMemberEntity>
 }

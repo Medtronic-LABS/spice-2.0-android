@@ -942,6 +942,7 @@ interface RoomHelper {
         filterBySubVillages: List<Long> = emptyList(),
         staticFilter: ServiceStaticFilter,
         allowNullHousehold: Boolean = false,
+        qrCode: String? = null,
     ): LiveData<List<HouseholdMemberWithTb>>
 
     /**
@@ -954,6 +955,7 @@ interface RoomHelper {
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
         allowNullHousehold: Boolean = false,
+        qrCode: String? = null,
     ): Int
 
     suspend fun getMemberAssessmentHistory(
@@ -1103,4 +1105,6 @@ interface RoomHelper {
     suspend fun getAllChiefDoms(): List<ChiefDomEntity>
 
     suspend fun getSubVillage(villageId: Long): List<SubVillageEntity>
+
+    suspend fun getMemberByQRCode(qrCode: String): List<HouseholdMemberEntity>
 }

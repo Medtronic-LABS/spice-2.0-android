@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Spinner
 import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -44,6 +45,7 @@ import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.YES
 import org.medtroniclabs.uhis.formgeneration.listener.FormEventListener
 import org.medtroniclabs.uhis.formgeneration.model.FormLayout
 import org.medtroniclabs.uhis.formgeneration.ui.FormResultComposer
+import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
 import org.medtroniclabs.uhis.mappingkey.Screening
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.resource.ResourceState
@@ -56,6 +58,7 @@ import org.medtroniclabs.uhis.ui.patient.UIConstants
 import org.medtroniclabs.uhis.ui.patient.viewmodel.EnrollmentFormBuilderViewModel
 import org.medtroniclabs.uhis.ui.patient.viewmodel.PatientDetailViewModel
 import org.medtroniclabs.uhis.ui.patient.viewmodel.ScreeningFormBuilderViewModel
+import kotlin.text.get
 
 class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
     private lateinit var binding: FragmentEnrollmentFormBinding
@@ -202,6 +205,10 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
             when (id) {
                 Screening.Weight, Screening.Height -> {
                     viewModel.renderBMIValue(requireContext(), formGenerator, map)
+                }
+
+                DefinedParams.GENDER -> {
+                    addOrRemoveGDMOption(map[id] as String)
                 }
             }
         }
@@ -579,7 +586,34 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
         }
 
     override fun onRenderingComplete() {
-        Log.e("TEST", "dddd")
+        patientDetailsViewModel.screeningDetailResponse.value?.data?.gender?.let {
+            addOrRemoveGDMOption(it)
+        }
+    }
+
+    private fun addOrRemoveGDMOption(gender: String) {
+        formGenerator.getViewByTag(DefinedParams.DIABETES_DIAGNOSIS)?.let { view ->
+            if (view is Spinner) {
+                val adapter = view.adapter as? CustomSpinnerAdapter
+                adapter?.let {
+                    val list = adapter.itemList
+                    list.removeAll { it[DefinedParams.NAME] == DefinedParams.GESTATIONAL_DIABETES }
+
+                    if (gender.lowercase() == DefinedParams.FEMALE.lowercase() && list.none { it[DefinedParams.NAME] == DefinedParams.GESTATIONAL_DIABETES }) {
+                        list.add(
+                            hashMapOf(
+                                DefinedParams.CULTURE_VALUE to getString(R.string.gestational_diabetes_gdm),
+                                DefinedParams.NAME to DefinedParams.GESTATIONAL_DIABETES,
+                                DefinedParams.ID to DefinedParams.GESTATIONAL_DIABETES,
+                            ),
+                        )
+                    }
+
+                    adapter.itemList = list
+                    adapter.notifyDataSetChanged()
+                }
+            }
+        }
     }
 
     override fun onUpdateInstruction(

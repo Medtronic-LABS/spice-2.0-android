@@ -237,6 +237,8 @@ object DefinedParams {
 
     const val QR_CODE = "qrCode"
 
+    const val QR_CARD = "qrCard"
+
     const val PROVENANCE = "provenance"
 
     const val IS_REGULAR_SMOKER = "isRegularSmoker"

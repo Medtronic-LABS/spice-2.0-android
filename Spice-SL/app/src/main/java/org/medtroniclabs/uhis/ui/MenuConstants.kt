@@ -32,6 +32,7 @@ object MenuConstants {
 
     const val SCREENING = "SCREENING"
     const val REGISTRATION = "REGISTRATION"
+    const val CONFIRM_DIAGNOSIS = "CONFIRM DIAGNOSIS"
     const val ENROLLMENT = "ENROLLMENT"
     const val ASSESSMENT = "ASSESSMENT"
     const val DASHBOARD = "DASHBOARD"

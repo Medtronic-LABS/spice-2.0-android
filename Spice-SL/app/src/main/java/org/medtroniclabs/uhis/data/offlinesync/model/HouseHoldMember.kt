@@ -68,6 +68,8 @@ data class HouseHoldMember(
     val maritalStatus: String? = null,
     @ColumnInfo("disability")
     val disability: String? = null,
+    @ColumnInfo("qr_code")
+    var qrCode: String? = null,
 ) {
     @Ignore
     var isChild: Boolean? = false
@@ -118,6 +120,7 @@ data class HouseHoldMember(
             guardianFhirId = this.guardianFhirId,
             maritalStatus = this.maritalStatus,
             disability = this.disability,
+            qrCode = this.qrCode,
         ).apply {
             val newCreateAt = if (this@HouseHoldMember.createdAt == null ||
                 this@HouseHoldMember.createdAt == 0L

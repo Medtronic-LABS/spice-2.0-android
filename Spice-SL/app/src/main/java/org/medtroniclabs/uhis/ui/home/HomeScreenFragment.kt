@@ -113,7 +113,7 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
                 startActivity(Intent(requireContext(), HouseholdSearchActivity::class.java))
             }
 
-            MenuConstants.REGISTRATION -> {
+            MenuConstants.REGISTRATION, MenuConstants.CONFIRM_DIAGNOSIS -> {
                 withNetworkAvailability(online = {
                     val bundle = Bundle().apply {
                         putString(DefinedParams.ORIGIN, MenuConstants.ENROLLMENT.lowercase())

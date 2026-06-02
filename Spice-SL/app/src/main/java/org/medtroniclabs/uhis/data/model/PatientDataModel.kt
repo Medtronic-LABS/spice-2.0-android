@@ -7,7 +7,7 @@ data class PatientDataModel(
     var skip: Int? = null,
     var limit: Int? = null,
     var tenantId: Long? = null,
-    val searchId: String? = null,
+    val searchText: String? = null,
     val isSearchUserOrgPatient: Boolean? = null,
     val globally: Boolean? = null,
     val operatingUnitId: Long? = null,
@@ -37,6 +37,7 @@ data class PatientDataModel(
     val callStatus: String? = null,
     val patientType: String? = null,
     val isParaCounsellingDisabled: Boolean? = null,
+    var status: String? = null,
 )
 
 @Parcelize

@@ -1341,7 +1341,8 @@ class RoomHelperImpl @Inject constructor(
         filterBySubVillages: List<Long>,
         staticFilter: ServiceStaticFilter,
         allowNullHousehold: Boolean,
-    ) = memberDAO.getServiceMembers(searchInput, filterBySs, filterBySubVillages, staticFilter, allowNullHousehold)
+        qrCode: String?,
+    ) = memberDAO.getServiceMembers(searchInput, filterBySs, filterBySubVillages, staticFilter, allowNullHousehold, qrCode)
 
     override suspend fun getServiceMemberCountForFilter(
         staticFilter: ServiceStaticFilter,
@@ -1349,6 +1350,7 @@ class RoomHelperImpl @Inject constructor(
         filterBySs: List<Long>,
         filterBySubVillages: List<Long>,
         allowNullHousehold: Boolean,
+        qrCode: String?,
     ): Int =
         memberDAO.getServiceMemberCountForFilter(
             staticFilter = staticFilter,
@@ -1609,4 +1611,6 @@ class RoomHelperImpl @Inject constructor(
     override suspend fun getAllChiefDoms(): List<ChiefDomEntity> = metaDataDAO.getAllChiefDoms()
 
     override suspend fun getSubVillage(villageId: Long): List<SubVillageEntity> = metaDataDAO.getSubVillage(villageId)
+
+    override suspend fun getMemberByQRCode(qrCode: String): List<HouseholdMemberEntity> = memberDAO.getMemberByQRCode(qrCode)
 }

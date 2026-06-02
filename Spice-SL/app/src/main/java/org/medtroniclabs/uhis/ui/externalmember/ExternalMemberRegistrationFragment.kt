@@ -1,6 +1,8 @@
 package org.medtroniclabs.uhis.ui.externalmember
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.text.InputFilter
@@ -9,7 +11,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatSpinner
+import androidx.core.content.ContextCompat
 import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -34,6 +39,9 @@ import org.medtroniclabs.uhis.common.DefinedParams.EXTERNAL_MEMBER_REGISTRATION
 import org.medtroniclabs.uhis.common.DefinedParams.MEMBER_ID
 import org.medtroniclabs.uhis.common.EntityMapper.getResultSpinnerMapList
 import org.medtroniclabs.uhis.common.SecuredPreference
+import org.medtroniclabs.uhis.common.qrscanner.QRScanContract
+import org.medtroniclabs.uhis.common.qrscanner.QRScanResult
+import org.medtroniclabs.uhis.common.qrscanner.QRScannerActivity
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
 import org.medtroniclabs.uhis.databinding.FragmentExternalMemberRegistrationBinding
 import org.medtroniclabs.uhis.db.entity.HouseholdMemberEntity
@@ -60,6 +68,7 @@ import org.medtroniclabs.uhis.ui.dialog.SuccessDialogFragment
 import org.medtroniclabs.uhis.ui.home.AssessmentToolsActivity
 import org.medtroniclabs.uhis.ui.household.viewmodel.HouseRegistrationViewModel
 import org.medtroniclabs.uhis.ui.member.MemberRegistrationViewModel
+import org.medtroniclabs.uhis.ui.patient.UIConstants
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams as FormDefinedParams
 
 @AndroidEntryPoint
@@ -392,6 +401,21 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                 }
             }
         }
+
+        memberRegistrationViewModel.isValidQRLiveData.observe(viewLifecycleOwner) { resourceState ->
+            when (resourceState.state) {
+                ResourceState.SUCCESS -> {
+                    resourceState.data?.let {
+                        if (it.first) {
+                            formGenerator.showQRScannedText(it.second, FormDefinedParams.QR_CODE)
+                        } else {
+                            formGenerator.showErrorQRScanned(FormDefinedParams.QR_CODE)
+                        }
+                    }
+                }
+                else -> {}
+            }
+        }
     }
 
     private fun autoPopulateDetails(details: HouseholdMemberEntity) {
@@ -691,7 +715,41 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
     }
 
     override fun onQRScanRequested() {
+        try {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_DENIED
+            ) {
+                cameraPermission.launch(Manifest.permission.CAMERA)
+            } else {
+                startScanning()
+            }
+        } catch (e: Exception) {
+            // error block
+        }
     }
+
+    private val cameraPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            startScanning()
+        } else {
+            // Camera permission denied
+        }
+    }
+
+    private fun startScanning() {
+        qrScanLauncher.launch(
+            Intent(requireContext(), QRScannerActivity::class.java).apply {
+                putExtra(QRScanResult.REQUEST_FROM, UIConstants.SCREENING_UNIQUE_ID)
+            },
+        )
+    }
+
+    private val qrScanLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(QRScanContract()) { result ->
+            if (result.resultString != null) {
+                memberRegistrationViewModel.validateQRCodeLocally(result.resultString)
+            }
+        }
 
     override fun onClick(v: View?) {
         when (v?.id) {

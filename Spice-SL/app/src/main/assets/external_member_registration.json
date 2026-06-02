@@ -1,6 +1,5 @@
 {
-    "formLayout":
-    [
+    "formLayout": [
         {
             "familyOrder": 0,
             "id": "locationInformation",
@@ -9,8 +8,7 @@
             "viewType": "CardView"
         },
         {
-            "condition":
-            [],
+            "condition": [],
             "defaultValue": null,
             "errorMessage": "Please select Upazila",
             "cultureErrorMessage": "অনুগ্রহ করে উপজেলা নির্বাচন করুন",
@@ -28,8 +26,7 @@
             "visibility": "gone"
         },
         {
-            "condition":
-            [],
+            "condition": [],
             "defaultValue": null,
             "errorMessage": "Please select Union",
             "cultureErrorMessage": "অনুগ্রহ করে ইউনিয়ন নির্বাচন করুন",
@@ -48,8 +45,7 @@
             "visibility": "gone"
         },
         {
-            "condition":
-            [],
+            "condition": [],
             "defaultValue": null,
             "errorMessage": "Please select SK",
             "cultureErrorMessage": "অনুগ্রহ করে শাস্থ্য কর্মী নির্বাচন করুন",
@@ -69,8 +65,7 @@
             "visibility": "gone"
         },
         {
-            "condition":
-            [],
+            "condition": [],
             "defaultValue": null,
             "errorMessage": "Please select SS",
             "cultureErrorMessage": "অনুগ্রহ করে স্বাস্থ্য সেবিকা নির্বাচন করুন",
@@ -90,8 +85,7 @@
             "visibility": "visible"
         },
         {
-            "condition":
-            [],
+            "condition": [],
             "defaultValue": null,
             "errorMessage": "Please select Village",
             "cultureErrorMessage": "অনুগ্রহ করে গ্রাম নির্বাচন করুন",
@@ -117,11 +111,9 @@
             "viewType": "CardView"
         },
         {
-            "condition":
-            [
+            "condition": [
                 {
-                    "eqList":
-                    [
+                    "eqList": [
                         "nid",
                         "brn"
                     ],
@@ -139,8 +131,7 @@
             "isEnabled": true,
             "isMandatory": true,
             "isNeededDefault": true,
-            "optionsList":
-            [
+            "optionsList": [
                 {
                     "id": "nid",
                     "name": "National ID",
@@ -197,8 +188,7 @@
             "visibility": "visible"
         },
         {
-            "condition":
-            [
+            "condition": [
                 {
                     "eq": "0",
                     "targetId": "phone_number_category",
@@ -223,8 +213,7 @@
             "viewType": "EditText",
             "visibility": "visible",
             "optionType": "phoneNumberWithoutCountryCode",
-            "startsWith":
-            [
+            "startsWith": [
                 "01"
             ]
         },
@@ -238,8 +227,7 @@
             "isEnabled": true,
             "isMandatory": true,
             "isNeededDefault": true,
-            "optionsList":
-            [
+            "optionsList": [
                 {
                     "id": "personal",
                     "name": "Personal (Self)",
@@ -291,8 +279,7 @@
             "isNeededDefault": true,
             "isSummary": true,
             "orderId": 6,
-            "optionsList":
-            [
+            "optionsList": [
                 {
                     "name": "Male",
                     "cultureValue": "পুরুষ",
@@ -325,8 +312,7 @@
             "isNeededDefault": true,
             "isSummary": true,
             "orderId": 7,
-            "optionsList":
-            [
+            "optionsList": [
                 {
                     "name": "Married",
                     "cultureValue": "বিবাহিত",
@@ -362,8 +348,7 @@
             "isNeededDefault": true,
             "isSummary": true,
             "orderId": 8,
-            "optionsList":
-            [
+            "optionsList": [
                 {
                     "name": "Yes",
                     "cultureValue": "হ্যাঁ",
@@ -382,6 +367,22 @@
             "isInfo": "visible",
             "infoTitle": "Who has great difficulty or cannot see, hear, walk, climb, do things independently",
             "infoTitleCulture": "যার খুব অসুবিধা হয় অথবা সে স্বাধীনভাবে দেখতে, শুনতে, হাঁটতে, আরোহণ করতে, কিছু করতে পারে না"
+        },
+        {
+            "familyOrder": 5.0,
+            "viewType": "CardView",
+            "id": "qrCard",
+            "title": "Scan QR Code",
+            "titleCulture": "QR কোড স্ক্যান করুন"
+        },
+        {
+            "isEditable": true,
+            "viewType": "QRView",
+            "id": "qrCode",
+            "family": "qrCard",
+            "title": "Scan QR Code",
+            "isMandatory": false,
+            "titleCulture": "QR কোড স্ক্যান করুন"
         }
     ]
 }

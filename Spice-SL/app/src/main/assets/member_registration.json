@@ -301,6 +301,22 @@
             "titleCulture": "খানা প্রধান কিনা",
             "viewType": "CheckBox",
             "visibility": "gone"
+        },
+        {
+            "familyOrder": 5.0,
+            "viewType": "CardView",
+            "id": "qrCard",
+            "title": "Scan QR Code",
+            "titleCulture": "QR কোড স্ক্যান করুন"
+        },
+        {
+            "isEditable": true,
+            "viewType": "QRView",
+            "id": "qrCode",
+            "family": "qrCard",
+            "title": "Scan QR Code",
+            "isMandatory": false,
+            "titleCulture": "QR কোড স্ক্যান করুন"
         }
     ]
 }

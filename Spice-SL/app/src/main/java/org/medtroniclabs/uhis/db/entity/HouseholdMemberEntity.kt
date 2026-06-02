@@ -66,4 +66,6 @@ data class HouseholdMemberEntity(
     var maritalStatus: String? = null,
     @ColumnInfo("disability")
     var disability: String? = null,
+    @ColumnInfo("qr_code")
+    var qrCode: String? = null,
 ) : BaseEntity()

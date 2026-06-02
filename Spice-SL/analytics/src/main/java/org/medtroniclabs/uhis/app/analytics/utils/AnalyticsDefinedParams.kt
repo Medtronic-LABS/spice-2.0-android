@@ -236,4 +236,6 @@ object AnalyticsDefinedParams {
 
     const val SERVICES = "Services Recipient List"
     const val SERVICES_SEARCH_TRIGGERED = "Services Recipient List Screen Search Triggered"
+
+    const val SERVICES_QR_SEARCH_TRIGGERED = "Services Recipient List Screen QR Search Triggered"
 }

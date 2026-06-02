@@ -139,7 +139,7 @@ class PatientListViewModel @Inject constructor(
                 PatientsDataSource(
                     isSiteBasedSearch = isSiteBasedSearch(),
                     searchModel = PatientDataModel(
-                        searchId = searchPatientId,
+                        searchText = searchPatientId,
                         operatingUnitId = null,
                         accountId = null,
                         isLabtestReferred = isLabTestReferred(),
