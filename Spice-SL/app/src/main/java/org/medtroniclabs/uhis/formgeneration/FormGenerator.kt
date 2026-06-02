@@ -3745,18 +3745,8 @@ class FormGenerator(
         serverData?.forEach { data ->
             if (fieldId == null || fieldId == data.id) {
                 data.apply {
-                    if ((
-                            isMandatory &&
-                                !resultHashMap.containsKey(id) &&
-                                isViewVisible(id) &&
-                                isViewEnabled(id)
-                        ) ||
-                        (
-                            isMandatory &&
-                                resultHashMap.containsKey(id) &&
-                                resultHashMap[id] is String &&
-                                (resultHashMap[id] as String).isEmpty()
-                        )
+                    if ((isMandatory && !resultHashMap.containsKey(id) && isViewVisible(id) && isViewEnabled(id)) ||
+                        (isMandatory && resultHashMap.containsKey(id) && resultHashMap[id] is String && (resultHashMap[id] as String).isEmpty())
                     ) {
                         isValid = false
                         requestFocusView(data)
@@ -3833,16 +3823,6 @@ class FormGenerator(
                                 isValid = false
                                 requestFocusView(data)
                             }
-                        }
-                    } else if (data.viewType.equals(VIEW_TYPE_FORM_AGE_OR_DOB, true) && isMandatory) {
-                        // AgeOrDob component validation - check if DOB exists
-                        val actualValue = resultHashMap[id] as? String
-                        if (actualValue.isNullOrBlank()) {
-                            isValid = false
-                            requestFocusView(data)
-                        } else {
-                            // AgeOrDob component already validates maxAge in its own logic
-                            hideValidationField(data)
                         }
                     } else if (data.viewType.equals(VIEW_TYPE_FORM_BP, true)) {
                         if (getViewByTag(AssessmentDefinedParams.BP_LOG + rootSuffix)?.visibility == View.VISIBLE) {
