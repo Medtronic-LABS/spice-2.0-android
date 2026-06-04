@@ -36,7 +36,7 @@ class TermsAndConditionViewModel @Inject constructor(
             viewModelScope.launch(dispatcherIO) {
                 try {
                     consentDoneLiveDate.postLoading()
-                    val response: String? = SecuredPreference.getUserId()?.let { userId ->
+                    val response: String? = SecuredPreference.getUserId().let { userId ->
                         val uniqueID = when {
                             enrollmentConsent -> UIConstants.ENROLLMENT_UNIQUE_ID
                             isEyeFromScreening -> UIConstants.EYE_CARE_SCREENING_UNIQUE_ID
@@ -44,7 +44,7 @@ class TermsAndConditionViewModel @Inject constructor(
                             else -> UIConstants.SCREENING_UNIQUE_ID
                         }
 
-                        screeningRepository.getConsentHtmlRawString(uniqueID, userId)?.content
+                        screeningRepository.getConsentHtmlRawString(uniqueID)?.content
                     }
                     consentDoneLiveDate.postSuccess(
                         response?.let {

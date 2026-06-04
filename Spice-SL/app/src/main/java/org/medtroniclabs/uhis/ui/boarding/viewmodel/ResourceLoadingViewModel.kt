@@ -41,8 +41,6 @@ class ResourceLoadingViewModel @Inject constructor(
     /** 0–100 cumulative sync progress for the resource loading screen. */
     val syncProgressPercent = MutableLiveData(0)
 
-    private val workflowNames = mutableListOf<Long>()
-    private val meta = mutableListOf<String>()
     private val syncDelay = 20 * 1000L // 20 Sec
     var changeFacility = false
 
@@ -74,8 +72,6 @@ class ResourceLoadingViewModel @Inject constructor(
             }
             metaDataCompleteLiveData.postValue(
                 metaRepository.getMetaDataInformation(
-                    workflowNames,
-                    meta,
                     changeFacility,
                     onSyncProgress,
                 ),

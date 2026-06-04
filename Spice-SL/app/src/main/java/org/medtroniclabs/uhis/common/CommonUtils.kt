@@ -26,12 +26,14 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.nullIfEmpty
 import org.medtroniclabs.uhis.common.DateUtils.calculateAge
 import org.medtroniclabs.uhis.common.RoleConstant.CHA
+import org.medtroniclabs.uhis.common.RoleConstant.CHCP
 import org.medtroniclabs.uhis.common.RoleConstant.CHWs
 import org.medtroniclabs.uhis.common.RoleConstant.COMMUNITY_HEALTH_ASSISTANT
 import org.medtroniclabs.uhis.common.RoleConstant.COMMUNITY_HEALTH_CARE_PROVIDER
 import org.medtroniclabs.uhis.common.RoleConstant.COMMUNITY_HEALTH_PROMOTER
 import org.medtroniclabs.uhis.common.RoleConstant.FIELD_ORGANIZER
 import org.medtroniclabs.uhis.common.RoleConstant.FO
+import org.medtroniclabs.uhis.common.RoleConstant.HE
 import org.medtroniclabs.uhis.common.RoleConstant.HEALTH_EDUCATOR
 import org.medtroniclabs.uhis.common.RoleConstant.HEALTH_SCREENER
 import org.medtroniclabs.uhis.common.RoleConstant.LAB_ASSISTANT
@@ -293,7 +295,7 @@ object CommonUtils {
     fun isRolePresent(): Boolean {
         val roleList =
             listOf(SECHN, MCHA, PROVIDER, CHA, MID_WIFE, LAB_ASSISTANT, SRN).map { it.lowercase() }
-        val currentRole = SecuredPreference.getRole()?.lowercase()
+        val currentRole = SecuredPreference.getRole().lowercase()
         return roleList.contains(currentRole)
     }
 
@@ -2443,7 +2445,7 @@ object CommonUtils {
     fun isHealthEducator(): Boolean {
         val userRole = SecuredPreference.getUserDetails()?.roles?.joinToString { it.name }
         if (userRole != null) {
-            return userRole.contains(HEALTH_EDUCATOR)
+            return userRole.contains(HEALTH_EDUCATOR) || userRole.contains(HE)
         }
         return false
     }
@@ -2467,7 +2469,7 @@ object CommonUtils {
     fun isCHCP(): Boolean {
         val userRole = SecuredPreference.getUserDetails()?.roles?.joinToString { it.name }
         if (userRole != null) {
-            return userRole.contains(COMMUNITY_HEALTH_CARE_PROVIDER)
+            return userRole.contains(COMMUNITY_HEALTH_CARE_PROVIDER) || userRole.contains(CHCP)
         }
         return false
     }

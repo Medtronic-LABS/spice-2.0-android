@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "spice_sl_mobile"
+rootProject.name = "uhis"
 include(":app")
 include(":analytics")

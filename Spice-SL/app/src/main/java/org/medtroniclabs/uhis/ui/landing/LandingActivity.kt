@@ -647,17 +647,17 @@ class LandingActivity :
 
     private fun initializeDrawerView() {
         val menu: Menu = binding.navView.menu
-        val menuItemToRemove: MenuItem? = menu.findItem(R.id.offline_sync)
+        val offlineSyncMenuItem: MenuItem? = menu.findItem(R.id.offline_sync)
         val changeFacilityMenuItem: MenuItem? = menu.findItem(R.id.changeFacility)
-        if (CommonUtils.isCommunity() && !CommonUtils.isChw() && menuItemToRemove != null) {
-            menu.removeItem(menuItemToRemove.itemId)
+        if (CommonUtils.isCommunity() && !CommonUtils.isChw() && offlineSyncMenuItem != null) {
+            menu.removeItem(offlineSyncMenuItem.itemId)
         }
         if (CommonUtils.isCommunity() && !CommonUtils.isProvider() && changeFacilityMenuItem != null) {
             menu.removeItem(changeFacilityMenuItem.itemId)
         }
 
         if (CommonUtils.isNonCommunity()) {
-            menuItemToRemove?.let {
+            offlineSyncMenuItem?.let {
                 if (CommonUtils.isTiberbuUser() || CommonUtils.isCha()) {
                     menu.removeItem(it.itemId)
                 }
@@ -669,7 +669,7 @@ class LandingActivity :
             }
         }
 
-        if (CommonUtils.isFoOrPo()) {
+        if (CommonUtils.isFoOrPo() || CommonUtils.isHealthEducator()) {
             menu.findItem(R.id.external_member)?.let { menu.removeItem(it.itemId) }
         }
 

@@ -134,7 +134,7 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
             }
 
             MenuConstants.MY_PATIENTS_MENU_ID -> {
-                if (CommonUtils.isNurse()) {
+                if (CommonUtils.isNurse() || CommonUtils.isCHCP()) {
                     val bundle = Bundle().apply {
                         putString(DefinedParams.ORIGIN, MenuConstants.MY_PATIENTS_MENU_ID.lowercase())
                     }

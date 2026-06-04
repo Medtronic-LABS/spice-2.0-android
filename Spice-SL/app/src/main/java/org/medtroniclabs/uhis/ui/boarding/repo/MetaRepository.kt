@@ -5,7 +5,6 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import org.medtroniclabs.uhis.BuildConfig
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.ConsentFormType
 import org.medtroniclabs.uhis.common.DateUtils
@@ -23,14 +22,12 @@ import org.medtroniclabs.uhis.data.HealthFacility
 import org.medtroniclabs.uhis.data.MedicalReviewMetaItems
 import org.medtroniclabs.uhis.data.Menu
 import org.medtroniclabs.uhis.data.MenuDetail
-import org.medtroniclabs.uhis.data.MetaDataResponse
 import org.medtroniclabs.uhis.data.ModelQuestion
 import org.medtroniclabs.uhis.data.ProgramEntity
 import org.medtroniclabs.uhis.data.UserProfile
 import org.medtroniclabs.uhis.data.model.ShasthyaKormi
 import org.medtroniclabs.uhis.data.model.ShasthyaShebika
 import org.medtroniclabs.uhis.data.model.SubVillage
-import org.medtroniclabs.uhis.data.registration.SiteResponse
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowConditionEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowEntity
 import org.medtroniclabs.uhis.db.entity.ConsentEntity
@@ -50,7 +47,6 @@ import org.medtroniclabs.uhis.db.entity.ShasthyaKormiLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
-import org.medtroniclabs.uhis.db.entity.SiteEntity
 import org.medtroniclabs.uhis.db.entity.SubVillageEntity
 import org.medtroniclabs.uhis.db.entity.UserProfileEntity
 import org.medtroniclabs.uhis.db.entity.VillageEntity
@@ -134,27 +130,26 @@ class MetaRepository @Inject constructor(
         }
 
     suspend fun getMetaDataInformation(
-        workflowNames: MutableList<Long>,
-        meta: MutableList<String>,
         changeFacility: Boolean,
         onProgress: ((Int) -> Unit)? = null,
     ): Resource<Boolean> {
+        val meta = mutableListOf<String>()
+        val workflowNames = mutableListOf<Long>()
         return try {
             withContext(Dispatchers.IO) {
                 val response = async { apiHelper.getMetaDataInformation() }.await()
-                BuildConfig.SALT
                 if (response.isSuccessful && response.body()?.status == true) {
                     with(roomHelper) {
                         response.body()?.entity?.apply {
                             saveHealthFacilityInDb(
                                 nearestHealthFacilities,
-                                defaultHealthFacility.id,
+                                defaultHealthFacility?.id ?: 0,
                                 userHealthFacilities,
                             )
                             saveUserLinkedVillages(userHealthFacilities)
                             SecuredPreference.putString(
                                 SecuredPreference.EnvironmentKey.DEFAULT_SITE_ID.name,
-                                defaultHealthFacility.fhirId,
+                                defaultHealthFacility?.fhirId ?: "",
                             )
 
                             chiefdoms?.let { chiefdomList ->
@@ -196,7 +191,10 @@ class MetaRepository @Inject constructor(
                             }
                             roomHelper.deleteAllMenus()
                             if (CommonUtils.isRolePresent()) {
-                                saveClinicalWorkflowsForProvider(defaultHealthFacility.clinicalWorkflows)
+                                val clinicalWorkFlows = defaultHealthFacility?.clinicalWorkflows
+                                clinicalWorkFlows?.takeIf { it.isNotEmpty() }?.let {
+                                    saveClinicalWorkflowsForProvider(clinicalWorkFlows)
+                                }
                                 if (CommonUtils.isNonCommunity()) {
                                     handleMeta(menu, meta)
                                 }
@@ -245,57 +243,63 @@ class MetaRepository @Inject constructor(
                         }
                         onProgress?.invoke(ResourceLoadingSyncProgress.USER_DATA_COMPLETE)
 
-                        val formsResponse = async {
-                            apiHelper.getForms(
-                                FormRequest(
-                                    nonNcdWorkflowEnabled = CommonUtils.isCommunity(),
-                                    workflowNames,
-                                ),
-                            )
-                        }.await()
-                        if (formsResponse.isSuccessful && formsResponse.body()?.status == true) {
-                            if (formsResponse.body()?.entity == null) {
-                                return@with Resource(state = ResourceState.ERROR)
-                            }
-                            formsResponse.body()?.entity?.apply {
-                                if (CommonUtils.isCommunity()) {
-                                    formData?.let {
-                                        saveFormsInDb(it)
+                        // For health educators, since there will only be tele support.
+                        // Ignored triggering the API as is not required.
+                        if (CommonUtils.isHealthEducator()) {
+                            onProgress?.invoke(ResourceLoadingSyncProgress.FORMS_COMPLETE)
+                        } else {
+                            val formsResponse = async {
+                                apiHelper.getForms(
+                                    FormRequest(
+                                        nonNcdWorkflowEnabled = CommonUtils.isCommunity(),
+                                        workflowNames,
+                                    ),
+                                )
+                            }.await()
+                            if (formsResponse.isSuccessful && formsResponse.body()?.status == true) {
+                                if (formsResponse.body()?.entity == null) {
+                                    return@with Resource(state = ResourceState.ERROR)
+                                }
+                                formsResponse.body()?.entity?.apply {
+                                    if (CommonUtils.isCommunity()) {
+                                        formData?.let {
+                                            saveFormsInDb(it)
+                                        } ?: run {
+                                            return@with Resource(state = ResourceState.ERROR)
+                                        }
+
+                                        enrollment?.let {
+                                            roomHelper.insertConsentForm(
+                                                ConsentForm(
+                                                    type = ENROLLMENT_UNIQUE_ID,
+                                                    content = it.consentForm,
+                                                ),
+                                            )
+                                        }
+
+                                        screening?.let {
+                                            roomHelper.insertConsentForm(
+                                                ConsentForm(
+                                                    type = SCREENING_UNIQUE_ID,
+                                                    content = it.consentForm,
+                                                ),
+                                            )
+                                        }
+                                    }
+                                    if (CommonUtils.isNonCommunity()) {
+                                        saveNcdFormsInDb(this)
+                                        saveNcdModelQuestions(modelQuestions)
+                                    }
+                                    clinicalTools?.let {
+                                        saveClinicalWorkflowsInDb(it)
                                     } ?: run {
                                         return@with Resource(state = ResourceState.ERROR)
                                     }
-
-                                    enrollment?.let {
-                                        roomHelper.insertConsentForm(
-                                            ConsentForm(
-                                                type = ENROLLMENT_UNIQUE_ID,
-                                                content = it.consentForm,
-                                            ),
-                                        )
-                                    }
-
-                                    screening?.let {
-                                        roomHelper.insertConsentForm(
-                                            ConsentForm(
-                                                type = SCREENING_UNIQUE_ID,
-                                                content = it.consentForm,
-                                            ),
-                                        )
-                                    }
                                 }
-                                if (CommonUtils.isNonCommunity()) {
-                                    saveNcdFormsInDb(this)
-                                    saveNcdModelQuestions(modelQuestions)
-                                }
-                                clinicalTools?.let {
-                                    saveClinicalWorkflowsInDb(it)
-                                } ?: run {
-                                    return@with Resource(state = ResourceState.ERROR)
-                                }
+                                onProgress?.invoke(ResourceLoadingSyncProgress.FORMS_COMPLETE)
+                            } else {
+                                return@with Resource(state = ResourceState.ERROR)
                             }
-                            onProgress?.invoke(ResourceLoadingSyncProgress.FORMS_COMPLETE)
-                        } else {
-                            return@with Resource(state = ResourceState.ERROR)
                         }
                         if (!SecuredPreference.getBoolean(SecuredPreference.EnvironmentKey.IS_TB_LOADED.name)) {
                             val tbResponse = async {
@@ -450,47 +454,6 @@ class MetaRepository @Inject constructor(
         }
     }
 
-    private fun updateSiteResponse(
-        fromOs: SiteResponse?,
-        siteResponse: SiteResponse,
-        list: ArrayList<SiteEntity>,
-        name: String,
-        responseBody: MetaDataResponse,
-    ) {
-        if (siteResponse.roleName.isNotEmpty() &&
-            (siteResponse.roleDisplayName?.isNotEmpty() == true)
-        ) {
-            SecuredPreference.getUserId()?.let { userId ->
-                list.add(
-                    SiteEntity(
-                        id = siteResponse._id,
-                        name = name,
-                        userSite = true,
-                        role = siteResponse.roleName[0],
-                        roleName = siteResponse.roleDisplayName[0],
-                        userId = userId,
-                        tenantId = siteResponse.tenantId,
-                        countyId = siteResponse.countyId,
-                        accountId = siteResponse.accountId,
-                        subCountyId = siteResponse.subCountyId,
-                        isDefault = siteResponse._id == responseBody.defaultHealthFacility.id,
-                        isQualipharmEnabledSite = siteResponse.isQualipharmEnabledSite,
-                        siteLevel = siteResponse.siteLevel,
-                        bpLog = fromOs?.workflows?.bpLog == true,
-                        glucoseLog = fromOs?.workflows?.glucoseLog == true,
-                        phq4 = fromOs?.workflows?.phq4 == true,
-                        cataract = fromOs?.workflows?.cataract == true,
-                        eyeCare = fromOs?.workflows?.eyeCare == true,
-                        countyName = siteResponse.countyName,
-                        subCountyName = siteResponse.subCountyName,
-                        countryName = siteResponse.countryName,
-                        code = siteResponse.code,
-                    ),
-                )
-            }
-        }
-    }
-
     private fun insertPrescriptionInstruction(items: List<String>): List<MedicalReviewMetaItems> {
         var itemId = 1L
         val resultList = ArrayList<MedicalReviewMetaItems>()
@@ -557,7 +520,7 @@ class MetaRepository @Inject constructor(
         allVillages?.forEach { root ->
             root.isUserVillage = userVillages?.firstOrNull { it.id == root.id } != null
         }
-        if (allVillages != null && allVillages.isNotEmpty()) {
+        if (!allVillages.isNullOrEmpty()) {
             val storedVillages = SecuredPreference.getLongList(SecuredPreference.EnvironmentKey.LINKED_VILLAGE_IDS.name)
             val newVillages = allVillages.filter { it.isUserVillage }.map { it.id }
             val hasChanges = storedVillages.isEmpty() || storedVillages.toSet() != newVillages.toSet()
@@ -569,11 +532,7 @@ class MetaRepository @Inject constructor(
             }
         }
 
-        if (allVillages != null) {
-            return allVillages
-        } else {
-            return emptyList()
-        }
+        return allVillages ?: emptyList()
     }
 
     private suspend fun saveUserLinkedVillages(userHealthFacilities: List<HealthFacility>?) {
@@ -729,7 +688,7 @@ class MetaRepository @Inject constructor(
 
     private fun saveFhirId(
         userId: String?,
-        healthFacility: HealthFacility,
+        healthFacility: HealthFacility?,
         changeFacility: Boolean,
     ) {
         userId?.let {
@@ -740,14 +699,14 @@ class MetaRepository @Inject constructor(
         SecuredPreference.putLong(SecuredPreference.EnvironmentKey.OLD_USER_ID.name, spiceUserId)
 
         if (!changeFacility) {
-            healthFacility.id.let {
+            healthFacility?.id?.let {
                 SecuredPreference.putLong(
                     SecuredPreference.EnvironmentKey.ORGANIZATION_ID.name,
                     it,
                 )
             }
 
-            healthFacility.fhirId?.let {
+            healthFacility?.fhirId?.let {
                 SecuredPreference.putString(
                     SecuredPreference.EnvironmentKey.ORGANIZATION_FHIR_ID.name,
                     it,
@@ -756,14 +715,14 @@ class MetaRepository @Inject constructor(
 
             SecuredPreference.putLong(
                 SecuredPreference.EnvironmentKey.TENANT_ID.name,
-                healthFacility.tenantId,
+                healthFacility?.tenantId ?: 0,
             )
 
-            healthFacility.district.id.let {
+            healthFacility?.district?.id?.let {
                 SecuredPreference.putLong(SecuredPreference.EnvironmentKey.DISTRICT_ID.name, it)
             }
 
-            healthFacility.chiefdom?.id?.let {
+            healthFacility?.chiefdom?.id?.let {
                 SecuredPreference.putLong(SecuredPreference.EnvironmentKey.CHIEFDOM_ID.name, it)
             }
         }
@@ -1504,10 +1463,7 @@ class MetaRepository @Inject constructor(
         }
     }
 
-    suspend fun getConsentHtmlRawString(
-        formType: String,
-        userId: Long,
-    ) = roomHelper.getConsentFormByType(formType)
+    suspend fun getConsentHtmlRawString(formType: String) = roomHelper.getConsentFormByType(formType)
 
     suspend fun riskFactorListing() = roomHelper.getAllRiskFactorEntityList()
 

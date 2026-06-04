@@ -16,7 +16,7 @@ import org.medtroniclabs.uhis.db.entity.VillageEntity
 
 data class MetaDataResponse(
     val nearestHealthFacilities: List<HealthFacility>,
-    val defaultHealthFacility: HealthFacility,
+    val defaultHealthFacility: HealthFacility?,
     val menu: Menu,
     val userProfile: UserProfile,
     val workflowIds: ArrayList<Long>,

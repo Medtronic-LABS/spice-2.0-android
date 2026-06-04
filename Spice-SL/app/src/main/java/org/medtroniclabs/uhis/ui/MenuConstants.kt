@@ -40,6 +40,7 @@ object MenuConstants {
     const val MENTAL_HEALTH = "mentalHealth"
     const val DISPENSE = "DISPENSE"
     const val FOLLOW_UP = "FOLLOW UP"
+    const val TELE_SUPPORT = "TELE SUPPORT"
     const val OTHER_REASON = "Other Reason"
     const val LIFESTYLE = "LIFESTYLE"
     const val PSYCHOLOGICAL = "PSYCHOLOGICAL"
