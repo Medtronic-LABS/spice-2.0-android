@@ -409,7 +409,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                         if (it.first) {
                             formGenerator.showQRScannedText(it.second, FormDefinedParams.QR_CODE)
                         } else {
-                            formGenerator.showErrorQRScanned(FormDefinedParams.QR_CODE)
+                            formGenerator.showErrorQRScanned(FormDefinedParams.QR_CODE, getString(R.string.invalid_qr_message))
                         }
                     }
                 }

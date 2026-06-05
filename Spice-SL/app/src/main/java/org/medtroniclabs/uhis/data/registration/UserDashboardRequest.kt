@@ -4,7 +4,7 @@ data class UserDashboardRequest(
     val sortField: String? = null,
     val customDate: CustomDateModel? = null,
     val tenantId: Long,
-    val userId: Long,
+    val userId: String,
     val shasthyaShebikaId: Long? = null,
 )
 

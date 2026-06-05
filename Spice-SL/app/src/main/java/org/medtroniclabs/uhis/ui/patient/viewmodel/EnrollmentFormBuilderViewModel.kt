@@ -91,9 +91,11 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
                             DefinedParams.GENDER,
                             DefinedParams.IS_PREGNANT,
                             DefinedParams.DATE_OF_BIRTH,
+                            DefinedParams.QR_CODE,
+                            DefinedParams.QR_CARD,
                         )
                         formLayout?.filter {
-                            it.id !in excludedIds && it.family != DefinedParams.BIO_DATA
+                            it.id !in excludedIds && it.family != DefinedParams.BIO_DATA && it.family != DefinedParams.QR_CARD
                         }
                     } else {
                         formLayout

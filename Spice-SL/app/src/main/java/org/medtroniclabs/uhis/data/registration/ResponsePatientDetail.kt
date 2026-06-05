@@ -14,4 +14,6 @@ data class ResponsePatientDetail(
     val subVillageId: String? = null,
     val phoneNumberCategory: String? = null,
     val isActive: Boolean? = null,
+    val identityType: String? = null,
+    val identityValue: String? = null,
 )

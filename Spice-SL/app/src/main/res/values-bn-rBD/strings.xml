@@ -127,6 +127,7 @@
     <string name="rmnch">RMNCH</string>
     <string name="tb">TB</string>
     <string name="national_id">জাতীয় আইডি</string>
+    <string name="brn">জন্ম নিবন্ধন নম্বর</string>
     <string name="bio_data">বায়োডাটা</string>
     <string name="name">নাম</string>
     <string name="gender">লিঙ্গ</string>
@@ -1779,6 +1780,8 @@
     <string name="reason_for_qulaipharm">কোয়ালিফার্ম রেসপন্স</string>
     <string name="start_treatment">ট্রিটমেন্ট শুরু করুন</string>
     <string name="village_town_city_name">গ্রাম/শহর/শহরের নাম</string>
+
+    <string name="invalid_qr_message">অবৈধ QR কোড। স্ক্যান করা QR কোডটি ইতোমধ্যে অন্য একজন ব্যক্তির সাথে সংযুক্ত রয়েছে।</string>
 
     <string name="linked_to_care">লিংক টু কেয়ার</string>
 

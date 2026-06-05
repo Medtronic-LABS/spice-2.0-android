@@ -361,7 +361,7 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
                         if (it.first) {
                             formGenerator.showQRScannedText(it.second, FormDefinedParams.QR_CODE)
                         } else {
-                            formGenerator.showErrorQRScanned(FormDefinedParams.QR_CODE)
+                            formGenerator.showErrorQRScanned(FormDefinedParams.QR_CODE, getString(R.string.invalid_qr_message))
                         }
                     }
                 }

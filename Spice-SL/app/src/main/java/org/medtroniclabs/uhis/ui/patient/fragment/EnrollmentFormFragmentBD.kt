@@ -1,13 +1,17 @@
 package org.medtroniclabs.uhis.ui.patient.fragment
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.text.InputFilter
+import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Spinner
 import androidx.activity.addCallback
@@ -46,6 +50,7 @@ import org.medtroniclabs.uhis.formgeneration.listener.FormEventListener
 import org.medtroniclabs.uhis.formgeneration.model.FormLayout
 import org.medtroniclabs.uhis.formgeneration.ui.FormResultComposer
 import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
+import org.medtroniclabs.uhis.mappingkey.MemberRegistration
 import org.medtroniclabs.uhis.mappingkey.Screening
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.resource.ResourceState
@@ -151,7 +156,12 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
             val village = response.villageId ?: getString(R.string.hyphen_symbol)
             val subVillage = response.subVillage ?: getString(R.string.hyphen_symbol)
 
-            layout.addView(inflateChildView(getString(R.string.national_id), patientId))
+            getIdentityLabel(requireContext(), response.identityType)?.let {
+                val identityValue = response.identityValue ?: getString(R.string.hyphen_symbol)
+                layout.addView(inflateChildView(it, identityValue))
+            }
+
+            layout.addView(inflateChildView(getString(R.string.patient_id), patientId))
             layout.addView(inflateChildView(getString(R.string.name), name))
             layout.addView(inflateChildView(getString(R.string.phone_no), phoneNumber))
             layout.addView(inflateChildView(getString(R.string.age), age))
@@ -160,6 +170,16 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
             layout.addView(inflateChildView(getString(R.string.village), subVillage))
         }
     }
+
+    private fun getIdentityLabel(
+        context: Context,
+        identityType: String?,
+    ): String? =
+        when {
+            identityType.isNullOrEmpty() || identityType == DefinedParams.NA -> null
+            identityType == DefinedParams.IDENTITY_TYPE_BRN -> context.getString(R.string.brn)
+            else -> context.getString(R.string.national_id)
+        }
 
     private fun inflateChildView(
         labelKey: String,
@@ -209,6 +229,37 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
 
                 DefinedParams.GENDER -> {
                     addOrRemoveGDMOption(map[id] as String)
+                }
+
+                DefinedParams.IDENTITY_TYPE -> {
+                    val selectedId = map[id] as? String
+                    val nationalIdView = formGenerator.getViewByTag(DefinedParams.IDENTITY_VALUE) as? EditText
+                    nationalIdView?.let {
+                        nationalIdView.setText("")
+                        if (MemberRegistration.IdType.NATIONAL_ID.value == selectedId) {
+                            nationalIdView.inputType = InputType.TYPE_CLASS_NUMBER
+                            val filters = nationalIdView.filters.toMutableList()
+                            filters.add(InputFilter.LengthFilter(MemberRegistration.MAX_LENGTH_NATIONAL_ID))
+                            nationalIdView.filters = filters.toTypedArray()
+                        } else {
+                            nationalIdView.inputType = InputType.TYPE_CLASS_TEXT
+                            val filters = nationalIdView.filters.toMutableList()
+                            filters.removeIf {
+                                it is InputFilter.LengthFilter
+                            }
+                            nationalIdView.filters = filters.toTypedArray()
+                        }
+                    }
+                    formGenerator.updateNationalIdLabelForIdType(
+                        selectedId,
+                        SecuredPreference.getIsTranslationEnabled(),
+                        optionsViewId = DefinedParams.IDENTITY_TYPE,
+                        viewId = DefinedParams.IDENTITY_VALUE,
+                    )
+                }
+
+                DefinedParams.IDENTITY_VALUE -> {
+                    formGenerator.hideError(id)
                 }
             }
         }
@@ -300,8 +351,12 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
         viewModel.qrCodeValidationResult.observe(viewLifecycleOwner) { resourceState ->
             when (resourceState.state) {
                 ResourceState.SUCCESS -> {
-                    resourceState.data?.qrCode?.let { qrCode ->
-                        formGenerator.showQRScannedText(qrCode, DefinedParams.QR_CODE)
+                    resourceState.data?.let { data ->
+                        if (data.status && data.qrCode != null) {
+                            formGenerator.showQRScannedText(data.qrCode!!, DefinedParams.QR_CODE)
+                        } else {
+                            formGenerator.showErrorQRScanned(DefinedParams.QR_CODE, data.message)
+                        }
                     }
                 }
                 else -> {
@@ -529,7 +584,9 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
             }
 
             viewModel.patientTrackId?.let {
-                map[DefinedParams.PATIENT_ID] = it.toString()
+                if (it != -1L) {
+                    map[DefinedParams.PATIENT_ID] = it.toString()
+                }
             }
 
             map[DefinedParams.PROVENANCE] = ProvanceDto(modifiedDate = System.currentTimeMillis().convertToUtcDateTime())
@@ -604,7 +661,7 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
                             hashMapOf(
                                 DefinedParams.CULTURE_VALUE to getString(R.string.gestational_diabetes_gdm),
                                 DefinedParams.NAME to DefinedParams.GESTATIONAL_DIABETES,
-                                DefinedParams.ID to DefinedParams.GESTATIONAL_DIABETES,
+                                DefinedParams.ID to DefinedParams.GESTATIONAL_DIABETES_ID,
                             ),
                         )
                     }

@@ -194,7 +194,7 @@ class NurseDashboardFragment : Fragment(), View.OnClickListener, FilterSortInter
                         val request = UserDashboardRequest(
                             sortField = it.type,
                             tenantId = SecuredPreference.getTenantId(),
-                            userId = SecuredPreference.getUserId(),
+                            userId = SecuredPreference.getUserFhirId(),
                             shasthyaShebikaId = viewModel.filter?.shasthyaShebikaId,
                         )
                         constructRequest(request)
@@ -219,7 +219,7 @@ class NurseDashboardFragment : Fragment(), View.OnClickListener, FilterSortInter
                         inUTC = true,
                     ),
                 ),
-                userId = SecuredPreference.getUserId(),
+                userId = SecuredPreference.getUserFhirId(),
                 shasthyaShebikaId = viewModel.filter?.shasthyaShebikaId,
             )
             constructRequest(request)

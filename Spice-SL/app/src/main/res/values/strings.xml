@@ -133,6 +133,7 @@
     <string name="rmnch">RMNCH</string>
     <string name="tb">TB</string>
     <string name="national_id">National ID</string>
+    <string name="brn">BRN</string>
     <string name="bio_data">Bio Data</string>
     <string name="name">Name</string>
     <string name="gender">Gender</string>
@@ -1853,6 +1854,7 @@
     <string name="prescribed_quantity">Prescribed Days</string>
     <string name="reason_for_qulaipharm">Qualipharm Response</string>
     <string name="village_town_city_name">Village/Town/City Name</string>
+    <string name="invalid_qr_message">Invalid QR Code. The scanned QR Code is already associated with a different individual.</string>
 
     <string name="string_slash_string" translatable="false">%1$s/%2$s</string>
     <string name="upcoming_in_days">Upcoming in %1$s days</string>

@@ -4945,11 +4945,13 @@ class FormGenerator(
     fun updateNationalIdLabelForIdType(
         selectedIdType: String?,
         translate: Boolean,
+        optionsViewId: String = MemberRegistration.ID_TYPE,
+        viewId: String = MemberRegistration.NATIONAL_ID,
     ) {
-        val idTypeLayout = getFormLayout(MemberRegistration.ID_TYPE) ?: return
-        val nationalIdLayout = getFormLayout(MemberRegistration.NATIONAL_ID) ?: return
-        val titleView = getViewByTag(MemberRegistration.NATIONAL_ID + titleSuffix) as? TextView
-        val nationalIdInput = getViewByTag(MemberRegistration.NATIONAL_ID) as? EditText
+        val idTypeLayout = getFormLayout(optionsViewId) ?: return
+        val nationalIdLayout = getFormLayout(viewId) ?: return
+        val titleView = getViewByTag(viewId + titleSuffix) as? TextView
+        val nationalIdInput = getViewByTag(viewId) as? EditText
 
         val options = idTypeLayout.optionsList
         val option =

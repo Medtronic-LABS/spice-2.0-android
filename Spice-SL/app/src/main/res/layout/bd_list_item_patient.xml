@@ -88,13 +88,6 @@
                 app:layout_constraintStart_toEndOf="@+id/tvCardNationalID"
                 app:layout_constraintTop_toBottomOf="@+id/tvLabelPatientID" />
 
-            <androidx.constraintlayout.widget.Group
-                android:id="@+id/patientIdGroup"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:constraint_referenced_ids="tvLabelNationalID, tvLabelPatientID, tvCardNationalID, tvCardPatientID" />
-
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvBPStatus"
                 style="@style/TextStyle_Regular_16_Blue"

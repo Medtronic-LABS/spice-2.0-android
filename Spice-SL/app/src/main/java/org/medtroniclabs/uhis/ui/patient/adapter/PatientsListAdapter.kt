@@ -11,6 +11,8 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import org.medtroniclabs.uhis.R
+import org.medtroniclabs.uhis.appextensions.gone
+import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.StringConverter
@@ -58,7 +60,6 @@ class PatientsListAdapter(
             with(binding) {
                 val context = binding.root.context
                 if (origin == UIConstants.FOLLOW_UP) {
-                    patientIdGroup.visibility = View.GONE
                     if (selectedTab.equals(DefinedParams.RED_RISK, true)) {
                         patientFollowupGroup.visibility = View.VISIBLE
                     } else {
@@ -75,7 +76,6 @@ class PatientsListAdapter(
                     binding.callContainer.isEnabled = !item.callInitiated
                     binding.tvCallBtn.isEnabled = !item.callInitiated
                 } else {
-                    patientIdGroup.visibility = View.VISIBLE
                     patientFollowupGroup.visibility = View.GONE
                 }
 
@@ -89,11 +89,31 @@ class PatientsListAdapter(
                     ),
                 )
 
-                tvCardNationalID.text = item.nationalId ?: "-"
-                tvCardPatientID.text = item.patientId ?: "-"
+                val identityLabel = getIdentityLabel(context, item.identityType)
+                if (identityLabel != null) {
+                    tvLabelNationalID.visible()
+                    tvCardNationalID.visible()
+                    tvLabelNationalID.text = identityLabel
+                    tvCardNationalID.text = item.identityValue ?: context.getString(R.string.hyphen_symbol)
+                } else {
+                    tvLabelNationalID.gone()
+                    tvCardNationalID.gone()
+                }
+
+                tvCardPatientID.text = item.patientId ?: context.getString(R.string.hyphen_symbol)
                 getDrawable(clPatientRoot, item.riskColorCode ?: "#FFFFFFFF")
             }
     }
+
+    private fun getIdentityLabel(
+        context: Context,
+        identityType: String?,
+    ): String? =
+        when {
+            identityType.isNullOrEmpty() || identityType == DefinedParams.NA -> null
+            identityType == DefinedParams.IDENTITY_TYPE_BRN -> context.getString(R.string.brn)
+            else -> context.getString(R.string.national_id)
+        }
 
     private fun conditionalVisibility(
         item: PatientListResModel,

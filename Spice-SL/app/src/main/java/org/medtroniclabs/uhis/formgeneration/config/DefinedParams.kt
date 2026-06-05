@@ -121,6 +121,8 @@ object DefinedParams {
 
     const val GESTATIONAL_DIABETES = "Gestational Diabetes(GDM)"
 
+    const val GESTATIONAL_DIABETES_ID = "gestationalDiabetes"
+
     const val RED_RISK_COMMENTS = "redRiskComments"
 
     const val GENDER = "gender"
@@ -256,6 +258,14 @@ object DefinedParams {
     const val IS_PREGNANT = "isPregnant"
 
     const val DATE_OF_BIRTH = "dateOfBirth"
+
+    const val IDENTITY_TYPE = "identityType"
+
+    const val IDENTITY_VALUE = "identityValue"
+
+    const val IDENTITY_TYPE_BRN = "brn"
+
+    const val IDENTITY_TYPE_NID = "nid"
 
     /**
      * Returns true if a given name starts with no symptoms or equals none

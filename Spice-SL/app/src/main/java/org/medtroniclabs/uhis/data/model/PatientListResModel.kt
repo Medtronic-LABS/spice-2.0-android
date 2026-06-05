@@ -27,4 +27,6 @@ data class PatientListResModel(
     val tenantId: Long? = null,
     val retryAttempts: Int? = null,
     val callRegisterId: Long? = null,
+    val identityType: String? = null,
+    val identityValue: String? = null,
 )
