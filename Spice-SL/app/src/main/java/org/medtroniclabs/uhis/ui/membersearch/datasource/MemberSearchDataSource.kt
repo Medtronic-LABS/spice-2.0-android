@@ -47,11 +47,20 @@ class MemberSearchDataSource(
             filterBySs = params.effectiveSsIds,
             filterBySubVillages = params.effectiveSubVillageIds,
             allowNullHousehold = params.allowNullHousehold,
+            qrCode = params.qrCode,
         )
         localFhirIds = memberSearchRepository.extractLocalFhirIds(localMembers)
         val localItems = localMembers.map { MemberSearchListItem.Local(it) }
+        val earlyReturn = (!params.qrCode.isNullOrBlank() && localMembers.isNotEmpty()) || !shouldFetchRemote()
 
-        if (!shouldFetchRemote()) {
+        /**
+         * Return DB items
+         *
+         * 1. If searching using qr value && found the record in DB
+         * 2. If active search (text or QR) cannot reach remote, return local results (may be empty)
+         * 3. If no active search, return default local list
+         */
+        if (earlyReturn) {
             return LoadResult.Page(
                 data = localItems,
                 prevKey = null,
@@ -76,6 +85,7 @@ class MemberSearchDataSource(
                 searchInput = params.searchInput,
                 skip = 0,
                 isSiteBasedSearch = params.isSiteBasedSearch,
+                qrValue = params.qrCode,
             )
             totalCount = result.totalCount
             loadedCount = result.patients.size
@@ -99,6 +109,7 @@ class MemberSearchDataSource(
             searchInput = params.searchInput,
             skip = loadedCount,
             isSiteBasedSearch = params.isSiteBasedSearch,
+            qrValue = params.qrCode,
         )
         totalCount = result.totalCount
         val remoteItems = mapRemoteResults(result)
@@ -116,7 +127,7 @@ class MemberSearchDataSource(
             .filterNot { patient -> isDuplicate(patient) }
             .map { MemberSearchListItem.Remote(it) }
 
-    private fun shouldFetchRemote(): Boolean = params.searchInput.isNotBlank() && params.isOnline
+    private fun shouldFetchRemote(): Boolean = (!params.searchInput.isNullOrBlank() || !params.qrCode.isNullOrBlank()) && params.isOnline
 
     private fun isDuplicate(patient: PatientListResModel): Boolean = localFhirIds.contains(patient.id?.toString())
 

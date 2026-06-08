@@ -1336,7 +1336,7 @@ class RoomHelperImpl @Inject constructor(
     override suspend fun updateUndercountedDisabilityHouseholds(): Int = householdDAO.updateUndercountedDisabilityHouseholds()
 
     override fun getServiceMembers(
-        searchInput: String,
+        searchInput: String?,
         filterBySs: List<Long>,
         filterBySubVillages: List<Long>,
         staticFilter: ServiceStaticFilter,
@@ -1358,6 +1358,7 @@ class RoomHelperImpl @Inject constructor(
             filterBySs = filterBySs,
             filterBySubVillages = filterBySubVillages,
             allowNullHousehold = allowNullHousehold,
+            qrCode = qrCode,
         )
 
     override suspend fun getMemberAssessmentHistory(

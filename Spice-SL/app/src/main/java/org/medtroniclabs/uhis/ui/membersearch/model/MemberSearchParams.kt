@@ -8,7 +8,7 @@ import org.medtroniclabs.uhis.data.model.ChipViewItemModel
  * Drives both the filter UI and the paging query (local Room + optional remote API).
  */
 data class MemberSearchParams(
-    val searchInput: String = "",
+    val searchInput: String? = null,
     val isOnline: Boolean = false,
     val isSiteBasedSearch: Boolean = true,
     val filterSk: Long = -1L,

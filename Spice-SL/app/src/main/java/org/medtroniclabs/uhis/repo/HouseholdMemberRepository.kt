@@ -324,7 +324,7 @@ class HouseholdMemberRepository @Inject constructor(
         try {
             val memberEntity = roomHelper.getMemberDetailsByID(memberId)
             Resource(state = ResourceState.SUCCESS, data = memberEntity)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Resource(state = ResourceState.SUCCESS)
         }
 
@@ -334,7 +334,7 @@ class HouseholdMemberRepository @Inject constructor(
         try {
             val memberEntity = roomHelper.getMemberDetailsByParentId(memberId)
             Resource(state = ResourceState.SUCCESS, data = memberEntity)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Resource(state = ResourceState.ERROR)
         }
 
@@ -342,7 +342,7 @@ class HouseholdMemberRepository @Inject constructor(
         try {
             val memberEntity = roomHelper.getMemberDetailsByPatientId(patientId)
             Resource(state = ResourceState.SUCCESS, data = memberEntity)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Resource(state = ResourceState.ERROR)
         }
 
@@ -350,7 +350,7 @@ class HouseholdMemberRepository @Inject constructor(
         try {
             val memberEntity = roomHelper.getAssessmentMemberDetails(id)
             Resource(state = ResourceState.SUCCESS, data = memberEntity)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Resource(state = ResourceState.ERROR)
         }
 
@@ -459,7 +459,7 @@ class HouseholdMemberRepository @Inject constructor(
     }
 
     fun getServiceMembers(
-        searchInput: String,
+        searchInput: String?,
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
         staticFilter: ServiceStaticFilter,
@@ -493,6 +493,7 @@ class HouseholdMemberRepository @Inject constructor(
                                     filterBySs = filterBySs,
                                     filterBySubVillages = filterBySubVillages,
                                     allowNullHousehold = allowNullHousehold,
+                                    qrCode = qrCode,
                                 )
                         }
                     }

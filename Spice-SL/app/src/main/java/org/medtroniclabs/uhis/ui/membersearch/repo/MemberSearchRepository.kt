@@ -27,10 +27,11 @@ class MemberSearchRepository @Inject constructor(
      * Waits for Room to emit the first query result.
      */
     suspend fun getLocalMembers(
-        searchInput: String,
+        searchInput: String?,
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
         allowNullHousehold: Boolean = false,
+        qrCode: String? = null,
     ): List<HouseholdMemberWithTb> =
         householdMemberRepository
             .getServiceMembers(
@@ -39,6 +40,7 @@ class MemberSearchRepository @Inject constructor(
                 filterBySubVillages = filterBySubVillages,
                 staticFilter = ServiceStaticFilter.ALL_MEMBERS,
                 allowNullHousehold = allowNullHousehold,
+                qrCode = qrCode,
             ).asFlow()
             .first()
 
@@ -46,9 +48,10 @@ class MemberSearchRepository @Inject constructor(
      * Searches patients on the remote API for the given text query.
      */
     suspend fun searchRemotePatients(
-        searchInput: String,
+        searchInput: String?,
         skip: Int,
         isSiteBasedSearch: Boolean,
+        qrValue: String?,
     ): RemotePatientSearchResult {
         val request =
             PatientDataModel(
@@ -57,6 +60,7 @@ class MemberSearchRepository @Inject constructor(
                 tenantId = SecuredPreference.getTenantId(),
                 searchText = searchInput,
                 isSearchUserOrgPatient = isSiteBasedSearch,
+                searchQRValue = qrValue,
             )
         val response = apiHelper.searchPatientById(request)
         return RemotePatientSearchResult(

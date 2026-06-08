@@ -34,6 +34,7 @@ internal object ServiceMemberCountQueryBuilder {
         filterBySs: List<Long>,
         filterBySubVillages: List<Long>,
         allowNullHousehold: Boolean,
+        qrCode: String?,
     ): SimpleSQLiteQuery {
         val areaFilters = buildAreaFilters(filterBySs, filterBySubVillages)
         val conditions = mutableListOf<String>()
@@ -44,6 +45,14 @@ internal object ServiceMemberCountQueryBuilder {
             val pattern = "%${searchInput.trim()}%"
             args += pattern
             args += pattern
+        }
+
+        // Search by QR code
+        if (!qrCode.isNullOrBlank()) {
+            conditions += "hhm.qr_code LIKE ?"
+
+            val qrPattern = "%${qrCode.trim()}%"
+            args += qrPattern
         }
 
         when (staticFilter) {

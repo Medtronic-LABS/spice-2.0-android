@@ -301,7 +301,7 @@ interface MemberDAO {
      *
      */
     fun getServiceMembers(
-        searchInput: String,
+        searchInput: String?,
         filterBySs: List<Long>,
         filterBySubVillages: List<Long>,
         staticFilter: ServiceStaticFilter,
@@ -326,7 +326,7 @@ interface MemberDAO {
             conditions += ServiceFilterConditions.IS_ACTIVE
         }
 
-        if (searchInput.isNotBlank()) {
+        if (!searchInput.isNullOrBlank()) {
             conditions += "(hhm.name LIKE ? OR hhm.phone_number LIKE ?)"
             val pattern = "%${searchInput.trim()}%"
             args += pattern
@@ -508,6 +508,7 @@ interface MemberDAO {
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
         allowNullHousehold: Boolean,
+        qrCode: String?,
     ): Int {
         val query = ServiceMemberCountQueryBuilder.buildCountQuery(
             staticFilter = staticFilter,
@@ -515,6 +516,7 @@ interface MemberDAO {
             filterBySs = filterBySs,
             filterBySubVillages = filterBySubVillages,
             allowNullHousehold = allowNullHousehold,
+            qrCode = qrCode,
         )
         return getServiceMemberCountRaw(query)
     }

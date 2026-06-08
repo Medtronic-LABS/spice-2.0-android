@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -81,7 +80,7 @@ class MemberSearchViewModel @Inject constructor(
                         )
                     },
                 ).flow
-            }.cachedIn(viewModelScope)
+            }
 
     init {
         observeSearch { query ->
@@ -112,6 +111,7 @@ class MemberSearchViewModel @Inject constructor(
         }
         _searchParams.value = current.copy(
             searchInput = search ?: current.searchInput,
+            qrCode = null,
             filterBySs = newSsFilter,
             filterBySubVillages = subVillagesFilter ?: current.filterBySubVillages,
             filterSk = newFilterSk,
@@ -202,5 +202,9 @@ class MemberSearchViewModel @Inject constructor(
 
     fun clearRemoteMemberDetailsState() {
         _remoteMemberDetailsState.value = Resource(ResourceState.SUCCESS)
+    }
+
+    fun filterMemberListByQr(qrCode: String) {
+        _searchParams.value = MemberSearchParams(qrCode = qrCode)
     }
 }
