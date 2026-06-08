@@ -84,7 +84,7 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
         preSelectedStaticFilter = intent.getStringExtra(DashboardConstants.EXTRA_DASHBOARD_STATIC_FILTER)?.let {
             runCatching { ServiceStaticFilter.valueOf(it) }.getOrNull()
         }
-        if (CommonUtils.isFoOrPo() && !isExternalMember) {
+        if (servicesViewModel.isFoPo && !isExternalMember) {
             if (preSelectedStaticFilter != null && preSelectedStaticFilter !in servicesViewModel.getStaticFilters()) {
                 preSelectedStaticFilter = null
             }
@@ -142,7 +142,7 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
             binding.bottomNavigationView.visible()
             binding.btnAddExternalMember.text = getString(R.string.add_external_member)
             binding.btnAddExternalMember.safeClickListener(this)
-        } else if (CommonUtils.isFoOrPo()) {
+        } else if (servicesViewModel.isFoPo) {
             binding.bottomNavigationView.visible()
             binding.btnAddExternalMember.text = getString(R.string.add_new_member_small)
             binding.btnAddExternalMember.safeClickListener(this)

@@ -29,6 +29,7 @@ import org.medtroniclabs.uhis.ui.followup.FollowUpMyPatientActivity
 import org.medtroniclabs.uhis.ui.home.adapter.DashboardMenuItemsAdapter
 import org.medtroniclabs.uhis.ui.household.HouseholdSearchActivity
 import org.medtroniclabs.uhis.ui.landing.viewmodel.LandingViewModel
+import org.medtroniclabs.uhis.ui.membersearch.MemberSearchActivity
 import org.medtroniclabs.uhis.ui.patient.AdvancedSearchActivity
 import org.medtroniclabs.uhis.ui.patient.NurseDashboardActivity
 import org.medtroniclabs.uhis.ui.peersupervisor.PerformanceMonitoringActivity
@@ -134,7 +135,9 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
             }
 
             MenuConstants.MY_PATIENTS_MENU_ID -> {
-                if (CommonUtils.isNurse() || CommonUtils.isCHCP()) {
+                if (CommonUtils.isFoOrPo()) {
+                    startActivity(Intent(requireContext(), MemberSearchActivity::class.java))
+                } else if (CommonUtils.isNurse() || CommonUtils.isCHCP()) {
                     val bundle = Bundle().apply {
                         putString(DefinedParams.ORIGIN, MenuConstants.MY_PATIENTS_MENU_ID.lowercase())
                     }

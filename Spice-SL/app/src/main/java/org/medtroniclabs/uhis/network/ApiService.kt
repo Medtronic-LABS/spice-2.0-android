@@ -84,6 +84,7 @@ import org.medtroniclabs.uhis.data.model.PatientTypeCreateRequest
 import org.medtroniclabs.uhis.data.model.PncSubmitResponse
 import org.medtroniclabs.uhis.data.model.RegistrationResponse
 import org.medtroniclabs.uhis.data.model.RequestChangePassword
+import org.medtroniclabs.uhis.data.model.RequestMemberDetails
 import org.medtroniclabs.uhis.data.model.ResponseChangePassword
 import org.medtroniclabs.uhis.data.model.SiteRoleResponse
 import org.medtroniclabs.uhis.data.model.TbHistory
@@ -1108,6 +1109,11 @@ interface ApiService {
     suspend fun searchPatientById(
         @Body request: PatientDataModel,
     ): APIResponse<ArrayList<PatientListResModel>>
+
+    @POST("/spice-service/patient/member-details")
+    suspend fun getMemberDetails(
+        @Body request: RequestMemberDetails,
+    ): Response<ResponseBody>
 
     @POST("/spice-service/patient/followup-list")
     suspend fun patientFollowUpList(

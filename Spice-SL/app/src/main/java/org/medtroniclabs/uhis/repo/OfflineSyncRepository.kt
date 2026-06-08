@@ -30,6 +30,7 @@ import org.medtroniclabs.uhis.common.DefinedParams.UnAssigned
 import org.medtroniclabs.uhis.common.DefinedParams.VILLAGE_ID
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.StringConverter
+import org.medtroniclabs.uhis.data.model.RequestMemberDetails
 import org.medtroniclabs.uhis.data.offlinesync.model.Assessment
 import org.medtroniclabs.uhis.data.offlinesync.model.AssessmentEncounter
 import org.medtroniclabs.uhis.data.offlinesync.model.CallRegisterDetail
@@ -40,12 +41,14 @@ import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberLinkCallDeta
 import org.medtroniclabs.uhis.data.offlinesync.model.ProvanceDto
 import org.medtroniclabs.uhis.data.offlinesync.model.RequestGetSyncStatus
 import org.medtroniclabs.uhis.data.offlinesync.model.ResponseInitialDownload
+import org.medtroniclabs.uhis.data.offlinesync.model.ResponseMemberDetails
 import org.medtroniclabs.uhis.data.offlinesync.model.ResponseRxBuddy
 import org.medtroniclabs.uhis.data.offlinesync.model.RxBuddy
 import org.medtroniclabs.uhis.data.offlinesync.model.RxBuddyFollowUp
 import org.medtroniclabs.uhis.data.offlinesync.model.RxBuddyMember
 import org.medtroniclabs.uhis.data.offlinesync.model.RxBuddyRegister
 import org.medtroniclabs.uhis.data.offlinesync.model.RxBuddyRegisterDetail
+import org.medtroniclabs.uhis.data.offlinesync.model.SavedMemberDetails
 import org.medtroniclabs.uhis.data.offlinesync.model.SyncResponse
 import org.medtroniclabs.uhis.data.offlinesync.model.TreatmentDetails
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineConstant
@@ -316,6 +319,70 @@ class OfflineSyncRepository @Inject constructor(
         return false
     }
 
+    suspend fun fetchAndSaveMemberDetails(memberId: String): SavedMemberDetails? {
+        val response = apiHelper.getMemberDetails(RequestMemberDetails(memberId))
+        if (!response.isSuccessful) {
+            return null
+        }
+        val body = response.body()?.string() ?: return null
+        return try {
+            val gson = Gson()
+            val type: Type = object : TypeToken<ResponseMemberDetails>() {}.type
+            val memberDetails: ResponseMemberDetails? = gson.fromJson(body, type)
+            memberDetails?.let { saveMemberDetailsResponse(it, memberId) }
+        } catch (e: Exception) {
+            Timber.d("Exception ${e.localizedMessage}")
+            null
+        }
+    }
+
+    private suspend fun saveMemberDetailsResponse(
+        response: ResponseMemberDetails,
+        requestedMemberId: String,
+    ): SavedMemberDetails? {
+        val localMemberId = roomHelper
+            .insertOrUpdateHHMFromBE(
+                response.member.toHouseholdMemberEntity(null, OfflineSyncStatus.Success),
+            ).takeIf { it > 0 } ?: roomHelper.getHouseholdMemberIdByFhirId(requestedMemberId)
+            ?: return null
+
+        response.followUps?.forEach { followUp ->
+            followUp.patientStatus = followUp.patientStatus ?: ""
+            followUp.syncStatus = OfflineSyncStatus.Success
+            roomHelper.insertOrUpdateFollowUp(followUp)
+        }
+
+        response.pregnancyInfos?.forEach {
+            roomHelper.insertUpdatePregnancyDetailFromBE(it)
+        }
+
+        saveAssessmentHistory(response.assessmentHistory ?: emptyList())
+
+        return SavedMemberDetails(
+            localMemberId = localMemberId,
+            dateOfBirth = response.member.dateOfBirth,
+        )
+    }
+
+    private suspend fun saveAssessmentHistory(assessmentHistory: List<MemberAssessmentHistoryEntity>) {
+        if (assessmentHistory.isEmpty()) return
+        val updatedHistoryList = assessmentHistory.map { history ->
+            val memberId = roomHelper.getHouseholdMemberIdByFhirId(history.memberFhirId)
+            val existingHistory = roomHelper.getMemberAssessmentHistory(
+                history.memberFhirId,
+                memberId,
+                history.visitDate,
+                history.serviceProvided?.uppercase(Locale.ENGLISH),
+            )
+            if (existingHistory != null) {
+                history.copy(id = existingHistory.id, memberId = memberId)
+            } else {
+                history.copy(memberId = memberId)
+            }
+        }
+        roomHelper.insertMemberAssessmentHistory(updatedHistoryList)
+    }
+
     private suspend fun saveRequestInitialDownload(
         requestInitialDownload: ResponseInitialDownload,
         assessmentHistory: List<MemberAssessmentHistoryEntity>,
@@ -398,27 +465,7 @@ class OfflineSyncRepository @Inject constructor(
             val followUpCriteria = FollowUpCriteria(3, 5, 3, 7, 7, 2, 2, 2, 2, 5, 5, 5, 5)
             SecuredPreference.putFollowUpCriteria(followUpCriteria)
         }
-        if (assessmentHistory.isNotEmpty()) {
-            // Set member assessment history
-            val updatedHistoryList = assessmentHistory.map { history ->
-                val memberId = roomHelper.getHouseholdMemberIdByFhirId(history.memberFhirId)
-
-                // Uniqueness check: Member (FHIR ID or Local ID), Visit Date, Service Provided
-                val existingHistory = roomHelper.getMemberAssessmentHistory(
-                    history.memberFhirId,
-                    memberId,
-                    history.visitDate,
-                    history.serviceProvided?.uppercase(Locale.ENGLISH),
-                )
-
-                if (existingHistory != null) {
-                    history.copy(id = existingHistory.id, memberId = memberId)
-                } else {
-                    history.copy(memberId = memberId)
-                }
-            }
-            roomHelper.insertMemberAssessmentHistory(updatedHistoryList)
-        }
+        saveAssessmentHistory(assessmentHistory)
 
         SecuredPreference.putString(
             SecuredPreference.EnvironmentKey.SERVER_LAST_SYNCED.name,

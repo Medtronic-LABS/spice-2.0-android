@@ -85,6 +85,7 @@ import org.medtroniclabs.uhis.data.model.PatientTypeCreateRequest
 import org.medtroniclabs.uhis.data.model.PncSubmitResponse
 import org.medtroniclabs.uhis.data.model.RegistrationResponse
 import org.medtroniclabs.uhis.data.model.RequestChangePassword
+import org.medtroniclabs.uhis.data.model.RequestMemberDetails
 import org.medtroniclabs.uhis.data.model.ResponseChangePassword
 import org.medtroniclabs.uhis.data.model.SiteRoleResponse
 import org.medtroniclabs.uhis.data.model.TbHistory
@@ -260,6 +261,8 @@ interface ApiHelper {
     suspend fun fetchSyncedData(request: RequestAllEntities): Response<ResponseBody>
 
     suspend fun fetchMemberAssessmentHistory(request: RequestAllEntities): Response<List<MemberAssessmentHistoryEntity>>
+
+    suspend fun getMemberDetails(request: RequestMemberDetails): Response<ResponseBody>
 
     suspend fun getPatients(request: PatientsDataModel): APIResponse<SearchAndListResponse>
 

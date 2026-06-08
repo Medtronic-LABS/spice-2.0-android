@@ -57,6 +57,7 @@ import org.medtroniclabs.uhis.ui.home.AssessmentToolsActivity
 import org.medtroniclabs.uhis.ui.household.HouseholdDefinedParams
 import org.medtroniclabs.uhis.ui.household.summary.HouseholdSummaryActivity
 import org.medtroniclabs.uhis.ui.landing.LandingActivity
+import org.medtroniclabs.uhis.ui.membersearch.MemberSearchActivity
 import org.medtroniclabs.uhis.ui.services.ServicesActivity
 
 @AndroidEntryPoint
@@ -720,13 +721,13 @@ class AssessmentActivity : BaseActivity() {
                     ?.data
                     ?.householdLocalId
                 val isExternalMember = householdLocalId == null || householdLocalId == 0L
-                if (viewModel.entryPoint == ServicesActivity.ENTRY_POINT_SERVICES) {
+                if (viewModel.entryPoint == MemberSearchActivity.ENTRY_POINT_MEMBER_SEARCH) {
+                    Intent(this, MemberSearchActivity::class.java)
+                } else if (viewModel.entryPoint == ServicesActivity.ENTRY_POINT_SERVICES) {
                     Intent(this, ServicesActivity::class.java)
                 } else if (isExternalMember) {
                     Intent(this, ServicesActivity::class.java).apply {
-                        if (!CommonUtils.isFoOrPo()) {
-                            putExtra(ServicesActivity.IS_EXTERNAL_MEMBER, true)
-                        }
+                        putExtra(ServicesActivity.IS_EXTERNAL_MEMBER, true)
                     }
                 } else {
                     Intent(this, HouseholdSummaryActivity::class.java).apply {

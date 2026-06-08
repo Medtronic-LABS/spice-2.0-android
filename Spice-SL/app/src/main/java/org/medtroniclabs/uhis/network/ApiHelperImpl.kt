@@ -87,6 +87,7 @@ import org.medtroniclabs.uhis.data.model.PatientTypeCreateRequest
 import org.medtroniclabs.uhis.data.model.PncSubmitResponse
 import org.medtroniclabs.uhis.data.model.RegistrationResponse
 import org.medtroniclabs.uhis.data.model.RequestChangePassword
+import org.medtroniclabs.uhis.data.model.RequestMemberDetails
 import org.medtroniclabs.uhis.data.model.ResponseChangePassword
 import org.medtroniclabs.uhis.data.model.SiteRoleResponse
 import org.medtroniclabs.uhis.data.model.TbHistory
@@ -275,6 +276,8 @@ class ApiHelperImpl @Inject constructor(
 
     override suspend fun fetchMemberAssessmentHistory(request: RequestAllEntities): Response<List<MemberAssessmentHistoryEntity>> =
         apiService.fetchMemberAssessmentHistory(request)
+
+    override suspend fun getMemberDetails(request: RequestMemberDetails): Response<ResponseBody> = apiService.getMemberDetails(request)
 
     override suspend fun getHouseholdAndMembers(request: RequestAllEntities): Response<APIResponse<List<HouseHold>>> = apiService.getHouseholdDetails(request)
 
