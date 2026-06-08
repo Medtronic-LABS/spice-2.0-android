@@ -508,6 +508,7 @@ interface MemberDAO {
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
         allowNullHousehold: Boolean,
+        qrCode: String?,
     ): Int {
         val query = ServiceMemberCountQueryBuilder.buildCountQuery(
             staticFilter = staticFilter,
@@ -515,6 +516,7 @@ interface MemberDAO {
             filterBySs = filterBySs,
             filterBySubVillages = filterBySubVillages,
             allowNullHousehold = allowNullHousehold,
+            qrCode = qrCode,
         )
         return getServiceMemberCountRaw(query)
     }

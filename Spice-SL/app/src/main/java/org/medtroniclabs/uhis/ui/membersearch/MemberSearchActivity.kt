@@ -58,7 +58,7 @@ class MemberSearchActivity : BaseActivity(), View.OnClickListener, MemberSelecti
      * We are removing this listener when scanning a valid QR code
      * and adding again as the search text is also getting cleared
      */
-    private var searchTextListener: TextWatcher? = null
+    private lateinit var searchTextListener: TextWatcher
 
     private val cameraPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) {
@@ -73,14 +73,10 @@ class MemberSearchActivity : BaseActivity(), View.OnClickListener, MemberSelecti
             val qrCode = result.resultString?.trim().orEmpty()
             if (qrCode.isNotBlank()) {
                 viewModel.filterMemberListByQr(qrCode)
-                searchTextListener?.let {
-                    binding.llExactSearch.etSearchTerm.removeTextChangedListener(searchTextListener)
-                }
+                binding.llExactSearch.etSearchTerm.removeTextChangedListener(searchTextListener)
                 binding.llExactSearch.etSearchTerm.text
                     ?.clear()
-                searchTextListener?.let {
-                    binding.llExactSearch.etSearchTerm.addTextChangedListener(searchTextListener)
-                }
+                binding.llExactSearch.etSearchTerm.addTextChangedListener(searchTextListener)
             } else {
                 showErrorDialogue(
                     title = getString(R.string.alert),

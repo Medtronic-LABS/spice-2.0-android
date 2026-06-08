@@ -493,6 +493,7 @@ class HouseholdMemberRepository @Inject constructor(
                                     filterBySs = filterBySs,
                                     filterBySubVillages = filterBySubVillages,
                                     allowNullHousehold = allowNullHousehold,
+                                    qrCode = qrCode,
                                 )
                         }
                     }

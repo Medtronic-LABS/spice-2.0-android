@@ -68,7 +68,7 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
 
     private var lastPosition = -1
 
-    private lateinit var textChange: TextWatcher
+    private lateinit var searchTextListener: TextWatcher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -227,7 +227,7 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
     private fun setListeners() {
         binding.llFilter.btnFilter.safeClickListener(this)
         binding.llExactSearch.btnQrSearch.safeClickListener(this)
-        textChange = binding.llExactSearch.etSearchTerm.doOnTextChanged { text, _, _, _ ->
+        searchTextListener = binding.llExactSearch.etSearchTerm.doOnTextChanged { text, _, _, _ ->
             servicesViewModel.onTextChange(text?.toString())
         }
     }
@@ -260,9 +260,11 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
                     hideLoading()
                     // Do Nothing
                 }
+
                 ResourceState.LOADING -> {
                     showLoading()
                 }
+
                 ResourceState.SUCCESS -> {
                     hideLoading()
                     filteredMembersResource.data?.let { filteredMembersUiData ->
@@ -366,8 +368,19 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
 
     private val qrScanLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(QRScanContract()) { result ->
-            if (result.resultString != null) {
-                servicesViewModel.filterMemberListByQr(result.resultString)
+            val qrCode = result.resultString?.trim().orEmpty()
+            if (qrCode.isNotBlank()) {
+                servicesViewModel.filterMemberListByQr(qrCode)
+                binding.llExactSearch.etSearchTerm.removeTextChangedListener(searchTextListener)
+                binding.llExactSearch.etSearchTerm.text
+                    ?.clear()
+                binding.llExactSearch.etSearchTerm.addTextChangedListener(searchTextListener)
+            } else {
+                showErrorDialogue(
+                    title = getString(R.string.alert),
+                    message = getString(R.string.invalid_qr),
+                    positiveButtonName = getString(R.string.ok),
+                ) { }
             }
         }
 

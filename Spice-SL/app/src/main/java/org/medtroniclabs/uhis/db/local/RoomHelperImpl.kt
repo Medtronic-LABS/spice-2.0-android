@@ -1358,6 +1358,7 @@ class RoomHelperImpl @Inject constructor(
             filterBySs = filterBySs,
             filterBySubVillages = filterBySubVillages,
             allowNullHousehold = allowNullHousehold,
+            qrCode = qrCode,
         )
 
     override suspend fun getMemberAssessmentHistory(
