@@ -301,7 +301,7 @@ interface MemberDAO {
      *
      */
     fun getServiceMembers(
-        searchInput: String,
+        searchInput: String?,
         filterBySs: List<Long>,
         filterBySubVillages: List<Long>,
         staticFilter: ServiceStaticFilter,
@@ -326,7 +326,7 @@ interface MemberDAO {
             conditions += ServiceFilterConditions.IS_ACTIVE
         }
 
-        if (searchInput.isNotBlank()) {
+        if (!searchInput.isNullOrBlank()) {
             conditions += "(hhm.name LIKE ? OR hhm.phone_number LIKE ?)"
             val pattern = "%${searchInput.trim()}%"
             args += pattern

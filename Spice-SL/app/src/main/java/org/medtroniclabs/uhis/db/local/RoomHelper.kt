@@ -937,7 +937,7 @@ interface RoomHelper {
     suspend fun updateUndercountedDisabilityHouseholds(): Int
 
     fun getServiceMembers(
-        searchInput: String,
+        searchInput: String?,
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
         staticFilter: ServiceStaticFilter,
