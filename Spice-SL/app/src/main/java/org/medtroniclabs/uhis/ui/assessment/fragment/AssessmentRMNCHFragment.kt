@@ -1208,13 +1208,13 @@ class AssessmentRMNCHFragment :
         updateFieldVisibility(AssessmentDefinedParams.FOLIC_ACID_TOTAL_CONSUMED, showFolicAcid)
         updateFieldVisibility(AssessmentDefinedParams.FOLIC_ACID_PROVIDED, showFolicAcid)
 
-        // 6. IFA/Iron Total Consumed - show only if gestational age <= 12 weeks
+        // 6. IFA/Iron Total Consumed - show only if gestational age > 12 weeks
         val showIFA = gestationalAgeWeeks == null || gestationalAgeWeeks > AssessmentDefinedParams.GESTATIONAL_AGE_WEEK_12
         updateFieldVisibility(AssessmentDefinedParams.IFA_TABLETS, showIFA)
         updateFieldVisibility(AssessmentDefinedParams.IFA_TOTAL_CONSUMED, showIFA)
         updateFieldVisibility(AssessmentDefinedParams.IFA_PROVIDED, showIFA)
 
-        // 7. Calcium Total Consumed - show only if gestational age <= 12 weeks
+        // 7. Calcium Total Consumed - show only if gestational age > 12 weeks
         val showCalcium = gestationalAgeWeeks == null || gestationalAgeWeeks > AssessmentDefinedParams.GESTATIONAL_AGE_WEEK_12
         updateFieldVisibility(AssessmentDefinedParams.CALCIUM_TABLETS, showCalcium)
         updateFieldVisibility(AssessmentDefinedParams.CALCIUM_TOTAL_CONSUMED, showCalcium)
@@ -2331,15 +2331,19 @@ class AssessmentRMNCHFragment :
         }
 
         // 5. Inadequate /Non consumption IFA
-        val ifaConsumed = (getValueFromNestedMap(resultMap, AssessmentDefinedParams.IFA_TOTAL_CONSUMED) as? String)?.toIntOrNull()
-        if (ifaConsumed == null || ifaConsumed < AssessmentDefinedParams.TABLET_CONSUMPTION_THRESHOLD) {
-            gaps.add(ANCGaps.INADEQUATE_IFA.value + "::" + ANCGaps.INADEQUATE_IFA.cultureValue)
+        if (formGenerator.isViewVisible(AssessmentDefinedParams.IFA_TOTAL_CONSUMED)) {
+            val ifaConsumed = (getValueFromNestedMap(resultMap, AssessmentDefinedParams.IFA_TOTAL_CONSUMED) as? String)?.toIntOrNull()
+            if (ifaConsumed == null || ifaConsumed < AssessmentDefinedParams.TABLET_CONSUMPTION_THRESHOLD) {
+                gaps.add(ANCGaps.INADEQUATE_IFA.value + "::" + ANCGaps.INADEQUATE_IFA.cultureValue)
+            }
         }
 
         // 6. Inadequate /Non consumption Calcium
-        val calciumConsumed = (getValueFromNestedMap(resultMap, AssessmentDefinedParams.CALCIUM_TOTAL_CONSUMED) as? String)?.toIntOrNull()
-        if (calciumConsumed == null || calciumConsumed < AssessmentDefinedParams.TABLET_CONSUMPTION_THRESHOLD) {
-            gaps.add(ANCGaps.INADEQUATE_CALCIUM.value + "::" + ANCGaps.INADEQUATE_CALCIUM.cultureValue)
+        if (formGenerator.isViewVisible(AssessmentDefinedParams.CALCIUM_TOTAL_CONSUMED)) {
+            val calciumConsumed = (getValueFromNestedMap(resultMap, AssessmentDefinedParams.CALCIUM_TOTAL_CONSUMED) as? String)?.toIntOrNull()
+            if (calciumConsumed == null || calciumConsumed < AssessmentDefinedParams.TABLET_CONSUMPTION_THRESHOLD) {
+                gaps.add(ANCGaps.INADEQUATE_CALCIUM.value + "::" + ANCGaps.INADEQUATE_CALCIUM.cultureValue)
+            }
         }
 
         // 7. Facility not identified for institutional delivery
