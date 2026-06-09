@@ -50,6 +50,7 @@ import org.medtroniclabs.uhis.common.RoleConstant.PROGRAM_ORGANIZER
 import org.medtroniclabs.uhis.common.RoleConstant.PROVIDER
 import org.medtroniclabs.uhis.common.RoleConstant.PSYCHOLOGIST
 import org.medtroniclabs.uhis.common.RoleConstant.SECHN
+import org.medtroniclabs.uhis.common.RoleConstant.SHASTIYA_KORMI
 import org.medtroniclabs.uhis.common.RoleConstant.SRN
 import org.medtroniclabs.uhis.data.ErrorResponse
 import org.medtroniclabs.uhis.data.Prescription
@@ -281,6 +282,8 @@ object CommonUtils {
     fun isChw(): Boolean = SecuredPreference.getUserDetails()?.roles?.any { it.name in CHWs } == true
 
     fun offlineUsers(): Boolean = isNonCommunity() || (isCommunity() && isChw())
+
+    fun isSk() = SecuredPreference.getUserDetails()?.roles?.any { it.name == SHASTIYA_KORMI } == true
 
     fun isChwChp(): Boolean = isChw() || isChp()
 

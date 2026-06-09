@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "c01ee509a8d0082183c8c0b9a6b2f130",
+    "identityHash": "544bc89e72a01932a04cbde9e98910c4",
     "entities": [
       {
         "tableName": "Household",
@@ -1451,7 +1451,7 @@
       },
       {
         "tableName": "FollowUpCall",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `followUpId` INTEGER NOT NULL, `callDate` TEXT NOT NULL, `duration` INTEGER NOT NULL, `attempts` INTEGER NOT NULL, `status` TEXT NOT NULL, `patientStatus` TEXT, `reason` TEXT, `isSynced` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `followUpId` INTEGER NOT NULL, `callDate` TEXT NOT NULL, `duration` REAL, `attempts` INTEGER NOT NULL, `status` TEXT NOT NULL, `callType` TEXT, `isWillingToVisitUHC` INTEGER, `visitRejectReason` TEXT, `otherVisitRejectReason` TEXT, `unSuccessfulCallReason` TEXT, `wrongNumber` INTEGER NOT NULL, `isSynced` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `calledByUserId` TEXT NOT NULL, `calledByUserName` TEXT NOT NULL, `calledByUserRole` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -1474,8 +1474,8 @@
           {
             "fieldPath": "duration",
             "columnName": "duration",
-            "affinity": "INTEGER",
-            "notNull": true
+            "affinity": "REAL",
+            "notNull": false
           },
           {
             "fieldPath": "attempts",
@@ -1490,16 +1490,40 @@
             "notNull": true
           },
           {
-            "fieldPath": "patientStatus",
-            "columnName": "patientStatus",
+            "fieldPath": "callType",
+            "columnName": "callType",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "reason",
-            "columnName": "reason",
+            "fieldPath": "isWillingToVisitUHC",
+            "columnName": "isWillingToVisitUHC",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "visitRejectReason",
+            "columnName": "visitRejectReason",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "otherVisitRejectReason",
+            "columnName": "otherVisitRejectReason",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "unSuccessfulCallReason",
+            "columnName": "unSuccessfulCallReason",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "wrongNumber",
+            "columnName": "wrongNumber",
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "isSynced",
@@ -1517,6 +1541,24 @@
             "fieldPath": "longitude",
             "columnName": "longitude",
             "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "calledByUserId",
+            "columnName": "calledByUserId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "calledByUserName",
+            "columnName": "calledByUserName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "calledByUserRole",
+            "columnName": "calledByUserRole",
+            "affinity": "TEXT",
             "notNull": true
           }
         ],
@@ -3785,7 +3827,7 @@
       },
       {
         "tableName": "MemberAssessmentHistory",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `memberFhirId` TEXT, `memberId` INTEGER, `visitDate` TEXT, `serviceProvided` TEXT, `encounterId` TEXT, `customStatus` TEXT, `latestVisit` INTEGER NOT NULL, `referralStatus` TEXT, `referralReason` TEXT, `nextFollowUpDate` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `memberFhirId` TEXT, `memberId` INTEGER, `visitDate` TEXT, `serviceProvided` TEXT, `encounterId` TEXT, `customStatus` TEXT, `latestVisit` INTEGER NOT NULL, `referralStatus` TEXT, `referralReason` TEXT, `nextFollowUpDate` TEXT, `practitionerId` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -3852,6 +3894,12 @@
             "columnName": "nextFollowUpDate",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "practitionerId",
+            "columnName": "practitionerId",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -3887,6 +3935,15 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `idx_member_assessment_history_service_provided` ON `${TABLE_NAME}` (`serviceProvided`)"
+          },
+          {
+            "name": "idx_member_assessment_history_practitioner_id",
+            "unique": false,
+            "columnNames": [
+              "practitionerId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_member_assessment_history_practitioner_id` ON `${TABLE_NAME}` (`practitionerId`)"
           }
         ],
         "foreignKeys": []
@@ -4457,7 +4514,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c01ee509a8d0082183c8c0b9a6b2f130')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '544bc89e72a01932a04cbde9e98910c4')"
     ]
   }
 }

@@ -1,5 +1,6 @@
 package org.medtroniclabs.uhis.db.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -15,6 +16,7 @@ import org.medtroniclabs.uhis.db.entity.EntitiesName.MEMBER_ASSESSMENT_HISTORY_E
         Index(value = ["visitDate"], name = "idx_member_assessment_history_visit_date"),
         Index(value = ["memberId"], name = "idx_member_assessment_history_member_id"),
         Index(value = ["serviceProvided"], name = "idx_member_assessment_history_service_provided"),
+        Index(value = [COLUMN_PRACTITIONER_ID], name = INDEX_PRACTITIONER_ID),
     ],
 )
 data class MemberAssessmentHistoryEntity(
@@ -31,4 +33,9 @@ data class MemberAssessmentHistoryEntity(
     val referralStatus: String?,
     val referralReason: String?,
     var nextFollowUpDate: String? = null,
+    @ColumnInfo(COLUMN_PRACTITIONER_ID)
+    var practitionerId: String? = null,
 )
+
+const val COLUMN_PRACTITIONER_ID = "practitionerId"
+const val INDEX_PRACTITIONER_ID = "idx_member_assessment_history_practitioner_id"

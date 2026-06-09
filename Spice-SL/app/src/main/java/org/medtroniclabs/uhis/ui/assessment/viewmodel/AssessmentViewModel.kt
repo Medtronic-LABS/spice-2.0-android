@@ -379,6 +379,7 @@ class AssessmentViewModel @Inject constructor(
                         referralStatus = getReferralStatus(referralStatus, assessmentMap),
                         referralReason = referralReason.toString(),
                         nextFollowUpDate = getNextFollowUpDate(otherDetails),
+                        practitionerId = SecuredPreference.getUserFhirId(),
                     )
                     assessmentHistoryResultLiveData.postValue(assessmentRepository.saveAssessmentHistory(history))
                 }
@@ -1587,6 +1588,7 @@ class AssessmentViewModel @Inject constructor(
                     latestVisit = true,
                     referralStatus = referralStatus,
                     referralReason = referralReason.toString(),
+                    practitionerId = SecuredPreference.getUserFhirId(),
                 )
                 assessmentHistoryResultLiveData.postValue(assessmentRepository.saveAssessmentHistory(history))
             }

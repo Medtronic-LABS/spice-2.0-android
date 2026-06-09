@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.db.entity.EntitiesName.MEMBER_ASSESSMENT_HISTORY_ENTITY
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
 import org.medtroniclabs.uhis.db.response.DashboardCountsRow
@@ -183,6 +184,7 @@ interface MemberAssessmentHistoryDao {
                 ELSE 1
             END
         )
+        AND (practitionerId IS NULL OR practitionerId IS :userId)
         """,
     )
     suspend fun getDashboardCounts(
@@ -192,6 +194,7 @@ interface MemberAssessmentHistoryDao {
         ssIdsSize: Int,
         subVillageIds: List<Long>,
         subVillageIdsSize: Int,
+        userId: String = SecuredPreference.getUserFhirId(),
     ): DashboardCountsRow?
 
     @Query(
@@ -227,6 +230,7 @@ interface MemberAssessmentHistoryDao {
                           AND (:endDate IS NULL OR date(datetime(h.visitDate, 'localtime')) <= :endDate)
                           AND date(datetime(h.visitDate, 'localtime')) >= substr(lp.lastMenstrualPeriod, 1, 10)
                           AND date(datetime(h.visitDate, 'localtime')) <= date(substr(lp.lastMenstrualPeriod, 1, 10), '+4 months')
+                          AND (practitionerId IS NULL OR practitionerId IS :userId)
                     )
                     THEN 1 ELSE 0
                 END
@@ -240,6 +244,7 @@ interface MemberAssessmentHistoryDao {
                           AND LOWER(h.serviceProvided) = 'anc'
                           AND (:startDate IS NULL OR date(datetime(h.visitDate, 'localtime')) >= :startDate)
                           AND (:endDate IS NULL OR date(datetime(h.visitDate, 'localtime')) <= :endDate)
+                          AND (practitionerId IS NULL OR practitionerId IS :userId)
                     ) >= 3
                     THEN 1 ELSE 0
                 END
@@ -270,6 +275,7 @@ interface MemberAssessmentHistoryDao {
         ssIdsSize: Int,
         subVillageIds: List<Long>,
         subVillageIdsSize: Int,
+        userId: String = SecuredPreference.getUserFhirId(),
     ): MaternalDashboardCountsRow?
 
     /**

@@ -185,7 +185,7 @@ class MemberSearchViewModel @Inject constructor(
     private fun MemberSearchParams.withOnlineState(): MemberSearchParams = copy(isOnline = connectivityManager.isNetworkAvailable())
 
     fun fetchRemoteMemberDetails(patient: PatientListResModel) {
-        val memberId = patient.id?.toString() ?: run {
+        val memberId = patient.memberReference ?: run {
             _remoteMemberDetailsState.value = Resource(ResourceState.ERROR)
             return
         }

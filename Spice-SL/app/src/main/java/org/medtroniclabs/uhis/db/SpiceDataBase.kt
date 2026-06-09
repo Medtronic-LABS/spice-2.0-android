@@ -119,12 +119,11 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentNCDEntity
         ComplicationEntity::class, CurrentMedicationEntity::class, PhysicalExaminationEntity::class, ComplaintsEntity::class,
         SymptomEntity::class, ShasthyaKormiEntity::class, ShasthyaKormiLinkedVillageEntity::class,
     ],
-    version = 8,
+    version = 6,
     autoMigrations = [
         AutoMigration(1, 2),
         AutoMigration(2, 3),
         AutoMigration(4, 5),
-        AutoMigration(5, 6),
     ],
 )
 @TypeConverters(OfflineStatusTypeConverter::class)
@@ -201,8 +200,7 @@ abstract class SpiceDataBase : RoomDatabase() {
                     SpiceDataBase::class.java,
                     DATABASE_NAME,
                 ).addMigrations(SpiceDatabaseMigration.MIGRATION_3_4)
-                .addMigrations(SpiceDatabaseMigration.MIGRATION_6_7)
-                .addMigrations(SpiceDatabaseMigration.Migration_7_8)
+                .addMigrations(SpiceDatabaseMigration.MIGRATION_5_6)
             if (!BuildConfig.DEBUG) {
                 db.openHelperFactory(factory)
             }
