@@ -4,6 +4,8 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.db.entity.COLUMN_PRACTITIONER_ID
+import org.medtroniclabs.uhis.db.entity.COLUMN_REFERRAL_FACILITY_TYPE
+import org.medtroniclabs.uhis.db.entity.EntitiesName.FOLLOW_UP
 import org.medtroniclabs.uhis.db.entity.EntitiesName.FOLLOW_UP_CALL
 import org.medtroniclabs.uhis.db.entity.EntitiesName.MEMBER_ASSESSMENT_HISTORY_ENTITY
 import org.medtroniclabs.uhis.db.entity.INDEX_PRACTITIONER_ID
@@ -47,6 +49,8 @@ object SpiceDatabaseMigration {
 
             db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN $COLUMN_PRACTITIONER_ID TEXT;")
             db.execSQL("CREATE INDEX IF NOT EXISTS $INDEX_PRACTITIONER_ID ON $MEMBER_ASSESSMENT_HISTORY_ENTITY($COLUMN_PRACTITIONER_ID)")
+
+            db.execSQL("ALTER TABLE $FOLLOW_UP ADD COLUMN $COLUMN_REFERRAL_FACILITY_TYPE TEXT;")
         }
     }
 }

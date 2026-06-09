@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "544bc89e72a01932a04cbde9e98910c4",
+    "identityHash": "fc040f469148aac4afb96307e37c7712",
     "entities": [
       {
         "tableName": "Household",
@@ -1293,7 +1293,7 @@
       },
       {
         "tableName": "FollowUp",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`referenceId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id` INTEGER, `householdId` TEXT, `memberId` TEXT NOT NULL, `patientId` TEXT NOT NULL, `encounterId` TEXT, `patientStatus` TEXT, `currentPatientStatus` TEXT, `reason` TEXT, `attempts` INTEGER NOT NULL, `successfulAttempts` INTEGER NOT NULL, `unsuccessfulAttempts` INTEGER NOT NULL, `type` TEXT NOT NULL, `encounterType` TEXT, `encounterName` TEXT, `encounterDate` TEXT, `nextVisitDate` TEXT, `referredSiteId` TEXT, `villageId` TEXT NOT NULL, `isCompleted` INTEGER NOT NULL, `isWrongNumber` INTEGER NOT NULL, `calledAt` INTEGER, `syncStatus` TEXT NOT NULL, `updatedAt` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`referenceId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id` INTEGER, `householdId` TEXT, `memberId` TEXT NOT NULL, `patientId` TEXT NOT NULL, `encounterId` TEXT, `patientStatus` TEXT, `currentPatientStatus` TEXT, `reason` TEXT, `attempts` INTEGER NOT NULL, `successfulAttempts` INTEGER NOT NULL, `unsuccessfulAttempts` INTEGER NOT NULL, `type` TEXT NOT NULL, `encounterType` TEXT, `encounterName` TEXT, `encounterDate` TEXT, `nextVisitDate` TEXT, `referredSiteId` TEXT, `referralFacilityType` TEXT, `villageId` TEXT NOT NULL, `isCompleted` INTEGER NOT NULL, `isWrongNumber` INTEGER NOT NULL, `calledAt` INTEGER, `syncStatus` TEXT NOT NULL, `updatedAt` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "referenceId",
@@ -1400,6 +1400,12 @@
           {
             "fieldPath": "referredSiteId",
             "columnName": "referredSiteId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "referralFacilityType",
+            "columnName": "referralFacilityType",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -4514,7 +4520,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '544bc89e72a01932a04cbde9e98910c4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fc040f469148aac4afb96307e37c7712')"
     ]
   }
 }

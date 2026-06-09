@@ -579,7 +579,7 @@ class RoomHelperImpl @Inject constructor(
         selectedReferralReasonTypes: List<String>,
         selectedReferralReasonTypesSize: Int,
         ncdSelectedReason: String?,
-        ncdReferralFacility: String?,
+        ncdSelectedReferralTo: String?,
         fromDate: String,
         toDate: String,
     ): LiveData<List<FollowUpPatientModel>> {
@@ -594,6 +594,7 @@ class RoomHelperImpl @Inject constructor(
                 selectedReferralReasonTypes = selectedReferralReasonTypes,
                 selectedReferralReasonTypesSize = selectedReferralReasonTypesSize,
                 ncdSelectedReason = ncdSelectedReason,
+                ncdSelectedReferralTo = ncdSelectedReferralTo,
                 fromDate = fromDate,
                 toDate = toDate,
             )
@@ -608,6 +609,7 @@ class RoomHelperImpl @Inject constructor(
                 selectedReferralReasonTypes = selectedReferralReasonTypes,
                 selectedReferralReasonTypesSize = selectedReferralReasonTypesSize,
                 ncdSelectedReason = ncdSelectedReason,
+                ncdSelectedReferralTo = ncdSelectedReferralTo,
                 fromDate = fromDate,
                 toDate = toDate,
             )

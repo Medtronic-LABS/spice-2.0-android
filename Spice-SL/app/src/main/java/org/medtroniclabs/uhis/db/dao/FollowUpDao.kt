@@ -29,7 +29,7 @@ interface FollowUpDao {
             "hhm.isActive = 1 AND " +
             "fu.id IS NOT NULL AND " +
             "CASE WHEN :villageIdsSize > 0 THEN fu.villageId IN (:villageIds) WHEN :shashthyaShebikaIdsSize > 0 THEN fu.villageId IN (SELECT DISTINCT sslv.subVillageId FROM ShasthyaShebikaLinkedVillageEntity AS sslv WHERE sslv.shasthyaShebikaId IN (:shashthyaShebikaIds)) ELSE 1 END AND " +
-            "((:selectedReferralReasonTypesSize = 0 AND (:ncdSelectedReason IS NULL OR :ncdSelectedReason= '')) OR (:selectedReferralReasonTypesSize > 0 AND LOWER(fu.encounterName) IN (:selectedReferralReasonTypes)) OR (:ncdSelectedReason IS NOT NULL AND :ncdSelectedReason != '' AND LOWER(fu.encounterName) = LOWER('${FollowUpDefinedParams.FILTER_NCD}') AND LOWER(fu.reason) LIKE '%' || :ncdSelectedReason || '%')) AND " +
+            "((:selectedReferralReasonTypesSize = 0 AND (:ncdSelectedReason IS NULL OR :ncdSelectedReason= '') AND (:ncdSelectedReferralTo IS NULL OR :ncdSelectedReferralTo='')) OR (:selectedReferralReasonTypesSize > 0 AND LOWER(fu.encounterName) IN (:selectedReferralReasonTypes)) OR ((:ncdSelectedReason IS NOT NULL AND :ncdSelectedReason != '') OR (:ncdSelectedReferralTo IS NOT NULL AND :ncdSelectedReferralTo != '')) AND LOWER(fu.encounterName) = LOWER('${FollowUpDefinedParams.FILTER_NCD}') AND ((:ncdSelectedReason IS NULL OR :ncdSelectedReason = '') OR LOWER(fu.reason) LIKE '%' || :ncdSelectedReason || '%') AND ((:ncdSelectedReferralTo IS NULL OR :ncdSelectedReferralTo = '') OR LOWER(fu.referralFacilityType) = LOWER(:ncdSelectedReferralTo))) AND " +
             "fu.type=:type AND " +
             "(hhm.name LIKE '%' || :search || '%' OR hhm.phone_number LIKE '%' || :search || '%' OR :search IS NULL) AND " +
             "CASE WHEN :fromDate = '' THEN 1 ELSE date(fu.encounterDate) BETWEEN :fromDate AND :toDate END " +
@@ -45,6 +45,7 @@ interface FollowUpDao {
         selectedReferralReasonTypes: List<String>,
         selectedReferralReasonTypesSize: Int,
         ncdSelectedReason: String?,
+        ncdSelectedReferralTo: String?,
         fromDate: String = "",
         toDate: String = "",
     ): LiveData<List<FollowUpPatientModel>>
@@ -56,7 +57,7 @@ interface FollowUpDao {
             "hhm.isActive = 1 AND " +
             "fu.id IS NOT NULL AND " +
             "CASE WHEN :villageIdsSize > 0 THEN fu.villageId IN (:villageIds) WHEN :shashthyaShebikaIdsSize > 0 THEN fu.villageId IN (SELECT DISTINCT sslv.subVillageId FROM ShasthyaShebikaLinkedVillageEntity AS sslv WHERE sslv.shasthyaShebikaId IN (:shashthyaShebikaIds)) ELSE 1 END AND " +
-            "((:selectedReferralReasonTypesSize = 0 AND (:ncdSelectedReason IS NULL OR :ncdSelectedReason= '')) OR (:selectedReferralReasonTypesSize > 0 AND LOWER(fu.encounterName) IN (:selectedReferralReasonTypes)) OR (:ncdSelectedReason IS NOT NULL AND :ncdSelectedReason != '' AND LOWER(fu.encounterName) = LOWER('${FollowUpDefinedParams.FILTER_NCD}') AND LOWER(fu.reason) LIKE '%' || :ncdSelectedReason || '%')) AND " +
+            "((:selectedReferralReasonTypesSize = 0 AND (:ncdSelectedReason IS NULL OR :ncdSelectedReason= '') AND (:ncdSelectedReferralTo IS NULL OR :ncdSelectedReferralTo='')) OR (:selectedReferralReasonTypesSize > 0 AND LOWER(fu.encounterName) IN (:selectedReferralReasonTypes)) OR ((:ncdSelectedReason IS NOT NULL AND :ncdSelectedReason != '') OR (:ncdSelectedReferralTo IS NOT NULL AND :ncdSelectedReferralTo != '')) AND LOWER(fu.encounterName) = LOWER('${FollowUpDefinedParams.FILTER_NCD}') AND ((:ncdSelectedReason IS NULL OR :ncdSelectedReason = '') OR LOWER(fu.reason) LIKE '%' || :ncdSelectedReason || '%') AND ((:ncdSelectedReferralTo IS NULL OR :ncdSelectedReferralTo = '') OR LOWER(fu.referralFacilityType) = LOWER(:ncdSelectedReferralTo))) AND " +
             "fu.type=:type AND " +
             "(hhm.name LIKE '%' || :search || '%' OR hhm.phone_number LIKE '%' || :search || '%' OR :search IS NULL) AND " +
             "CASE WHEN :fromDate = '' THEN 1 ELSE date(fu.nextVisitDate) BETWEEN :fromDate AND :toDate END " +
@@ -72,6 +73,7 @@ interface FollowUpDao {
         selectedReferralReasonTypes: List<String>,
         selectedReferralReasonTypesSize: Int,
         ncdSelectedReason: String?,
+        ncdSelectedReferralTo: String?,
         fromDate: String = "",
         toDate: String = "",
     ): LiveData<List<FollowUpPatientModel>>

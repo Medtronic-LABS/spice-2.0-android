@@ -1,5 +1,6 @@
 package org.medtroniclabs.uhis.db.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
@@ -29,6 +30,8 @@ data class FollowUp(
     val encounterDate: String? = null,
     val nextVisitDate: String? = null,
     val referredSiteId: String? = null,
+    @ColumnInfo(COLUMN_REFERRAL_FACILITY_TYPE)
+    val referralFacilityType: String? = null,
     val villageId: String,
     var isCompleted: Boolean = false,
     var isWrongNumber: Boolean = false,
@@ -42,3 +45,5 @@ data class FollowUp(
     @Ignore
     var provenance: ProvanceDto = ProvanceDto(modifiedDate = System.currentTimeMillis().convertToUtcDateTime())
 }
+
+const val COLUMN_REFERRAL_FACILITY_TYPE = "referralFacilityType"

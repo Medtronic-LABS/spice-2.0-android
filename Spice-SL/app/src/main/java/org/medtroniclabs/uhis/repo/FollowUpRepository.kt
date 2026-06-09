@@ -34,10 +34,10 @@ class FollowUpRepository @Inject constructor(
             ?.filterNot { it == FollowUpDefinedParams.BOTH }
             ?.firstOrNull()
         // Get first referral facility as is single selection
-        val ncdReferralFacility = filter.ncdSelectedReferralTo?.map { it.type!! }?.firstOrNull()
+        val ncdSelectedReferralTo = filter.ncdSelectedReferralTo?.map { it.type!! }?.firstOrNull()
         // If there is any ncd selected reason or ncd referral facility, then remove NCD from the selected referral reason
         val selectedReferralReasonTypes = filter.selectedReferralReasons?.map { it.type!!.lowercase() }?.filterNot {
-            (ncdSelectedReason != null || ncdReferralFacility != null) && it == FollowUpDefinedParams.FILTER_NCD.lowercase()
+            (ncdSelectedReason != null || ncdSelectedReferralTo != null) && it == FollowUpDefinedParams.FILTER_NCD.lowercase()
         } ?: listOf()
         val selectedReferralReasonTypesSize = selectedReferralReasonTypes.size
 
@@ -53,7 +53,7 @@ class FollowUpRepository @Inject constructor(
             selectedReferralReasonTypes,
             selectedReferralReasonTypesSize,
             ncdSelectedReason,
-            ncdReferralFacility,
+            ncdSelectedReferralTo,
             fromAndToDate.first,
             fromAndToDate.second,
         )

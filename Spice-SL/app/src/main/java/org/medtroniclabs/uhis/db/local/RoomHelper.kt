@@ -379,7 +379,7 @@ interface RoomHelper {
         selectedReferralReasonTypes: List<String>,
         selectedReferralReasonTypesSize: Int,
         ncdSelectedReason: String?,
-        ncdReferralFacility: String?,
+        ncdSelectedReferralTo: String?,
         fromDate: String = "",
         toDate: String = "",
     ): LiveData<List<FollowUpPatientModel>>
