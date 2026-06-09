@@ -2,6 +2,13 @@ package org.medtroniclabs.uhis.formgeneration.config
 
 object DefinedParams {
     const val NAME = "name"
+
+    const val FULL_NAME = "fullName"
+
+    const val PHONE_NUMBER = "phoneNumber"
+    const val PHONE_NUMBER_CATEGORY = "phoneNumberCategory"
+    const val HEIGHT = "height"
+    const val WEIGHT = "weight"
     const val ID = "id"
     const val VALUE = "value"
     const val DISPLAY_VALUE = "displayValue"
@@ -39,7 +46,6 @@ object DefinedParams {
     const val HOUSEHOLD_HEAD_RELATIONSHIP = "household_head_relationship"
     const val TITLE = "Title"
     const val ACCORDION_GROUP = "accordionGroup"
-    const val ChipGroup = "chipGroup"
     const val OTHER_METHOD_SPECIFY = "Other Method (specify)"
     const val NCD = "NCD"
     const val IMMUNISATION = "IMMUNISATION"
@@ -92,6 +98,8 @@ object DefinedParams {
 
     const val UPAZILA = "upazila"
 
+    const val CHIEF_DOM = "chiefdom"
+
     const val SCREENING_TYPE = "screeningType"
     const val EYE_CARE_SCREENING = "EYE_CARE_SCREENING"
 
@@ -127,6 +135,8 @@ object DefinedParams {
 
     const val GENDER = "gender"
     const val FEMALE = "Female"
+    const val MALE = "Male"
+    const val GENDER_OTHER = "Other"
 
     const val CULTURE_VALUE = "cultureValue"
 
@@ -258,6 +268,8 @@ object DefinedParams {
     const val IS_PREGNANT = "isPregnant"
 
     const val DATE_OF_BIRTH = "dateOfBirth"
+
+    const val DATA_OF_BIRTH_UNDERSCORE = "date_of_birth"
 
     const val IDENTITY_TYPE = "identityType"
 

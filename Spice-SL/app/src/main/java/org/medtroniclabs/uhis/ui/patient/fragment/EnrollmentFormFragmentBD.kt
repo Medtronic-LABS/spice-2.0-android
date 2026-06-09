@@ -1,7 +1,6 @@
 package org.medtroniclabs.uhis.ui.patient.fragment
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -12,17 +11,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.Spinner
+import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.isNotEmpty
 import androidx.fragment.app.activityViewModels
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.convertToUtcDateTime
+import org.medtroniclabs.uhis.common.DateUtils
+import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
+import org.medtroniclabs.uhis.common.DateUtils.DATE_ddMMyyyy
 import org.medtroniclabs.uhis.common.EntityMapper
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.qrscanner.QRScanContract
@@ -32,18 +32,15 @@ import org.medtroniclabs.uhis.data.LocalSpinnerResponse
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
 import org.medtroniclabs.uhis.data.offlinesync.model.ProvanceDto
 import org.medtroniclabs.uhis.data.registration.RequestPatientDetail
-import org.medtroniclabs.uhis.data.registration.ResponsePatientDetail
-import org.medtroniclabs.uhis.databinding.CardLayoutBinding
 import org.medtroniclabs.uhis.databinding.FragmentEnrollmentFormBinding
-import org.medtroniclabs.uhis.databinding.SummaryLayoutBinding
 import org.medtroniclabs.uhis.formgeneration.FormGenerator
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.CHIEF_DOM
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.ID
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.IS_DIABETES_DIAGNOSIS
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.IS_HTN_DIAGNOSIS
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.IS_REGULAR_SMOKER
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.SUB_VILLAGE
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.UPAZILA
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.VILLAGE
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.YES
 import org.medtroniclabs.uhis.formgeneration.listener.FormEventListener
@@ -63,7 +60,6 @@ import org.medtroniclabs.uhis.ui.patient.UIConstants
 import org.medtroniclabs.uhis.ui.patient.viewmodel.EnrollmentFormBuilderViewModel
 import org.medtroniclabs.uhis.ui.patient.viewmodel.PatientDetailViewModel
 import org.medtroniclabs.uhis.ui.patient.viewmodel.ScreeningFormBuilderViewModel
-import kotlin.text.get
 
 class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
     private lateinit var binding: FragmentEnrollmentFormBinding
@@ -102,105 +98,6 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
         attachObservers()
     }
 
-    private fun addChildViews(response: ResponsePatientDetail) {
-        binding.bioDataContainer.removeAllViews()
-        addCardView(getString(R.string.bio_data), response)
-    }
-
-    private fun addCardView(
-        cardTitle: String,
-        response: ResponsePatientDetail,
-        cardColor: Int? = null,
-        textColor: Int? = null,
-    ) {
-        setCardViewEdit(cardTitle, response, cardColor, textColor)
-    }
-
-    private fun setCardViewEdit(
-        cardTitle: String,
-        response: ResponsePatientDetail,
-        cardColor: Int?,
-        textColor: Int?,
-    ) {
-        val cardBinding = CardLayoutBinding.inflate(layoutInflater)
-        cardBinding.cardTitle.text = cardTitle
-        cardColor?.let {
-            cardBinding.viewCardBG.setBackgroundColor(it)
-        }
-        textColor?.let {
-            cardBinding.cardTitle.setTextColor(it)
-        }
-        inflateCardChild(cardBinding.llFamilyRoot, response)
-        if (cardBinding.llFamilyRoot.isNotEmpty()) {
-            binding.bioDataContainer.addView(cardBinding.root)
-        }
-    }
-
-    private fun inflateCardChild(
-        llFamilyRoot: LinearLayout,
-        response: ResponsePatientDetail,
-    ) {
-        addBioDataCardDetails(llFamilyRoot, response)
-    }
-
-    private fun addBioDataCardDetails(
-        llFamilyRoot: LinearLayout,
-        response: ResponsePatientDetail,
-    ) {
-        llFamilyRoot.let { layout ->
-            val patientId = response.patientId ?: getString(R.string.hyphen_symbol)
-            val name = response.name ?: getString(R.string.hyphen_symbol)
-            val phoneNumber = response.phoneNumber ?: getString(R.string.hyphen_symbol)
-            val age = response.age?.toString() ?: getString(R.string.hyphen_symbol)
-            val gender = response.gender ?: getString(R.string.hyphen_symbol)
-            val village = response.villageId ?: getString(R.string.hyphen_symbol)
-            val subVillage = response.subVillage ?: getString(R.string.hyphen_symbol)
-
-            getIdentityLabel(requireContext(), response.identityType)?.let {
-                val identityValue = response.identityValue ?: getString(R.string.hyphen_symbol)
-                layout.addView(inflateChildView(it, identityValue))
-            }
-
-            layout.addView(inflateChildView(getString(R.string.patient_id), patientId))
-            layout.addView(inflateChildView(getString(R.string.name), name))
-            layout.addView(inflateChildView(getString(R.string.phone_no), phoneNumber))
-            layout.addView(inflateChildView(getString(R.string.age), age))
-            layout.addView(inflateChildView(getString(R.string.gender), gender))
-            layout.addView(inflateChildView(getString(R.string.union), village))
-            layout.addView(inflateChildView(getString(R.string.village), subVillage))
-        }
-    }
-
-    private fun getIdentityLabel(
-        context: Context,
-        identityType: String?,
-    ): String? =
-        when {
-            identityType.isNullOrEmpty() || identityType == DefinedParams.NA -> null
-            identityType == DefinedParams.IDENTITY_TYPE_BRN -> context.getString(R.string.brn)
-            else -> context.getString(R.string.national_id)
-        }
-
-    private fun inflateChildView(
-        labelKey: String,
-        value: String,
-        applyBoldStyle: Boolean? = null,
-        textColor: Int? = null,
-    ): View {
-        val summaryBinding = SummaryLayoutBinding.inflate(layoutInflater)
-        summaryBinding.tvKey.text = labelKey
-        summaryBinding.tvValue.text = value
-        summaryBinding.tvRowSeparator.text = ":"
-        applyBoldStyle?.let {
-            summaryBinding.tvValue.typeface =
-                ResourcesCompat.getFont(requireContext(), R.font.inter_bold)
-        }
-        textColor?.let {
-            summaryBinding.tvValue.setTextColor(requireContext().getColor(it))
-        }
-        return summaryBinding.root
-    }
-
     private fun getFormDataForWorkflow() {
         if (viewModel.isConfirmDiagnosis && viewModel.patientTrackId != -1L) {
             viewModel.patientTrackId?.let {
@@ -235,7 +132,7 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
                     val selectedId = map[id] as? String
                     val nationalIdView = formGenerator.getViewByTag(DefinedParams.IDENTITY_VALUE) as? EditText
                     nationalIdView?.let {
-                        nationalIdView.setText("")
+                        // nationalIdView.setText("")
                         if (MemberRegistration.IdType.NATIONAL_ID.value == selectedId) {
                             nationalIdView.inputType = InputType.TYPE_CLASS_NUMBER
                             val filters = nationalIdView.filters.toMutableList()
@@ -280,9 +177,6 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
                     showProgress()
                 }
                 ResourceState.SUCCESS -> {
-                    resourceState.data?.let {
-                        addChildViews(it)
-                    }
                     viewModel.fetchWorkFlow(MenuConstants.MENU_REGISTRATION)
                 }
                 ResourceState.ERROR -> {
@@ -309,43 +203,13 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
             }
         }
 
-        viewModel.localDataCacheResponse.observe(viewLifecycleOwner) { resourceState ->
-            when (resourceState.state) {
-                ResourceState.SUCCESS -> {
-                    resourceState.data?.let {
-                        getCountyByTag(it.tag)
-                        formGenerator.spinnerDataInjection(
-                            it,
-                            EntityMapper.getResultSpinnerMapList(it),
-                        )
-                    }
-                }
-                else -> {
-                    // Invoked if response state is not success
-                }
-            }
-        }
-
-        viewModel.countyCacheResponse.observe(viewLifecycleOwner) { resourceState ->
-            when (resourceState.state) {
-                ResourceState.SUCCESS -> {
-                    resourceState.data?.let {
-                        getCountyByTag(it.tag)
-                        formGenerator.spinnerDataInjection(
-                            it,
-                            EntityMapper.getResultSpinnerMapList(it),
-                        )
-                    }
-                }
-                else -> {
-                    // Invoked if response state is not success
-                }
-            }
-        }
-
-        viewModel.subCountyCacheResponse.observe(viewLifecycleOwner, ::subCountyCacheResponse)
+        // Upazila
         viewModel.programListResponse.observe(viewLifecycleOwner, ::handleProgramListResponse)
+
+        // Unions
         viewModel.unionCacheResponse.observe(viewLifecycleOwner, ::unionCacheResponse)
+
+        // Villages
         viewModel.villageCacheResponse.observe(viewLifecycleOwner, ::handleVillageCacheResponse)
 
         viewModel.qrCodeValidationResult.observe(viewLifecycleOwner) { resourceState ->
@@ -435,20 +299,13 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
             it,
             EntityMapper.getResultSpinnerMapList(it),
         )
-//        patientDetailsViewModel.screeningDetailResponse.value?.data?.let { screeningLog ->
-//            val village = screeningLog[DefinedParams.VILLAGE_NAME]
-//            if (village is String?) {
-//                formGenerator.spinnerDataInjection(
-//                    it,
-//                    EntityMapper.getResultSpinnerMapList(it),
-//                )
-//            }
-//        } ?: kotlin.run {
-//            formGenerator.spinnerDataInjection(
-//                it,
-//                EntityMapper.getResultSpinnerMapList(it),
-//            )
-//        }
+
+        patientDetailsViewModel.screeningDetailResponse.value?.data?.subVillageId?.let {
+            formGenerator.getViewByTag(DefinedParams.SUB_VILLAGE)?.let { view ->
+                formGenerator.setValueForView(it.toLong(), view)
+                formGenerator.disableView(view)
+            }
+        }
     }
 
     private fun autoPopulateUnion(it: LocalSpinnerResponse) {
@@ -456,20 +313,13 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
             it,
             EntityMapper.getResultSpinnerMapList(it),
         )
-//        patientDetailsViewModel.screeningDetailResponse.value?.data?.let { screeningLog ->
-//            val unionName = screeningLog[DefinedParams.UNION_NAME]
-//            if (unionName is String?) {
-//                formGenerator.spinnerDataInjection(
-//                    it,
-//                    EntityMapper.getResultSpinnerMapList(it),
-//                )
-//            }
-//        } ?: kotlin.run {
-//            formGenerator.spinnerDataInjection(
-//                it,
-//                EntityMapper.getResultSpinnerMapList(it),
-//            )
-//        }
+
+        patientDetailsViewModel.screeningDetailResponse.value?.data?.villageId?.let {
+            formGenerator.getViewByTag(DefinedParams.VILLAGE)?.let { view ->
+                formGenerator.setValueForView(it.toLong(), view)
+                formGenerator.disableView(view)
+            }
+        }
     }
 
     private fun autoPopulateUpazila(it: LocalSpinnerResponse) {
@@ -477,20 +327,13 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
             it,
             EntityMapper.getResultSpinnerMapList(it),
         )
-//        patientDetailsViewModel.screeningDetailResponse.value?.data?.let { screeningLog ->
-//            val unionName = screeningLog["siteId"]
-//            if (unionName is Double?) {
-//                formGenerator.spinnerDataInjection(
-//                    it,
-//                    EntityMapper.getResultSpinnerMapList(it),
-//                )
-//            }
-//        } ?: kotlin.run {
-//            formGenerator.spinnerDataInjection(
-//                it,
-//                EntityMapper.getResultSpinnerMapList(it),
-//            )
-//        }
+
+        patientDetailsViewModel.screeningDetailResponse.value?.data?.chiefdomId?.let {
+            formGenerator.getViewByTag(DefinedParams.CHIEF_DOM)?.let { view ->
+                formGenerator.setValueForView(it.toLong(), view)
+                formGenerator.disableView(view)
+            }
+        }
     }
 
     private fun handleProgramListResponse(resourceState: Resource<LocalSpinnerResponse>) {
@@ -595,9 +438,13 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
             changeToBoolean(map, IS_HTN_DIAGNOSIS)
             changeToBoolean(map, IS_DIABETES_DIAGNOSIS)
 
-            changeToObject(map, UPAZILA)
+            changeToObject(map, CHIEF_DOM)
             changeToObject(map, VILLAGE)
             changeToObject(map, SUB_VILLAGE)
+
+            map[DefinedParams.DATA_OF_BIRTH_UNDERSCORE]?.let {
+                map[DefinedParams.DATE_OF_BIRTH] = it
+            }
 
             val result = serverData?.let {
                 FormResultComposer().groupValues(
@@ -643,9 +490,123 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
         }
 
     override fun onRenderingComplete() {
-        patientDetailsViewModel.screeningDetailResponse.value?.data?.gender?.let {
-            addOrRemoveGDMOption(it)
+        patientDetailsViewModel.screeningDetailResponse.value?.data?.let { memberDetail ->
+            memberDetail.identityType?.let { idType ->
+                formGenerator.getViewByTag(DefinedParams.IDENTITY_TYPE)?.let { view ->
+                    formGenerator.setValueForView(idType, view)
+                }
+
+                memberDetail.identityValue?.let { idValue ->
+                    formGenerator.getViewByTag(DefinedParams.IDENTITY_VALUE)?.let { view ->
+                        formGenerator.setValueForView(idValue, view)
+                    }
+                }
+
+                formGenerator.updateNationalIdLabelForIdType(
+                    idType,
+                    SecuredPreference.getIsTranslationEnabled(),
+                    optionsViewId = DefinedParams.IDENTITY_TYPE,
+                    viewId = DefinedParams.IDENTITY_VALUE,
+                )
+            }
+
+            memberDetail.name?.let {
+                formGenerator.getViewByTag(DefinedParams.FULL_NAME)?.let { view ->
+                    formGenerator.setValueForView(it, view)
+                }
+            }
+
+            memberDetail.phoneNumber?.let {
+                formGenerator.getViewByTag(DefinedParams.PHONE_NUMBER)?.let { view ->
+                    formGenerator.setValueForView(it, view)
+                }
+            }
+
+            memberDetail.phoneNumberCategory?.let {
+                formGenerator.getViewByTag(DefinedParams.PHONE_NUMBER_CATEGORY)?.let { view ->
+                    formGenerator.setValueForView(it, view)
+                }
+            }
+
+            memberDetail.gender?.let {
+                addOrRemoveGDMOption(it)
+                when (it.lowercase()) {
+                    DefinedParams.MALE.lowercase() -> {
+                        singleSelectValueOption(
+                            DefinedParams.MALE,
+                            DefinedParams.GENDER,
+                        )
+                    }
+
+                    DefinedParams.FEMALE.lowercase() -> {
+                        singleSelectValueOption(
+                            DefinedParams.FEMALE,
+                            DefinedParams.GENDER,
+                        )
+                    }
+
+                    DefinedParams.GENDER_OTHER.lowercase() -> {
+                        singleSelectValueOption(
+                            DefinedParams.GENDER_OTHER,
+                            DefinedParams.GENDER,
+                        )
+                    }
+                }
+                formGenerator.disableSingleSelection(DefinedParams.GENDER)
+            }
+
+            memberDetail.birthDate?.let { originalDobUtc ->
+                val dateOfBirth =
+                    DateUtils.convertDateFormat(originalDobUtc, DATE_FORMAT_yyyyMMddHHmmssZZZZZ, DATE_ddMMyyyy)
+                val dateDob = DateUtils.convertStringToDate(originalDobUtc, DATE_FORMAT_yyyyMMddHHmmssZZZZZ)
+
+                formGenerator.getViewByTag(DefinedParams.DATE_OF_BIRTH)?.let { view ->
+                    if (dateOfBirth.isNotBlank()) {
+                        formGenerator.disableView(view)
+                    }
+                    // Store original UTC value before setting view value for AgeOrDob edit mode
+                    formGenerator.setDobValueForAgeOrDob(DefinedParams.DATE_OF_BIRTH, originalDobUtc, dateOfBirth, view)
+
+                    dateDob?.let { dob ->
+                        formGenerator.fillDetailsOnDatePickerSet(
+                            dob,
+                            false,
+                        )
+                    }
+                    formGenerator.hideError(DefinedParams.DATE_OF_BIRTH)
+                }
+            }
+
+            memberDetail.height?.let {
+                formGenerator.getViewByTag(DefinedParams.HEIGHT)?.let { view ->
+                    formGenerator.setValueForView(it, view)
+                }
+            }
+
+            memberDetail.weight?.let {
+                formGenerator.getViewByTag(DefinedParams.WEIGHT)?.let { view ->
+                    formGenerator.setValueForView(it, view)
+                }
+            }
+
+            memberDetail.qrCode?.let {
+                formGenerator.showHideCardFamily(false, DefinedParams.QR_CARD)
+            }
         }
+    }
+
+    private fun singleSelectValueOption(
+        value: String,
+        key: String,
+    ) {
+        formGenerator
+            .getViewByTag("${value}_$key")
+            ?.let { view ->
+                if (view is TextView) {
+                    view.isSelected = true
+                    view.performClick()
+                }
+            }
     }
 
     private fun addOrRemoveGDMOption(gender: String) {
@@ -715,7 +676,7 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
                 startScanning()
             }
         } catch (e: Exception) {
-            // error block
+            // error code block
         }
     }
 

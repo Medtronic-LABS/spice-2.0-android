@@ -29,4 +29,5 @@ data class PatientListResModel(
     val callRegisterId: Long? = null,
     val identityType: String? = null,
     val identityValue: String? = null,
+    val qrCode: String? = null,
 )

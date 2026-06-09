@@ -143,8 +143,7 @@ class PatientListFragment() : BaseFragment(), PatientSelectionListener, CallRegi
 
         binding.btnEnrol.visibility = handleRegistrationBtnVisibility(fragmentVm.origin == UIConstants.ENROLLMENT_UNIQUE_ID)
 
-        binding.llExactSearch.qrSearchGrp.visibility =
-            if (fragmentVm.origin == UIConstants.ENROLLMENT_UNIQUE_ID || fragmentVm.origin == UIConstants.FOLLOW_UP) View.GONE else View.VISIBLE
+        binding.llExactSearch.qrSearchGrp.visibility = if (fragmentVm.origin == UIConstants.FOLLOW_UP) View.GONE else View.VISIBLE
     }
 
     override fun onResume() {

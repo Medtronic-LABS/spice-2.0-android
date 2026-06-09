@@ -59,9 +59,7 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
 
         var assessmentRequired: Boolean = true
         var list = ArrayList<RiskClassificationModel>()
-        var localDataCacheResponse = MutableLiveData<Resource<LocalSpinnerResponse>>()
-        var countyCacheResponse = MutableLiveData<Resource<LocalSpinnerResponse>>()
-        var subCountyCacheResponse = MutableLiveData<Resource<LocalSpinnerResponse>>()
+
         var unionCacheResponse = MutableLiveData<Resource<LocalSpinnerResponse>>()
         var villageCacheResponse = MutableLiveData<Resource<LocalSpinnerResponse>>()
         var mentalHealthQuestions = MutableLiveData<Resource<HashMap<String, LocalSpinnerResponse>>>()
@@ -85,23 +83,7 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
                         .data
                         ?.formLayout
 
-                    val result = if (isConfirmDiagnosis && patientTrackId != -1L) {
-                        val excludedIds = setOf(
-                            DefinedParams.BIO_DATA,
-                            DefinedParams.GENDER,
-                            DefinedParams.IS_PREGNANT,
-                            DefinedParams.DATE_OF_BIRTH,
-                            DefinedParams.QR_CODE,
-                            DefinedParams.QR_CARD,
-                        )
-                        formLayout?.filter {
-                            it.id !in excludedIds && it.family != DefinedParams.BIO_DATA && it.family != DefinedParams.QR_CARD
-                        }
-                    } else {
-                        formLayout
-                    }
-
-                    formResponseLiveData.postSuccess(result)
+                    formResponseLiveData.postSuccess(formLayout)
                 } catch (e: Exception) {
                     formResponseLiveData.postError(e.message)
                 }
@@ -255,13 +237,13 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
             viewModelScope.launch(dispatcherIO) {
                 try {
                     when (type) {
-                        DefinedParams.UPAZILA -> {
+                        DefinedParams.CHIEF_DOM -> {
                             programListResponse.postLoading()
                             val response = onBoardingRepo.getAllChiefDoms()
                             programListResponse.postValue(
                                 Resource(
                                     ResourceState.SUCCESS,
-                                    LocalSpinnerResponse(DefinedParams.UPAZILA, response),
+                                    LocalSpinnerResponse(DefinedParams.CHIEF_DOM, response),
                                 ),
                             )
                         }

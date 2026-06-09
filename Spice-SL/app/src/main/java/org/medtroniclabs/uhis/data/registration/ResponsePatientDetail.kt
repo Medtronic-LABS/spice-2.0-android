@@ -12,8 +12,12 @@ data class ResponsePatientDetail(
     val memberReference: String? = null,
     val villageId: String? = null,
     val subVillageId: String? = null,
+    val chiefdomId: String? = null,
     val phoneNumberCategory: String? = null,
     val isActive: Boolean? = null,
     val identityType: String? = null,
     val identityValue: String? = null,
+    var qrCode: String? = null,
+    var height: String? = null,
+    var weight: String? = null,
 )
