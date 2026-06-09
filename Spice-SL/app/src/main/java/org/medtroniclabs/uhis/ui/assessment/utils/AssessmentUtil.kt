@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.DateUtils
+import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
 import org.medtroniclabs.uhis.common.DateUtils.DATE_ddMMyyyy
 import org.medtroniclabs.uhis.formgeneration.model.BPModel
@@ -106,7 +107,7 @@ object AssessmentUtil {
     fun getSymptomsList(resultMap: HashMap<String, Any>): List<String> {
         val list = mutableListOf<String>()
 
-        val symptomsLogs = resultMap[SYMPTOMS_LOG] as HashMap<String, Any>
+        val symptomsLogs = resultMap[SYMPTOMS_LOG] as? HashMap<String, Any> ?: return list
         if (symptomsLogs.containsKey(NCD_SYMPTOMS)) {
             val ncdSymptoms = symptomsLogs[NCD_SYMPTOMS] as List<*>
 
@@ -170,6 +171,15 @@ object AssessmentUtil {
             else -> context.getString(R.string.na)
         } ?: run { context.getString(R.string.separator_double_hyphen) }
 
+    fun shouldShowNextFollowUpDate(service: String): Boolean =
+        when (service.lowercase()) {
+            MenuConstants.NCD_MENU_ID.lowercase(),
+            MenuConstants.CATARACT_MENU_ID.lowercase(),
+            MenuConstants.EYE_CARE_MENU_ID.lowercase(),
+            -> false
+            else -> true
+        }
+
     /**
      * Returns display follow-up date based on service
      */
@@ -181,8 +191,6 @@ object AssessmentUtil {
         when (service.lowercase()) {
             RMNCH.ANC.lowercase(),
             RMNCH.PNC_MOTHER_MENU.lowercase(),
-            MenuConstants.NCD_MENU_ID.lowercase(),
-            MenuConstants.CATARACT_MENU_ID.lowercase(),
             -> {
                 followUpDate?.let {
                     DateUtils.convertDateFormat(
@@ -195,6 +203,40 @@ object AssessmentUtil {
 
             else -> context.getString(R.string.na)
         } ?: run { context.getString(R.string.separator_double_hyphen) }
+
+    /**
+     * Formats saved custom status values for Service History, combining High BP/BG when both apply
+     * and omitting legacy controlled vitals statuses.
+     */
+    fun formatServiceHistoryCurrentStatus(
+        customStatus: List<String>?,
+        context: Context,
+    ): String? {
+        if (customStatus.isNullOrEmpty()) return null
+
+        val hasHighBp = customStatus.contains(AssessmentStatus.UNCONTROLLED_BP.name)
+        val hasHighBg = customStatus.contains(AssessmentStatus.UNCONTROLLED_BG.name)
+        val otherStatuses = customStatus.filter { status ->
+            status != AssessmentStatus.UNCONTROLLED_BP.name &&
+                status != AssessmentStatus.UNCONTROLLED_BG.name &&
+                status != AssessmentStatus.CONTROLLED_BP.name &&
+                status != AssessmentStatus.CONTROLLED_BG.name
+        }
+
+        val displayParts = mutableListOf<String>()
+        when {
+            hasHighBp && hasHighBg ->
+                displayParts.add(context.getString(R.string.high_both))
+            hasHighBp ->
+                displayParts.add(context.getString(R.string.high_bp))
+            hasHighBg ->
+                displayParts.add(context.getString(R.string.high_bg))
+        }
+        otherStatuses.forEach { status ->
+            mapAssessmentStatus(status, context).takeIf { it.isNotBlank() }?.let { displayParts.add(it) }
+        }
+        return displayParts.takeIf { it.isNotEmpty() }?.joinToString()
+    }
 
     /**
      * Maps corresponding status to display value
@@ -269,17 +311,15 @@ object AssessmentUtil {
                 context.getString(R.string.gaps_in_pnc)
             }
 
-            AssessmentStatus.CONTROLLED_BP -> {
-                context.getString(R.string.controlled_bp)
-            }
-            AssessmentStatus.CONTROLLED_BG -> {
-                context.getString(R.string.controlled_bg)
-            }
+            AssessmentStatus.CONTROLLED_BP,
+            AssessmentStatus.CONTROLLED_BG,
+            -> ""
+
             AssessmentStatus.UNCONTROLLED_BP -> {
-                context.getString(R.string.uncontrolled_bp)
+                context.getString(R.string.high_bp)
             }
             AssessmentStatus.UNCONTROLLED_BG -> {
-                context.getString(R.string.uncontrolled_bg)
+                context.getString(R.string.high_bg)
             }
 
             AssessmentStatus.GLASSES_SOLD -> {
@@ -336,4 +376,28 @@ object AssessmentUtil {
                 View.NO_ID
             }
         }
+
+    fun getLocalServiceProvidedByName(): String? {
+        val user = SecuredPreference.getUserDetails() ?: return null
+        val name = listOfNotNull(user.firstName?.trim(), user.lastName?.trim()).joinToString(" ")
+        return name.takeIf { it.isNotBlank() } ?: user.username?.trim()?.takeIf { it.isNotBlank() }
+    }
+
+    fun getLocalServiceProvidedByRole(): String? =
+        SecuredPreference.getRole().takeIf { it.isNotBlank() }
+
+    fun formatServiceProviderDisplay(
+        context: Context,
+        name: String?,
+        role: String?,
+    ): String {
+        val providerName = name?.takeIf { it.isNotBlank() }
+        val providerRole = role?.takeIf { it.isNotBlank() }
+        return when {
+            providerName != null && providerRole != null -> "$providerName ($providerRole)"
+            providerName != null -> providerName
+            providerRole != null -> providerRole
+            else -> context.getString(R.string.separator_double_hyphen)
+        }
+    }
 }

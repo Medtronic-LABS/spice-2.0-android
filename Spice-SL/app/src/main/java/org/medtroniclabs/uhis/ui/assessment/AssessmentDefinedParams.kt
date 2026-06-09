@@ -533,8 +533,13 @@ object AssessmentDefinedParams {
 
     const val FBS_MAXIMUM_MGDL_VALUE = 110
     const val RBS_MAXIMUM_MGDL_VALUE = 140
-    const val FBS_MAXIMUM_VALUE_BD = 7.0
+    const val FBS_MAXIMUM_VALUE_BD = 7.1
     const val RBS_MAXIMUM_VALUE_BD = 11.1
+
+    const val FOLLOW_UP_FBS_MAXIMUM_VALUE_BD = 7.3
+    const val FOLLOW_UP_RBS_MAXIMUM_VALUE_BD = 10.0
+    const val FOLLOW_UP_FBS_MAXIMUM_MGDL_VALUE = 131
+    const val FOLLOW_UP_RBS_MAXIMUM_MGDL_VALUE = 180
 
     const val UPAZILA_FBS_RBS_MAXIMUM_VALUE_BD = 15
 

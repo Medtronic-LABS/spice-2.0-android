@@ -177,6 +177,9 @@ class ToolsMenuFragment : BaseFragment(), MenuSelectionListener {
         menuId: String,
         subModule: String? = null,
     ) {
+        if (CommonUtils.isCataractMenuId(menuId) && !CommonUtils.isCataractWorkflowEnabledForUser()) {
+            return
+        }
         when (menuId) {
             MenuConstants.RMNCH_MENU_ID -> {
                 subModule?.let {

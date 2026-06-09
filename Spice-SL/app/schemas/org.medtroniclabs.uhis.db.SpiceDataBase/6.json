@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "fc040f469148aac4afb96307e37c7712",
+    "identityHash": "92bd064c4e2e06e25ad02d4214d984a5",
     "entities": [
       {
         "tableName": "Household",
@@ -3833,7 +3833,7 @@
       },
       {
         "tableName": "MemberAssessmentHistory",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `memberFhirId` TEXT, `memberId` INTEGER, `visitDate` TEXT, `serviceProvided` TEXT, `encounterId` TEXT, `customStatus` TEXT, `latestVisit` INTEGER NOT NULL, `referralStatus` TEXT, `referralReason` TEXT, `nextFollowUpDate` TEXT, `practitionerId` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `memberFhirId` TEXT, `memberId` INTEGER, `visitDate` TEXT, `serviceProvided` TEXT, `encounterId` TEXT, `customStatus` TEXT, `latestVisit` INTEGER NOT NULL, `referralStatus` TEXT, `referralReason` TEXT, `nextFollowUpDate` TEXT, `serviceProvidedByName` TEXT, `serviceProvidedByRole` TEXT, `practitionerId` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -3898,6 +3898,18 @@
           {
             "fieldPath": "nextFollowUpDate",
             "columnName": "nextFollowUpDate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "serviceProvidedByName",
+            "columnName": "serviceProvidedByName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "serviceProvidedByRole",
+            "columnName": "serviceProvidedByRole",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -4520,7 +4532,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fc040f469148aac4afb96307e37c7712')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '92bd064c4e2e06e25ad02d4214d984a5')"
     ]
   }
 }

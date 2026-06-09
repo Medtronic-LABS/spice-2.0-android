@@ -83,9 +83,17 @@ class AssessmentActivity : BaseActivity() {
             },
         )
         getIntentValue()
+        if (isCataractAccessDenied()) {
+            finish()
+            return
+        }
         loadFragment()
         attachObservers()
     }
+
+    private fun isCataractAccessDenied(): Boolean =
+        CommonUtils.isCataractMenuId(viewModel.menuId) &&
+            !CommonUtils.isCataractWorkflowEnabledForUser()
 
     private fun getCurrentLocation() {
         val locationManager = SpiceLocationManager(this)

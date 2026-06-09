@@ -2203,6 +2203,12 @@ object CommonUtils {
 
     fun isFoOrPo(): Boolean = isFo() || isPo()
 
+    /** Cataract camp workflow is available only to FO/PO, regardless of facility assignment. */
+    fun isCataractWorkflowEnabledForUser(): Boolean = isFoOrPo()
+
+    fun isCataractMenuId(menuId: String?): Boolean =
+        menuId.equals(MenuConstants.CATARACT_MENU_ID, ignoreCase = true)
+
     fun gestationalWeekLimitCheck(date: String?): Boolean {
         date?.let {
             DateUtils.calculateGestationalWeeks(it)?.let { weeks ->

@@ -2,8 +2,12 @@ package org.medtroniclabs.uhis.ui.assessment
 
 import android.content.Context
 import android.graphics.Typeface
+import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.core.text.color
 import org.json.JSONArray
 import org.json.JSONObject
 import org.medtroniclabs.uhis.R
@@ -224,6 +228,46 @@ object AssessmentCommonUtils {
         }
 
         return null
+    }
+
+    fun formatBMISummaryDisplay(
+        context: Context,
+        bmi: Any?,
+    ): CharSequence? {
+        val bmiValue = (bmi as? Number)?.toDouble() ?: return null
+        val bmiInfo = CommonUtils.getBMIInformation(context, bmiValue)
+            ?: return CommonUtils.getDecimalFormatted(bmiValue)
+        val bmiFormattedValue = CommonUtils.getDecimalFormatted(bmiValue)
+        return SpannableStringBuilder()
+            .append(bmiFormattedValue)
+            .color(ContextCompat.getColor(context, bmiInfo.second)) {
+                append(" (${bmiInfo.first})")
+            }
+    }
+
+    fun formatCVDRiskSummaryDisplay(
+        context: Context,
+        json: JSONObject,
+    ): Pair<CharSequence, Int>? {
+        val display = findValueByKey(json, DefinedParams.CVD_RISK_SCORE_DISPLAY) as? String ?: return null
+        val score = findValueByKey(json, DefinedParams.CVD_RISK_SCORE) as? Number ?: return null
+        return Pair(display, CommonUtils.cvdRiskColorCode(score.toLong(), context))
+    }
+
+    fun createSummaryLayout(
+        context: Context,
+        title: String?,
+        value: CharSequence?,
+        valueTextColor: Int? = null,
+    ): ConstraintLayout? {
+        if (title == null || value == null) return null
+        return if (value is Spanned) {
+            addViewSummaryLayout(title, value.toString(), null, context).apply {
+                AssessmentSummaryLayoutBinding.bind(this).tvValue.text = value
+            }
+        } else {
+            addViewSummaryLayout(title, value.toString(), valueTextColor, context)
+        }
     }
 
     /**

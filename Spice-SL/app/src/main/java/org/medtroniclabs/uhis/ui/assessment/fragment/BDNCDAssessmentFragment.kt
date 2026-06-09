@@ -190,19 +190,33 @@ class BDNCDAssessmentFragment : BaseFragment(), FormEventListener {
             }
 
             viewModel.memberDetailsLiveData.value?.data?.let { memberDetail ->
-                result?.second?.let {
-                    val ncdMap = it[ncd] as HashMap<String, Any>
-                    val bpResult = AssessmentUtil.calculateAverageBloodPressure(ncdMap)
-                    val bgResult = AssessmentUtil.addDateAndTimeForGlucose(ncdMap)
-                    val symptomList = AssessmentUtil.getSymptomsList(ncdMap)
+                result?.second?.let { assessmentMap ->
+                    lifecycleScope.launch {
+                        val ncdMap = assessmentMap[ncd] as HashMap<String, Any>
+                        val bpResult = AssessmentUtil.calculateAverageBloodPressure(ncdMap)
+                        val bgResult = AssessmentUtil.addDateAndTimeForGlucose(ncdMap)
+                        val symptomList = AssessmentUtil.getSymptomsList(ncdMap)
+                        val isFollowUpVisit =
+                            viewModel.getLastServiceHistory(MenuConstants.NCD_MENU_ID) != null
 
-                    // Compute Referral Logic
-                    val referralResult = ReferralResultGenerator().computeReferralResultForBDNCD(ncdMap, bpResult, bgResult, symptomList)
+                        val referralResult =
+                            ReferralResultGenerator().computeReferralResultForBDNCD(
+                                ncdMap,
+                                bpResult,
+                                bgResult,
+                                symptomList,
+                                isFollowUpVisit,
+                            )
 
-                    // Compute CVD Risk
-                    CVDRiskCalculator.calculateCVDRiskFactor(ncdMap, viewModel.riskClassificationModels, memberDetail.dateOfBirth, memberDetail.gender)
+                        CVDRiskCalculator.calculateCVDRiskFactor(
+                            ncdMap,
+                            viewModel.riskClassificationModels,
+                            memberDetail.dateOfBirth,
+                            memberDetail.gender,
+                        )
 
-                    viewModel.saveAssessment(serverData, it, referralResult, viewModel.menuId)
+                        viewModel.saveAssessment(serverData, assessmentMap, referralResult, viewModel.menuId)
+                    }
                 }
             }
         }

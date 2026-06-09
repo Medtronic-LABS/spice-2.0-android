@@ -98,15 +98,19 @@ class BDCataractAssessmentSummaryFragment : BaseFragment() {
     }
 
     private fun attachObservers() {
-        viewModel.assessmentStringLiveData.value?.let {
-            val json = JSONObject(it)
+        viewModel.assessmentStringLiveData.observe(viewLifecycleOwner) { assessmentString ->
+            if (assessmentString.isNullOrBlank()) return@observe
+            val json = JSONObject(assessmentString)
             updateStatusBar(json)
             val items = createNCDSummaryData(json)
-            createSummaryView(items)
+            createSummaryView(items, json)
         }
     }
 
-    private fun createSummaryView(listSummaryData: MutableList<AssessmentSummaryModel>?) {
+    private fun createSummaryView(
+        listSummaryData: MutableList<AssessmentSummaryModel>?,
+        json: JSONObject,
+    ) {
         listSummaryData?.let { summaryData ->
             binding.parentLayout.removeAllViews()
 
@@ -118,7 +122,7 @@ class BDCataractAssessmentSummaryFragment : BaseFragment() {
             }
 
             summaryData.forEach { item ->
-                val displayValue =
+                val rawValue =
                     getSpinnerDisplayValue(
                         item.id.toString(),
                         item.value,
@@ -127,7 +131,22 @@ class BDCataractAssessmentSummaryFragment : BaseFragment() {
                             ?.data
                             ?.formLayout,
                     ) ?: item.value
-                bindSummaryView(if (isTranslationEnabled) item.cultureValue else item.title, displayValue)
+                val title = if (isTranslationEnabled) item.cultureValue else item.title
+                when (item.id) {
+                    BMI -> {
+                        val bmiDisplay = AssessmentCommonUtils.formatBMISummaryDisplay(
+                            requireContext(),
+                            findValueByKey(json, BMI),
+                        )
+                        bindSummaryView(title, bmiDisplay ?: rawValue)
+                    }
+                    CVD_RISK -> {
+                        AssessmentCommonUtils.formatCVDRiskSummaryDisplay(requireContext(), json)?.let {
+                            bindSummaryView(title, it.first, it.second)
+                        } ?: rawValue?.let { bindSummaryView(title, it) }
+                    }
+                    else -> bindSummaryView(title, rawValue)
+                }
             }
         }
     }
@@ -235,12 +254,12 @@ class BDCataractAssessmentSummaryFragment : BaseFragment() {
             }
 
             BMI -> {
-                val bmi = findValueByKey(jsonObject, id)
-                val bmiCategory = findValueByKey(jsonObject, BMI_CATEGORY)
-                return if (bmiCategory != null && bmi != null) {
-                    "${bmi as Double} (${bmiCategory as String})"
+                val bmi = (findValueByKey(jsonObject, id) as? Number)?.toDouble()
+                val bmiCategory = findValueByKey(jsonObject, BMI_CATEGORY) as? String
+                return if (bmi != null && bmiCategory != null) {
+                    "${CommonUtils.getDecimalFormatted(bmi)} ($bmiCategory)"
                 } else {
-                    null
+                    bmi?.let { CommonUtils.getDecimalFormatted(it) }
                 }
             }
 
@@ -343,19 +362,15 @@ class BDCataractAssessmentSummaryFragment : BaseFragment() {
 
     private fun bindSummaryView(
         title: String?,
-        value: String?,
+        value: CharSequence?,
         valueTextColor: Int? = null,
     ) {
-        if (title != null && value != null) {
-            binding.parentLayout.addView(
-                AssessmentCommonUtils.addViewSummaryLayout(
-                    title,
-                    value,
-                    valueTextColor,
-                    requireContext(),
-                ),
-            )
-        }
+        AssessmentCommonUtils.createSummaryLayout(
+            requireContext(),
+            title,
+            value,
+            valueTextColor,
+        )?.let { binding.parentLayout.addView(it) }
     }
 
     fun getCurrentAnsweredStatus(): Boolean = viewModel.otherAssessmentDetails.isNotEmpty()

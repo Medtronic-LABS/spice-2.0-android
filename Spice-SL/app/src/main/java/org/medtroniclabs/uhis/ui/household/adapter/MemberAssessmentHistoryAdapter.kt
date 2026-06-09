@@ -51,14 +51,23 @@ class MemberAssessmentHistoryAdapter(
                 context.getString(R.string.service_name),
                 AssessmentUtil.mapServiceToServiceName(history.serviceProvided ?: "", context),
             )
+            addSummaryView(
+                context.getString(R.string.service_provided_by),
+                AssessmentUtil.formatServiceProviderDisplay(
+                    context,
+                    history.serviceProvidedByName,
+                    history.serviceProvidedByRole,
+                ),
+            )
             val visitDateMillis = DateUtils.getLastMenstrualDate(history.visitDate ?: "").timeInMillis
             addSummaryView(
                 context.getString(R.string.service_date),
                 DateUtils.formatDateToDisplayFormat(visitDateMillis) ?: "",
             )
-            val currentStatus = history.customStatus?.joinToString {
-                AssessmentUtil.mapAssessmentStatus(it, context)
-            }
+            val currentStatus = AssessmentUtil.formatServiceHistoryCurrentStatus(
+                history.customStatus,
+                context,
+            )
             addSummaryView(
                 context.getString(R.string.current_status),
                 CommonUtils.getStringElse(currentStatus, context.getString(R.string.separator_double_hyphen)),
@@ -72,15 +81,18 @@ class MemberAssessmentHistoryAdapter(
                 context.getString(R.string.referral_status),
                 referralStatus,
             )
-            val nextFollowUpDate = AssessmentUtil.getNextFollowUpDate(
-                context,
-                history.serviceProvided ?: "",
-                history.nextFollowUpDate,
-            )
-            addSummaryView(
-                context.getString(R.string.next_follow_up_date),
-                nextFollowUpDate,
-            )
+            val service = history.serviceProvided ?: ""
+            if (AssessmentUtil.shouldShowNextFollowUpDate(service)) {
+                val nextFollowUpDate = AssessmentUtil.getNextFollowUpDate(
+                    context,
+                    service,
+                    history.nextFollowUpDate,
+                )
+                addSummaryView(
+                    context.getString(R.string.next_follow_up_date),
+                    nextFollowUpDate,
+                )
+            }
         }
 
         private fun addSummaryView(

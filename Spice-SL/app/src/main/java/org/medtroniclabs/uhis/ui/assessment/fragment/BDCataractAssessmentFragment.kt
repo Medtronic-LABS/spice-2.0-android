@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import dagger.hilt.android.AndroidEntryPoint
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.common.CVDRiskCalculator
@@ -149,18 +151,32 @@ class BDCataractAssessmentFragment() : BaseFragment(), FormEventListener {
             }
 
             viewModel.memberDetailsLiveData.value?.data?.let { memberDetail ->
-                result?.second?.let {
-                    val ncdMap = it[CATARACT] as HashMap<String, Any>
-                    val bpResult = AssessmentUtil.calculateAverageBloodPressure(ncdMap)
-                    val bgResult = AssessmentUtil.addDateAndTimeForGlucose(ncdMap)
+                result?.second?.let { assessmentMap ->
+                    lifecycleScope.launch {
+                        val ncdMap = assessmentMap[CATARACT] as HashMap<String, Any>
+                        val bpResult = AssessmentUtil.calculateAverageBloodPressure(ncdMap)
+                        val bgResult = AssessmentUtil.addDateAndTimeForGlucose(ncdMap)
 
-                    // Compute Referral Logic
-                    val referralResult = ReferralResultGenerator().computeReferralResultForBDNCD(ncdMap, bpResult, bgResult, listOf())
+                        val isFollowUpVisit =
+                            viewModel.getLastServiceHistory(MenuConstants.NCD_MENU_ID) != null
+                        val referralResult =
+                            ReferralResultGenerator().computeReferralResultForBDNCD(
+                                ncdMap,
+                                bpResult,
+                                bgResult,
+                                AssessmentUtil.getSymptomsList(ncdMap),
+                                isFollowUpVisit,
+                            )
 
-                    // Compute CVD Risk
-                    CVDRiskCalculator.calculateCVDRiskFactor(ncdMap, viewModel.riskClassificationModels, memberDetail.dateOfBirth, memberDetail.gender)
-                    viewModel.setUserJourney(AnalyticsDefinedParams.SUBMITBUTTONTRIGGERED)
-                    viewModel.saveAssessment(serverData, it, referralResult, viewModel.menuId)
+                        CVDRiskCalculator.calculateCVDRiskFactor(
+                            ncdMap,
+                            viewModel.riskClassificationModels,
+                            memberDetail.dateOfBirth,
+                            memberDetail.gender,
+                        )
+                        viewModel.setUserJourney(AnalyticsDefinedParams.SUBMITBUTTONTRIGGERED)
+                        viewModel.saveAssessment(serverData, assessmentMap, referralResult, viewModel.menuId)
+                    }
                 }
             }
         }

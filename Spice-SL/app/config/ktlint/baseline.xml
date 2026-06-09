@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <baseline version="1.0">
+    <file name="src/main/java/org/medtroniclabs/uhis/common/CommonUtils.kt">
+        <error line="2209" column="53" source="standard:function-signature" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/common/DateUtils.kt">
         <error line="43" column="15" source="standard:property-naming" />
         <error line="44" column="15" source="standard:property-naming" />
@@ -147,11 +150,11 @@
     <file name="src/main/java/org/medtroniclabs/uhis/data/resource/labourDeliverySummaryRequest.kt">
         <error line="1" column="1" source="standard:filename" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/db/SpiceDatabaseMigration.kt">
+        <error line="52" column="1" source="standard:no-trailing-spaces" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/db/entity/BaseEntity.kt">
         <error line="14" column="9" source="standard:property-naming" />
-    </file>
-    <file name="src/main/java/org/medtroniclabs/uhis/formgeneration/config/DefinedParams.kt">
-        <error line="42" column="15" source="standard:property-naming" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/formgeneration/extension/SafePopupMenuClickListener.kt">
         <error line="6" column="160" source="standard:max-line-length" />
@@ -782,6 +785,18 @@
     <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/ComplianceChooseDialog.kt">
         <error line="1" column="1" source="standard:filename" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/BDCataractAssessmentFragment.kt">
+        <error line="3" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/BDCataractAssessmentSummaryFragment.kt">
+        <error line="368" column="30" source="standard:chain-method-continuation" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/BDNCDAssessmentSummaryFragment.kt">
+        <error line="329" column="30" source="standard:chain-method-continuation" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/referrallogic/ReferralResultGenerator.kt">
+        <error line="3" column="1" source="standard:import-ordering" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/referrallogic/model/ReferralDefinedParams.kt">
         <error line="4" column="15" source="standard:property-naming" />
         <error line="5" column="15" source="standard:property-naming" />
@@ -840,6 +855,17 @@
         <error line="79" column="15" source="standard:property-naming" />
         <error line="86" column="15" source="standard:property-naming" />
         <error line="88" column="15" source="standard:property-naming" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/statuslogic/AssessmentStatusGenerator.kt">
+        <error line="28" column="87" source="standard:function-signature" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/utils/AssessmentUtil.kt">
+        <error line="3" column="1" source="standard:import-ordering" />
+        <error line="386" column="51" source="standard:function-signature" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/viewmodel/AssessmentViewModel.kt">
+        <error line="2097" column="42" source="standard:chain-method-continuation" />
+        <error line="2097" column="59" source="standard:chain-method-continuation" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/boarding/MenuTypeEnums.kt">
         <error line="4" column="5" source="standard:enum-entry-name-case" />

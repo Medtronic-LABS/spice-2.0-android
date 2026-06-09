@@ -980,14 +980,14 @@ class MetaRepository @Inject constructor(
 
                 Resource(
                     state = ResourceState.SUCCESS,
-                    data = menuList.filter { !it.isDisabled },
+                    data = filterCataractMenusForRole(menuList.filter { !it.isDisabled }),
                 )
             } else if (!gender.isNullOrBlank()) {
                 val list = roomHelper.getAssessmentClinicalWorkflow(gender, DefinedParams.Assessment)
 
                 Resource(
                     state = ResourceState.SUCCESS,
-                    data = convertorClinicalWorkflowsToMenuEntity(list),
+                    data = filterCataractMenusForRole(convertorClinicalWorkflowsToMenuEntity(list)),
                 )
             } else {
                 Resource(state = ResourceState.ERROR)
@@ -1160,17 +1160,28 @@ class MetaRepository @Inject constructor(
      */
     suspend fun getClinicalWorkflowWorkflowNamesLower(): Set<String> =
         try {
-            roomHelper
-                .getMenuForClinicalWorkflows()
-                .mapNotNull { wf ->
-                    wf.workflowName
-                        ?.trim()
-                        ?.lowercase()
-                        ?.takeIf { it.isNotEmpty() }
-                }.toSet()
+            val workflowNames =
+                roomHelper
+                    .getMenuForClinicalWorkflows()
+                    .mapNotNull { wf ->
+                        wf.workflowName
+                            ?.trim()
+                            ?.lowercase()
+                            ?.takeIf { it.isNotEmpty() }
+                    }.toSet()
+            if (CommonUtils.isCataractWorkflowEnabledForUser()) {
+                workflowNames
+            } else {
+                workflowNames - MenuConstants.CATARACT_MENU_ID.lowercase()
+            }
         } catch (_: Exception) {
             emptySet()
         }
+
+    private fun filterCataractMenusForRole(menus: List<MenuEntity>): List<MenuEntity> {
+        if (CommonUtils.isCataractWorkflowEnabledForUser()) return menus
+        return menus.filterNot { CommonUtils.isCataractMenuId(it.menuId) }
+    }
 
     suspend fun getUserProfile(): Resource<UserProfile> =
         try {

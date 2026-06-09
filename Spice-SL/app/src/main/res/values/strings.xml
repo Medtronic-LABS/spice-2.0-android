@@ -1717,6 +1717,7 @@
     <string name="service_history_not_found">There are no service history</string>
     <string name="service_name">Service Name</string>
     <string name="service_date">Service Date</string>
+    <string name="service_provided_by">Service Provided By</string>
     <string name="referral_status">Referral Status</string>
     <string name="error_person_name">Please enter valid name</string>
     <string name="emergency_referral">⚠️ Emergency referral</string>

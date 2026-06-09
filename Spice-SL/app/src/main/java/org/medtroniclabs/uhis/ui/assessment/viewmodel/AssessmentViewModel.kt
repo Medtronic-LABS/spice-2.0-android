@@ -367,6 +367,7 @@ class AssessmentViewModel @Inject constructor(
                 )
 
                 assessmentResult.data?.let {
+                    val serviceProvider = getServiceProviderInfo()
                     val history = MemberAssessmentHistoryEntity(
                         memberFhirId = details.memberId,
                         memberId = details.id,
@@ -379,6 +380,8 @@ class AssessmentViewModel @Inject constructor(
                         referralStatus = getReferralStatus(referralStatus, assessmentMap),
                         referralReason = referralReason.toString(),
                         nextFollowUpDate = getNextFollowUpDate(otherDetails),
+                        serviceProvidedByName = serviceProvider.first,
+                        serviceProvidedByRole = serviceProvider.second,
                         practitionerId = SecuredPreference.getUserFhirId(),
                     )
                     assessmentHistoryResultLiveData.postValue(assessmentRepository.saveAssessmentHistory(history))
@@ -1577,6 +1580,7 @@ class AssessmentViewModel @Inject constructor(
                 status = status,
             )
             assessmentResult.data?.let {
+                val serviceProvider = getServiceProviderInfo()
                 val history = MemberAssessmentHistoryEntity(
                     memberFhirId = memberDetail.memberId,
                     memberId = memberDetail.id,
@@ -1588,6 +1592,8 @@ class AssessmentViewModel @Inject constructor(
                     latestVisit = true,
                     referralStatus = referralStatus,
                     referralReason = referralReason.toString(),
+                    serviceProvidedByName = serviceProvider.first,
+                    serviceProvidedByRole = serviceProvider.second,
                     practitionerId = SecuredPreference.getUserFhirId(),
                 )
                 assessmentHistoryResultLiveData.postValue(assessmentRepository.saveAssessmentHistory(history))
@@ -2084,6 +2090,17 @@ class AssessmentViewModel @Inject constructor(
                 riskClassificationModels.addAll(resultList)
             }
         }
+    }
+
+    private suspend fun getServiceProviderInfo(): Pair<String?, String?> {
+        val providerName = AssessmentUtil.getLocalServiceProvidedByName()
+        val providerRole = metaRepository.getUserProfile().data
+            ?.roles
+            ?.firstOrNull()
+            ?.displayName
+            ?.takeIf { it.isNotBlank() }
+            ?: AssessmentUtil.getLocalServiceProvidedByRole()
+        return providerName to providerRole
     }
 
     suspend fun getLastServiceHistory(type: String): MemberAssessmentHistoryEntity? =

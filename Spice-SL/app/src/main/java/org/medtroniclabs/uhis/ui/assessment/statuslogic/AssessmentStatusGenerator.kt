@@ -10,6 +10,7 @@ import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.EYE_CARE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_HAVE_THE_GLASSES_BEEN_SOLD
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NCD_SERVICE_PROVIDED
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.YES
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
@@ -22,6 +23,22 @@ object AssessmentStatusGenerator {
         val wrapped = map[MenuConstants.CATARACT_MENU_ID] as? Map<*, *> ?: return null
         val inner = wrapped[AssessmentDefinedParams.CATARACT] as? Map<*, *>
         return inner ?: wrapped
+    }
+
+    private fun isNcdServiceProvidedInCataract(cataractSection: Map<*, *>?): Boolean =
+        YES.equals(cataractSection?.get(NCD_SERVICE_PROVIDED)?.toString(), true)
+
+    /** Adds High BP / High BG statuses only when referral reasons include elevated vitals. */
+    private fun addHighBpBgStatusesFromReferral(
+        statusList: ArrayList<AssessmentStatus>,
+        referralReasons: List<String>,
+    ) {
+        if (referralReasons.contains(bloodPressure)) {
+            statusList.add(AssessmentStatus.UNCONTROLLED_BP)
+        }
+        if (referralReasons.contains(bloodGlucose)) {
+            statusList.add(AssessmentStatus.UNCONTROLLED_BG)
+        }
     }
 
     fun evaluateStatus(
@@ -127,21 +144,8 @@ object AssessmentStatusGenerator {
             }
 
             map.containsKey(MenuConstants.NCD_MENU_ID) -> {
-                val results = referralResult?.second ?: listOf()
                 val statusList = arrayListOf<AssessmentStatus>()
-                if (results.isNotEmpty()) {
-                    if (results.contains(bloodPressure) && results.contains(bloodGlucose)) {
-                        statusList.add(AssessmentStatus.UNCONTROLLED_BP)
-                        statusList.add(AssessmentStatus.UNCONTROLLED_BG)
-                    } else if (results.contains(bloodPressure)) {
-                        statusList.add(AssessmentStatus.UNCONTROLLED_BP)
-                    } else {
-                        statusList.add(AssessmentStatus.UNCONTROLLED_BG)
-                    }
-                } else {
-                    statusList.add(AssessmentStatus.CONTROLLED_BP)
-                    statusList.add(AssessmentStatus.CONTROLLED_BG)
-                }
+                addHighBpBgStatusesFromReferral(statusList, referralResult?.second ?: listOf())
                 val ncdMap = map[MenuConstants.NCD_MENU_ID] as Map<*, *>
                 val eyeCareMap = ncdMap[EYE_CARE] as? Map<*, *>
                 if (YES.equals(eyeCareMap?.get(ID_HAVE_THE_GLASSES_BEEN_SOLD)?.toString(), true)) {
@@ -151,22 +155,11 @@ object AssessmentStatusGenerator {
             }
 
             map.containsKey(MenuConstants.CATARACT_MENU_ID) -> {
-                val results = referralResult?.second ?: listOf()
                 val statusList = arrayListOf<AssessmentStatus>()
-                if (results.isNotEmpty()) {
-                    if (results.contains(bloodPressure) && results.contains(bloodGlucose)) {
-                        statusList.add(AssessmentStatus.UNCONTROLLED_BP)
-                        statusList.add(AssessmentStatus.UNCONTROLLED_BG)
-                    } else if (results.contains(bloodPressure)) {
-                        statusList.add(AssessmentStatus.UNCONTROLLED_BP)
-                    } else {
-                        statusList.add(AssessmentStatus.UNCONTROLLED_BG)
-                    }
-                } else {
-                    statusList.add(AssessmentStatus.CONTROLLED_BP)
-                    statusList.add(AssessmentStatus.CONTROLLED_BG)
-                }
                 val cataractSection = getCataractFieldSection(map)
+                if (isNcdServiceProvidedInCataract(cataractSection)) {
+                    addHighBpBgStatusesFromReferral(statusList, referralResult?.second ?: listOf())
+                }
                 if (YES.equals(cataractSection?.get(AssessmentDefinedParams.ID_HAVE_THE_GLASSES_BEEN_SOLD)?.toString(), true)) {
                     statusList.add(AssessmentStatus.GLASSES_SOLD)
                 }

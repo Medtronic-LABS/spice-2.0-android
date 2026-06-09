@@ -61,7 +61,9 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
 
     private fun hasEyeCareWorkflow(): Boolean = workflowSlugsContain(MenuConstants.EYE_CARE_MENU_ID)
 
-    private fun hasCataractWorkflow(): Boolean = workflowSlugsContain(MenuConstants.CATARACT_MENU_ID)
+    private fun hasCataractWorkflow(): Boolean =
+        CommonUtils.isCataractWorkflowEnabledForUser() &&
+            workflowSlugsContain(MenuConstants.CATARACT_MENU_ID)
 
     private fun reboundDashboardAfterClinicalWorkflowsLoaded() {
         val resource = viewModel.userDashboardDetails.value

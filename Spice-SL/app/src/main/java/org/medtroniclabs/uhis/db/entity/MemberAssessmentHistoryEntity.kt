@@ -33,6 +33,8 @@ data class MemberAssessmentHistoryEntity(
     val referralStatus: String?,
     val referralReason: String?,
     var nextFollowUpDate: String? = null,
+    val serviceProvidedByName: String? = null,
+    val serviceProvidedByRole: String? = null,
     @ColumnInfo(COLUMN_PRACTITIONER_ID)
     var practitionerId: String? = null,
 )
