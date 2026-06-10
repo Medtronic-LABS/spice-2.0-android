@@ -102,7 +102,7 @@ object NCDReferralColorEvaluator {
             (
                 sys in Thresholds.BP_YELLOW_HIGHER_SYSTOLIC_MIN..Thresholds.BP_YELLOW_HIGHER_SYSTOLIC_MAX ||
                     dia in Thresholds.BP_YELLOW_HIGHER_DIASTOLIC_MIN..Thresholds.BP_YELLOW_HIGHER_DIASTOLIC_MAX
-            ) &&
+            ) ||
                 symptoms -> ScoredRisk(
                 Severity.YELLOW_HIGHER,
                 YellowPriority.HIGHER,
@@ -111,8 +111,7 @@ object NCDReferralColorEvaluator {
             (
                 sys in Thresholds.BP_YELLOW_LOWER_SYSTOLIC_MIN..Thresholds.BP_YELLOW_LOWER_SYSTOLIC_MAX ||
                     dia in Thresholds.BP_YELLOW_LOWER_DIASTOLIC_MIN..Thresholds.BP_YELLOW_LOWER_DIASTOLIC_MAX
-            ) ||
-                symptoms -> ScoredRisk(Severity.YELLOW_LOWER, YellowPriority.LOWER)
+            ) -> ScoredRisk(Severity.YELLOW_LOWER, YellowPriority.LOWER)
 
             sys < Thresholds.BP_NORMAL_SYSTOLIC_MAX &&
                 dia < Thresholds.BP_NORMAL_DIASTOLIC_MAX -> ScoredRisk(Severity.GREEN)
