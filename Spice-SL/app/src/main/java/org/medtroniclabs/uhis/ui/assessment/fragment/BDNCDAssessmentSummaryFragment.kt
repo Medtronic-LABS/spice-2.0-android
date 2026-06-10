@@ -1,11 +1,13 @@
 package org.medtroniclabs.uhis.ui.assessment.fragment
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.activityViewModels
 import org.json.JSONArray
 import org.json.JSONObject
@@ -27,6 +29,8 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils.findValueByKey
 import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils.getSpinnerDisplayValue
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_BLOOD_PRESSURE
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_DIASTOLIC
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_SYSTOLIC
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BMI
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BMI_CATEGORY
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BP_LOG_DETAILS
@@ -36,6 +40,7 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FACILITY_TYP
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_TYPE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_UNIT
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HAS_SYMPTOMS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HBA1CUnit
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HEIGHT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.MMHG
@@ -44,7 +49,9 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NCD_SYMPTOMS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.REFERRAL_FACILITY_TYPE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ReferredPHUSiteID
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.WEIGHT
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.YES
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.hba1c
+import org.medtroniclabs.uhis.ui.assessment.referrallogic.NCDReferralColorEvaluator
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.utils.ReferralStatus
 import org.medtroniclabs.uhis.ui.assessment.viewmodel.AssessmentViewModel
 
@@ -97,9 +104,31 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
             if (assessmentString.isNullOrBlank()) return@observe
             val json = JSONObject(assessmentString)
             updateStatusBar(json)
+            applyRiskColor(json)
             val items = createNCDSummaryData(json)
             createSummaryView(items, json)
         }
+    }
+
+    private fun applyRiskColor(json: JSONObject) {
+        val systolic = (findValueByKey(json, AVG_SYSTOLIC) as? Number)?.toInt()?.takeIf { it > 0 }
+        val diastolic = (findValueByKey(json, AVG_DIASTOLIC) as? Number)?.toInt()?.takeIf { it > 0 }
+        val glucoseUnit = findValueByKey(json, GLUCOSE_UNIT) as? String
+        val glucoseType = findValueByKey(json, GLUCOSE_TYPE) as? String
+        val glucoseValue = (findValueByKey(json, GLUCOSE) as? Number)?.toDouble()?.takeIf { it > 0 }
+        val hasSymptoms = YES.equals(findValueByKey(json, HAS_SYMPTOMS)?.toString(), true)
+        val colorResult = NCDReferralColorEvaluator.evaluate(
+            NCDReferralColorEvaluator.Input(
+                systolic = systolic,
+                diastolic = diastolic,
+                glucoseUnit = glucoseUnit,
+                glucoseType = glucoseType,
+                glucoseValue = glucoseValue,
+                hasSymptoms = hasSymptoms,
+            ),
+        )
+        binding.riskResultLayout.backgroundTintList =
+            ColorStateList.valueOf(colorResult.colorHex.toColorInt())
     }
 
     private fun createSummaryView(

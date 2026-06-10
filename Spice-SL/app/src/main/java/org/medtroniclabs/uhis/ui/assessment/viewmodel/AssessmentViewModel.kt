@@ -192,7 +192,6 @@ class AssessmentViewModel @Inject constructor(
     var complianceMap: ArrayList<HashMap<String, Any>>? = null
     var bioDataMap: HashMap<String, Any>? = null
     var bioMetric: HashMap<String, Any>? = null
-    var riskClassificationModels = ArrayList<RiskClassificationModel>()
     private var fbsBloodGlucose: Double? = null
     private var rbsBloodGlucose: Double? = null
     var assessmentType: String? = null
@@ -2075,13 +2074,6 @@ class AssessmentViewModel @Inject constructor(
             } else if (value is MutableMap<*, *>) {
                 processMapForDialogCheckbox(value as MutableMap<Any, Any>, dialogCheckboxIds)
             }
-        }
-    }
-
-    fun getRiskEntityList() {
-        viewModelScope.launch(dispatcherIO) {
-            riskClassificationModels.clear()
-            riskClassificationModels.addAll(loadRiskClassificationModels())
         }
     }
 

@@ -73,7 +73,6 @@ class BDNCDAssessmentFragment : BaseFragment(), FormEventListener {
 
     private fun getFormDataForWorkflow() {
         viewModel.getFormData(MenuConstants.NCD_MENU_ID)
-        viewModel.getRiskEntityList()
         viewModel.getNearestHealthFacility()
     }
 

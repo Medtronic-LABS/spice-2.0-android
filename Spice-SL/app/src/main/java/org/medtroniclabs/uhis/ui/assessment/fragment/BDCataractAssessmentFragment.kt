@@ -60,7 +60,6 @@ class BDCataractAssessmentFragment() : BaseFragment(), FormEventListener {
 
     private fun getFormDataForWorkflow() {
         viewModel.getFormData(MenuConstants.CATARACT_MENU_ID)
-        viewModel.getRiskEntityList()
         viewModel.getNearestHealthFacility()
     }
 
@@ -141,7 +140,6 @@ class BDCataractAssessmentFragment() : BaseFragment(), FormEventListener {
         serverData: List<FormLayout>?,
     ) {
         resultMap?.let { details ->
-            // val referralResult = ReferralResultGenerator().calculateNCDStatus(requireContext(), details)
             val result = serverData?.let {
                 FormResultComposer().groupValues(
                     serverData = it,

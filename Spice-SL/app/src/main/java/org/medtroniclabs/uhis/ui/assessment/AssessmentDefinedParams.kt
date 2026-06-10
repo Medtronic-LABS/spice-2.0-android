@@ -501,6 +501,7 @@ object AssessmentDefinedParams {
 
     const val GLUCOSE_LOG = "glucoseLog"
     const val SYMPTOMS_LOG = "symptomsLog"
+    const val HAS_SYMPTOMS = "hasSymptoms"
 
     const val HBA1C_DATE_TIME = "hba1cDateTime"
 
