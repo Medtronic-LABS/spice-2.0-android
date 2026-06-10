@@ -75,7 +75,11 @@ object AssessmentStatusGenerator {
         extraTokens: MutableList<String>,
         section: Map<*, *>?,
     ) {
-        val power = section?.get(AssessmentDefinedParams.GLASS_POWER)?.toString()?.trim()?.takeIf { it.isNotEmpty() }
+        val power = section
+            ?.get(AssessmentDefinedParams.GLASS_POWER)
+            ?.toString()
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
         if (power != null) {
             extraTokens.add("${AssessmentDefinedParams.GLASS_POWER_STATUS_PREFIX}$power")
         }
@@ -144,8 +148,8 @@ object AssessmentStatusGenerator {
         map: HashMap<String, Any>,
         memberDetails: AssessmentMemberDetails?,
         referralResult: Pair<String?, ArrayList<String>>? = null,
-    ): ArrayList<String>? {
-        return when {
+    ): ArrayList<String>? =
+        when {
             map.containsKey(MenuConstants.PREGNANT_WOMEN_PROFILE) -> {
                 val riskFactors = PregnantWomen.computeRiskFactors(
                     map[MenuConstants.PREGNANT_WOMEN_PROFILE] as Map<String, Any?>,
@@ -262,5 +266,4 @@ object AssessmentStatusGenerator {
                 null
             }
         }
-    }
 }

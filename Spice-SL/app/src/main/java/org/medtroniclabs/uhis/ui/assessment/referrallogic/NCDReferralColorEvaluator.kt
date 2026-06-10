@@ -72,10 +72,10 @@ object NCDReferralColorEvaluator {
     }
 
     private object Colors {
-        const val RED = "#FF0000"
-        const val ORANGE = "#FFA500"
-        const val YELLOW = "#FFFF00"
-        const val GREEN = "#92D050"
+        const val RED = "#8B0000"
+        const val ORANGE = "#E4A476"
+        const val YELLOW = "#E4CC76"
+        const val GREEN = "#B1CD77"
     }
 
     /**
@@ -102,22 +102,21 @@ object NCDReferralColorEvaluator {
             (
                 sys in Thresholds.BP_YELLOW_HIGHER_SYSTOLIC_MIN..Thresholds.BP_YELLOW_HIGHER_SYSTOLIC_MAX ||
                     dia in Thresholds.BP_YELLOW_HIGHER_DIASTOLIC_MIN..Thresholds.BP_YELLOW_HIGHER_DIASTOLIC_MAX
-            ) &&
-                symptoms -> ScoredRisk(Severity.YELLOW_HIGHER, YellowPriority.HIGHER)
+            ) ||
+                symptoms -> ScoredRisk(
+                Severity.YELLOW_HIGHER,
+                YellowPriority.HIGHER,
+            )
 
             (
                 sys in Thresholds.BP_YELLOW_LOWER_SYSTOLIC_MIN..Thresholds.BP_YELLOW_LOWER_SYSTOLIC_MAX ||
                     dia in Thresholds.BP_YELLOW_LOWER_DIASTOLIC_MIN..Thresholds.BP_YELLOW_LOWER_DIASTOLIC_MAX
-            ) &&
-                symptoms -> ScoredRisk(Severity.YELLOW_LOWER, YellowPriority.LOWER)
+            ) -> ScoredRisk(Severity.YELLOW_LOWER, YellowPriority.LOWER)
 
-            isBpNormal(sys, dia) && !symptoms -> ScoredRisk(Severity.GREEN)
-            symptoms -> ScoredRisk(Severity.YELLOW_LOWER, YellowPriority.LOWER)
-            isBpHigherYellowBand(sys, dia) ->
-                ScoredRisk(Severity.YELLOW_HIGHER, YellowPriority.HIGHER)
-            isBpLowerYellowBand(sys, dia) ->
-                ScoredRisk(Severity.YELLOW_LOWER, YellowPriority.LOWER)
-            else -> ScoredRisk(Severity.YELLOW_LOWER, YellowPriority.LOWER)
+            sys < Thresholds.BP_NORMAL_SYSTOLIC_MAX &&
+                dia < Thresholds.BP_NORMAL_DIASTOLIC_MAX -> ScoredRisk(Severity.GREEN)
+
+            else -> ScoredRisk(Severity.GREEN)
         }
     }
 
@@ -129,8 +128,7 @@ object NCDReferralColorEvaluator {
 
         val type = input.glucoseType?.lowercase()
         return when {
-            bg > Thresholds.DIABETES_RED_MMOL -> ScoredRisk(Severity.RED)
-            bg < Thresholds.HYPOGLYCEMIA_MMOL -> ScoredRisk(Severity.ORANGE)
+            bg > Thresholds.DIABETES_RED_MMOL || bg < Thresholds.HYPOGLYCEMIA_MMOL -> ScoredRisk(Severity.RED)
             bg in Thresholds.DIABETES_ORANGE_LOW_MMOL..Thresholds.DIABETES_RED_MMOL ->
                 ScoredRisk(Severity.ORANGE)
 
@@ -141,26 +139,9 @@ object NCDReferralColorEvaluator {
                 ScoredRisk(Severity.YELLOW_LOWER, YellowPriority.LOWER)
 
             isGreenDiabetes(bg, type) -> ScoredRisk(Severity.GREEN)
-            else -> ScoredRisk(Severity.YELLOW_LOWER, YellowPriority.LOWER)
+            else -> ScoredRisk(Severity.GREEN)
         }
     }
-
-    private fun isBpNormal(
-        sys: Int,
-        dia: Int,
-    ) = sys < Thresholds.BP_NORMAL_SYSTOLIC_MAX && dia < Thresholds.BP_NORMAL_DIASTOLIC_MAX
-
-    private fun isBpHigherYellowBand(
-        sys: Int,
-        dia: Int,
-    ) = sys in Thresholds.BP_YELLOW_HIGHER_SYSTOLIC_MIN..Thresholds.BP_YELLOW_HIGHER_SYSTOLIC_MAX ||
-        dia in Thresholds.BP_YELLOW_HIGHER_DIASTOLIC_MIN..Thresholds.BP_YELLOW_HIGHER_DIASTOLIC_MAX
-
-    private fun isBpLowerYellowBand(
-        sys: Int,
-        dia: Int,
-    ) = sys in Thresholds.BP_YELLOW_LOWER_SYSTOLIC_MIN..Thresholds.BP_YELLOW_LOWER_SYSTOLIC_MAX ||
-        dia in Thresholds.BP_YELLOW_LOWER_DIASTOLIC_MIN..Thresholds.BP_YELLOW_LOWER_DIASTOLIC_MAX
 
     private fun isBpCrisis(
         sys: Int,
