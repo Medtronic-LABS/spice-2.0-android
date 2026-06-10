@@ -229,6 +229,15 @@
     <string name="assessment_status_ncd_service_cataract_camp">ক্যাটারেক্ট ক্যাম্পে এনসিডি সেবা</string>
     <string name="assessment_status_referred_for_operation">অপারেশনের জন্য রেফার</string>
     <string name="assessment_status_glasses_sold">চশমা বিক্রয়</string>
+    <string name="assessment_status_glass_power">পাওয়ার - %1$s</string>
+    <string name="assessment_status_cataracts">ছানি</string>
+    <string name="assessment_status_lacrimal_tear_duct_problem">নেত্রনালীর সমস্যা</string>
+    <string name="assessment_status_pterygium">টেরিজিয়াম/মাংসবৃদ্ধি</string>
+    <string name="assessment_status_glaucoma">গ্লুকোমা</string>
+    <string name="assessment_status_myopia">দূরদৃষ্টি সমস্যা</string>
+    <string name="assessment_status_presbyopia">প্রেসবায়োপিয়া বা নিকট দৃষ্টি সমস্যা</string>
+    <string name="assessment_status_other_eye_problem">অন্যান্য সমস্যা</string>
+    <string name="assessment_status_no_eye_problem">সমস্যা নেই</string>
     <string name="child_hood_visit">শিশু ফলোআপ</string>
     <string name="other_value" translatable="false">%1$s - %2$s</string>
     <string name="gps_disabled_title">লোকেশন সেবা বন্ধ!</string>

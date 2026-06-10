@@ -12,6 +12,7 @@ import org.medtroniclabs.uhis.common.CommonUtils.getStringOrEmptyString
 import org.medtroniclabs.uhis.common.DefinedParams.CHIEF_DOM_CODE_LENGTH
 import org.medtroniclabs.uhis.common.DefinedParams.PATIENT_NUMBER_LENGTH
 import org.medtroniclabs.uhis.common.DefinedParams.VILLAGE_CODE_LENGTH
+import org.medtroniclabs.uhis.common.RoleConstant
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberFhirId
 import org.medtroniclabs.uhis.data.offlinesync.model.UnAssignedHouseholdMemberDetail
@@ -130,6 +131,7 @@ class HouseholdMemberRepository @Inject constructor(
         if (before.householdId != after.householdId) return true
         if (before.villageId != after.villageId) return true
         if (before.shasthyaShebikaId != after.shasthyaShebikaId) return true
+        if (before.shasthyaKormiId != after.shasthyaKormiId) return true
         if (before.subVillageId != after.subVillageId) return true
         if (before.motherReferenceId != after.motherReferenceId) return true
         if (before.idType != after.idType) return true
@@ -265,8 +267,42 @@ class HouseholdMemberRepository @Inject constructor(
             householdMemberEntity.longitude = it.longitude
         }
 
+        applyShasthyaKormiId(householdMemberEntity)
+
         return householdMemberEntity
     }
+
+    private suspend fun applyShasthyaKormiId(member: HouseholdMemberEntity) {
+        if (isValidShasthyaKormiId(member.shasthyaKormiId)) return
+
+        member.shasthyaShebikaId?.takeIf { it > 0L }?.let { ssId ->
+            roomHelper.getShasthyaShebikaById(ssId)?.shasthyaKormiId
+                ?.takeIf { isValidShasthyaKormiId(it) }
+                ?.let {
+                    member.shasthyaKormiId = it
+                    return
+                }
+        }
+
+        if (shouldApplyLoggedInUserAsKormi()) {
+            val userId = SecuredPreference.getUserId()
+            if (isValidShasthyaKormiId(userId)) {
+                member.shasthyaKormiId = userId
+            }
+        }
+    }
+
+    private suspend fun shouldApplyLoggedInUserAsKormi(): Boolean {
+        if (CommonUtils.isFoOrPo()) return false
+        val userId = SecuredPreference.getUserId()
+        if (!isValidShasthyaKormiId(userId)) return false
+        // SS users share the CHW role; their login id matches ShasthyaShebikaEntity.id.
+        if (roomHelper.getShasthyaShebikaById(userId) != null) return false
+        if (CommonUtils.isSk()) return true
+        return SecuredPreference.getRole() == RoleConstant.COMMUNITY_HEALTH_WORKER
+    }
+
+    private fun isValidShasthyaKormiId(id: Long?): Boolean = id != null && id > 0L
 
     private fun applyLocationFromMap(
         householdMemberEntity: HouseholdMemberEntity,
@@ -288,7 +324,7 @@ class HouseholdMemberRepository @Inject constructor(
         }
 
         val shasthyaKormiIdFromMap = CommonUtils.getLongOrNull(map[HouseHoldRegistration.SHASTHYA_KORMI_ID])
-        if (shasthyaKormiIdFromMap != null) {
+        if (isValidShasthyaKormiId(shasthyaKormiIdFromMap)) {
             householdMemberEntity.shasthyaKormiId = shasthyaKormiIdFromMap
         }
 

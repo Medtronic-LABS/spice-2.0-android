@@ -27,7 +27,7 @@ object SpiceDatabaseMigration {
      * - Drop patientStatus and reason as are not required
      * - Add callType, isWillingToVisitUHC, visitRejectReason, otherVisitRejectReason, unSuccessfulCallReason
      * - Add wrongNumber, calledByUserId, calledByUserName, calledByUserRole
-     * - Add [COLUMN_PRACTITIONER_ID], serviceProvidedByName, serviceProvidedByRole to [MEMBER_ASSESSMENT_HISTORY_ENTITY]
+     * - Add [COLUMN_PRACTITIONER_ID], serviceProvidedByName, serviceProvidedByRole, observations to [MEMBER_ASSESSMENT_HISTORY_ENTITY]
      */
     val MIGRATION_5_6 = object : Migration(5, 6) {
         override fun migrate(db: SupportSQLiteDatabase) {
@@ -54,6 +54,7 @@ object SpiceDatabaseMigration {
 
             db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN serviceProvidedByName TEXT;")
             db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN serviceProvidedByRole TEXT;")
+            db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN observations TEXT;")
         }
     }
 }

@@ -37,6 +37,7 @@ data class MemberAssessmentHistoryEntity(
     val serviceProvidedByRole: String? = null,
     @ColumnInfo(COLUMN_PRACTITIONER_ID)
     var practitionerId: String? = null,
+    val observations: MemberAssessmentObservations? = null,
 )
 
 const val COLUMN_PRACTITIONER_ID = "practitionerId"

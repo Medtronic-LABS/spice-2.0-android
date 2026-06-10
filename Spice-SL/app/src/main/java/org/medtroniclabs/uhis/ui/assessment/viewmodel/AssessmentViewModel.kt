@@ -383,6 +383,7 @@ class AssessmentViewModel @Inject constructor(
                         serviceProvidedByName = serviceProvider.first,
                         serviceProvidedByRole = serviceProvider.second,
                         practitionerId = SecuredPreference.getUserFhirId(),
+                        observations = AssessmentUtil.buildMemberAssessmentObservations(assessmentMap, menuId),
                     )
                     assessmentHistoryResultLiveData.postValue(assessmentRepository.saveAssessmentHistory(history))
                 }

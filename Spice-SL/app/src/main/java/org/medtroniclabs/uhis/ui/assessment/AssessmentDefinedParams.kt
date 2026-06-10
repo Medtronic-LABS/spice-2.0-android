@@ -656,6 +656,17 @@ object AssessmentDefinedParams {
     const val CAMP_TYPE = "camp_type"
 
     const val EYE_DISEASE = "eyeDisease"
+    const val GLASS_POWER = "glassPower"
+    const val GLASS_POWER_STATUS_PREFIX = "GLASS_POWER:"
+
+    const val EYE_PROBLEM_CATARACTS = "cataracts"
+    const val EYE_PROBLEM_LECRIMAL_TEAR_DUCT = "lecrimalTearDuctProblem"
+    const val EYE_PROBLEM_PTERYGIUM = "pterygium"
+    const val EYE_PROBLEM_GLAUCOMA = "glaucoma"
+    const val EYE_PROBLEM_MYOPIA = "myopia"
+    const val EYE_PROBLEM_PRESBYOPIA = "presbyopia"
+    const val EYE_PROBLEM_OTHER = "otherProblem"
+    const val EYE_PROBLEM_NONE = "noProblem"
 
     /** Cataract form: Has NCD service been provided? */
     const val NCD_SERVICE_PROVIDED = "ncdServiceProvided"

@@ -11,9 +11,19 @@ import org.medtroniclabs.uhis.formgeneration.model.BPModel
 import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_BLOOD_PRESSURE
+import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
+import org.medtroniclabs.uhis.db.entity.MemberAssessmentObservations
+import org.medtroniclabs.uhis.formgeneration.FormGenerator
+import org.medtroniclabs.uhis.mappingkey.Screening
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_DIASTOLIC
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_SYSTOLIC
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BIO_METRICS
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BIOMETRIC_FAMILY
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BP_LOG
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.CATARACT
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HEIGHT
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.WEIGHT
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ncd
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BP_LOG_DETAILS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FBS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE
@@ -245,6 +255,10 @@ object AssessmentUtil {
         status: String,
         context: Context,
     ): String {
+        if (status.startsWith(AssessmentDefinedParams.GLASS_POWER_STATUS_PREFIX)) {
+            val power = status.removePrefix(AssessmentDefinedParams.GLASS_POWER_STATUS_PREFIX)
+            return context.getString(R.string.assessment_status_glass_power, power)
+        }
         val assessmentStatus = try {
             AssessmentStatus.valueOf(status)
         } catch (_: Exception) {
@@ -334,6 +348,38 @@ object AssessmentUtil {
                 context.getString(R.string.assessment_status_referred_for_operation)
             }
 
+            AssessmentStatus.CATARACTS -> {
+                context.getString(R.string.assessment_status_cataracts)
+            }
+
+            AssessmentStatus.LECRIMAL_TEAR_DUCT_PROBLEM -> {
+                context.getString(R.string.assessment_status_lacrimal_tear_duct_problem)
+            }
+
+            AssessmentStatus.PTERYGIUM -> {
+                context.getString(R.string.assessment_status_pterygium)
+            }
+
+            AssessmentStatus.GLAUCOMA -> {
+                context.getString(R.string.assessment_status_glaucoma)
+            }
+
+            AssessmentStatus.MYOPIA -> {
+                context.getString(R.string.assessment_status_myopia)
+            }
+
+            AssessmentStatus.PRESBYOPIA -> {
+                context.getString(R.string.assessment_status_presbyopia)
+            }
+
+            AssessmentStatus.OTHER_EYE_PROBLEM -> {
+                context.getString(R.string.assessment_status_other_eye_problem)
+            }
+
+            AssessmentStatus.NO_EYE_PROBLEM -> {
+                context.getString(R.string.assessment_status_no_eye_problem)
+            }
+
             AssessmentStatus.DEFAULT,
             -> {
                 status.uppercase(Locale.ENGLISH)
@@ -398,5 +444,158 @@ object AssessmentUtil {
             providerRole != null -> providerRole
             else -> context.getString(R.string.separator_double_hyphen)
         }
+    }
+
+    fun getHeightWeightFromHistory(history: MemberAssessmentHistoryEntity): Pair<String?, String?> {
+        val observations = history.observations
+        val height = observations?.height?.trim()?.takeIf { it.isNotEmpty() }
+        val weight = observations?.weight?.trim()?.takeIf { it.isNotEmpty() }
+        return height to weight
+    }
+
+    fun prefillHeightAndWeight(
+        formGenerator: FormGenerator,
+        height: String?,
+        weight: String?,
+        isHeightReadOnly: Boolean = false,
+    ) {
+        height?.let { value ->
+            formGenerator.getViewByTag(Screening.Height)?.let { view ->
+                formGenerator.setValueForView(value, view)
+                if (isHeightReadOnly) {
+                    view.isEnabled = false
+                }
+            }
+        }
+        weight?.let { value ->
+            formGenerator.getViewByTag(Screening.Weight)?.let { view ->
+                formGenerator.setValueForView(value, view)
+            }
+        }
+    }
+
+    fun buildMemberAssessmentObservations(
+        assessmentMap: HashMap<String, Any>,
+        menuId: String?,
+    ): MemberAssessmentObservations? {
+        val service = menuId ?: return null
+        if (!shouldShowServiceObservations(service)) return null
+
+        val vitalsMap = resolveVitalsMap(assessmentMap, service) ?: return null
+        val height = resolveObservationHeight(vitalsMap)
+        val weight = resolveObservationWeight(vitalsMap)
+        val bp = resolveObservationBloodPressure(vitalsMap)
+        val bg = resolveObservationBloodGlucose(vitalsMap)
+
+        if (height == null && weight == null && bp == null && bg == null) return null
+
+        return MemberAssessmentObservations(
+            height = height,
+            weight = weight,
+            bp = bp,
+            bg = bg,
+        )
+    }
+
+    private fun resolveVitalsMap(
+        assessmentMap: HashMap<String, Any>,
+        menuId: String,
+    ): HashMap<String, Any>? =
+        when (menuId.lowercase()) {
+            MenuConstants.NCD_MENU_ID.lowercase() ->
+                (assessmentMap[ncd] ?: assessmentMap[MenuConstants.NCD_MENU_ID]) as? HashMap<String, Any>
+            MenuConstants.CATARACT_MENU_ID.lowercase() ->
+                (assessmentMap[CATARACT] ?: assessmentMap[MenuConstants.CATARACT_MENU_ID]) as? HashMap<String, Any>
+            else -> null
+        }
+
+    private fun resolveObservationHeight(map: HashMap<String, Any>): String? =
+        resolveObservationNumber(map, HEIGHT)
+
+    private fun resolveObservationWeight(map: HashMap<String, Any>): String? =
+        resolveObservationNumber(map, WEIGHT)
+
+    private fun resolveObservationNumber(
+        map: HashMap<String, Any>,
+        key: String,
+    ): String? {
+        val bpLogs = map[BP_LOG] as? HashMap<*, *>
+        (bpLogs?.get(key) as? Number)?.let { return formatObservationNumber(it) }
+        for (familyKey in listOf(BIOMETRIC_FAMILY, BIO_METRICS)) {
+            val family = map[familyKey] as? HashMap<*, *> ?: continue
+            (family[key] as? Number)?.let { return formatObservationNumber(it) }
+        }
+        return (map[key] as? Number)?.let { formatObservationNumber(it) }
+    }
+
+    private fun formatObservationNumber(value: Number): String {
+        val doubleValue = value.toDouble()
+        return if (doubleValue == doubleValue.roundToInt().toDouble()) {
+            doubleValue.roundToInt().toString()
+        } else {
+            doubleValue.toString()
+        }
+    }
+
+    private fun resolveObservationBloodPressure(map: HashMap<String, Any>): String? {
+        val bpLogs = map[BP_LOG] as? HashMap<String, Any> ?: return null
+
+        (bpLogs[AVG_BLOOD_PRESSURE] as? String)?.trim()?.takeIf { it.isNotEmpty() }?.let { return it }
+
+        val sys = (bpLogs[AVG_SYSTOLIC] as? Number)?.toInt()
+        val dia = (bpLogs[AVG_DIASTOLIC] as? Number)?.toInt()
+        if (sys != null && sys > 0 && dia != null && dia > 0) {
+            return "$sys/$dia"
+        }
+
+        val (computedSys, computedDia) = calculateAverageBloodPressure(map)
+        return if (computedSys > 0 && computedDia > 0) {
+            "$computedSys/$computedDia"
+        } else {
+            null
+        }
+    }
+
+    private fun resolveObservationBloodGlucose(map: HashMap<String, Any>): String? {
+        val glucoseLogs = map[GLUCOSE_LOG] as? HashMap<*, *> ?: return null
+        val glucose = glucoseLogs[GLUCOSE] as? Number ?: return null
+        if (glucose.toDouble() <= 0) return null
+        return formatObservationNumber(glucose)
+    }
+
+    fun shouldShowServiceObservations(service: String): Boolean =
+        when (service.lowercase()) {
+            MenuConstants.NCD_MENU_ID.lowercase(),
+            MenuConstants.CATARACT_MENU_ID.lowercase(),
+            -> true
+            else -> false
+        }
+
+    fun formatServiceHistoryBloodPressure(
+        context: Context,
+        bp: String?,
+    ): String {
+        val value = bp?.trim()?.takeIf { it.isNotEmpty() }
+        return value?.let {
+            if (it.contains("mmHg", ignoreCase = true)) {
+                it
+            } else {
+                "$it ${context.getString(R.string.mmHg)}"
+            }
+        } ?: context.getString(R.string.separator_double_hyphen)
+    }
+
+    fun formatServiceHistoryBloodGlucose(
+        context: Context,
+        bg: String?,
+    ): String {
+        val value = bg?.trim()?.takeIf { it.isNotEmpty() }
+        return value?.let {
+            if (it.contains("mmol", ignoreCase = true)) {
+                it
+            } else {
+                "$it $MMOLL"
+            }
+        } ?: context.getString(R.string.separator_double_hyphen)
     }
 }

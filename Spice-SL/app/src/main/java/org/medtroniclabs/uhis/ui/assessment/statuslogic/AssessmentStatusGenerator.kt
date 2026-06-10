@@ -27,6 +27,60 @@ object AssessmentStatusGenerator {
 
     private fun isNcdServiceProvidedInCataract(cataractSection: Map<*, *>?): Boolean = YES.equals(cataractSection?.get(NCD_SERVICE_PROVIDED)?.toString(), true)
 
+    private fun ArrayList<AssessmentStatus>.toStatusStrings(extraTokens: List<String> = emptyList()): ArrayList<String> =
+        ArrayList(map { it.name } + extraTokens)
+
+    private fun extractEyeProblemIds(section: Map<*, *>?): List<String> {
+        if (section == null) return emptyList()
+        val ids = mutableListOf<String>()
+        (section[AssessmentDefinedParams.EYE_DISEASE] as? List<*>)?.forEach { item ->
+            when (item) {
+                is String -> ids.add(item)
+                is Map<*, *> -> (item[DefinedParams.ID] as? String)?.let { ids.add(it) }
+            }
+        }
+        (section[AssessmentDefinedParams.EYE_TEST_OUTCOME] as? String)?.takeIf { it.isNotBlank() }?.let { ids.add(it) }
+        (section[AssessmentDefinedParams.EYE_TEST_OUTCOMES] as? List<*>)?.forEach { item ->
+            when (item) {
+                is String -> ids.add(item)
+                is Map<*, *> -> (item[DefinedParams.ID] as? String)?.let { ids.add(it) }
+            }
+        }
+        return ids.distinct()
+    }
+
+    private fun mapEyeProblemIdToStatus(id: String): AssessmentStatus? =
+        when (id) {
+            AssessmentDefinedParams.EYE_PROBLEM_CATARACTS -> AssessmentStatus.CATARACTS
+            AssessmentDefinedParams.EYE_PROBLEM_LECRIMAL_TEAR_DUCT -> AssessmentStatus.LECRIMAL_TEAR_DUCT_PROBLEM
+            AssessmentDefinedParams.EYE_PROBLEM_PTERYGIUM -> AssessmentStatus.PTERYGIUM
+            AssessmentDefinedParams.EYE_PROBLEM_GLAUCOMA -> AssessmentStatus.GLAUCOMA
+            AssessmentDefinedParams.EYE_PROBLEM_MYOPIA -> AssessmentStatus.MYOPIA
+            AssessmentDefinedParams.EYE_PROBLEM_PRESBYOPIA -> AssessmentStatus.PRESBYOPIA
+            AssessmentDefinedParams.EYE_PROBLEM_OTHER -> AssessmentStatus.OTHER_EYE_PROBLEM
+            AssessmentDefinedParams.EYE_PROBLEM_NONE -> AssessmentStatus.NO_EYE_PROBLEM
+            else -> null
+        }
+
+    private fun addEyeProblemStatuses(
+        statusList: ArrayList<AssessmentStatus>,
+        section: Map<*, *>?,
+    ) {
+        extractEyeProblemIds(section).forEach { id ->
+            mapEyeProblemIdToStatus(id)?.let { statusList.add(it) }
+        }
+    }
+
+    private fun addGlassPowerToken(
+        extraTokens: MutableList<String>,
+        section: Map<*, *>?,
+    ) {
+        val power = section?.get(AssessmentDefinedParams.GLASS_POWER)?.toString()?.trim()?.takeIf { it.isNotEmpty() }
+        if (power != null) {
+            extraTokens.add("${AssessmentDefinedParams.GLASS_POWER_STATUS_PREFIX}$power")
+        }
+    }
+
     /** Adds High BP / High BG statuses only when referral reasons include elevated vitals. */
     private fun addHighBpBgStatusesFromReferral(
         statusList: ArrayList<AssessmentStatus>,
@@ -40,12 +94,49 @@ object AssessmentStatusGenerator {
         }
     }
 
+    private fun buildCataractStatuses(
+        map: HashMap<String, Any>,
+        referralResult: Pair<String?, ArrayList<String>>?,
+    ): ArrayList<String> {
+        val statusList = arrayListOf<AssessmentStatus>()
+        val extraTokens = mutableListOf<String>()
+        val cataractSection = getCataractFieldSection(map)
+        addEyeProblemStatuses(statusList, cataractSection)
+        addGlassPowerToken(extraTokens, cataractSection)
+        if (isNcdServiceProvidedInCataract(cataractSection)) {
+            addHighBpBgStatusesFromReferral(statusList, referralResult?.second ?: listOf())
+        }
+        if (YES.equals(cataractSection?.get(AssessmentDefinedParams.ID_HAVE_THE_GLASSES_BEEN_SOLD)?.toString(), true)) {
+            statusList.add(AssessmentStatus.GLASSES_SOLD)
+        }
+        if (YES.equals(cataractSection?.get(AssessmentDefinedParams.NCD_SERVICE_PROVIDED)?.toString(), true)) {
+            statusList.add(AssessmentStatus.NCD_SERVICE_IN_CATARACT_CAMP)
+        }
+        if (YES.equals(cataractSection?.get(AssessmentDefinedParams.PATIENT_REFERRED_FOR_OPERATION)?.toString(), true)) {
+            statusList.add(AssessmentStatus.REFERRED_FOR_OPERATION)
+        }
+        return statusList.toStatusStrings(extraTokens)
+    }
+
+    private fun buildEyeCareStatuses(map: HashMap<String, Any>): ArrayList<String> {
+        val eyeCareMainMap = map[MenuConstants.EYE_CARE_MENU_ID] as Map<*, *>
+        val eyeCareMap = eyeCareMainMap[EYE_CARE] as? Map<*, *>
+        val statusList = arrayListOf<AssessmentStatus>()
+        val extraTokens = mutableListOf<String>()
+        addEyeProblemStatuses(statusList, eyeCareMap)
+        addGlassPowerToken(extraTokens, eyeCareMap)
+        if (YES.equals(eyeCareMap?.get(ID_HAVE_THE_GLASSES_BEEN_SOLD)?.toString(), true)) {
+            statusList.add(AssessmentStatus.GLASSES_SOLD)
+        }
+        return statusList.toStatusStrings(extraTokens)
+    }
+
     fun evaluateStatus(
         map: HashMap<String, Any>,
         memberDetails: AssessmentMemberDetails?,
         referralResult: Pair<String?, ArrayList<String>>? = null,
     ): ArrayList<String>? {
-        val statusList = when {
+        return when {
             map.containsKey(MenuConstants.PREGNANT_WOMEN_PROFILE) -> {
                 val riskFactors = PregnantWomen.computeRiskFactors(
                     map[MenuConstants.PREGNANT_WOMEN_PROFILE] as Map<String, Any?>,
@@ -55,7 +146,7 @@ object AssessmentStatusGenerator {
                     arrayListOf(AssessmentStatus.NORMAL_PREGNANCY)
                 } else {
                     arrayListOf(AssessmentStatus.HIGH_RISK_PW)
-                }
+                }.toStatusStrings()
             }
 
             map.containsKey(RMNCH.ANC) -> {
@@ -70,7 +161,7 @@ object AssessmentStatusGenerator {
                 if (summaryGroup?.containsKey(AssessmentDefinedParams.GAPS_IN_ANC) == true) {
                     statusList.add(AssessmentStatus.GAPS_IN_ANC)
                 }
-                statusList
+                statusList.toStatusStrings()
             }
 
             map.containsKey(RMNCH.PNC) -> {
@@ -84,7 +175,7 @@ object AssessmentStatusGenerator {
                 if (pncMap.containsKey(RMNCH.ID_PNC_GAPS)) {
                     statusList.add(AssessmentStatus.GAPS_IN_PNC)
                 }
-                statusList
+                statusList.toStatusStrings()
             }
 
             map.containsKey(MenuConstants.PREGNANCY_OUTCOME) -> {
@@ -128,7 +219,7 @@ object AssessmentStatusGenerator {
                         }
                     }
                 }
-                statusList
+                statusList.toStatusStrings()
             }
 
             map.containsKey(MenuConstants.FP_MENU_ID) -> {
@@ -139,7 +230,7 @@ object AssessmentStatusGenerator {
                     arrayListOf(AssessmentStatus.NOT_USING_MODERN_FP)
                 } else {
                     arrayListOf(AssessmentStatus.USING_MODERN_FP)
-                }
+                }.toStatusStrings()
             }
 
             map.containsKey(MenuConstants.NCD_MENU_ID) -> {
@@ -150,43 +241,16 @@ object AssessmentStatusGenerator {
                 if (YES.equals(eyeCareMap?.get(ID_HAVE_THE_GLASSES_BEEN_SOLD)?.toString(), true)) {
                     statusList.add(AssessmentStatus.GLASSES_SOLD)
                 }
-                statusList
+                statusList.toStatusStrings()
             }
 
-            map.containsKey(MenuConstants.CATARACT_MENU_ID) -> {
-                val statusList = arrayListOf<AssessmentStatus>()
-                val cataractSection = getCataractFieldSection(map)
-                if (isNcdServiceProvidedInCataract(cataractSection)) {
-                    addHighBpBgStatusesFromReferral(statusList, referralResult?.second ?: listOf())
-                }
-                if (YES.equals(cataractSection?.get(AssessmentDefinedParams.ID_HAVE_THE_GLASSES_BEEN_SOLD)?.toString(), true)) {
-                    statusList.add(AssessmentStatus.GLASSES_SOLD)
-                }
-                if (YES.equals(cataractSection?.get(AssessmentDefinedParams.NCD_SERVICE_PROVIDED)?.toString(), true)) {
-                    statusList.add(AssessmentStatus.NCD_SERVICE_IN_CATARACT_CAMP)
-                }
-                if (YES.equals(cataractSection?.get(AssessmentDefinedParams.PATIENT_REFERRED_FOR_OPERATION)?.toString(), true)) {
-                    statusList.add(AssessmentStatus.REFERRED_FOR_OPERATION)
-                }
-                statusList
-            }
+            map.containsKey(MenuConstants.CATARACT_MENU_ID) -> buildCataractStatuses(map, referralResult)
 
-            map.containsKey(MenuConstants.EYE_CARE_MENU_ID) -> {
-                val map = map[MenuConstants.EYE_CARE_MENU_ID] as Map<*, *>
-                val eyeCareMap = map[EYE_CARE] as? Map<*, *>
-                val statusList = arrayListOf<AssessmentStatus>()
-                if (YES.equals(eyeCareMap?.get(ID_HAVE_THE_GLASSES_BEEN_SOLD)?.toString(), true)) {
-                    statusList.add(AssessmentStatus.GLASSES_SOLD)
-                }
-                statusList
-            }
+            map.containsKey(MenuConstants.EYE_CARE_MENU_ID) -> buildEyeCareStatuses(map)
 
             else -> {
                 null
             }
-        }?.map { it.name }
-        return statusList?.let {
-            ArrayList(it)
         }
     }
 }

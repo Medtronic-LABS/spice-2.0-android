@@ -95,5 +95,29 @@ enum class AssessmentStatus {
     /** Cataract form: patientReferredForOperation = Yes. */
     REFERRED_FOR_OPERATION,
 
+    /** Eye problem: cataracts. */
+    CATARACTS,
+
+    /** Eye problem: lacrimal (tear duct) problem. */
+    LECRIMAL_TEAR_DUCT_PROBLEM,
+
+    /** Eye problem: pterygium. */
+    PTERYGIUM,
+
+    /** Eye problem: glaucoma. */
+    GLAUCOMA,
+
+    /** Eye problem: myopia. */
+    MYOPIA,
+
+    /** Eye problem: presbyopia. */
+    PRESBYOPIA,
+
+    /** Eye problem: other problem. */
+    OTHER_EYE_PROBLEM,
+
+    /** Eye problem: no problem. */
+    NO_EYE_PROBLEM,
+
     DEFAULT,
 }

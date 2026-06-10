@@ -8,6 +8,7 @@ import org.medtroniclabs.uhis.data.HealthFacility
 import org.medtroniclabs.uhis.data.offlinesync.model.FollowUpCallStatus
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineSyncStatus
 import org.medtroniclabs.uhis.db.entity.LifeStyleAnswer
+import org.medtroniclabs.uhis.db.entity.MemberAssessmentObservations
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.utils.ReferralStatus
 import java.lang.reflect.Type
 
@@ -86,4 +87,12 @@ class OfflineStatusTypeConverter {
         val gson = Gson()
         return gson.toJson(list)
     }
+
+    @TypeConverter
+    fun fromMemberAssessmentObservations(observations: MemberAssessmentObservations?): String? =
+        observations?.let { Gson().toJson(it) }
+
+    @TypeConverter
+    fun toMemberAssessmentObservations(value: String?): MemberAssessmentObservations? =
+        value?.let { Gson().fromJson(it, MemberAssessmentObservations::class.java) }
 }

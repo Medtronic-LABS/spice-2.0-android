@@ -231,6 +231,13 @@ class BDNCDAssessmentFragment : BaseFragment(), FormEventListener {
                 formGenerator.getViewByTag(ID_NCD_SYMPTOMS_MEDICATION + rootSuffix)?.visible()
                 formGenerator.getViewByTag(ID_DIAGNOSED_BP + rootSuffix)?.gone()
                 formGenerator.getViewByTag(ID_DIAGNOSED_GLUCOSE + rootSuffix)?.gone()
+                val (height, weight) = AssessmentUtil.getHeightWeightFromHistory(assessmentHistory)
+                AssessmentUtil.prefillHeightAndWeight(
+                    formGenerator,
+                    height,
+                    weight,
+                    isHeightReadOnly = height != null,
+                )
             }
         }
     }
