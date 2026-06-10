@@ -2079,17 +2079,19 @@ class AssessmentViewModel @Inject constructor(
 
     fun getRiskEntityList() {
         viewModelScope.launch(dispatcherIO) {
-            val resultOne = metaRepository.riskFactorListing()
-            val baseType: Type = object : TypeToken<ArrayList<RiskClassificationModel>>() {}.type
-            if (resultOne.isNotEmpty()) {
-                val resultList = Gson().fromJson<ArrayList<RiskClassificationModel>>(
-                    resultOne[0].nonLabEntity,
-                    baseType,
-                )
-                riskClassificationModels.clear()
-                riskClassificationModels.addAll(resultList)
-            }
+            riskClassificationModels.clear()
+            riskClassificationModels.addAll(loadRiskClassificationModels())
         }
+    }
+
+    suspend fun loadRiskClassificationModels(): ArrayList<RiskClassificationModel> {
+        val resultOne = metaRepository.riskFactorListing()
+        if (resultOne.isEmpty()) return arrayListOf()
+        val baseType: Type = object : TypeToken<ArrayList<RiskClassificationModel>>() {}.type
+        return Gson().fromJson<ArrayList<RiskClassificationModel>>(
+            resultOne[0].nonLabEntity,
+            baseType,
+        ) ?: arrayListOf()
     }
 
     private suspend fun getServiceProviderInfo(): Pair<String?, String?> {

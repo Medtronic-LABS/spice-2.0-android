@@ -3,9 +3,13 @@ package org.medtroniclabs.uhis.common
 import org.medtroniclabs.uhis.db.entity.RiskClassificationModel
 import org.medtroniclabs.uhis.db.entity.RiskFactorModel
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_SYSTOLIC
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BIO_METRICS
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BIOMETRIC_FAMILY
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BMI
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BP_LOG
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HEIGHT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.IS_REGULAR_SMOKER
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.WEIGHT
 
 object CVDRiskCalculator {
     fun calculateCVDRiskFactor(
@@ -14,14 +18,14 @@ object CVDRiskCalculator {
         dob: String,
         gender: String,
     ) {
-        val bpLogs = map[BP_LOG] as HashMap<*, *>
-        val bmiValue = bpLogs[BMI]?.let { it as Double } // Need to Check
-        val systolicAverage = bpLogs[AVG_SYSTOLIC]?.let { it as Int }
-        val isSmoker = bpLogs[IS_REGULAR_SMOKER]?.let { getSmokerType(it) }
+        if (list.isEmpty()) return
+
+        val bpLogs = map[BP_LOG] as? HashMap<*, *>
+        val bmiValue = resolveBmi(map, bpLogs) ?: return
+        val systolicAverage = bpLogs?.get(AVG_SYSTOLIC)?.let { (it as Number).toInt() }
+        val isSmoker = bpLogs?.get(IS_REGULAR_SMOKER)?.let { getSmokerType(it) } ?: false
 
         val age = DateUtils.getV2YearMonthAndWeek(dob).years.toDouble()
-
-        if (bmiValue == null || list.isEmpty()) return
 
         calculateRiskFactor(
             list,
@@ -38,6 +42,30 @@ object CVDRiskCalculator {
         }
     }
 
+    private fun resolveBmi(
+        map: HashMap<String, Any>,
+        bpLogs: HashMap<*, *>?,
+    ): Double? {
+        toBmiDouble(bpLogs?.get(BMI))?.let { return it }
+        for (familyKey in listOf(BIOMETRIC_FAMILY, BIO_METRICS)) {
+            val family = map[familyKey] as? HashMap<*, *> ?: continue
+            toBmiDouble(family[BMI])?.let { return it }
+            val height = (family[HEIGHT] as? Number)?.toDouble()
+            val weight = (family[WEIGHT] as? Number)?.toDouble()
+            if (height != null && weight != null && height > 0) {
+                CommonUtils.getBMIForNcd(height, weight)?.toDoubleOrNull()?.let { return it }
+            }
+        }
+        return toBmiDouble(map[BMI])
+    }
+
+    private fun toBmiDouble(value: Any?): Double? =
+        when (value) {
+            is Double -> value
+            is Number -> value.toDouble()
+            else -> null
+        }
+
     private fun getSmokerType(value: Any): Boolean =
         when (value) {
             is String -> value == DefinedParams.YES
@@ -51,15 +79,51 @@ object CVDRiskCalculator {
         gender: String?,
         bmiValue: Double?,
         systolicAverage: Int?,
-        isSmoker: Boolean?,
+        isSmoker: Boolean,
     ): Map<String, Any>? {
-        val model = list.firstOrNull {
-            it.isSmoker == isSmoker &&
-                it.gender.equals(gender, true) &&
-                isAgeInLimit(age, it.age)
-        } ?: return null
-
+        val model = findMatchingModel(list, age, gender, isSmoker) ?: return null
         return getRiskBasedOnParams(model.riskFactors, bmiValue, systolicAverage)
+    }
+
+    private fun findMatchingModel(
+        list: ArrayList<RiskClassificationModel>,
+        age: Double?,
+        gender: String?,
+        isSmoker: Boolean,
+    ): RiskClassificationModel? {
+        val normalizedGender = normalizeGender(gender)
+        val candidates =
+            list.filter {
+                it.isSmoker == isSmoker &&
+                    it.gender.equals(normalizedGender, ignoreCase = true)
+            }
+        if (candidates.isEmpty() || age == null) return null
+
+        candidates.firstOrNull { isAgeInLimit(age, it.age) }?.let { return it }
+
+        return candidates.minByOrNull { ageBandDistance(age, it.age) }
+    }
+
+    private fun normalizeGender(gender: String?): String =
+        if (gender.equals(DefinedParams.FEMALE, ignoreCase = true)) {
+            DefinedParams.FEMALE
+        } else {
+            DefinedParams.MALE
+        }
+
+    private fun ageBandDistance(
+        age: Double,
+        band: String,
+    ): Double {
+        val parts = band.split("-")
+        if (parts.size != 2) return Double.MAX_VALUE
+        val min = parts[0].toDoubleOrNull() ?: return Double.MAX_VALUE
+        val max = parts[1].toDoubleOrNull() ?: return Double.MAX_VALUE
+        return when {
+            age < min -> min - age
+            age > max -> age - max
+            else -> 0.0
+        }
     }
 
     private fun getRiskBasedOnParams(
@@ -103,8 +167,9 @@ object CVDRiskCalculator {
         value: Int,
     ): Boolean =
         when {
-            sbp.startsWith("<") -> value < sbp.substringAfter("<").trim().toInt()
             sbp.startsWith(">=") -> value >= sbp.substringAfter(">=").trim().toInt()
+            sbp.startsWith("<=") -> value <= sbp.substringAfter("<=").trim().toInt()
+            sbp.startsWith("<") -> value < sbp.substringAfter("<").trim().toInt()
             sbp.contains("-") -> {
                 val (min, max) = sbp.split("-").map { it.trim().toInt() }
                 value in min..max

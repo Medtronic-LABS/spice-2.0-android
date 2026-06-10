@@ -168,9 +168,10 @@ class BDCataractAssessmentFragment() : BaseFragment(), FormEventListener {
                                 isFollowUpVisit,
                             )
 
+                        val riskModels = viewModel.loadRiskClassificationModels()
                         CVDRiskCalculator.calculateCVDRiskFactor(
                             ncdMap,
-                            viewModel.riskClassificationModels,
+                            riskModels,
                             memberDetail.dateOfBirth,
                             memberDetail.gender,
                         )

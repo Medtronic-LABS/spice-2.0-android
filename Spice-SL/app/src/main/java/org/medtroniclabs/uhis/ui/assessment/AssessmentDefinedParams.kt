@@ -642,6 +642,7 @@ object AssessmentDefinedParams {
     const val REASON_ = "reason_"
 
     const val BIO_METRICS = "bioMetrics"
+    const val BIOMETRIC_FAMILY = "biometric"
 
     const val TITLE_SUFFIX = "titleTextView"
     const val SUMMARY_VALUE = "summaryValue"

@@ -65,6 +65,17 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
         CommonUtils.isCataractWorkflowEnabledForUser() &&
             workflowSlugsContain(MenuConstants.CATARACT_MENU_ID)
 
+    /** FO/PO dashboard is limited to NCD, eye screening, and cataract KPIs only. */
+    private fun isFoOrPoDashboard(): Boolean = CommonUtils.isFoOrPo()
+
+    private fun shouldShowSkRmnchKpis(): Boolean = CommonUtils.isSk() && !isFoOrPoDashboard()
+
+    private fun shouldShowNcdKpis(): Boolean = isFoOrPoDashboard() || hasNcdWorkflow()
+
+    private fun shouldShowEyeCareKpis(): Boolean = isFoOrPoDashboard() || hasEyeCareWorkflow()
+
+    private fun shouldShowCataractKpis(): Boolean = isFoOrPoDashboard() || hasCataractWorkflow()
+
     private fun reboundDashboardAfterClinicalWorkflowsLoaded() {
         val resource = viewModel.userDashboardDetails.value
         if (resource?.isSuccess() == true) {
@@ -185,7 +196,7 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
     ) {
         val userDashboardList = ArrayList<DashboardCardItem>()
         entity.let {
-            if (CommonUtils.isSk()) {
+            if (shouldShowSkRmnchKpis()) {
                 userDashboardList.add(
                     DashboardCardItem(
                         CARD_PREGNANT_WOMEN_REGISTRATION,
@@ -267,7 +278,7 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
                     ),
                 )
             }
-            if (hasNcdWorkflow()) {
+            if (shouldShowNcdKpis()) {
                 userDashboardList.add(
                     DashboardCardItem(
                         CARD_NCD_SCREENING,
@@ -301,7 +312,7 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
                     ),
                 )
             }
-            if (hasEyeCareWorkflow()) {
+            if (shouldShowEyeCareKpis()) {
                 userDashboardList.add(
                     DashboardCardItem(
                         CARD_TOTAL_EYE_SCREENING,
@@ -319,7 +330,7 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
                     ),
                 )
             }
-            if (hasCataractWorkflow()) {
+            if (shouldShowCataractKpis()) {
                 userDashboardList.add(
                     DashboardCardItem(
                         CARD_CATARACT_SCREENING,
