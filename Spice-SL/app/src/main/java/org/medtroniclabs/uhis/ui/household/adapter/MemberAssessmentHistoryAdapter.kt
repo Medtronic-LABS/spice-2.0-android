@@ -63,24 +63,8 @@ class MemberAssessmentHistoryAdapter(
             addSummaryView(
                 context.getString(R.string.service_date),
                 DateUtils.formatDateToDisplayFormat(visitDateMillis) ?: "",
-            )   
+            )
             val service = history.serviceProvided ?: ""
-            if (AssessmentUtil.shouldShowServiceObservations(service)) {
-                addSummaryView(
-                    context.getString(R.string.blood_pressure),
-                    AssessmentUtil.formatServiceHistoryBloodPressure(
-                        context,
-                        history.observations?.bp,
-                    ),
-                )
-                addSummaryView(
-                    context.getString(R.string.blood_glucose),
-                    AssessmentUtil.formatServiceHistoryBloodGlucose(
-                        context,
-                        history.observations?.bg,
-                    ),
-                )
-            }
             val currentStatus = AssessmentUtil.formatServiceHistoryCurrentStatus(
                 history.customStatus,
                 context,

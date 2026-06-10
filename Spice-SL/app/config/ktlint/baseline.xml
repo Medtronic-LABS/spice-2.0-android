@@ -870,10 +870,6 @@
         <error line="49" column="9" source="standard:function-naming" />
         <error line="88" column="9" source="standard:function-naming" />
     </file>
-    <file name="src/main/java/org/medtroniclabs/uhis/ui/household/adapter/MemberAssessmentHistoryAdapter.kt">
-        <error line="66" column="14" source="standard:no-trailing-spaces" />
-        <error line="66" column="15" source="standard:no-multi-spaces" />
-    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/landing/viewmodel/OfflineSyncViewModel.kt">
         <error line="3" column="1" source="standard:import-ordering" />
     </file>

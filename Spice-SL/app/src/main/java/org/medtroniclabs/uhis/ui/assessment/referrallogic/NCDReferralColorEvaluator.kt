@@ -111,11 +111,13 @@ object NCDReferralColorEvaluator {
             ) &&
                 symptoms -> ScoredRisk(Severity.YELLOW_LOWER, YellowPriority.LOWER)
 
-            sys < Thresholds.BP_NORMAL_SYSTOLIC_MAX &&
-                dia < Thresholds.BP_NORMAL_DIASTOLIC_MAX &&
-                !symptoms -> ScoredRisk(Severity.GREEN)
+            isBpNormal(sys, dia) && !symptoms -> ScoredRisk(Severity.GREEN)
             symptoms -> ScoredRisk(Severity.YELLOW_LOWER, YellowPriority.LOWER)
-            else -> ScoredRisk(Severity.GREEN)
+            isBpHigherYellowBand(sys, dia) ->
+                ScoredRisk(Severity.YELLOW_HIGHER, YellowPriority.HIGHER)
+            isBpLowerYellowBand(sys, dia) ->
+                ScoredRisk(Severity.YELLOW_LOWER, YellowPriority.LOWER)
+            else -> ScoredRisk(Severity.YELLOW_LOWER, YellowPriority.LOWER)
         }
     }
 
@@ -139,9 +141,26 @@ object NCDReferralColorEvaluator {
                 ScoredRisk(Severity.YELLOW_LOWER, YellowPriority.LOWER)
 
             isGreenDiabetes(bg, type) -> ScoredRisk(Severity.GREEN)
-            else -> ScoredRisk(Severity.GREEN)
+            else -> ScoredRisk(Severity.YELLOW_LOWER, YellowPriority.LOWER)
         }
     }
+
+    private fun isBpNormal(
+        sys: Int,
+        dia: Int,
+    ) = sys < Thresholds.BP_NORMAL_SYSTOLIC_MAX && dia < Thresholds.BP_NORMAL_DIASTOLIC_MAX
+
+    private fun isBpHigherYellowBand(
+        sys: Int,
+        dia: Int,
+    ) = sys in Thresholds.BP_YELLOW_HIGHER_SYSTOLIC_MIN..Thresholds.BP_YELLOW_HIGHER_SYSTOLIC_MAX ||
+        dia in Thresholds.BP_YELLOW_HIGHER_DIASTOLIC_MIN..Thresholds.BP_YELLOW_HIGHER_DIASTOLIC_MAX
+
+    private fun isBpLowerYellowBand(
+        sys: Int,
+        dia: Int,
+    ) = sys in Thresholds.BP_YELLOW_LOWER_SYSTOLIC_MIN..Thresholds.BP_YELLOW_LOWER_SYSTOLIC_MAX ||
+        dia in Thresholds.BP_YELLOW_LOWER_DIASTOLIC_MIN..Thresholds.BP_YELLOW_LOWER_DIASTOLIC_MAX
 
     private fun isBpCrisis(
         sys: Int,
