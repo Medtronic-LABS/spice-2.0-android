@@ -21,6 +21,8 @@ import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseFragment
 import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.CATARACT
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NCD_SERVICE_PROVIDED
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.YES
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.ReferralResultGenerator
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 import org.medtroniclabs.uhis.ui.assessment.viewmodel.AssessmentViewModel
@@ -184,12 +186,31 @@ class BDCataractAssessmentFragment() : BaseFragment(), FormEventListener {
     fun getCurrentAnsweredStatus(): Boolean = formGenerator.getResultMap().isNotEmpty()
 
     override fun onRenderingComplete() {
+        lifecycleScope.launch {
+            prefillHeightAndWeightFromObservations()
+        }
     }
 
     override fun onUpdateInstruction(
         id: String,
         selectedId: Any?,
     ) {
+        if (id == NCD_SERVICE_PROVIDED && YES.equals(selectedId?.toString(), true)) {
+            lifecycleScope.launch {
+                prefillHeightAndWeightFromObservations()
+            }
+        }
+    }
+
+    private suspend fun prefillHeightAndWeightFromObservations() {
+        val (height, weight) = viewModel.getLatestHeightWeightFromServiceHistory() ?: return
+        AssessmentUtil.prefillHeightAndWeight(
+            formGenerator,
+            height,
+            weight,
+            isHeightReadOnly = height != null,
+        )
+        viewModel.renderBMIValue(requireContext(), formGenerator, formGenerator.getResultMap())
     }
 
     override fun onInformationHandling(

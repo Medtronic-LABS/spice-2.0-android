@@ -94,6 +94,15 @@ object AssessmentStatusGenerator {
         }
     }
 
+    private fun addNcdNormalStatusIfApplicable(
+        statusList: ArrayList<AssessmentStatus>,
+        referralResult: Pair<String?, ArrayList<String>>?,
+    ) {
+        if (referralResult != null) return
+        if (AssessmentStatus.UNCONTROLLED_BP in statusList || AssessmentStatus.UNCONTROLLED_BG in statusList) return
+        statusList.add(AssessmentStatus.NORMAL_NCD)
+    }
+
     private fun buildCataractStatuses(
         map: HashMap<String, Any>,
         referralResult: Pair<String?, ArrayList<String>>?,
@@ -236,6 +245,7 @@ object AssessmentStatusGenerator {
             map.containsKey(MenuConstants.NCD_MENU_ID) -> {
                 val statusList = arrayListOf<AssessmentStatus>()
                 addHighBpBgStatusesFromReferral(statusList, referralResult?.second ?: listOf())
+                addNcdNormalStatusIfApplicable(statusList, referralResult)
                 val ncdMap = map[MenuConstants.NCD_MENU_ID] as Map<*, *>
                 val eyeCareMap = ncdMap[EYE_CARE] as? Map<*, *>
                 if (YES.equals(eyeCareMap?.get(ID_HAVE_THE_GLASSES_BEEN_SOLD)?.toString(), true)) {

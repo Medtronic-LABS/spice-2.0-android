@@ -221,12 +221,15 @@ object AssessmentUtil {
     fun formatServiceHistoryCurrentStatus(
         customStatus: List<String>?,
         context: Context,
+        serviceProvided: String? = null,
+        referralStatus: String? = null,
     ): String? {
-        if (customStatus.isNullOrEmpty()) return null
+        val effectiveStatus = applyNcdNormalStatusFallback(customStatus, serviceProvided, referralStatus)
+        if (effectiveStatus.isEmpty()) return null
 
-        val hasHighBp = customStatus.contains(AssessmentStatus.UNCONTROLLED_BP.name)
-        val hasHighBg = customStatus.contains(AssessmentStatus.UNCONTROLLED_BG.name)
-        val otherStatuses = customStatus.filter { status ->
+        val hasHighBp = effectiveStatus.contains(AssessmentStatus.UNCONTROLLED_BP.name)
+        val hasHighBg = effectiveStatus.contains(AssessmentStatus.UNCONTROLLED_BG.name)
+        val otherStatuses = effectiveStatus.filter { status ->
             status != AssessmentStatus.UNCONTROLLED_BP.name &&
                 status != AssessmentStatus.UNCONTROLLED_BG.name &&
                 status != AssessmentStatus.CONTROLLED_BP.name &&
@@ -246,6 +249,25 @@ object AssessmentUtil {
             mapAssessmentStatus(status, context).takeIf { it.isNotBlank() }?.let { displayParts.add(it) }
         }
         return displayParts.takeIf { it.isNotEmpty() }?.joinToString()
+    }
+
+    private fun applyNcdNormalStatusFallback(
+        customStatus: List<String>?,
+        serviceProvided: String?,
+        referralStatus: String?,
+    ): List<String> {
+        val statuses = customStatus?.toMutableList() ?: mutableListOf()
+        if (serviceProvided?.lowercase() != MenuConstants.NCD_MENU_ID.lowercase()) return statuses
+        if (ReferralStatus.Referred.name.equals(referralStatus, true)) return statuses
+        if (statuses.contains(AssessmentStatus.UNCONTROLLED_BP.name) ||
+            statuses.contains(AssessmentStatus.UNCONTROLLED_BG.name)
+        ) {
+            return statuses
+        }
+        if (!statuses.contains(AssessmentStatus.NORMAL_NCD.name)) {
+            statuses.add(0, AssessmentStatus.NORMAL_NCD.name)
+        }
+        return statuses
     }
 
     /**
@@ -334,6 +356,10 @@ object AssessmentUtil {
             }
             AssessmentStatus.UNCONTROLLED_BG -> {
                 context.getString(R.string.high_bg)
+            }
+
+            AssessmentStatus.NORMAL_NCD -> {
+                context.getString(R.string.normal)
             }
 
             AssessmentStatus.GLASSES_SOLD -> {
@@ -453,6 +479,19 @@ object AssessmentUtil {
         return height to weight
     }
 
+    fun getLatestHeightWeightFromHistories(
+        histories: List<MemberAssessmentHistoryEntity>,
+    ): Pair<String?, String?>? =
+        histories
+            .mapNotNull { history ->
+                val (height, weight) = getHeightWeightFromHistory(history)
+                if (height == null && weight == null) return@mapNotNull null
+                val visitMillis = DateUtils.getLastMenstrualDate(history.visitDate ?: "").timeInMillis
+                Triple(visitMillis, height, weight)
+            }
+            .maxByOrNull { it.first }
+            ?.let { it.second to it.third }
+
     fun prefillHeightAndWeight(
         formGenerator: FormGenerator,
         height: String?,
@@ -505,10 +544,21 @@ object AssessmentUtil {
             MenuConstants.NCD_MENU_ID.lowercase() ->
                 (assessmentMap[ncd] ?: assessmentMap[MenuConstants.NCD_MENU_ID]) as? HashMap<String, Any>
             MenuConstants.CATARACT_MENU_ID.lowercase() ->
-                (assessmentMap[CATARACT] ?: assessmentMap[MenuConstants.CATARACT_MENU_ID]) as? HashMap<String, Any>
+                resolveCataractVitalsMap(assessmentMap)
             else -> null
         }
 
+    /** Merges cataract root with nested [ncd] vitals when NCD service is provided. */
+    private fun resolveCataractVitalsMap(assessmentMap: HashMap<String, Any>): HashMap<String, Any>? {
+        val cataractSection = (assessmentMap[CATARACT] ?: assessmentMap[MenuConstants.CATARACT_MENU_ID])
+            as? HashMap<String, Any> ?: return null
+        val ncdSection = (cataractSection[ncd] ?: cataractSection[MenuConstants.NCD_MENU_ID])
+            as? HashMap<String, Any> ?: return cataractSection
+        return HashMap<String, Any>().apply {
+            putAll(cataractSection)
+            putAll(ncdSection)
+        }
+    }
     private fun resolveObservationHeight(map: HashMap<String, Any>): String? =
         resolveObservationNumber(map, HEIGHT)
 

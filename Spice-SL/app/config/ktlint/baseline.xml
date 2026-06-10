@@ -850,12 +850,16 @@
         <error line="78" column="70" source="standard:chain-method-continuation" />
         <error line="78" column="82" source="standard:chain-method-continuation" />
         <error line="78" column="90" source="standard:chain-method-continuation" />
-        <error line="138" column="27" source="standard:function-expression-body" />
+        <error line="147" column="27" source="standard:function-expression-body" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/utils/AssessmentUtil.kt">
         <error line="3" column="1" source="standard:import-ordering" />
-        <error line="512" column="79" source="standard:function-signature" />
-        <error line="515" column="79" source="standard:function-signature" />
+        <error line="483" column="9" source="standard:function-signature" />
+        <error line="483" column="56" source="standard:function-signature" />
+        <error line="492" column="13" source="standard:chain-method-continuation" />
+        <error line="562" column="5" source="standard:blank-line-before-declaration" />
+        <error line="562" column="79" source="standard:function-signature" />
+        <error line="565" column="79" source="standard:function-signature" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/boarding/MenuTypeEnums.kt">
         <error line="4" column="5" source="standard:enum-entry-name-case" />
@@ -865,6 +869,10 @@
         <error line="29" column="9" source="standard:function-naming" />
         <error line="49" column="9" source="standard:function-naming" />
         <error line="88" column="9" source="standard:function-naming" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/household/adapter/MemberAssessmentHistoryAdapter.kt">
+        <error line="66" column="14" source="standard:no-trailing-spaces" />
+        <error line="66" column="15" source="standard:no-multi-spaces" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/landing/viewmodel/OfflineSyncViewModel.kt">
         <error line="3" column="1" source="standard:import-ordering" />

@@ -2105,4 +2105,12 @@ class AssessmentViewModel @Inject constructor(
             selectedHouseholdMemberId,
             type.lowercase(),
         )
+
+    suspend fun getLatestHeightWeightFromServiceHistory(): Pair<String?, String?>? {
+        val histories = listOfNotNull(
+            getLastServiceHistory(MenuConstants.NCD_MENU_ID),
+            getLastServiceHistory(MenuConstants.CATARACT_MENU_ID),
+        )
+        return AssessmentUtil.getLatestHeightWeightFromHistories(histories)
+    }
 }

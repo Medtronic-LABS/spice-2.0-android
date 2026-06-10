@@ -87,6 +87,9 @@ enum class AssessmentStatus {
 
     UNCONTROLLED_BG,
 
+    /** NCD visit with normal BP/BG and patient not referred. */
+    NORMAL_NCD,
+
     GLASSES_SOLD,
 
     /** NCD vitals captured during a cataract camp visit (form: ncdServiceProvided = Yes). */

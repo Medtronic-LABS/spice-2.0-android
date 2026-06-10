@@ -225,20 +225,24 @@ class BDNCDAssessmentFragment : BaseFragment(), FormEventListener {
     override fun onRenderingComplete() {
         handleDateOfBirth()
         lifecycleScope.launch {
-            val assessmentHistory = viewModel.getLastServiceHistory(MenuConstants.NCD_MENU_ID)
-            if (assessmentHistory != null) {
+            if (viewModel.getLastServiceHistory(MenuConstants.NCD_MENU_ID) != null) {
                 formGenerator.getViewByTag(ID_NCD_SYMPTOMS_MEDICATION + rootSuffix)?.visible()
                 formGenerator.getViewByTag(ID_DIAGNOSED_BP + rootSuffix)?.gone()
                 formGenerator.getViewByTag(ID_DIAGNOSED_GLUCOSE + rootSuffix)?.gone()
-                val (height, weight) = AssessmentUtil.getHeightWeightFromHistory(assessmentHistory)
-                AssessmentUtil.prefillHeightAndWeight(
-                    formGenerator,
-                    height,
-                    weight,
-                    isHeightReadOnly = height != null,
-                )
             }
+            prefillHeightAndWeightFromObservations()
         }
+    }
+
+    private suspend fun prefillHeightAndWeightFromObservations() {
+        val (height, weight) = viewModel.getLatestHeightWeightFromServiceHistory() ?: return
+        AssessmentUtil.prefillHeightAndWeight(
+            formGenerator,
+            height,
+            weight,
+            isHeightReadOnly = height != null,
+        )
+        viewModel.renderBMIValue(requireContext(), formGenerator, formGenerator.getResultMap())
     }
 
     /**

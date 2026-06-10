@@ -63,7 +63,7 @@ class MemberAssessmentHistoryAdapter(
             addSummaryView(
                 context.getString(R.string.service_date),
                 DateUtils.formatDateToDisplayFormat(visitDateMillis) ?: "",
-            )
+            )   
             val service = history.serviceProvided ?: ""
             if (AssessmentUtil.shouldShowServiceObservations(service)) {
                 addSummaryView(
@@ -84,11 +84,29 @@ class MemberAssessmentHistoryAdapter(
             val currentStatus = AssessmentUtil.formatServiceHistoryCurrentStatus(
                 history.customStatus,
                 context,
+                history.serviceProvided,
+                history.referralStatus,
             )
             addSummaryView(
                 context.getString(R.string.current_status),
                 CommonUtils.getStringElse(currentStatus, context.getString(R.string.separator_double_hyphen)),
             )
+            if (AssessmentUtil.shouldShowServiceObservations(service)) {
+                addSummaryView(
+                    context.getString(R.string.blood_pressure),
+                    AssessmentUtil.formatServiceHistoryBloodPressure(
+                        context,
+                        history.observations?.bp,
+                    ),
+                )
+                addSummaryView(
+                    context.getString(R.string.blood_glucose),
+                    AssessmentUtil.formatServiceHistoryBloodGlucose(
+                        context,
+                        history.observations?.bg,
+                    ),
+                )
+            }
             val referralStatus = AssessmentUtil.getReferralStatus(
                 context,
                 history.serviceProvided ?: "",
