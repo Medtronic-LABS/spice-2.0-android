@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.common.DefinedParams.LIST_LIMIT
@@ -19,6 +20,7 @@ import org.medtroniclabs.uhis.data.model.PatientListResModel
 import org.medtroniclabs.uhis.data.offlinesync.model.SavedMemberDetails
 import org.medtroniclabs.uhis.di.IoDispatcher
 import org.medtroniclabs.uhis.model.household.HouseHoldFilterUiData
+import org.medtroniclabs.uhis.model.services.ServiceStaticFilter
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.network.utils.ConnectivityManager
@@ -66,10 +68,24 @@ class MemberSearchViewModel @Inject constructor(
     /** Remote member fetch + persist state for navigation from search results. */
     val remoteMemberDetailsState: StateFlow<Resource<SavedMemberDetails>> = _remoteMemberDetailsState.asStateFlow()
 
-    /** Hybrid local + remote member list; refreshes when [searchParams] changes. */
+    /**
+     * Static filters enabled for the flow/user
+     */
+    private val staticFilters = mutableListOf<ServiceStaticFilter>()
+
+    private val _staticFilterCounts = MutableStateFlow<Map<ServiceStaticFilter, Int>>(emptyMap())
+
+    /**
+     * Per-filter member counts for the member-type spinner.
+     */
+    val staticFilterCounts: StateFlow<Map<ServiceStaticFilter, Int>> = _staticFilterCounts.asStateFlow()
+
+    /**
+     * Hybrid local + remote member list; refreshes when [searchParams] changes.
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
     val membersFlow: Flow<PagingData<MemberSearchListItem>> =
-        _searchParams
+        searchParams
             .flatMapLatest { params ->
                 Pager(
                     config = PagingConfig(pageSize = LIST_LIMIT),
@@ -83,15 +99,32 @@ class MemberSearchViewModel @Inject constructor(
             }
 
     init {
+        initializeAllowedDropdown()
         observeSearch { query ->
             updateFilter(search = query)
         }
+        viewModelScope.launch(dispatcherIO) {
+            searchParams.collectLatest { params ->
+                refreshStaticFilterCounts(params)
+            }
+        }
+    }
+
+    /**
+     * Populates [staticFilters] with FO/PO member-type options shown in the dropdown.
+     */
+    private fun initializeAllowedDropdown() {
+        staticFilters.add(ServiceStaticFilter.ALL_MEMBERS)
+        staticFilters.add(ServiceStaticFilter.NCD_SERVICES)
+        staticFilters.add(ServiceStaticFilter.CATARACT_SCREENING)
+        staticFilters.add(ServiceStaticFilter.EYE_SCREENING)
     }
 
     /**
      * Merges partial filter updates into [searchParams] and triggers a list refresh.
      */
     fun updateFilter(
+        staticFilter: ServiceStaticFilter? = null,
         search: String? = null,
         ssFilter: List<ChipViewItemModel>? = null,
         subVillagesFilter: List<ChipViewItemModel>? = null,
@@ -110,12 +143,25 @@ class MemberSearchViewModel @Inject constructor(
             else -> current.skScopeSsIds
         }
         _searchParams.value = current.copy(
+            staticFilter = staticFilter ?: current.staticFilter,
             searchInput = search ?: current.searchInput,
             qrCode = null,
             filterBySs = newSsFilter,
             filterBySubVillages = subVillagesFilter ?: current.filterBySubVillages,
             filterSk = newFilterSk,
             skScopeSsIds = skScopeSsIds,
+        )
+    }
+
+    private suspend fun refreshStaticFilterCounts(params: MemberSearchParams) {
+        if (staticFilters.isEmpty()) return
+        _staticFilterCounts.value = memberSearchRepository.getStaticFilterCounts(
+            filters = staticFilters.toList(),
+            searchInput = params.searchInput.orEmpty(),
+            filterBySs = params.effectiveSsIds,
+            filterBySubVillages = params.effectiveSubVillageIds,
+            allowNullHousehold = params.allowNullHousehold,
+            qrCode = params.qrCode,
         )
     }
 

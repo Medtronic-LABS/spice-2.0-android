@@ -49,15 +49,11 @@ object SpiceDatabaseMigration {
 
             db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN $COLUMN_PRACTITIONER_ID TEXT;")
             db.execSQL("CREATE INDEX IF NOT EXISTS $INDEX_PRACTITIONER_ID ON $MEMBER_ASSESSMENT_HISTORY_ENTITY($COLUMN_PRACTITIONER_ID)")
-            
+
             db.execSQL("ALTER TABLE $FOLLOW_UP ADD COLUMN $COLUMN_REFERRAL_FACILITY_TYPE TEXT;")
 
-            db.execSQL(
-                "ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN serviceProvidedByName TEXT",
-            )
-            db.execSQL(
-                "ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN serviceProvidedByRole TEXT",
-            )
+            db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN serviceProvidedByName TEXT;")
+            db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN serviceProvidedByRole TEXT;")
         }
     }
 }

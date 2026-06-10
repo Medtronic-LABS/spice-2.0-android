@@ -2096,7 +2096,9 @@ class AssessmentViewModel @Inject constructor(
 
     private suspend fun getServiceProviderInfo(): Pair<String?, String?> {
         val providerName = AssessmentUtil.getLocalServiceProvidedByName()
-        val providerRole = metaRepository.getUserProfile().data
+        val providerRole = metaRepository
+            .getUserProfile()
+            .data
             ?.roles
             ?.firstOrNull()
             ?.displayName

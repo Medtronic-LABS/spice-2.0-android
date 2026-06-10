@@ -25,8 +25,7 @@ object AssessmentStatusGenerator {
         return inner ?: wrapped
     }
 
-    private fun isNcdServiceProvidedInCataract(cataractSection: Map<*, *>?): Boolean =
-        YES.equals(cataractSection?.get(NCD_SERVICE_PROVIDED)?.toString(), true)
+    private fun isNcdServiceProvidedInCataract(cataractSection: Map<*, *>?): Boolean = YES.equals(cataractSection?.get(NCD_SERVICE_PROVIDED)?.toString(), true)
 
     /** Adds High BP / High BG statuses only when referral reasons include elevated vitals. */
     private fun addHighBpBgStatusesFromReferral(

@@ -4,9 +4,9 @@ import android.content.Context
 import android.view.View
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.DateUtils
-import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
 import org.medtroniclabs.uhis.common.DateUtils.DATE_ddMMyyyy
+import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.formgeneration.model.BPModel
 import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
@@ -383,8 +383,7 @@ object AssessmentUtil {
         return name.takeIf { it.isNotBlank() } ?: user.username?.trim()?.takeIf { it.isNotBlank() }
     }
 
-    fun getLocalServiceProvidedByRole(): String? =
-        SecuredPreference.getRole().takeIf { it.isNotBlank() }
+    fun getLocalServiceProvidedByRole(): String? = SecuredPreference.getRole().takeIf { it.isNotBlank() }
 
     fun formatServiceProviderDisplay(
         context: Context,

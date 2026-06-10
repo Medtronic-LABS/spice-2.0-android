@@ -326,11 +326,12 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
         value: CharSequence?,
         valueTextColor: Int? = null,
     ) {
-        AssessmentCommonUtils.createSummaryLayout(
-            requireContext(),
-            title,
-            value,
-            valueTextColor,
-        )?.let { binding.parentLayout.addView(it) }
+        AssessmentCommonUtils
+            .createSummaryLayout(
+                requireContext(),
+                title,
+                value,
+                valueTextColor,
+            )?.let { binding.parentLayout.addView(it) }
     }
 }

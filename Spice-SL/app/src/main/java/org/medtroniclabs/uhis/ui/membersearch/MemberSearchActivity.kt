@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.TextWatcher
 import android.view.View
+import android.widget.AdapterView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -16,7 +17,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
-import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -26,12 +26,16 @@ import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.hideKeyboard
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
+import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.qrscanner.QRScanContract
 import org.medtroniclabs.uhis.common.qrscanner.QRScanResult
 import org.medtroniclabs.uhis.common.qrscanner.QRScannerActivity
 import org.medtroniclabs.uhis.data.offlinesync.model.SavedMemberDetails
 import org.medtroniclabs.uhis.databinding.ActivityMemberSearchBinding
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
+import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
+import org.medtroniclabs.uhis.model.services.ServiceStaticFilter
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
 import org.medtroniclabs.uhis.ui.externalmember.ExternalMemberRegistrationActivity
@@ -59,6 +63,15 @@ class MemberSearchActivity : BaseActivity(), View.OnClickListener, MemberSelecti
      * and adding again as the search text is also getting cleared
      */
     private lateinit var searchTextListener: TextWatcher
+
+    /**
+     * Spinner adapter holding filters
+     */
+    private lateinit var spinnerAdapter: CustomSpinnerAdapter
+
+    private var lastPosition = -1
+
+    private var isPreselectedFilterAlreadySet = false
 
     private val cameraPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) {
@@ -99,6 +112,77 @@ class MemberSearchActivity : BaseActivity(), View.OnClickListener, MemberSelecti
         attachObservers()
     }
 
+    /**
+     * Listener for member type spinner
+     */
+    private val dropdownListener = object : AdapterView.OnItemSelectedListener {
+        override fun onItemSelected(
+            adapterView: AdapterView<*>?,
+            itemView: View?,
+            position: Int,
+            itemId: Long,
+        ) {
+            lastPosition = position
+            val item = spinnerAdapter.getData(position)
+            val id = item?.get(DefinedParams.ID) as? ServiceStaticFilter
+            if (id != null) {
+                viewModel.updateFilter(staticFilter = id)
+            }
+        }
+
+        override fun onNothingSelected(p0: AdapterView<*>?) {
+            // Do Nothing
+        }
+    }
+
+    /**
+     * Sets member type spinner data with count for each dropdown element
+     */
+    private fun setDropDownData(counts: Map<ServiceStaticFilter, Int>) {
+        // Remove any existing listener, so that the filter won't get triggered
+        binding.tvMemberTypes.onItemSelectedListener = null
+
+        val dropDownList = buildDropDownList(counts)
+        spinnerAdapter = CustomSpinnerAdapter(this, SecuredPreference.getIsTranslationEnabled())
+        spinnerAdapter.setData(dropDownList)
+        binding.tvMemberTypes.adapter = spinnerAdapter
+
+        if (!isPreselectedFilterAlreadySet) {
+            isPreselectedFilterAlreadySet = true
+            val initialFilter = ServiceStaticFilter.ALL_MEMBERS
+            val initialPosition = dropDownList
+                .indexOfFirst { item ->
+                    (item[DefinedParams.ID] as? ServiceStaticFilter) == initialFilter
+                }.takeIf { it >= 0 } ?: 0
+            lastPosition = initialPosition
+        }
+        if (lastPosition != -1) {
+            binding.tvMemberTypes.setSelection(lastPosition, false)
+        }
+
+        // Set listener after setting adapter, so that the filter works
+        binding.tvMemberTypes.post {
+            binding.tvMemberTypes.onItemSelectedListener = dropdownListener
+        }
+    }
+
+    /**
+     * Builds list for member type spinner
+     */
+    private fun buildDropDownList(counts: Map<ServiceStaticFilter, Int>): ArrayList<Map<String, Any>> {
+        val dropdownList = arrayListOf<Map<String, Any>>()
+        counts.forEach { (filter, filterCount) ->
+            dropdownList.add(
+                mapOf(
+                    DefinedParams.CULTURE_VALUE to filter.culturalValue + " (${CommonUtils.formatCountForCurrentLocale(filterCount)})",
+                    DefinedParams.NAME to filter.value + " (${CommonUtils.formatCountForCurrentLocale(filterCount)})",
+                    DefinedParams.ID to filter,
+                ),
+            )
+        }
+        return dropdownList
+    }
+
     override fun onResume() {
         super.onResume()
         viewModel.setUserJourney(AnalyticsDefinedParams.SERVICES)
@@ -120,19 +204,6 @@ class MemberSearchActivity : BaseActivity(), View.OnClickListener, MemberSelecti
         )
         binding.rvMembersList.adapter = adapter
         adapter.addOnPagesUpdatedListener { updateListState() }
-        adapter.registerAdapterDataObserver(
-            object : RecyclerView.AdapterDataObserver() {
-                override fun onItemRangeInserted(
-                    positionStart: Int,
-                    itemCount: Int,
-                ) {
-                    super.onItemRangeInserted(positionStart, itemCount)
-                    if (positionStart == 0) {
-                        binding.rvMembersList.scrollToPosition(0)
-                    }
-                }
-            },
-        )
         showLoading()
 
         binding.bottomNavigationView.visible()
@@ -152,12 +223,12 @@ class MemberSearchActivity : BaseActivity(), View.OnClickListener, MemberSelecti
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    adapter.loadStateFlow.collect { loadState ->
+                    adapter.loadStateFlow.collectLatest { loadState ->
                         handleLoadState(loadState)
                     }
                 }
                 launch {
-                    viewModel.searchParams.collect { params ->
+                    viewModel.searchParams.collectLatest { params ->
                         binding.llFilter.btnFilter.text = if (params.activeFilterCount > 0) {
                             getString(
                                 R.string.filter_count,
@@ -169,12 +240,19 @@ class MemberSearchActivity : BaseActivity(), View.OnClickListener, MemberSelecti
                     }
                 }
                 launch {
+                    viewModel.staticFilterCounts.collectLatest { counts ->
+                        if (counts.isNotEmpty()) {
+                            setDropDownData(counts)
+                        }
+                    }
+                }
+                launch {
                     viewModel.membersFlow.collectLatest { pagingData ->
                         adapter.submitData(lifecycle, pagingData)
                     }
                 }
                 launch {
-                    viewModel.remoteMemberDetailsState.collect { resource ->
+                    viewModel.remoteMemberDetailsState.collectLatest { resource ->
                         when (resource.state) {
                             ResourceState.LOADING -> {
                                 showLoading()
@@ -208,6 +286,7 @@ class MemberSearchActivity : BaseActivity(), View.OnClickListener, MemberSelecti
             showLoading()
         } else {
             hideLoading()
+            binding.rvMembersList.scrollToPosition(0)
         }
         if (loadState.append is LoadState.Loading) {
             binding.pageProgress.visible()

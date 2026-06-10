@@ -3,8 +3,8 @@ package org.medtroniclabs.uhis.common
 import org.medtroniclabs.uhis.db.entity.RiskClassificationModel
 import org.medtroniclabs.uhis.db.entity.RiskFactorModel
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_SYSTOLIC
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BIO_METRICS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BIOMETRIC_FAMILY
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BIO_METRICS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BMI
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BP_LOG
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HEIGHT

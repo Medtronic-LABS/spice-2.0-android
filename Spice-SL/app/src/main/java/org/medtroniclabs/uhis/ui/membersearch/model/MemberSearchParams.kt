@@ -1,6 +1,7 @@
 package org.medtroniclabs.uhis.ui.membersearch.model
 
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
+import org.medtroniclabs.uhis.model.services.ServiceStaticFilter
 
 /**
  * Search and filter state for member search.
@@ -8,6 +9,7 @@ import org.medtroniclabs.uhis.data.model.ChipViewItemModel
  * Drives both the filter UI and the paging query (local Room + optional remote API).
  */
 data class MemberSearchParams(
+    val staticFilter: ServiceStaticFilter = ServiceStaticFilter.ALL_MEMBERS,
     val searchInput: String? = null,
     val isOnline: Boolean = false,
     val isSiteBasedSearch: Boolean = true,

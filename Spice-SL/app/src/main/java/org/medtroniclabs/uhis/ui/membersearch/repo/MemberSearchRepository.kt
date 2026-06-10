@@ -30,6 +30,7 @@ class MemberSearchRepository @Inject constructor(
         searchInput: String?,
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
+        staticFilter: ServiceStaticFilter = ServiceStaticFilter.ALL_MEMBERS,
         allowNullHousehold: Boolean = false,
         qrCode: String? = null,
     ): List<HouseholdMemberWithTb> =
@@ -38,11 +39,28 @@ class MemberSearchRepository @Inject constructor(
                 searchInput = searchInput,
                 filterBySs = filterBySs,
                 filterBySubVillages = filterBySubVillages,
-                staticFilter = ServiceStaticFilter.ALL_MEMBERS,
+                staticFilter = staticFilter,
                 allowNullHousehold = allowNullHousehold,
                 qrCode = qrCode,
             ).asFlow()
             .first()
+
+    suspend fun getStaticFilterCounts(
+        filters: List<ServiceStaticFilter>,
+        searchInput: String = "",
+        filterBySs: List<Long> = emptyList(),
+        filterBySubVillages: List<Long> = emptyList(),
+        allowNullHousehold: Boolean = false,
+        qrCode: String? = null,
+    ): Map<ServiceStaticFilter, Int> =
+        householdMemberRepository.getServiceMemberCounts(
+            filters = filters,
+            searchInput = searchInput,
+            filterBySs = filterBySs,
+            filterBySubVillages = filterBySubVillages,
+            allowNullHousehold = allowNullHousehold,
+            qrCode = qrCode,
+        )
 
     /**
      * Searches patients on the remote API for the given text query.

@@ -46,6 +46,7 @@ class MemberSearchDataSource(
             searchInput = params.searchInput,
             filterBySs = params.effectiveSsIds,
             filterBySubVillages = params.effectiveSubVillageIds,
+            staticFilter = params.staticFilter,
             allowNullHousehold = params.allowNullHousehold,
             qrCode = params.qrCode,
         )

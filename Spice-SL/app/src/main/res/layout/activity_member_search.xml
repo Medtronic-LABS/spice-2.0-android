@@ -60,6 +60,24 @@
         app:barrierDirection="bottom"
         app:constraint_referenced_ids="llFilter,tvMembersCount" />
 
+    <androidx.appcompat.widget.AppCompatSpinner
+        android:id="@+id/tvMemberTypes"
+        style="@style/Form_Spinner_Style"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_16sdp"
+        android:layout_marginTop="@dimen/_16sdp"
+        android:minHeight="@dimen/_40sdp"
+        app:layout_constraintTop_toBottomOf="@id/filterBarrier" />
+
+    <View
+        android:id="@+id/viewMemberTypes"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_marginTop="@dimen/_16sdp"
+        android:background="@color/graph_limit_linecolor"
+        app:layout_constraintTop_toBottomOf="@+id/tvMemberTypes" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvMembersList"
         android:layout_width="match_parent"
@@ -69,7 +87,7 @@
         android:visibility="visible"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@id/pageProgress"
-        app:layout_constraintTop_toBottomOf="@id/filterBarrier" />
+        app:layout_constraintTop_toBottomOf="@id/viewMemberTypes" />
 
     <ProgressBar
         android:id="@+id/pageProgress"
