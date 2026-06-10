@@ -276,7 +276,9 @@ class HouseholdMemberRepository @Inject constructor(
         if (isValidShasthyaKormiId(member.shasthyaKormiId)) return
 
         member.shasthyaShebikaId?.takeIf { it > 0L }?.let { ssId ->
-            roomHelper.getShasthyaShebikaById(ssId)?.shasthyaKormiId
+            roomHelper
+                .getShasthyaShebikaById(ssId)
+                ?.shasthyaKormiId
                 ?.takeIf { isValidShasthyaKormiId(it) }
                 ?.let {
                     member.shasthyaKormiId = it

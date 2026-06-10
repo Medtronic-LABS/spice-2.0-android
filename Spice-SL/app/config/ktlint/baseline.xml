@@ -147,9 +147,6 @@
     <file name="src/main/java/org/medtroniclabs/uhis/data/resource/labourDeliverySummaryRequest.kt">
         <error line="1" column="1" source="standard:filename" />
     </file>
-    <file name="src/main/java/org/medtroniclabs/uhis/db/converters/OfflineStatusTypeConverter.kt">
-        <error line="92" column="97" source="standard:function-signature" />
-    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/db/entity/BaseEntity.kt">
         <error line="14" column="9" source="standard:property-naming" />
     </file>
@@ -601,10 +598,6 @@
     <file name="src/main/java/org/medtroniclabs/uhis/offlinesync/ScheduledSyncWork.kt">
         <error line="155" column="13" source="standard:no-consecutive-comments" />
     </file>
-    <file name="src/main/java/org/medtroniclabs/uhis/repo/HouseholdMemberRepository.kt">
-        <error line="279" column="23" source="standard:chain-method-continuation" />
-        <error line="279" column="52" source="standard:chain-method-continuation" />
-    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/signature/view/SignatureView.kt">
         <error line="58" column="17" source="standard:property-naming" />
         <error line="59" column="17" source="standard:property-naming" />
@@ -844,22 +837,6 @@
         <error line="79" column="15" source="standard:property-naming" />
         <error line="86" column="15" source="standard:property-naming" />
         <error line="88" column="15" source="standard:property-naming" />
-    </file>
-    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/statuslogic/AssessmentStatusGenerator.kt">
-        <error line="78" column="28" source="standard:chain-method-continuation" />
-        <error line="78" column="70" source="standard:chain-method-continuation" />
-        <error line="78" column="82" source="standard:chain-method-continuation" />
-        <error line="78" column="90" source="standard:chain-method-continuation" />
-        <error line="147" column="27" source="standard:function-expression-body" />
-    </file>
-    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/utils/AssessmentUtil.kt">
-        <error line="3" column="1" source="standard:import-ordering" />
-        <error line="483" column="9" source="standard:function-signature" />
-        <error line="483" column="56" source="standard:function-signature" />
-        <error line="492" column="13" source="standard:chain-method-continuation" />
-        <error line="562" column="5" source="standard:blank-line-before-declaration" />
-        <error line="562" column="79" source="standard:function-signature" />
-        <error line="565" column="79" source="standard:function-signature" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/boarding/MenuTypeEnums.kt">
         <error line="4" column="5" source="standard:enum-entry-name-case" />

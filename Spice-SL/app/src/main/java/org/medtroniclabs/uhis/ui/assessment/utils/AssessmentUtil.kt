@@ -7,24 +7,21 @@ import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
 import org.medtroniclabs.uhis.common.DateUtils.DATE_ddMMyyyy
 import org.medtroniclabs.uhis.common.SecuredPreference
-import org.medtroniclabs.uhis.formgeneration.model.BPModel
-import org.medtroniclabs.uhis.ui.MenuConstants
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_BLOOD_PRESSURE
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentObservations
 import org.medtroniclabs.uhis.formgeneration.FormGenerator
+import org.medtroniclabs.uhis.formgeneration.model.BPModel
 import org.medtroniclabs.uhis.mappingkey.Screening
+import org.medtroniclabs.uhis.ui.MenuConstants
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_BLOOD_PRESSURE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_DIASTOLIC
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_SYSTOLIC
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BIO_METRICS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BIOMETRIC_FAMILY
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BIO_METRICS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BP_LOG
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.CATARACT
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HEIGHT
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.WEIGHT
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ncd
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BP_LOG_DETAILS
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.CATARACT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FBS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_LOG
@@ -32,10 +29,13 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_TYPE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_UNIT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.Glucose_Date_Time
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HBA1C_DATE_TIME
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HEIGHT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.MMOLL
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NAME
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NCD_SYMPTOMS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.SYMPTOMS_LOG
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.WEIGHT
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ncd
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.utils.ReferralStatus
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
 import org.medtroniclabs.uhis.ui.assessment.statuslogic.AssessmentStatus
@@ -479,17 +479,14 @@ object AssessmentUtil {
         return height to weight
     }
 
-    fun getLatestHeightWeightFromHistories(
-        histories: List<MemberAssessmentHistoryEntity>,
-    ): Pair<String?, String?>? =
+    fun getLatestHeightWeightFromHistories(histories: List<MemberAssessmentHistoryEntity>): Pair<String?, String?>? =
         histories
             .mapNotNull { history ->
                 val (height, weight) = getHeightWeightFromHistory(history)
                 if (height == null && weight == null) return@mapNotNull null
                 val visitMillis = DateUtils.getLastMenstrualDate(history.visitDate ?: "").timeInMillis
                 Triple(visitMillis, height, weight)
-            }
-            .maxByOrNull { it.first }
+            }.maxByOrNull { it.first }
             ?.let { it.second to it.third }
 
     fun prefillHeightAndWeight(
@@ -559,11 +556,10 @@ object AssessmentUtil {
             putAll(ncdSection)
         }
     }
-    private fun resolveObservationHeight(map: HashMap<String, Any>): String? =
-        resolveObservationNumber(map, HEIGHT)
 
-    private fun resolveObservationWeight(map: HashMap<String, Any>): String? =
-        resolveObservationNumber(map, WEIGHT)
+    private fun resolveObservationHeight(map: HashMap<String, Any>): String? = resolveObservationNumber(map, HEIGHT)
+
+    private fun resolveObservationWeight(map: HashMap<String, Any>): String? = resolveObservationNumber(map, WEIGHT)
 
     private fun resolveObservationNumber(
         map: HashMap<String, Any>,

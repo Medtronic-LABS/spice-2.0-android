@@ -89,8 +89,7 @@ class OfflineStatusTypeConverter {
     }
 
     @TypeConverter
-    fun fromMemberAssessmentObservations(observations: MemberAssessmentObservations?): String? =
-        observations?.let { Gson().toJson(it) }
+    fun fromMemberAssessmentObservations(observations: MemberAssessmentObservations?): String? = observations?.let { Gson().toJson(it) }
 
     @TypeConverter
     fun toMemberAssessmentObservations(value: String?): MemberAssessmentObservations? =
