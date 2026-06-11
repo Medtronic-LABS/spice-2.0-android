@@ -40,7 +40,6 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FACILITY_TYP
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_TYPE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_UNIT
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HAS_SYMPTOMS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HBA1CUnit
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HEIGHT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.MMHG
@@ -49,7 +48,6 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NCD_SYMPTOMS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.REFERRAL_FACILITY_TYPE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ReferredPHUSiteID
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.WEIGHT
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.YES
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.hba1c
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.NCDReferralColorEvaluator
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.utils.ReferralStatus
@@ -104,7 +102,9 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
             if (assessmentString.isNullOrBlank()) return@observe
             val json = JSONObject(assessmentString)
             updateStatusBar(json)
-            applyRiskColor(json)
+            if (viewModel.isFollowupVisit) {
+                applyRiskColor(json)
+            }
             val items = createNCDSummaryData(json)
             createSummaryView(items, json)
         }
@@ -116,7 +116,7 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
         val glucoseUnit = findValueByKey(json, GLUCOSE_UNIT) as? String
         val glucoseType = findValueByKey(json, GLUCOSE_TYPE) as? String
         val glucoseValue = (findValueByKey(json, GLUCOSE) as? Number)?.toDouble()?.takeIf { it > 0 }
-        val hasSymptoms = YES.equals(findValueByKey(json, HAS_SYMPTOMS)?.toString(), true)
+        val hasSymptoms = hasNcdSymptoms(json)
         val colorResult = NCDReferralColorEvaluator.evaluate(
             NCDReferralColorEvaluator.Input(
                 systolic = systolic,
@@ -129,6 +129,11 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
         )
         binding.riskResultLayout.backgroundTintList =
             ColorStateList.valueOf(colorResult.colorHex.toColorInt())
+    }
+
+    private fun hasNcdSymptoms(json: JSONObject): Boolean {
+        val symptoms = findValueByKey(json, NCD_SYMPTOMS)
+        return symptoms is JSONArray && symptoms.length() > 0
     }
 
     private fun createSummaryView(

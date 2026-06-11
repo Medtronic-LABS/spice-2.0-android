@@ -195,8 +195,7 @@ class BDNCDAssessmentFragment : BaseFragment(), FormEventListener {
                         val bpResult = AssessmentUtil.calculateAverageBloodPressure(ncdMap)
                         val bgResult = AssessmentUtil.addDateAndTimeForGlucose(ncdMap)
                         val symptomList = AssessmentUtil.getSymptomsList(ncdMap)
-                        val isFollowUpVisit =
-                            viewModel.getLastServiceHistory(MenuConstants.NCD_MENU_ID) != null
+                        viewModel.isFollowupVisit = viewModel.getLastServiceHistory(MenuConstants.NCD_MENU_ID) != null
 
                         val referralResult =
                             ReferralResultGenerator().computeReferralResultForBDNCD(
@@ -204,7 +203,8 @@ class BDNCDAssessmentFragment : BaseFragment(), FormEventListener {
                                 bpResult,
                                 bgResult,
                                 symptomList,
-                                isFollowUpVisit,
+                                viewModel.isFollowupVisit,
+                                useNcdRiskAlgorithm = viewModel.isFollowupVisit,
                             )
 
                         val riskModels = viewModel.loadRiskClassificationModels()

@@ -157,15 +157,14 @@ class BDCataractAssessmentFragment() : BaseFragment(), FormEventListener {
                         val bpResult = AssessmentUtil.calculateAverageBloodPressure(ncdMap)
                         val bgResult = AssessmentUtil.addDateAndTimeForGlucose(ncdMap)
 
-                        val isFollowUpVisit =
-                            viewModel.getLastServiceHistory(MenuConstants.NCD_MENU_ID) != null
+                        viewModel.isFollowupVisit = viewModel.getLastServiceHistory(MenuConstants.CATARACT_MENU_ID) != null
                         val referralResult =
                             ReferralResultGenerator().computeReferralResultForBDNCD(
                                 ncdMap,
                                 bpResult,
                                 bgResult,
                                 AssessmentUtil.getSymptomsList(ncdMap),
-                                isFollowUpVisit,
+                                viewModel.isFollowupVisit,
                             )
 
                         val riskModels = viewModel.loadRiskClassificationModels()

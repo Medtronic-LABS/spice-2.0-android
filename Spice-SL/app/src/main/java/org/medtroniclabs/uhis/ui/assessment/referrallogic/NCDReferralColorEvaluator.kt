@@ -1,11 +1,17 @@
 package org.medtroniclabs.uhis.ui.assessment.referrallogic
 
+import org.medtroniclabs.uhis.ncd.screening.utils.ReferredReason
+
 /**
+ * Red risk algorithm applied for NCD 2nd visit onwards.
+ *
  * Derives NCD referral risk level and summary UI color from blood pressure,
  * blood glucose, and symptom data.
  *
  * Hypertension and diabetes are scored independently; the higher-severity result
  * is returned when both are present.
+ *
+ * Reference : [Doc](https://docs.google.com/document/d/1el3e-Bz6thuWk0cDvaqAb4ZuDFi0RbO8/edit)
  */
 object NCDReferralColorEvaluator {
     /** Vital signs and symptom flags used for risk scoring. */
@@ -44,28 +50,20 @@ object NCDReferralColorEvaluator {
     )
 
     private object Thresholds {
-        const val MGDL_TO_MMOL = 18.0
+        const val MGDL_TO_MMOL = 18.0182
         const val HYPOGLYCEMIA_MMOL = 3.9
         const val DIABETES_RED_MMOL = 27.8
         const val DIABETES_ORANGE_LOW_MMOL = 16.7
         const val DIABETES_YELLOW_HIGH_MMOL = 13.9
-        const val FBS_YELLOW_LOW_MMOL = 7.3
-        const val RBS_YELLOW_LOW_MMOL = 10.0
         const val FBS_GREEN_HIGH_MMOL = 7.2
-        const val RBS_GREEN_HIGH_MMOL = 10.0
-        const val LOW_GLUCOSE_BAND_HIGH_MMOL = 4.4
+        const val RBS_GREEN_HIGH_MMOL = 9.9
+        const val LOW_GLUCOSE_BAND_HIGH_MMOL = 4.5
 
         const val BP_CRISIS_SYSTOLIC = 180
         const val BP_CRISIS_DIASTOLIC = 110
         const val BP_HYPOTENSION_SYSTOLIC = 90
         const val BP_HYPOTENSION_DIASTOLIC = 60
-        const val BP_YELLOW_HIGHER_SYSTOLIC_MIN = 160
-        const val BP_YELLOW_HIGHER_SYSTOLIC_MAX = 179
-        const val BP_YELLOW_HIGHER_DIASTOLIC_MIN = 100
-        const val BP_YELLOW_HIGHER_DIASTOLIC_MAX = 109
-        const val BP_YELLOW_LOWER_SYSTOLIC_MIN = 140
         const val BP_YELLOW_LOWER_SYSTOLIC_MAX = 159
-        const val BP_YELLOW_LOWER_DIASTOLIC_MIN = 90
         const val BP_YELLOW_LOWER_DIASTOLIC_MAX = 99
         const val BP_NORMAL_SYSTOLIC_MAX = 140
         const val BP_NORMAL_DIASTOLIC_MAX = 90
@@ -88,6 +86,22 @@ object NCDReferralColorEvaluator {
             ?.toResult()
             ?: ScoredRisk(Severity.GREEN).toResult()
 
+    fun isReferralRequired(input: Input): Boolean = evaluate(input).riskLevel != RiskLevel.GREEN
+
+    fun referralReasons(input: Input): ArrayList<String> {
+        val reasons = ArrayList<String>()
+        if (input.hasSymptoms) {
+            reasons.add(ReferredReason.SYMPTOMS)
+        }
+        evaluateHypertension(input)?.takeIf { it.severity != Severity.GREEN }?.let {
+            reasons.add(ReferredReason.bloodPressure)
+        }
+        evaluateDiabetes(input)?.takeIf { it.severity != Severity.GREEN }?.let {
+            reasons.add(ReferredReason.bloodGlucose)
+        }
+        return reasons
+    }
+
     private fun evaluateHypertension(input: Input): ScoredRisk? {
         val sys = input.systolic ?: return null
         val dia = input.diastolic ?: return null
@@ -100,8 +114,8 @@ object NCDReferralColorEvaluator {
             crisis && symptoms -> ScoredRisk(Severity.RED)
             crisis -> ScoredRisk(Severity.ORANGE)
             (
-                sys in Thresholds.BP_YELLOW_HIGHER_SYSTOLIC_MIN..Thresholds.BP_YELLOW_HIGHER_SYSTOLIC_MAX ||
-                    dia in Thresholds.BP_YELLOW_HIGHER_DIASTOLIC_MIN..Thresholds.BP_YELLOW_HIGHER_DIASTOLIC_MAX
+                (sys > Thresholds.BP_YELLOW_LOWER_SYSTOLIC_MAX && sys < Thresholds.BP_CRISIS_SYSTOLIC) ||
+                    (dia > Thresholds.BP_YELLOW_LOWER_DIASTOLIC_MAX && dia < Thresholds.BP_CRISIS_DIASTOLIC)
             ) ||
                 symptoms -> ScoredRisk(
                 Severity.YELLOW_HIGHER,
@@ -109,8 +123,8 @@ object NCDReferralColorEvaluator {
             )
 
             (
-                sys in Thresholds.BP_YELLOW_LOWER_SYSTOLIC_MIN..Thresholds.BP_YELLOW_LOWER_SYSTOLIC_MAX ||
-                    dia in Thresholds.BP_YELLOW_LOWER_DIASTOLIC_MIN..Thresholds.BP_YELLOW_LOWER_DIASTOLIC_MAX
+                sys in Thresholds.BP_NORMAL_SYSTOLIC_MAX..Thresholds.BP_YELLOW_LOWER_SYSTOLIC_MAX ||
+                    dia in Thresholds.BP_NORMAL_DIASTOLIC_MAX..Thresholds.BP_YELLOW_LOWER_DIASTOLIC_MAX
             ) -> ScoredRisk(Severity.YELLOW_LOWER, YellowPriority.LOWER)
 
             sys < Thresholds.BP_NORMAL_SYSTOLIC_MAX &&
@@ -155,13 +169,13 @@ object NCDReferralColorEvaluator {
         bg: Double,
         type: String?,
     ): Boolean {
-        val lowBand = bg in Thresholds.HYPOGLYCEMIA_MMOL..Thresholds.LOW_GLUCOSE_BAND_HIGH_MMOL
+        val lowBand = bg >= Thresholds.HYPOGLYCEMIA_MMOL && bg < Thresholds.LOW_GLUCOSE_BAND_HIGH_MMOL
         return when (type) {
-            "fbs" -> bg in Thresholds.FBS_YELLOW_LOW_MMOL..Thresholds.DIABETES_YELLOW_HIGH_MMOL || lowBand
-            "rbs" -> bg in Thresholds.RBS_YELLOW_LOW_MMOL..Thresholds.DIABETES_YELLOW_HIGH_MMOL || lowBand
+            "fbs" -> (bg > Thresholds.FBS_GREEN_HIGH_MMOL && bg < Thresholds.DIABETES_YELLOW_HIGH_MMOL) || lowBand
+            "rbs" -> (bg > Thresholds.RBS_GREEN_HIGH_MMOL && bg < Thresholds.DIABETES_YELLOW_HIGH_MMOL) || lowBand
             else ->
-                bg in Thresholds.FBS_YELLOW_LOW_MMOL..Thresholds.DIABETES_YELLOW_HIGH_MMOL ||
-                    bg in Thresholds.RBS_YELLOW_LOW_MMOL..Thresholds.DIABETES_YELLOW_HIGH_MMOL ||
+                (bg > Thresholds.FBS_GREEN_HIGH_MMOL && bg < Thresholds.DIABETES_YELLOW_HIGH_MMOL) ||
+                    (bg > Thresholds.RBS_GREEN_HIGH_MMOL && bg < Thresholds.DIABETES_YELLOW_HIGH_MMOL) ||
                     lowBand
         }
     }
@@ -172,10 +186,10 @@ object NCDReferralColorEvaluator {
     ): Boolean =
         when (type) {
             "fbs" -> bg in Thresholds.LOW_GLUCOSE_BAND_HIGH_MMOL..Thresholds.FBS_GREEN_HIGH_MMOL
-            "rbs" -> bg > Thresholds.LOW_GLUCOSE_BAND_HIGH_MMOL && bg < Thresholds.RBS_GREEN_HIGH_MMOL
+            "rbs" -> bg in Thresholds.LOW_GLUCOSE_BAND_HIGH_MMOL..Thresholds.RBS_GREEN_HIGH_MMOL
             else ->
                 bg in Thresholds.LOW_GLUCOSE_BAND_HIGH_MMOL..Thresholds.FBS_GREEN_HIGH_MMOL ||
-                    (bg > Thresholds.LOW_GLUCOSE_BAND_HIGH_MMOL && bg < Thresholds.RBS_GREEN_HIGH_MMOL)
+                    bg in Thresholds.LOW_GLUCOSE_BAND_HIGH_MMOL..Thresholds.RBS_GREEN_HIGH_MMOL
         }
 
     private fun ScoredRisk.toResult(): Result {

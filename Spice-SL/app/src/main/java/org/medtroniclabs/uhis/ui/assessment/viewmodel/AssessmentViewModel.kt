@@ -177,6 +177,7 @@ class AssessmentViewModel @Inject constructor(
     val formLayoutsLiveData = MutableLiveData<Resource<FormResponse>>()
     val nearestFacilityLiveData = MutableLiveData<Resource<ArrayList<Map<String, Any>>>>()
     var referralStatus: String? = null
+    var isFollowupVisit: Boolean = false
     var lastLocation: Location? = null
     val memberClinicalLiveData = MutableLiveData<MemberClinicalEntity?>()
     var dosageListModel: ArrayList<RecommendedDosageListModel>? = null

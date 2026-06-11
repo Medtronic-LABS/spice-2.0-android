@@ -640,7 +640,12 @@ class ReferralResultGenerator {
         bgResult: Triple<String?, String?, Double?>,
         symptomList: List<String>,
         isFollowUpVisit: Boolean = false,
+        useNcdRiskAlgorithm: Boolean = false,
     ): Pair<String, ArrayList<String>>? {
+        if (isFollowUpVisit && useNcdRiskAlgorithm) {
+            return computeNcdFollowUpReferralResult(map, bpResult, bgResult, symptomList)
+        }
+
         val referredReasonList = ArrayList<String>()
 
         if (symptomList.isNotEmpty()) {
@@ -672,6 +677,35 @@ class ReferralResultGenerator {
             null
         }
     }
+
+    private fun computeNcdFollowUpReferralResult(
+        map: HashMap<String, Any>,
+        bpResult: Pair<Int, Int>,
+        bgResult: Triple<String?, String?, Double?>,
+        symptomList: List<String>,
+    ): Pair<String, ArrayList<String>>? {
+        val input = buildNcdEvaluatorInput(bpResult, bgResult, symptomList)
+        if (!NCDReferralColorEvaluator.isReferralRequired(input)) {
+            return null
+        }
+
+        val referredReasonList = NCDReferralColorEvaluator.referralReasons(input)
+        map[REFERRAL_FACILITY_TYPE] = FACILITY_TYPE_UPAZILA
+        return Pair(ReferralStatus.Referred.name, referredReasonList)
+    }
+
+    private fun buildNcdEvaluatorInput(
+        bpResult: Pair<Int, Int>,
+        bgResult: Triple<String?, String?, Double?>,
+        symptomList: List<String>,
+    ) = NCDReferralColorEvaluator.Input(
+        systolic = bpResult.first.takeIf { it > 0 },
+        diastolic = bpResult.second.takeIf { it > 0 },
+        glucoseUnit = bgResult.first,
+        glucoseType = bgResult.second,
+        glucoseValue = bgResult.third,
+        hasSymptoms = symptomList.isNotEmpty(),
+    )
 
     private fun resolveReferralFacilityType(
         referredReasonList: ArrayList<String>,
