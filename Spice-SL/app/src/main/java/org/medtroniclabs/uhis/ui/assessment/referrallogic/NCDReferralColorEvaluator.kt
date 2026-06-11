@@ -142,7 +142,8 @@ object NCDReferralColorEvaluator {
 
         val type = input.glucoseType?.lowercase()
         return when {
-            bg > Thresholds.DIABETES_RED_MMOL || bg < Thresholds.HYPOGLYCEMIA_MMOL -> ScoredRisk(Severity.RED)
+            bg > Thresholds.DIABETES_RED_MMOL -> ScoredRisk(Severity.RED)
+            bg < Thresholds.HYPOGLYCEMIA_MMOL -> ScoredRisk(Severity.ORANGE)
             bg in Thresholds.DIABETES_ORANGE_LOW_MMOL..Thresholds.DIABETES_RED_MMOL ->
                 ScoredRisk(Severity.ORANGE)
 
