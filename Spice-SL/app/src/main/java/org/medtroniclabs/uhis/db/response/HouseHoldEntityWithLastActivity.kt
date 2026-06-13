@@ -1,6 +1,8 @@
 package org.medtroniclabs.uhis.db.response
 
 import androidx.room.ColumnInfo
+import androidx.room.Ignore
+import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
 
 data class HouseHoldEntityWithLastActivity(
     val id: Long,
@@ -19,5 +21,7 @@ data class HouseHoldEntityWithLastActivity(
     /** Epoch-ms of the most recently registered household member. */
     @ColumnInfo("last_member_registered_at")
     val lastMemberRegisteredAt: Long,
-    val services: ArrayList<String>? = null,
-)
+) {
+    @Ignore
+    var assessmentHistory: List<MemberAssessmentHistoryEntity> = emptyList()
+}

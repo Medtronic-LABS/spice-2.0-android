@@ -73,13 +73,20 @@ class NCDDashBoardViewModel @Inject constructor(
         if (fromChips.isNotEmpty()) return fromChips
         if (!isFoPo || filter.filterSk == -1L) return emptyList()
 
-        val cached = filterUiData.value?.data?.ssList?.map { it.id }.orEmpty()
+        val cached = filterUiData.value
+            ?.data
+            ?.ssList
+            ?.map { it.id }
+            .orEmpty()
         if (cached.isNotEmpty()) return cached
 
         val result = houseHoldRepository.getHouseHoldFilterUiDataForShasthyaKormi(filter.filterSk)
         if (result.state == ResourceState.SUCCESS) {
             filterUiData.postValue(result)
-            return result.data?.ssList?.map { it.id }.orEmpty()
+            return result.data
+                ?.ssList
+                ?.map { it.id }
+                .orEmpty()
         }
         return emptyList()
     }

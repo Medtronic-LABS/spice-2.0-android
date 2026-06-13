@@ -25,6 +25,7 @@ import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.data.model.PatientListResModel
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberWithTb
 import org.medtroniclabs.uhis.databinding.MembersSummaryListItemBinding
+import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
 import org.medtroniclabs.uhis.formgeneration.extension.capitalizeFirstChar
 import org.medtroniclabs.uhis.formgeneration.extension.px
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
@@ -101,9 +102,11 @@ class MemberSearchAdapter(
         holder.binding.tvRecentServiceDateSeparator.visible()
         holder.binding.tvRecentServiceDateValue.visible()
 
-        holder.binding.tvRecentServiceValue.text = item.services?.firstOrNull()?.let { recentService ->
-            AssessmentUtil.mapServiceToServiceName(recentService, context)
-        } ?: context.resources.getString(R.string.separator_double_hyphen)
+        holder.binding.tvRecentServiceValue.text = item.assessmentHistory
+            .firstOrNull { !it.serviceProvided.isNullOrBlank() }
+            ?.serviceProvided
+            ?.let { recentService -> AssessmentUtil.mapServiceToServiceName(recentService, context) }
+            ?: context.resources.getString(R.string.separator_double_hyphen)
         holder.binding.tvRecentServiceDateValue.text = item.recentServiceDate?.let {
             DateUtils.formatDateToDisplayFormat(it)
         } ?: context.resources.getString(R.string.separator_double_hyphen)
@@ -135,7 +138,7 @@ class MemberSearchAdapter(
             "${getMemberInfoText(context, item)} (${context.getString(R.string.deceased)})"
         }
 
-        bindTitle(holder, memberName, item.services)
+        bindTitle(holder, memberName, item.assessmentHistory)
 
         holder.binding.tvPatientId.text = item.patientId ?: context.getString(R.string.separator_double_hyphen)
 
@@ -189,7 +192,7 @@ class MemberSearchAdapter(
             CommonUtils.translatedGender(context, gender),
         )
 
-        bindTitle(holder, memberInfo, null)
+        bindTitle(holder, memberInfo, emptyList())
         holder.binding.tvPatientId.text = item.patientId ?: context.getString(R.string.separator_double_hyphen)
 
         holder.binding.cardPatient.safeClickListener {
@@ -200,7 +203,7 @@ class MemberSearchAdapter(
     private fun bindTitle(
         holder: MemberViewHolder,
         title: String,
-        services: ArrayList<String>?,
+        assessmentHistory: List<MemberAssessmentHistoryEntity>,
     ) {
         val context = holder.context
         holder.binding.flexTitle.removeAllViews()
@@ -216,9 +219,10 @@ class MemberSearchAdapter(
             },
         )
 
-        if (!services.isNullOrEmpty()) {
+        val services = assessmentHistory.filterNot { it.serviceProvided.isNullOrBlank() }
+        if (services.isNotEmpty()) {
             val iconsToShow = services
-                .map { service -> AssessmentUtil.mapServiceToServiceIcon(service) }
+                .map(AssessmentUtil::mapServiceToServiceIcon)
                 .filterNot { it == View.NO_ID }
                 .take(3)
 

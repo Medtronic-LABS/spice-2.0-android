@@ -1,7 +1,9 @@
 package org.medtroniclabs.uhis.data.offlinesync.model
 
 import androidx.room.ColumnInfo
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
 
 data class HouseholdMemberWithTb(
     @PrimaryKey(autoGenerate = true)
@@ -36,8 +38,6 @@ data class HouseholdMemberWithTb(
     @ColumnInfo("fhir_id")
     val fhirId: String? = null,
     val diagnoses: String? = null,
-    @ColumnInfo("services")
-    val services: ArrayList<String>? = null,
     @ColumnInfo("recent_service_date")
     val recentServiceDate: Long? = null,
     @ColumnInfo("shasthya_shebika_name")
@@ -48,4 +48,7 @@ data class HouseholdMemberWithTb(
     val subVillageName: String? = null,
     @ColumnInfo("created_by_role_name")
     val createdByRoleName: String? = null,
-)
+) {
+    @Ignore
+    var assessmentHistory: List<MemberAssessmentHistoryEntity> = emptyList()
+}

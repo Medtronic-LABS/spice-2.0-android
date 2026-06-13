@@ -1,6 +1,7 @@
 package org.medtroniclabs.uhis.db.dao
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -19,6 +20,7 @@ import org.medtroniclabs.uhis.db.entity.HouseholdMemberEntity
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
 import org.medtroniclabs.uhis.db.response.HouseHoldEntityWithLastActivity
 import org.medtroniclabs.uhis.db.response.HouseholdMemberCount
+import org.medtroniclabs.uhis.db.response.MemberAssessmentHistoryWithHouseholdId
 
 @Dao
 interface HouseholdDAO {
@@ -174,6 +176,19 @@ interface HouseholdDAO {
     @RawQuery(observedEntities = [HouseholdEntity::class, HouseholdMemberEntity::class, AssessmentEntity::class, MemberAssessmentHistoryEntity::class])
     fun getHouseholdsRaw(query: SimpleSQLiteQuery): LiveData<List<HouseHoldEntityWithLastActivity>>
 
+    @Query(
+        """
+        SELECT mah.*, hm.household_id AS household_id
+        FROM MemberAssessmentHistory mah
+        INNER JOIN HouseholdMember hm ON hm.id = mah.memberId
+        WHERE hm.household_id IN (:householdIds)
+        ORDER BY mah.visitDate DESC, mah.id DESC
+        """,
+    )
+    fun getAssessmentHistoryForHouseholds(
+        householdIds: List<Long>,
+    ): LiveData<List<MemberAssessmentHistoryWithHouseholdId>>
+
     /**
      * Returns a live list of households with last-activity info.
      *
@@ -244,74 +259,100 @@ interface HouseholdDAO {
         }
 
         val orderByClause = when (sortOrder) {
-            HouseholdSortOrder.HOUSEHOLD_NO -> "hh.household_no DESC"
+            HouseholdSortOrder.HOUSEHOLD_NO -> "fh.household_no DESC"
             HouseholdSortOrder.LAST_VISIT_DATE -> "last_activity_at DESC"
             HouseholdSortOrder.LAST_MEMBER_REGISTRATION -> "last_member_registered_at DESC"
-            HouseholdSortOrder.DEFAULT -> "hh.id DESC"
+            HouseholdSortOrder.DEFAULT -> "fh.id DESC"
         }
 
         val sql =
             """
+            WITH filtered_households AS (
+                SELECT
+                    hh.id,
+                    hh.name,
+                    hh.household_no,
+                    hh.updated_at,
+                    ve.name AS village_name,
+                    ss.name AS shasthya_shebika_name,
+                    sv.name AS sub_village_name
+                FROM Household AS hh
+                INNER JOIN VillageEntity AS ve
+                    ON ve.id = hh.village_id
+                INNER JOIN ShasthyaShebikaEntity AS ss
+                    ON ss.id = hh.shasthya_shebika_id
+                INNER JOIN SubVillageEntity AS sv
+                    ON sv.id = hh.sub_village_id
+                $whereClause
+            )
             SELECT
-                hh.id,
-                hh.name,
-                hh.household_no,
-                ve.name                  AS village_name,
-                ss.name                  AS shasthya_shebika_name,
-                sv.name                  AS sub_village_name,
+                fh.id,
+                fh.name,
+                fh.household_no,
+                fh.village_name,
+                fh.shasthya_shebika_name,
+                fh.sub_village_name,
                 memberAgg.last_member_registered_at,
-                assessmentAgg.services,
                 MAX(
-                    COALESCE(hh.updated_at, 0),
+                    COALESCE(fh.updated_at, 0),
                     COALESCE(memberAgg.last_member_registered_at, 0),
                     COALESCE(assessmentAgg.last_assessment_at, 0)
                 ) AS last_activity_at
-
-            FROM Household AS hh
-
-            INNER JOIN VillageEntity AS ve
-                ON ve.id = hh.village_id
-
-            INNER JOIN ShasthyaShebikaEntity AS ss
-                ON ss.id = hh.shasthya_shebika_id
-
-            INNER JOIN SubVillageEntity AS sv
-                ON sv.id = hh.sub_village_id
-
+            FROM filtered_households AS fh
             INNER JOIN (
                 SELECT
                     household_id,
                     MAX(updated_at) AS last_member_registered_at
                 FROM HouseholdMember
+                WHERE household_id IN (SELECT id FROM filtered_households)
                 GROUP BY household_id
             ) AS memberAgg
-                ON memberAgg.household_id = hh.id
-
+                ON memberAgg.household_id = fh.id
             LEFT JOIN (
                 SELECT
-                    household_id,
-                    MAX(last_assessment_at) AS last_assessment_at,
-                    '[' || GROUP_CONCAT('"' || serviceProvided || '"') || ']' AS services
-                FROM (
-                    SELECT
-                        hm.household_id,
-                        mah.serviceProvided,
-                        MAX(strftime('%s', mah.visitDate) * 1000) AS last_assessment_at
-                    FROM MemberAssessmentHistory mah
-                    INNER JOIN HouseholdMember hm
-                        ON hm.id = mah.memberId
-                    GROUP BY hm.household_id, mah.serviceProvided
-                    ORDER BY last_assessment_at DESC
-                )
-                GROUP BY household_id
+                    hm.household_id,
+                    MAX(strftime('%s', mah.visitDate) * 1000) AS last_assessment_at
+                FROM MemberAssessmentHistory mah
+                INNER JOIN HouseholdMember hm
+                    ON hm.id = mah.memberId
+                WHERE hm.household_id IN (SELECT id FROM filtered_households)
+                GROUP BY hm.household_id
             ) AS assessmentAgg
-                ON assessmentAgg.household_id = hh.id
-
-            $whereClause
+                ON assessmentAgg.household_id = fh.id
             ORDER BY $orderByClause
             """.trimIndent()
 
-        return getHouseholdsRaw(SimpleSQLiteQuery(sql, args.toTypedArray()))
+        val householdsLiveData = getHouseholdsRaw(SimpleSQLiteQuery(sql, args.toTypedArray()))
+        val result = MediatorLiveData<List<HouseHoldEntityWithLastActivity>>()
+        var latestHouseholds: List<HouseHoldEntityWithLastActivity> = emptyList()
+        var historySource: LiveData<List<MemberAssessmentHistoryWithHouseholdId>>? = null
+
+        fun attachAssessmentHistory(history: List<MemberAssessmentHistoryWithHouseholdId>?) {
+            val grouped = history.orEmpty().groupBy(
+                keySelector = { it.householdId },
+                valueTransform = { it.history },
+            )
+            result.value = latestHouseholds.map { household ->
+                household.apply {
+                    assessmentHistory = grouped[household.id] ?: emptyList()
+                }
+            }
+        }
+
+        result.addSource(householdsLiveData) { households ->
+            latestHouseholds = households
+            historySource?.let { result.removeSource(it) }
+            val householdIds = households.map { it.id }
+            if (householdIds.isEmpty()) {
+                result.value = emptyList()
+                return@addSource
+            }
+            val newHistorySource = getAssessmentHistoryForHouseholds(householdIds)
+            historySource = newHistorySource
+            result.addSource(newHistorySource, ::attachAssessmentHistory)
+        }
+
+        return result
     }
 
     @Query(

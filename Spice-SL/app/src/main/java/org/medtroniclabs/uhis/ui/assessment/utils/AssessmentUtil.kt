@@ -271,10 +271,12 @@ object AssessmentUtil {
 
     private fun isEyeProblemStatus(status: String): Boolean = status in EYE_PROBLEM_STATUSES
 
-    private fun isNcdService(serviceProvided: String?): Boolean =
-        serviceProvided?.lowercase() == MenuConstants.NCD_MENU_ID.lowercase()
+    private fun isNcdService(serviceProvided: String?): Boolean = serviceProvided?.lowercase() == MenuConstants.NCD_MENU_ID.lowercase()
 
-    private fun formatEyeProblemStatus(status: String, context: Context): String {
+    private fun formatEyeProblemStatus(
+        status: String,
+        context: Context,
+    ): String {
         val label = mapAssessmentStatus(status, context)
         if (label.isBlank()) return ""
         return context.getString(R.string.assessment_status_eye_problem, label)
@@ -462,14 +464,32 @@ object AssessmentUtil {
     /**
      * Returns services icon for the given service
      */
-    fun mapServiceToServiceIcon(service: String): Int =
-        when (service.lowercase()) {
-            MenuConstants.PREGNANT_WOMEN_PROFILE.lowercase() -> R.drawable.ic_services_anc
-            RMNCH.ANC.lowercase() -> R.drawable.ic_services_anc
+    fun mapServiceToServiceIcon(service: MemberAssessmentHistoryEntity): Int =
+        when (service.serviceProvided?.lowercase()) {
+            MenuConstants.PREGNANT_WOMEN_PROFILE.lowercase() -> {
+                if (service.customStatus?.contains(AssessmentStatus.HIGH_RISK_PW.name) == true) {
+                    R.drawable.ic_services_anc_high_risk
+                } else {
+                    R.drawable.ic_services_anc
+                }
+            }
+            RMNCH.ANC.lowercase() -> {
+                if (service.customStatus?.contains(AssessmentStatus.HIGH_RISK_PW.name) == true) {
+                    R.drawable.ic_services_anc_high_risk
+                } else {
+                    R.drawable.ic_services_anc
+                }
+            }
             MenuConstants.FP_MENU_ID.lowercase() -> R.drawable.ic_services_family_planning
             RMNCH.CHILD_MENU.lowercase() -> R.drawable.ic_services_child_health
             MenuConstants.PREGNANCY_OUTCOME.lowercase() -> R.drawable.ic_services_pnc
-            RMNCH.PNC_MOTHER_MENU.lowercase() -> R.drawable.ic_services_pnc
+            RMNCH.PNC_MOTHER_MENU.lowercase() -> {
+                if (service.customStatus?.contains(AssessmentStatus.HIGH_RISK_PNC.name) == true) {
+                    R.drawable.ic_services_pnc_high_risk
+                } else {
+                    R.drawable.ic_services_pnc
+                }
+            }
             MenuConstants.NCD_MENU_ID.lowercase() -> R.drawable.ic_services_ncd
             MenuConstants.EYE_CARE_MENU_ID.lowercase() -> R.drawable.ic_services_eye_care
             MenuConstants.CATARACT_MENU_ID.lowercase() -> R.drawable.ic_cataract

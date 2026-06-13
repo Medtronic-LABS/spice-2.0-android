@@ -36,7 +36,7 @@ class HouseholdListAdapter(
         notifyItemRangeInserted(0, list.size)
     }
 
-    inner class HouseholdListViewHolder(val binding: ListItemHouseholdBinding) :
+    class HouseholdListViewHolder(val binding: ListItemHouseholdBinding) :
         RecyclerView.ViewHolder(binding.root) {
         val context: Context = binding.root.context
 
@@ -71,12 +71,13 @@ class HouseholdListAdapter(
         holder.binding.tvSSName.text = item.shasthyaShebikaName
         holder.binding.tvLastVisitDate.text = DateUtils.formatDateToDisplayFormat(item.lastActivityAt)
 
+        val services = item.assessmentHistory.filterNot { it.serviceProvided.isNullOrBlank() }
+
         // If user have received some services, then add their icons beside name
-        if (!item.services.isNullOrEmpty()) {
-            val iconsToShow = item.services
-                .map { service ->
-                    AssessmentUtil.mapServiceToServiceIcon(service)
-                }.filterNot { it == View.NO_ID }
+        if (services.isNotEmpty()) {
+            val iconsToShow = services
+                .map(AssessmentUtil::mapServiceToServiceIcon)
+                .filterNot { it == View.NO_ID }
                 .take(3)
 
             iconsToShow.forEach { iconRes ->
@@ -90,7 +91,7 @@ class HouseholdListAdapter(
                 holder.binding.flexTitle.addView(imageView)
             }
 
-            val remainingCount = item.services.size - iconsToShow.size
+            val remainingCount = services.size - iconsToShow.size
             if (remainingCount > 0) {
                 val textView = TextView(holder.context).apply {
                     layoutParams = ViewGroup.MarginLayoutParams(

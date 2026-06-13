@@ -1,5 +1,6 @@
 package org.medtroniclabs.uhis.ui.household.adapter
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -71,9 +72,18 @@ class MemberAssessmentHistoryAdapter(
                 history.serviceProvided,
                 history.referralStatus,
             )
+            val statusColor = if (
+                currentStatus?.contains(context.getString(R.string.high_risk_pw), true) == true ||
+                currentStatus?.contains(context.getString(R.string.high_risk_pnc), true) == true
+            ) {
+                Color.RED
+            } else {
+                null
+            }
             addSummaryView(
                 context.getString(R.string.current_status),
                 CommonUtils.getStringElse(currentStatus, context.getString(R.string.separator_double_hyphen)),
+                valueColor = statusColor,
             )
             if (AssessmentUtil.shouldShowServiceObservations(service)) {
                 addSummaryView(
@@ -116,10 +126,12 @@ class MemberAssessmentHistoryAdapter(
         private fun addSummaryView(
             name: String,
             value: String,
+            valueColor: Int? = null,
         ) {
             val binding = SummaryListItemBinding.inflate(LayoutInflater.from(view.context))
             binding.tvLabel.text = name
             binding.tvValue.text = value
+            valueColor?.let { binding.tvValue.setTextColor(it) }
             view.addView(binding.root)
         }
     }

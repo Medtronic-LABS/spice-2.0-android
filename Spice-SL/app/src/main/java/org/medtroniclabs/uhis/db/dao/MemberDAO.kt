@@ -1,6 +1,7 @@
 package org.medtroniclabs.uhis.db.dao
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -39,36 +40,26 @@ interface MemberDAO {
 
     @Query(
         """
-                    SELECT
-                        hhm.*,
-                        td.diagnoses,
-                        mahAgg.services AS services,
-                        mahAgg.recent_service_date
-                    FROM householdmember AS hhm
-                    LEFT JOIN TreatmentDetailsEntity AS td ON hhm.fhir_id = td.memberId
-
-                    LEFT JOIN (
-                        SELECT
-                            memberId,
-                            '[' || GROUP_CONCAT('"' || serviceProvided || '"') || ']' AS services,
-                            MAX(last_visit) AS recent_service_date
-                        FROM (
-                            SELECT
-                                mah.memberId,
-                                mah.serviceProvided,
-                                MAX(strftime('%s', mah.visitDate) * 1000) AS last_visit
-                            FROM MemberAssessmentHistory mah
-                            GROUP BY mah.memberId, mah.serviceProvided
-                            ORDER BY last_visit DESC
-                        )
-                        GROUP BY memberId
-                    ) AS mahAgg
-                    ON mahAgg.memberId = hhm.id
-
-                    WHERE hhm.household_id = :houseHoldId
-    """,
+        SELECT
+            hhm.*,
+            td.diagnoses,
+            mahAgg.recent_service_date
+        FROM householdmember AS hhm
+        LEFT JOIN TreatmentDetailsEntity AS td ON hhm.fhir_id = td.memberId
+        LEFT JOIN (
+            SELECT
+                memberId,
+                MAX(strftime('%s', visitDate) * 1000) AS recent_service_date
+            FROM MemberAssessmentHistory
+            GROUP BY memberId
+        ) AS mahAgg
+            ON mahAgg.memberId = hhm.id
+        WHERE hhm.household_id = :houseHoldId
+        """,
     )
-    fun getAllHouseHoldMembersLiveData(houseHoldId: Long): LiveData<List<HouseholdMemberWithTb>>
+    fun getAllHouseHoldMembersLiveDataRaw(houseHoldId: Long): LiveData<List<HouseholdMemberWithTb>>
+
+    fun getAllHouseHoldMembersLiveData(houseHoldId: Long): LiveData<List<HouseholdMemberWithTb>> = attachAssessmentHistoryToMembers(getAllHouseHoldMembersLiveDataRaw(houseHoldId))
 
     @Query("SELECT * FROM HouseHoldMember WHERE household_id = :houseHoldId AND isActive =:aliveStatus")
     fun getAliveHouseHoldMembers(
@@ -452,7 +443,6 @@ interface MemberDAO {
             """
             SELECT
                 hhm.*, td.diagnoses,
-                mahAgg.services AS services,
                 mahAgg.recent_service_date,
                 COALESCE(ss.name, '') AS shasthya_shebika_name,
                 COALESCE(ss.ssId, '') AS shasthya_shebika_ssId,
@@ -471,25 +461,59 @@ interface MemberDAO {
             LEFT JOIN (
                 SELECT
                     memberId,
-                    '[' || GROUP_CONCAT('"' || serviceProvided || '"') || ']' AS services,
-                    MAX(last_visit) AS recent_service_date
-                FROM (
-                    SELECT
-                        mah.memberId,
-                        mah.serviceProvided,
-                        MAX(strftime('%s', mah.visitDate) * 1000) AS last_visit
-                    FROM MemberAssessmentHistory mah
-                    GROUP BY mah.memberId, mah.serviceProvided
-                    ORDER BY last_visit DESC
-                )
+                    MAX(strftime('%s', visitDate) * 1000) AS recent_service_date
+                FROM MemberAssessmentHistory
                 GROUP BY memberId
             ) AS mahAgg
-            ON mahAgg.memberId = hhm.id
+                ON mahAgg.memberId = hhm.id
 
             $whereClause
             $orderByClause
             """.trimIndent()
-        return getServiceMembersRaw(SimpleSQLiteQuery(query, args.toTypedArray()))
+        return attachAssessmentHistoryToMembers(getServiceMembersRaw(SimpleSQLiteQuery(query, args.toTypedArray())))
+    }
+
+    @Query(
+        """
+        SELECT * FROM MemberAssessmentHistory
+        WHERE memberId IN (:memberIds)
+        ORDER BY visitDate DESC, id DESC
+        """,
+    )
+    fun getAssessmentHistoryForMembers(
+        memberIds: List<Long>,
+    ): LiveData<List<MemberAssessmentHistoryEntity>>
+
+    private fun attachAssessmentHistoryToMembers(
+        membersLiveData: LiveData<List<HouseholdMemberWithTb>>,
+    ): LiveData<List<HouseholdMemberWithTb>> {
+        val result = MediatorLiveData<List<HouseholdMemberWithTb>>()
+        var latestMembers: List<HouseholdMemberWithTb> = emptyList()
+        var historySource: LiveData<List<MemberAssessmentHistoryEntity>>? = null
+
+        fun attachHistory(history: List<MemberAssessmentHistoryEntity>?) {
+            val grouped = history.orEmpty().groupBy { it.memberId }
+            result.value = latestMembers.map { member ->
+                member.apply {
+                    assessmentHistory = grouped[member.id] ?: emptyList()
+                }
+            }
+        }
+
+        result.addSource(membersLiveData) { members ->
+            latestMembers = members
+            historySource?.let { result.removeSource(it) }
+            val memberIds = members.map { it.id }
+            if (memberIds.isEmpty()) {
+                result.value = emptyList()
+                return@addSource
+            }
+            val newHistorySource = getAssessmentHistoryForMembers(memberIds)
+            historySource = newHistorySource
+            result.addSource(newHistorySource, ::attachHistory)
+        }
+
+        return result
     }
 
     /**

@@ -29,6 +29,7 @@ object SpiceDatabaseMigration {
      * - Add callType, isWillingToVisitUHC, visitRejectReason, otherVisitRejectReason, unSuccessfulCallReason
      * - Add wrongNumber, calledByUserId, calledByUserName, calledByUserRole
      * - Add [COLUMN_PRACTITIONER_ID], serviceProvidedByName, serviceProvidedByRole, observations to [MEMBER_ASSESSMENT_HISTORY_ENTITY]
+     * - Tracks which role registered the member; used to scope SK external-member lists.
      */
     val MIGRATION_5_6 = object : Migration(5, 6) {
         override fun migrate(db: SupportSQLiteDatabase) {
@@ -56,12 +57,6 @@ object SpiceDatabaseMigration {
             db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN serviceProvidedByName TEXT;")
             db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN serviceProvidedByRole TEXT;")
             db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN observations TEXT;")
-        }
-    }
-
-    /** Tracks which role registered the member; used to scope SK external-member lists. */
-    val MIGRATION_6_7 = object : Migration(6, 7) {
-        override fun migrate(db: SupportSQLiteDatabase) {
             db.execSQL("ALTER TABLE $HOUSEHOLD_MEMBER ADD COLUMN created_by_role_name TEXT;")
         }
     }
