@@ -26,12 +26,12 @@
               {
                 "id": "Combined",
                 "name": "Combined",
-                "cultureValue": "সমন্বিত"
+                "cultureValue": "কম্বাইন্ড"
               },
               {
                 "id": "Single",
                 "name": "Single",
-                "cultureValue": "একক"
+                "cultureValue": "সিঙ্গেল"
               }
             ],
             "orientation": 0,

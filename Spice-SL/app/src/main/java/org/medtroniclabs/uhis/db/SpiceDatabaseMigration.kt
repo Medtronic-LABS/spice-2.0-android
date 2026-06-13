@@ -7,6 +7,7 @@ import org.medtroniclabs.uhis.db.entity.COLUMN_PRACTITIONER_ID
 import org.medtroniclabs.uhis.db.entity.COLUMN_REFERRAL_FACILITY_TYPE
 import org.medtroniclabs.uhis.db.entity.EntitiesName.FOLLOW_UP
 import org.medtroniclabs.uhis.db.entity.EntitiesName.FOLLOW_UP_CALL
+import org.medtroniclabs.uhis.db.entity.EntitiesName.HOUSEHOLD_MEMBER
 import org.medtroniclabs.uhis.db.entity.EntitiesName.MEMBER_ASSESSMENT_HISTORY_ENTITY
 import org.medtroniclabs.uhis.db.entity.INDEX_PRACTITIONER_ID
 
@@ -55,6 +56,13 @@ object SpiceDatabaseMigration {
             db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN serviceProvidedByName TEXT;")
             db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN serviceProvidedByRole TEXT;")
             db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN observations TEXT;")
+        }
+    }
+
+    /** Tracks which role registered the member; used to scope SK external-member lists. */
+    val MIGRATION_6_7 = object : Migration(6, 7) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE $HOUSEHOLD_MEMBER ADD COLUMN created_by_role_name TEXT;")
         }
     }
 }

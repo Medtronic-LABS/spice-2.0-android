@@ -65,8 +65,10 @@ object AssessmentStatusGenerator {
     private fun addEyeProblemStatuses(
         statusList: ArrayList<AssessmentStatus>,
         section: Map<*, *>?,
+        skipNoProblem: Boolean = false,
     ) {
         extractEyeProblemIds(section).forEach { id ->
+            if (skipNoProblem && id == AssessmentDefinedParams.EYE_PROBLEM_NONE) return@forEach
             mapEyeProblemIdToStatus(id)?.let { statusList.add(it) }
         }
     }
@@ -252,6 +254,7 @@ object AssessmentStatusGenerator {
                 addNcdNormalStatusIfApplicable(statusList, referralResult)
                 val ncdMap = map[MenuConstants.NCD_MENU_ID] as Map<*, *>
                 val eyeCareMap = ncdMap[EYE_CARE] as? Map<*, *>
+                addEyeProblemStatuses(statusList, eyeCareMap, skipNoProblem = true)
                 if (YES.equals(eyeCareMap?.get(ID_HAVE_THE_GLASSES_BEEN_SOLD)?.toString(), true)) {
                     statusList.add(AssessmentStatus.GLASSES_SOLD)
                 }

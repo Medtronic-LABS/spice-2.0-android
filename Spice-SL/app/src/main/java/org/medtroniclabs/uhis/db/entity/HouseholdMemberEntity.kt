@@ -68,4 +68,6 @@ data class HouseholdMemberEntity(
     var disability: String? = null,
     @ColumnInfo("qr_code")
     var qrCode: String? = null,
+    @ColumnInfo("created_by_role_name")
+    var createdByRoleName: String? = null,
 ) : BaseEntity()

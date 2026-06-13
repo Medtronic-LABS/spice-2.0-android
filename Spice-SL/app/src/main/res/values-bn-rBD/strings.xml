@@ -229,6 +229,7 @@
     <string name="assessment_status_ncd_service_cataract_camp">ক্যাটারেক্ট ক্যাম্পে এনসিডি সেবা</string>
     <string name="assessment_status_referred_for_operation">অপারেশনের জন্য রেফার</string>
     <string name="assessment_status_glasses_sold">চশমা বিক্রয়</string>
+    <string name="assessment_status_eye_problem">চোখের সমস্যা - %1$s</string>
     <string name="assessment_status_glass_power">পাওয়ার - %1$s</string>
     <string name="assessment_status_cataracts">ছানি</string>
     <string name="assessment_status_lacrimal_tear_duct_problem">নেত্রনালীর সমস্যা</string>
@@ -1638,8 +1639,8 @@
     <string name="referred_for_nfurther_assessment_Upazila">আরও মূল্যায়নের জন্য নিকটস্থ উপজেলা স্বাস্থ্য কমপ্লেক্সে রেফার করুণ</string>
     <string name="services">সেবা প্রদান করুন</string>
 
-    <string name="eye_care">চোখের যত্ন</string>
-    <string name="cataract">ছানি</string>
+    <string name="eye_care">চক্ষু পরীক্ষা</string>
+    <string name="cataract">ক্যাটারাক্ট</string>
     <string name="services_provided">প্রদানকৃত সেবাসমূহ</string>
     <string name="recent_status">সর্বশেষ সেবা</string>
     <string name="service_history">সেবার ইতিহাস</string>

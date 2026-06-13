@@ -31,6 +31,7 @@ object DashboardConstants {
     const val CARD_NCD_SCREENING = "ncd_screening_first_service"
     const val CARD_NCD_REFERRED_FOLLOWUP = "ncd_referred_followup"
     const val CARD_NCD_FOLLOW_UP_ASSESSMENT = "ncd_follow_up_assessment"
+    const val CARD_LINKED_TO_CARE = "linked_to_care"
     const val CARD_TOTAL_NCD_SERVICES = "total_ncd_services"
     const val CARD_TOTAL_EYE_SCREENING = "total_eye_screening"
     const val CARD_CATARACT_SCREENING = "cataract_screening"

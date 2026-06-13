@@ -37,6 +37,7 @@ data class NCDUserDashboardResponse(
     val ncdScreeningFirstServiceCount: Int = 0,
     val ncdFollowUpAssessmentCount: Int = 0,
     val ncdFollowUpReferralCount: Int = 0,
+    val linkedToCareCount: Int = 0,
     val glassesSoldCustomStatusCount: Int = 0,
     val ncdServicesInCataractCampCount: Int = 0,
     val patientsReferredForOperationCount: Int = 0,

@@ -235,6 +235,7 @@
     <string name="assessment_status_ncd_service_cataract_camp">NCD service at cataract camp</string>
     <string name="assessment_status_referred_for_operation">Referred for operation</string>
     <string name="assessment_status_glasses_sold">Glasses sold</string>
+    <string name="assessment_status_eye_problem">Eye Problem - %1$s</string>
     <string name="assessment_status_glass_power">Power - %1$s</string>
     <string name="assessment_status_cataracts">Cataracts</string>
     <string name="assessment_status_lacrimal_tear_duct_problem">Lacrimal (Tear Duct) Problem</string>

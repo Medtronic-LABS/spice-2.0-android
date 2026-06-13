@@ -28,6 +28,7 @@ import org.medtroniclabs.uhis.data.UserProfile
 import org.medtroniclabs.uhis.data.model.ShasthyaKormi
 import org.medtroniclabs.uhis.data.model.ShasthyaShebika
 import org.medtroniclabs.uhis.data.model.SubVillage
+import org.medtroniclabs.uhis.db.entity.ChiefDomEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowConditionEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowEntity
 import org.medtroniclabs.uhis.db.entity.ConsentEntity
@@ -154,14 +155,16 @@ class MetaRepository @Inject constructor(
 
                             chiefdoms?.let { chiefdomList ->
                                 roomHelper.deleteChiefDoms()
-                                roomHelper.saveChiefDoms(chiefdomList)
+                                roomHelper.saveChiefDoms(filterChiefdomsForNurse(chiefdomList))
                             }
 
+                            val nurseVillages = filterVillagesForNurse(villages)
+                            val nurseVillageIds = nurseVillages?.map { it.id }?.toSet() ?: emptySet()
                             deleteAllVillages()
-                            saveVillage(modifiedVillages(villages, userProfile.villages))
+                            saveVillage(modifiedVillages(nurseVillages, userProfile.villages))
                             if (CommonUtils.isNurse()) {
                                 // Save SubVillages which are linked to Nurse
-                                saveSubVillages(subVillages)
+                                saveSubVillages(filterSubVillagesForNurse(subVillages, nurseVillageIds))
                             } else {
                                 // Save SubVillages which are linked to shasthya shebikas
                                 saveSubVillages(shasthyaShebikas?.flatMap { it.subVillages ?: emptyList() })
@@ -732,6 +735,9 @@ class MetaRepository @Inject constructor(
         val clinicalWorkFlowList = mutableListOf<ClinicalWorkflowEntity>()
         val clinicalWorkFlowConditions = mutableListOf<ClinicalWorkflowConditionEntity>()
         clinicalTools.forEach { clinicalWorkflow ->
+            if (!CommonUtils.isSk() && isRmnchClinicalWorkflow(clinicalWorkflow)) {
+                return@forEach
+            }
             clinicalWorkFlowList.add(
                 ClinicalWorkflowEntity(
                     id = clinicalWorkflow.id,
@@ -1183,6 +1189,27 @@ class MetaRepository @Inject constructor(
         return menus.filterNot { CommonUtils.isCataractMenuId(it.menuId) }
     }
 
+    private fun isRmnchClinicalWorkflow(clinicalWorkflow: ClinicalWorkflow): Boolean {
+        if (isRmnchClinicalMenuId(clinicalWorkflow.workflowName)) return true
+        return clinicalWorkflow.conditions?.any { isRmnchClinicalMenuId(it.category) } == true
+    }
+
+    private fun isRmnchClinicalMenuId(menuId: String?): Boolean {
+        if (menuId.isNullOrBlank()) return false
+        return RMNCH_CLINICAL_MENU_IDS.any { menuId.equals(it, ignoreCase = true) }
+    }
+
+    private companion object {
+        private val RMNCH_CLINICAL_MENU_IDS =
+            setOf(
+                MenuConstants.RMNCH_MENU_ID,
+                MenuConstants.FP_MENU_ID,
+                MenuConstants.PREGNANT_WOMEN_PROFILE,
+                MenuConstants.PREGNANCY_OUTCOME,
+                MenuConstants.CBS_MENU_ID,
+            )
+    }
+
     suspend fun getUserProfile(): Resource<UserProfile> =
         try {
             val data = roomHelper.getUserProfile()
@@ -1389,6 +1416,26 @@ class MetaRepository @Inject constructor(
             },
         )
         return chipItemList
+    }
+
+    private fun filterChiefdomsForNurse(chiefdoms: List<ChiefDomEntity>): List<ChiefDomEntity> {
+        if (!CommonUtils.isNurse()) return chiefdoms
+        return chiefdoms.filter { it.isDistrictChiefdom != true }
+    }
+
+    private fun filterVillagesForNurse(villages: List<VillageEntity>?): List<VillageEntity>? {
+        if (!CommonUtils.isNurse()) return villages
+        return villages?.filter { it.isDistrictVillage != true }
+    }
+
+    private fun filterSubVillagesForNurse(
+        subVillages: List<SubVillage>?,
+        villageIds: Set<Long> = emptySet(),
+    ): List<SubVillage>? {
+        if (!CommonUtils.isNurse()) return subVillages
+        return subVillages
+            ?.filter { it.isDistrictSubVillage != true }
+            ?.filter { villageIds.isEmpty() || it.villageId in villageIds }
     }
 
     private suspend fun saveSubVillages(subVillages: List<SubVillage>?) {

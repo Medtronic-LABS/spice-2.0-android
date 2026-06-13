@@ -227,13 +227,20 @@ object AssessmentUtil {
         val effectiveStatus = applyNcdNormalStatusFallback(customStatus, serviceProvided, referralStatus)
         if (effectiveStatus.isEmpty()) return null
 
+        val vitalsStatuses = setOf(
+            AssessmentStatus.UNCONTROLLED_BP.name,
+            AssessmentStatus.UNCONTROLLED_BG.name,
+            AssessmentStatus.CONTROLLED_BP.name,
+            AssessmentStatus.CONTROLLED_BG.name,
+        )
         val hasHighBp = effectiveStatus.contains(AssessmentStatus.UNCONTROLLED_BP.name)
         val hasHighBg = effectiveStatus.contains(AssessmentStatus.UNCONTROLLED_BG.name)
+        val eyeStatuses = effectiveStatus.filter { isEyeProblemStatus(it) }
+        val ncdStatuses = effectiveStatus.filter { it == AssessmentStatus.NORMAL_NCD.name }
         val otherStatuses = effectiveStatus.filter { status ->
-            status != AssessmentStatus.UNCONTROLLED_BP.name &&
-                status != AssessmentStatus.UNCONTROLLED_BG.name &&
-                status != AssessmentStatus.CONTROLLED_BP.name &&
-                status != AssessmentStatus.CONTROLLED_BG.name
+            status !in vitalsStatuses &&
+                !isEyeProblemStatus(status) &&
+                status != AssessmentStatus.NORMAL_NCD.name
         }
 
         val displayParts = mutableListOf<String>()
@@ -245,10 +252,32 @@ object AssessmentUtil {
             hasHighBg ->
                 displayParts.add(context.getString(R.string.high_bg))
         }
+        ncdStatuses.forEach { status ->
+            mapAssessmentStatus(status, context).takeIf { it.isNotBlank() }?.let { displayParts.add(it) }
+        }
+        eyeStatuses.forEach { status ->
+            val display = if (isNcdService(serviceProvided)) {
+                formatEyeProblemStatus(status, context)
+            } else {
+                mapAssessmentStatus(status, context)
+            }
+            display.takeIf { it.isNotBlank() }?.let { displayParts.add(it) }
+        }
         otherStatuses.forEach { status ->
             mapAssessmentStatus(status, context).takeIf { it.isNotBlank() }?.let { displayParts.add(it) }
         }
         return displayParts.takeIf { it.isNotEmpty() }?.joinToString()
+    }
+
+    private fun isEyeProblemStatus(status: String): Boolean = status in EYE_PROBLEM_STATUSES
+
+    private fun isNcdService(serviceProvided: String?): Boolean =
+        serviceProvided?.lowercase() == MenuConstants.NCD_MENU_ID.lowercase()
+
+    private fun formatEyeProblemStatus(status: String, context: Context): String {
+        val label = mapAssessmentStatus(status, context)
+        if (label.isBlank()) return ""
+        return context.getString(R.string.assessment_status_eye_problem, label)
     }
 
     private fun applyNcdNormalStatusFallback(
@@ -644,4 +673,15 @@ object AssessmentUtil {
             }
         } ?: context.getString(R.string.separator_double_hyphen)
     }
+
+    private val EYE_PROBLEM_STATUSES = setOf(
+        AssessmentStatus.CATARACTS.name,
+        AssessmentStatus.LECRIMAL_TEAR_DUCT_PROBLEM.name,
+        AssessmentStatus.PTERYGIUM.name,
+        AssessmentStatus.GLAUCOMA.name,
+        AssessmentStatus.MYOPIA.name,
+        AssessmentStatus.PRESBYOPIA.name,
+        AssessmentStatus.OTHER_EYE_PROBLEM.name,
+        AssessmentStatus.NO_EYE_PROBLEM.name,
+    )
 }

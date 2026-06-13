@@ -51,7 +51,7 @@
             "cultureErrorMessage": "অনুগ্রহ করে শাস্থ্য কর্মী নির্বাচন করুন",
             "family": "locationInformation",
             "fieldName": "SK Name",
-            "titleCulture": "শাস্থ্য কর্মী",
+            "titleCulture": "স্বাস্থ্যকর্মী",
             "id": "shasthya_kormi_id",
             "isEditable": true,
             "isEnabled": true,

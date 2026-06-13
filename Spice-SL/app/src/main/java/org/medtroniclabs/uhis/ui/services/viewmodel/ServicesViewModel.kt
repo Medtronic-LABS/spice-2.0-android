@@ -11,6 +11,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.appextensions.postLoading
 import org.medtroniclabs.uhis.common.CommonUtils
+import org.medtroniclabs.uhis.common.RoleConstant
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberWithTb
 import org.medtroniclabs.uhis.di.IoDispatcher
@@ -108,12 +109,18 @@ class ServicesViewModel @Inject constructor(
                 }
                 Timber.tag("bug_n_bug").d("Time taken for filtered data in seconds : " + members.duration.inWholeSeconds)
                 emitSource(
-                    members.value.map { members ->
+                    members.value.map { memberList ->
+                        val displayMembers =
+                            filterExternalMembersForSkIfNeeded(memberList, filter.staticFilter)
+                        val displayCounts = counts.value.toMutableMap()
+                        if (CommonUtils.isSk() && isSkScopedExternalFilter(filter.staticFilter)) {
+                            displayCounts[filter.staticFilter] = displayMembers.size
+                        }
                         Resource(
                             state = ResourceState.SUCCESS,
                             FilteredMembersUiData(
-                                members = members,
-                                counts = counts.value,
+                                members = displayMembers,
+                                counts = displayCounts,
                             ),
                         )
                     },
@@ -131,6 +138,7 @@ class ServicesViewModel @Inject constructor(
      * Populates [staticFilters] with the member-type options shown in the services dropdown.
      *
      * - FO/PO: all members, NCD, cataract, and eye screening
+     * - SK: all members, NCD and eye screening, plus RMNCH cohort filters
      * - Other roles: all members plus RMNCH and related cohort filters
      *
      * When [isExternalMember] is true, no filters are added because the screen is scoped
@@ -138,13 +146,8 @@ class ServicesViewModel @Inject constructor(
      */
     fun initializeAllowedDropdown(isExternalMember: Boolean = false) {
         if (!isExternalMember) {
-            if (isFoPo) {
-                staticFilters.add(ServiceStaticFilter.ALL_MEMBERS)
-                staticFilters.add(ServiceStaticFilter.NCD_SERVICES)
-                staticFilters.add(ServiceStaticFilter.CATARACT_SCREENING)
-                staticFilters.add(ServiceStaticFilter.EYE_SCREENING)
-            } else {
-                staticFilters.add(ServiceStaticFilter.ALL_MEMBERS)
+            staticFilters.add(ServiceStaticFilter.ALL_MEMBERS)
+            if (!isFoPo) {
                 staticFilters.add(ServiceStaticFilter.EXTERNAL_MEMBERS)
                 staticFilters.add(ServiceStaticFilter.CHILDREN_UNDER_TWO_YEARS)
                 staticFilters.add(ServiceStaticFilter.PREGNANT_WOMEN)
@@ -155,7 +158,18 @@ class ServicesViewModel @Inject constructor(
                 staticFilters.add(ServiceStaticFilter.EXPECTED_DELIVERIES)
                 staticFilters.add(ServiceStaticFilter.PENDING_DELIVERIES)
             }
+            if (isFoPo || CommonUtils.isSk()) {
+                addScreeningServiceFilters(includeCataract = isFoPo)
+            }
         }
+    }
+
+    private fun addScreeningServiceFilters(includeCataract: Boolean) {
+        staticFilters.add(ServiceStaticFilter.NCD_SERVICES)
+        if (includeCataract) {
+            staticFilters.add(ServiceStaticFilter.CATARACT_SCREENING)
+        }
+        staticFilters.add(ServiceStaticFilter.EYE_SCREENING)
     }
 
     /**
@@ -246,5 +260,20 @@ class ServicesViewModel @Inject constructor(
             qrCode = qrCodeString
         }
         filterLiveData.postValue(filter)
+    }
+
+    private fun isSkScopedExternalFilter(staticFilter: ServiceStaticFilter): Boolean =
+        staticFilter == ServiceStaticFilter.EXTERNAL_MEMBERS ||
+            staticFilter == ServiceStaticFilter.EXTERNAL_PREGNANT_WOMEN
+
+    private fun filterExternalMembersForSkIfNeeded(
+        members: List<HouseholdMemberWithTb>,
+        staticFilter: ServiceStaticFilter,
+    ): List<HouseholdMemberWithTb> {
+        if (!CommonUtils.isSk() || !isSkScopedExternalFilter(staticFilter)) return members
+        return members.filter { member ->
+            member.createdByRoleName.isNullOrBlank() ||
+                member.createdByRoleName.equals(RoleConstant.SHASTIYA_KORMI, ignoreCase = true)
+        }
     }
 }

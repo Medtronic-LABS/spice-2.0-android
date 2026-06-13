@@ -897,17 +897,14 @@ class AssessmentViewModel @Inject constructor(
             }
         }
 
-        // Request modification for syncing EyeCare Symptoms to Backend
+        // Eye care: transform eyeTestOutcome only; keep generalInformation (camp_type) under eye_care.
         if (map.containsKey(EYE_CARE_MENU_ID)) {
             val eyeCareMainMap = map[EYE_CARE_MENU_ID] as HashMap<Any, Any>
-            if (eyeCareMainMap.containsKey(EYE_CARE)) {
-                val eyeCareMap = eyeCareMainMap[EYE_CARE] as HashMap<Any, Any>
+            val eyeCareMap = eyeCareMainMap[EYE_CARE] as? HashMap<Any, Any>
+            if (eyeCareMap != null && eyeCareMap.containsKey(EYE_TEST_OUTCOME)) {
                 val eyeTestOutCome = eyeCareMap[EYE_TEST_OUTCOME] as String
                 eyeCareMap[EYE_TEST_OUTCOMES] = listOf(eyeTestOutCome)
-
                 eyeCareMap.remove(EYE_TEST_OUTCOME)
-                map[EYE_CARE] = eyeCareMap
-                map.remove(EYE_CARE_MENU_ID)
             }
         }
 
@@ -1170,7 +1167,7 @@ class AssessmentViewModel @Inject constructor(
     }
 
     /**
-     * Bangladesh FO/PO flows: show camp date (cataract) or camp type (eye care / NCD for PO only)
+     * Bangladesh FO/PO flows: show camp date (cataract) or camp type (eye care / NCD)
      * from assets JSON where those rows default to [gone].
      */
     private fun applyBdCampFieldVisibility(
@@ -1189,7 +1186,7 @@ class AssessmentViewModel @Inject constructor(
                 revealBdCampFields(layout, showCampDate = false, showCampType = true)
             }
             NCD_MENU_ID -> {
-                if (!CommonUtils.isPo()) return
+                if (!CommonUtils.isFoOrPo()) return
                 revealBdCampFields(layout, showCampDate = false, showCampType = true)
             }
             else -> return
@@ -1264,9 +1261,9 @@ class AssessmentViewModel @Inject constructor(
         }
     }
 
-    fun getNearestHealthFacility() {
+    fun getNearestHealthFacility(userSitesOnly: Boolean = false) {
         viewModelScope.launch(dispatcherIO) {
-            nearestFacilityLiveData.postValue(assessmentRepository.getNearestHealthFacility())
+            nearestFacilityLiveData.postValue(assessmentRepository.getNearestHealthFacility(userSitesOnly))
         }
     }
 

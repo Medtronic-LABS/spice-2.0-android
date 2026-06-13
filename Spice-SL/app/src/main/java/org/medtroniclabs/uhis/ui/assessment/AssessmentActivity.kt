@@ -739,7 +739,7 @@ class AssessmentActivity : BaseActivity() {
                     }
                 } else {
                     Intent(this, HouseholdSummaryActivity::class.java).apply {
-                        putExtra(DefinedParams.householdId, viewModel.selectedHouseholdId)
+                        putExtra(DefinedParams.householdId, resolveHouseholdIdForSummary())
                         putExtra(HouseholdDefinedParams.IS_FROM_HOUSEHOLD_REGISTRATION, false)
                     }
                 }
@@ -749,6 +749,16 @@ class AssessmentActivity : BaseActivity() {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
         finish()
+    }
+
+    private fun resolveHouseholdIdForSummary(): Long {
+        if (viewModel.selectedHouseholdId > 0L) {
+            return viewModel.selectedHouseholdId
+        }
+        return viewModel.memberDetailsLiveData.value
+            ?.data
+            ?.householdLocalId
+            ?.takeIf { it > 0L } ?: -1L
     }
 
     private fun getIntentValue() {

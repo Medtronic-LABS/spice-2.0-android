@@ -11,4 +11,6 @@ data class SubVillage(
     val code: String? = null,
     @SerializedName("villageId")
     val villageId: Long,
+    @SerializedName("isDistrictSubVillage")
+    val isDistrictSubVillage: Boolean? = false,
 )

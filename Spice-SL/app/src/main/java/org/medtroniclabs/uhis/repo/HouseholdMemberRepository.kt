@@ -220,6 +220,7 @@ class HouseholdMemberRepository @Inject constructor(
         val currentTime = System.currentTimeMillis()
 
         if (entity == null) {
+            householdMemberEntity.createdByRoleName = SecuredPreference.getRole().takeIf { it.isNotBlank() }
             // If householdId is null, get location fields from form map
             if (householdId == null) {
                 val villageIdFromMap = CommonUtils.getLongOrNull(map[HouseHoldRegistration.VILLAGE_ID])

@@ -378,6 +378,10 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
                 intent.putExtra(MEMBER_ID, it ?: -1)
             }
             intent.putExtra(DOB, memberRegistrationViewModel.memberDob)
+            val householdId = memberRegistrationViewModel.selectedHouseholdId.takeIf { it > 0L }
+                ?: householdRegistrationViewModel.householdId.takeIf { it > 0L }
+                ?: -1L
+            intent.putExtra(DefinedParams.HOUSEHOLD_ID, householdId)
             startActivity(intent)
             (activity as HouseholdActivity).finish()
         } else {

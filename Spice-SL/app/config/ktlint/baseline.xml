@@ -838,6 +838,12 @@
         <error line="86" column="15" source="standard:property-naming" />
         <error line="88" column="15" source="standard:property-naming" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/utils/AssessmentUtil.kt">
+        <error line="274" column="66" source="standard:function-signature" />
+        <error line="277" column="40" source="standard:function-signature" />
+        <error line="277" column="56" source="standard:function-signature" />
+        <error line="277" column="72" source="standard:function-signature" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/boarding/MenuTypeEnums.kt">
         <error line="4" column="5" source="standard:enum-entry-name-case" />
         <error line="5" column="5" source="standard:enum-entry-name-case" />
@@ -846,6 +852,15 @@
         <error line="29" column="9" source="standard:function-naming" />
         <error line="49" column="9" source="standard:function-naming" />
         <error line="88" column="9" source="standard:function-naming" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/dashboard/ncd/viewmodel/NCDDashBoardViewModel.kt">
+        <error line="76" column="40" source="standard:chain-method-continuation" />
+        <error line="76" column="46" source="standard:chain-method-continuation" />
+        <error line="76" column="54" source="standard:chain-method-continuation" />
+        <error line="76" column="69" source="standard:chain-method-continuation" />
+        <error line="82" column="31" source="standard:chain-method-continuation" />
+        <error line="82" column="39" source="standard:chain-method-continuation" />
+        <error line="82" column="54" source="standard:chain-method-continuation" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/landing/viewmodel/OfflineSyncViewModel.kt">
         <error line="3" column="1" source="standard:import-ordering" />

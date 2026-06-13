@@ -13,10 +13,8 @@ import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
 import org.medtroniclabs.uhis.common.DateUtils.DATE_ddMMyyyy
-import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.ViewUtils
 import org.medtroniclabs.uhis.data.CustomDateModel
-import org.medtroniclabs.uhis.data.NCDUserDashboardRequest
 import org.medtroniclabs.uhis.data.NCDUserDashboardResponse
 import org.medtroniclabs.uhis.databinding.FragmentDashboardBinding
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
@@ -31,6 +29,7 @@ import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_FAMILY_PL
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_GLASSES_SOLD
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_HIGH_RISK_PREGNANT_WOMEN
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_HOUSEHOLD_REGISTERED
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_LINKED_TO_CARE
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_NCD_FOLLOW_UP_ASSESSMENT
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_NCD_IN_CATARACT_CAMP
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_NCD_REFERRED_FOLLOWUP
@@ -111,6 +110,7 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
         }
         viewModel.getFilterLiveData().observe(viewLifecycleOwner) { filter ->
             var count = 0
+            if (CommonUtils.isFoOrPo() && filter.filterSk != -1L) count++
             if (filter.filterBySs.isNotEmpty()) count++
             if (filter.filterBySubVillages.isNotEmpty()) count++
             dashboardFilterCount = count
@@ -356,6 +356,16 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
                     ),
                 )
             }
+            if (shouldShowNcdKpis()) {
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_LINKED_TO_CARE,
+                        getString(R.string.linked_to_care),
+                        it.linkedToCareCount,
+                        R.drawable.ic_referred,
+                    ),
+                )
+            }
         }
         binding.rvActivitiesList.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -423,39 +433,23 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
         if (!hasCompleteDateRange()) return
         val endDate =
             DateUtils.convertStringToDate(binding.etToDate.text.toString(), DATE_ddMMyyyy)
-        val request =
-            NCDUserDashboardRequest(
-                customDate =
-                    CustomDateModel(
-                        startDate =
-                            DateUtils.convertDateTimeToDate(
-                                binding.etFromDate.text.toString(),
-                                DATE_ddMMyyyy,
-                                DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
-                                inUTC = true,
-                            ),
-                        endDate =
-                            DateUtils.getEndDate(
-                                endDate,
-                                DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
-                                inUTC = true,
-                            ),
+        viewModel.fetchDashboardForDateRange(
+            CustomDateModel(
+                startDate =
+                    DateUtils.convertDateTimeToDate(
+                        binding.etFromDate.text.toString(),
+                        DATE_ddMMyyyy,
+                        DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
+                        inUTC = true,
                     ),
-                userId = SecuredPreference.getUserFhirId(),
-                filterBySs =
-                    viewModel
-                        .getFilterLiveData()
-                        .value
-                        ?.filterBySs
-                        ?.mapNotNull { it.id },
-                filterBySubVillages =
-                    viewModel
-                        .getFilterLiveData()
-                        .value
-                        ?.filterBySubVillages
-                        ?.mapNotNull { it.id },
-            )
-        viewModel.getUserDashboardDetails(request)
+                endDate =
+                    DateUtils.getEndDate(
+                        endDate,
+                        DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
+                        inUTC = true,
+                    ),
+            ),
+        )
     }
 
     override fun onClick(v: View?) {

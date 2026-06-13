@@ -46,4 +46,6 @@ data class HouseholdMemberWithTb(
     val shasthyaShebikaNameSsId: String? = null,
     @ColumnInfo("sub_village_name")
     val subVillageName: String? = null,
+    @ColumnInfo("created_by_role_name")
+    val createdByRoleName: String? = null,
 )
