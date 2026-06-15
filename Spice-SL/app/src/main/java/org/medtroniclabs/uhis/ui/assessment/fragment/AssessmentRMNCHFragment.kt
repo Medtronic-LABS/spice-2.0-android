@@ -52,9 +52,6 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.muacStatus
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.rootSuffix
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.summaryKey
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.ANCAssessmentEvaluator
-import org.medtroniclabs.uhis.ui.assessment.referrallogic.ANCGaps
-import org.medtroniclabs.uhis.ui.assessment.referrallogic.ANCNonUrgentReferrals
-import org.medtroniclabs.uhis.ui.assessment.referrallogic.ANCUrgentReferrals
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.AnemiaLevel
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.PNCAssessmentEvaluator
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.PNCAssessmentEvaluator.isValueEquals
@@ -65,7 +62,6 @@ import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH.AncPncReferralType
 import org.medtroniclabs.uhis.ui.assessment.viewmodel.AssessmentViewModel
 import java.util.Calendar
 import java.util.Locale
-import kotlin.math.abs
 
 class AssessmentRMNCHFragment :
     BaseFragment(),
@@ -79,7 +75,7 @@ class AssessmentRMNCHFragment :
     private val originalTitles = HashMap<String, String>()
 
     /**
-     * By default non-mandatory
+     * By default, non-mandatory
      */
     private var mandatoryHemoglobin = false
 
@@ -182,7 +178,7 @@ class AssessmentRMNCHFragment :
                 }
 
                 RMNCH.ANC -> {
-                    updateConditionalFieldVisibility()
+                    updateANCConditionalFieldVisibility()
                     updateAllFieldStatuses()
                 }
 
@@ -864,7 +860,7 @@ class AssessmentRMNCHFragment :
                 }
 
                 RMNCH.ANC -> {
-                    updateConditionalFieldVisibility()
+                    updateANCConditionalFieldVisibility()
                     updateAllFieldStatuses()
                 }
 
@@ -896,7 +892,7 @@ class AssessmentRMNCHFragment :
                 pregnancyField.gone()
             }
         }
-        // By default non-mandatory
+        // By default, non-mandatory
         var bloodSugarMandatory = false
 
         if (pncVisitCount <= 1) {
@@ -911,7 +907,6 @@ class AssessmentRMNCHFragment :
 
             if (ancVisitCountForPnc > 0) {
                 // HTN
-                val htnView = formGenerator.getViewByTag(RMNCH.ID_KNOWN_HTN + formGenerator.rootSuffix)
                 disablePncIllnessView(RMNCH.ID_KNOWN_HTN)
                 setPncIllnessValue(RMNCH.ID_KNOWN_HTN) {
                     details?.pregnantWomanExistingIllness?.contains("HTN", true) == true
@@ -1159,7 +1154,7 @@ class AssessmentRMNCHFragment :
     /**
      * Updates field visibility based on ANC visit number and gestational age conditions
      */
-    private fun updateConditionalFieldVisibility() {
+    private fun updateANCConditionalFieldVisibility() {
         val visitNumber = getANCVisitNumber()
         val gestationalAgeWeeks = calculateGestationalAgeInWeeks()
 
@@ -1283,7 +1278,7 @@ class AssessmentRMNCHFragment :
             AssessmentDefinedParams.EDEMA -> evaluateEdemaStatus(value, resultMap)
             AssessmentDefinedParams.TEMPERATURE -> evaluateTemperatureStatus(value)
             AssessmentDefinedParams.PULSE -> evaluatePulseStatus(value)
-            AssessmentDefinedParams.FUNDAL_HEIGHT -> evaluateFundalHeightStatus(value)
+            AssessmentDefinedParams.FUNDAL_HEIGHT -> ANCAssessmentEvaluator.evaluateFundalHeightStatus(value, calculateGestationalAgeInWeeks())
             AssessmentDefinedParams.HEMOGLOBIN -> evaluateHemoglobinStatus(value)
             AssessmentDefinedParams.URINARY_ALBUMIN -> evaluateUrinaryAlbuminStatus(value, resultMap)
             AssessmentDefinedParams.URINARY_SUGAR -> evaluateUrinarySugarStatus(value)
@@ -1296,7 +1291,7 @@ class AssessmentRMNCHFragment :
             AssessmentDefinedParams.BLOOD_SUGAR_FASTING -> evaluateBloodSugarFastingStatus(value)
             AssessmentDefinedParams.BLOOD_SUGAR_RANDOM -> evaluateBloodSugarRandomStatus(value)
             AssessmentDefinedParams.FACILITY_IDENTIFIED_FOR_DELIVERY -> evaluateFacilityIdentifiedForDeliveryStatus(value)
-            Screening.Weight -> evaluateAncWeightStatus(value)
+            Screening.Weight -> ANCAssessmentEvaluator.evaluateAncWeightStatus(value, getANCVisitNumber(), viewModel.pregnancyDetailLiveData.value)
             else -> null
         }
     }
@@ -1343,12 +1338,7 @@ class AssessmentRMNCHFragment :
             }
 
             RMNCH.ID_PULSE -> {
-                val pulse = CommonUtils.getInteger(value)
-                if (pulse !in 60..90) {
-                    AssessmentDefinedParams.STATUS_HIGH_RISK to AssessmentDefinedParams.BN_STATUS_HIGH_RISK
-                } else {
-                    null
-                }
+                evaluatePulseStatus(value)
             }
 
             RMNCH.ID_POSTPARTUM_DANGER_SIGNS -> {
@@ -1469,7 +1459,7 @@ class AssessmentRMNCHFragment :
     private fun evaluateSystolicStatus(value: Any?): Pair<String?, String?>? {
         val systolic = CommonUtils.getDoubleOrNull(value) ?: return null
         if (systolic == 0.0) return null
-        return if (systolic >= AssessmentDefinedParams.BP_SYSTOLIC_THRESHOLD) {
+        return if (systolic >= AssessmentDefinedParams.HIGH_BP_SYSTOLIC_THRESHOLD || systolic <= AssessmentDefinedParams.LOW_BP_SYSTOLIC_THRESHOLD) {
             Pair(AssessmentDefinedParams.STATUS_HIGH_RISK, AssessmentDefinedParams.BN_STATUS_HIGH_RISK)
         } else {
             null
@@ -1482,7 +1472,7 @@ class AssessmentRMNCHFragment :
     private fun evaluateDiastolicStatus(value: Any?): Pair<String?, String?>? {
         val diastolic = CommonUtils.getDoubleOrNull(value) ?: return null
         if (diastolic == 0.0) return null
-        return if (diastolic >= AssessmentDefinedParams.BP_DIASTOLIC_THRESHOLD) {
+        return if (diastolic >= AssessmentDefinedParams.HIGH_BP_DIASTOLIC_THRESHOLD || diastolic <= AssessmentDefinedParams.LOW_BP_DIASTOLIC_THRESHOLD) {
             Pair(AssessmentDefinedParams.STATUS_HIGH_RISK, AssessmentDefinedParams.BN_STATUS_HIGH_RISK)
         } else {
             null
@@ -1502,7 +1492,7 @@ class AssessmentRMNCHFragment :
         // Check BP from individual systolic and diastolic fields
         val systolic = (resultMap[AssessmentDefinedParams.SYSTOLIC] as? String)?.toDouble() ?: 0.0
         val diastolic = (resultMap[AssessmentDefinedParams.DIASTOLIC] as? String)?.toDouble() ?: 0.0
-        val isHighBP = systolic >= AssessmentDefinedParams.BP_SYSTOLIC_THRESHOLD || diastolic >= AssessmentDefinedParams.BP_DIASTOLIC_THRESHOLD
+        val isHighBP = systolic >= AssessmentDefinedParams.HIGH_BP_SYSTOLIC_THRESHOLD || diastolic >= AssessmentDefinedParams.HIGH_BP_DIASTOLIC_THRESHOLD
 
         // Check urinary albumin
         val urinaryAlbumin = resultMap[AssessmentDefinedParams.URINARY_ALBUMIN] as? String
@@ -1553,25 +1543,6 @@ class AssessmentRMNCHFragment :
     }
 
     /**
-     * 6. Fundal Height - High risk if fundal height is not within gestational age ± 2 cm
-     */
-    private fun evaluateFundalHeightStatus(value: Any?): Pair<String?, String?>? {
-        val fundalHeight = (value as? Number)?.toDouble() ?: return null
-        if (fundalHeight == 0.0) return null
-        val gestationalAgeWeeks = calculateGestationalAgeInWeeks() ?: return null
-
-        // Expected fundal height = gestational age in weeks ± 2 cm
-        val expectedMin = gestationalAgeWeeks - AssessmentDefinedParams.FUNDAL_HEIGHT_TOLERANCE_CM
-        val expectedMax = gestationalAgeWeeks + AssessmentDefinedParams.FUNDAL_HEIGHT_TOLERANCE_CM
-
-        return if (fundalHeight !in expectedMin..expectedMax) {
-            Pair(AssessmentDefinedParams.STATUS_HIGH_RISK, AssessmentDefinedParams.BN_STATUS_HIGH_RISK)
-        } else {
-            null
-        }
-    }
-
-    /**
      * 7. Hemoglobin - "Moderate Anemia" if Hb<10, "Severe Anemia" if Hb <8
      */
     private fun evaluateHemoglobinStatus(value: Any?): Pair<String?, String?>? {
@@ -1611,7 +1582,7 @@ class AssessmentRMNCHFragment :
         // Check BP from individual systolic and diastolic fields
         val systolic = (resultMap[AssessmentDefinedParams.SYSTOLIC] as? String)?.toDouble() ?: 0.0
         val diastolic = (resultMap[AssessmentDefinedParams.DIASTOLIC] as? String)?.toDouble() ?: 0.0
-        val isHighBP = systolic >= AssessmentDefinedParams.BP_SYSTOLIC_THRESHOLD || diastolic >= AssessmentDefinedParams.BP_DIASTOLIC_THRESHOLD
+        val isHighBP = systolic >= AssessmentDefinedParams.HIGH_BP_SYSTOLIC_THRESHOLD || diastolic >= AssessmentDefinedParams.HIGH_BP_DIASTOLIC_THRESHOLD
 
         // Check edema
         val edema = resultMap[AssessmentDefinedParams.EDEMA] as? String
@@ -1762,39 +1733,6 @@ class AssessmentRMNCHFragment :
     }
 
     /**
-     * Evaluate : From 2nd ANC visit onwards – Auto-calculate difference in weight from previous ANC visit and highlight abnormal weight gain between ANC visits
-     * i.e, less or more than expected weight gain of 1 kg per 15 days
-     */
-    private fun evaluateAncWeightStatus(value: Any?): Pair<String?, String?>? {
-        val ancVisitNumber = getANCVisitNumber()
-        return if (ancVisitNumber < 2) {
-            // If visit is less than 2 then no need to calculate risk
-            null
-        } else {
-            val weight = CommonUtils.getDouble(value).takeIf { it > 0 }
-            val daysSinceLastVisit = viewModel.pregnancyDetailLiveData.value
-                ?.ancVisitDate
-                ?.let { DateUtils.parseDate(it) }
-                ?.getLongTime()
-                ?.let { DateUtils.getDaysDifference(it) }
-            val previousWeight = viewModel.pregnancyDetailLiveData.value
-                ?.ancWeight
-                ?.takeIf { it > 0 }
-            if (weight == null || daysSinceLastVisit == null || previousWeight == null) {
-                null
-            } else {
-                val weightDiff = abs(weight - previousWeight)
-                val daysForCalculate = daysSinceLastVisit / 15
-                if (weightDiff != daysForCalculate.toDouble()) {
-                    AssessmentDefinedParams.STATUS_ABNORMAL to AssessmentDefinedParams.BN_STATUS_ABNORMAL
-                } else {
-                    null
-                }
-            }
-        }
-    }
-
-    /**
      * Updates status for all fields that need evaluation
      */
     private fun updateAllFieldStatuses() {
@@ -1930,6 +1868,7 @@ class AssessmentRMNCHFragment :
         val urinaryAlbumin = resultMap[RMNCH.ID_URINARY_ALBUMIN] as? String
 
         val isHighBp = PNCAssessmentEvaluator.isHighBp(systolic, diastolic)
+        val isLowBp = PNCAssessmentEvaluator.isLowBp(systolic, diastolic)
         val isEdemaPresent = isValueEquals(edema)
         val isAlbuminPositive = isValueEquals(urinaryAlbumin)
 
@@ -1937,7 +1876,7 @@ class AssessmentRMNCHFragment :
         val bpHighRiskTrigger = isHighBp || (isEdemaPresent && isAlbuminPositive)
 
         // Systolic
-        if (systolic > 0 && bpHighRiskTrigger) {
+        if (systolic > 0 && (bpHighRiskTrigger || isLowBp)) {
             updateFieldTitleWithStatus(
                 AssessmentDefinedParams.SYSTOLIC,
                 emptyList(),
@@ -1949,7 +1888,7 @@ class AssessmentRMNCHFragment :
         }
 
         // Diastolic
-        if (diastolic > 0 && bpHighRiskTrigger) {
+        if (diastolic > 0 && (bpHighRiskTrigger || isLowBp)) {
             updateFieldTitleWithStatus(
                 AssessmentDefinedParams.DIASTOLIC,
                 emptyList(),
@@ -2056,13 +1995,20 @@ class AssessmentRMNCHFragment :
 
         // Evaluate highRiskPregnantWoman
         val (dangerSignsList, hasOtherSelected) = getDangerSignsValues(ancHashMap)
-        val emergencyConditions = evaluateEmergencyReferralConditions(ancHashMap).toMutableList()
-        val nonEmergencyConditions = evaluateNonEmergencyReferralConditions(
+        val emergencyConditions = ANCAssessmentEvaluator
+            .evaluateEmergencyReferralConditions(
+                ancHashMap,
+                getANCVisitNumber(),
+                viewModel.pregnancyDetailLiveData.value,
+                calculateGestationalAgeInWeeks(),
+            ).toMutableList()
+        val nonEmergencyConditions = ANCAssessmentEvaluator.evaluateNonEmergencyReferralConditions(
             ancHashMap,
             viewModel.memberDetailsLiveData.value
                 ?.data
                 ?.dateOfBirth,
             hasOtherSelected,
+            viewModel.pregnancyDetailLiveData.value,
         )
 
         val highRiskMap = hashMapOf<String, Any>()
@@ -2083,154 +2029,11 @@ class AssessmentRMNCHFragment :
         }
 
         // Evaluate gapsInAnc
-        val gapsList = evaluateGapsInANC(ancHashMap)
+        val gapsList =
+            ANCAssessmentEvaluator.evaluateGapsInANC(ancHashMap, calculateGestationalAgeInWeeks(), viewModel.pregnancyDetailLiveData.value, formGenerator)
         if (gapsList.isNotEmpty()) {
             summaryGroup[AssessmentDefinedParams.GAPS_IN_ANC] = gapsList
         }
-    }
-
-    /**
-     * Helper method to get value from nested structure
-     * Checks all ANC form groups first, then top level
-     */
-    private fun getValueFromNestedMap(
-        resultMap: HashMap<String, Any>,
-        key: String,
-    ): Any? {
-        // Check all ANC form groups for the field
-        for (groupId in AssessmentDefinedParams.ANC_FORM_GROUPS) {
-            val groupMap = resultMap[groupId] as? Map<*, *>
-            groupMap?.get(key)?.let { return it }
-        }
-        // If not found in any group, check top level
-        return resultMap[key]
-    }
-
-    /**
-     * Evaluate Emergency Referral conditions
-     * Returns list of condition texts that match
-     */
-    private fun evaluateEmergencyReferralConditions(resultMap: HashMap<String, Any>): List<String> {
-        val conditions = mutableListOf<String>()
-
-        // 1. Suspected Pre-eclampsia
-        if (ANCAssessmentEvaluator.isSuspectedPreEclampsia(resultMap)) {
-            conditions.add(ANCUrgentReferrals.SUSPECTED_PRE_ECLAMPSIA.value + "::" + ANCUrgentReferrals.SUSPECTED_PRE_ECLAMPSIA.cultureValue)
-        }
-
-        // 2. High Fever - >=102F
-        val temperature = (getValueFromNestedMap(resultMap, AssessmentDefinedParams.TEMPERATURE) as? Number)?.toDouble()?.takeIf { it > 0.0 }
-        if (temperature != null && temperature >= AssessmentDefinedParams.TEMP_HIGH_FEVER_THRESHOLD) {
-            conditions.add(ANCUrgentReferrals.HIGH_FEVER.value + "::" + ANCUrgentReferrals.HIGH_FEVER.cultureValue)
-        }
-
-        // 3. Abnormal fundal height
-        val fundalHeightValue = getValueFromNestedMap(resultMap, AssessmentDefinedParams.FUNDAL_HEIGHT)
-        if (evaluateFundalHeightStatus(fundalHeightValue)?.first == AssessmentDefinedParams.STATUS_HIGH_RISK) {
-            conditions.add(ANCUrgentReferrals.ABNORMAL_FUNDAL_HEIGHT.value + "::" + ANCUrgentReferrals.ABNORMAL_FUNDAL_HEIGHT.cultureValue)
-        }
-
-        // 4. Abnormal weight gain
-        val weightValue = getValueFromNestedMap(resultMap, AssessmentDefinedParams.WEIGHT)
-        if (evaluateAncWeightStatus(weightValue)?.first == AssessmentDefinedParams.STATUS_ABNORMAL) {
-            conditions.add(ANCUrgentReferrals.ABNORMAL_WEIGHT_GAIN.value + "::" + ANCUrgentReferrals.ABNORMAL_WEIGHT_GAIN.cultureValue)
-        }
-
-        // 5. Pulse - >90 or <60
-        val pulse = (getValueFromNestedMap(resultMap, AssessmentDefinedParams.PULSE) as? Number)?.toDouble()?.takeIf { it > 0.0 }
-        if (pulse != null && (pulse > AssessmentDefinedParams.PULSE_HIGH_THRESHOLD || pulse < AssessmentDefinedParams.PULSE_LOW_THRESHOLD)) {
-            conditions.add(ANCUrgentReferrals.ABNORMAL_PULSE.value + "::" + ANCUrgentReferrals.ABNORMAL_PULSE.cultureValue)
-        }
-
-        // 6. Severe Anemia <8g/dl
-        val hemoglobin = (getValueFromNestedMap(resultMap, AssessmentDefinedParams.HEMOGLOBIN) as? Number)?.toDouble()?.takeIf { it > 0.0 }
-        if (hemoglobin != null && hemoglobin < AssessmentDefinedParams.HEMOGLOBIN_SEVERE_ANEMIA_THRESHOLD) {
-            conditions.add(ANCUrgentReferrals.SEVERE_ANEMIA.value + "::" + ANCUrgentReferrals.SEVERE_ANEMIA.cultureValue)
-        }
-
-        // 7. Urinary Bilirubin present
-        val urinaryBilirubin = getValueFromNestedMap(resultMap, AssessmentDefinedParams.URINARY_BILIRUBIN) as? String
-        if (urinaryBilirubin == AssessmentDefinedParams.VALUE_PRESENT) {
-            conditions.add(ANCUrgentReferrals.URINARY_BILIRUBIN.value + "::" + ANCUrgentReferrals.URINARY_BILIRUBIN.cultureValue)
-        }
-
-        // 8. PW with existing chronic illnesses and not on treatment
-        if (ANCAssessmentEvaluator.hasChronicIllnessNotOnTreatment(resultMap)) {
-            conditions.add(ANCUrgentReferrals.CHRONIC_ILLNESS_NOT_ON_TREATMENT.value + "::" + ANCUrgentReferrals.CHRONIC_ILLNESS_NOT_ON_TREATMENT.cultureValue)
-        }
-
-        return conditions
-    }
-
-    /**
-     * Evaluate Non-Emergency Referral conditions
-     * Returns list of condition texts that match
-     * @param hasOtherSelected If true, adds "Any Other" to the conditions (when "other" option is selected in danger signs)
-     */
-    private fun evaluateNonEmergencyReferralConditions(
-        resultMap: HashMap<String, Any>,
-        dateOfBirth: String?,
-        hasOtherSelected: Boolean = false,
-    ): List<String> {
-        val conditions = mutableListOf<String>()
-
-        // 1. High risk pregnancy (short birth spacing <2 years/Age <18 years or >35 years/Multipara>3)
-        if (ANCAssessmentEvaluator.isHighRiskPregnancy(dateOfBirth, viewModel.pregnancyDetailLiveData.value)) {
-            conditions.add(ANCNonUrgentReferrals.HIGH_RISK_PREGNANCY.value + "::" + ANCNonUrgentReferrals.HIGH_RISK_PREGNANCY.cultureValue)
-        }
-
-        // 2. Moderate Anemia (Hb-<10)
-        val hemoglobin = (getValueFromNestedMap(resultMap, AssessmentDefinedParams.HEMOGLOBIN) as? Number)?.toDouble()?.takeIf { it > 0.0 }
-        if (hemoglobin != null &&
-            hemoglobin < AssessmentDefinedParams.HEMOGLOBIN_MODERATE_ANEMIA_THRESHOLD &&
-            hemoglobin >= AssessmentDefinedParams.HEMOGLOBIN_SEVERE_ANEMIA_THRESHOLD
-        ) {
-            conditions.add(ANCNonUrgentReferrals.MODERATE_ANEMIA.value + "::" + ANCNonUrgentReferrals.MODERATE_ANEMIA.cultureValue)
-        }
-
-        // 3. Mild Anemia (Hb < 11)
-        if (hemoglobin != null &&
-            hemoglobin >= AssessmentDefinedParams.HEMOGLOBIN_MODERATE_ANEMIA_THRESHOLD &&
-            hemoglobin < AssessmentDefinedParams.HEMOGLOBIN_MILD_ANEMIA_THRESHOLD
-        ) {
-            conditions.add(ANCNonUrgentReferrals.MILD_ANEMIA.value + "::" + ANCNonUrgentReferrals.MILD_ANEMIA.cultureValue)
-        }
-
-        // 4. Suspected/Existing Case of Diabetes
-        if (ANCAssessmentEvaluator.isSuspectedDiabetes(resultMap)) {
-            conditions.add(ANCNonUrgentReferrals.SUSPECTED_DIABETES.value + "::" + ANCNonUrgentReferrals.SUSPECTED_DIABETES.cultureValue)
-        }
-
-        // 5. PW with existing chronic illnesses with treatment
-        if (ANCAssessmentEvaluator.hasChronicIllnessWithTreatment(resultMap)) {
-            conditions.add(
-                ANCNonUrgentReferrals.CHRONIC_ILLNESS_WITH_TREATMENT.value + "::" + ANCNonUrgentReferrals.CHRONIC_ILLNESS_WITH_TREATMENT.cultureValue,
-            )
-        }
-
-        // 6. Mild Fever - 100-101.9
-        val temperature = (getValueFromNestedMap(resultMap, AssessmentDefinedParams.TEMPERATURE) as? Number)?.toDouble()?.takeIf { it > 0.0 }
-        if (temperature != null &&
-            temperature >= AssessmentDefinedParams.TEMP_FEVER_MIN_THRESHOLD &&
-            temperature <= AssessmentDefinedParams.TEMP_FEVER_MAX_THRESHOLD
-        ) {
-            conditions.add(ANCNonUrgentReferrals.MILD_FEVER.value + "::" + ANCNonUrgentReferrals.MILD_FEVER.cultureValue)
-        }
-
-        // 7. H/O Preg related medical complications (H/O Convulsions/ H/O Postpartum hemorrhage/H/O Severe Anemia /H/O GDM)
-        if (ANCAssessmentEvaluator.hasPregnancyRelatedMedicalComplications(resultMap)) {
-            conditions.add(
-                ANCNonUrgentReferrals.PREGNANCY_RELATED_MEDICAL_COMPLICATIONS.value + "::" +
-                    ANCNonUrgentReferrals.PREGNANCY_RELATED_MEDICAL_COMPLICATIONS.cultureValue,
-            )
-        }
-
-        // 8. Any Other - if "other" option is selected in danger signs
-        if (hasOtherSelected) {
-            conditions.add(ANCNonUrgentReferrals.OTHER.value + "::" + ANCNonUrgentReferrals.OTHER.cultureValue)
-        }
-
-        return conditions
     }
 
     /**
@@ -2278,86 +2081,6 @@ class AssessmentRMNCHFragment :
             }
         }
         return Pair(dangerSignsList, hasOtherSelected)
-    }
-
-    /**
-     * Evaluate all gap conditions in ANC
-     * Returns list of gap condition texts that match
-     */
-    private fun evaluateGapsInANC(resultMap: HashMap<String, Any>): List<String> {
-        val gaps = mutableListOf<String>()
-
-        // Calculate gestational age for conditions that need it
-        val gestationalAgeWeeks = calculateGestationalAgeInWeeks()
-
-        // 1. TT vaccination incomplete >20 weeks
-        val ttTdCompleted = getValueFromNestedMap(resultMap, AssessmentDefinedParams.TT_TD_COMPLETED) as? String
-        if ((gestationalAgeWeeks ?: 0.0) > AssessmentDefinedParams.GESTATIONAL_AGE_WEEK_20 &&
-            (
-                ttTdCompleted.isNullOrBlank() ||
-                    ttTdCompleted.equals(AssessmentDefinedParams.NO, ignoreCase = true)
-            )
-        ) {
-            gaps.add(ANCGaps.TT_VACCINATION_INCOMPLETE.value + "::" + ANCGaps.TT_VACCINATION_INCOMPLETE.cultureValue)
-        }
-
-        // 2. USG not done >36 weeks
-        val ultrasound = getValueFromNestedMap(resultMap, AssessmentDefinedParams.ULTRASOUND) as? String
-        if (ultrasound != null &&
-            ultrasound.equals(AssessmentDefinedParams.VALUE_NOT_DONE, ignoreCase = true) &&
-            gestationalAgeWeeks != null &&
-            gestationalAgeWeeks > AssessmentDefinedParams.GESTATIONAL_AGE_WEEK_36
-        ) {
-            gaps.add(ANCGaps.USG_NOT_DONE.value + "::" + ANCGaps.USG_NOT_DONE.cultureValue)
-        }
-
-        // 3. ANC with Doctor not done >36 weeks
-        val ancFromDoctor = getValueFromNestedMap(resultMap, AssessmentDefinedParams.ANC_FROM_MEDICAL_DOCTOR) as? String
-        if (ancFromDoctor != null &&
-            ancFromDoctor.equals(AssessmentDefinedParams.VALUE_NO, ignoreCase = true) &&
-            gestationalAgeWeeks != null &&
-            gestationalAgeWeeks > AssessmentDefinedParams.GESTATIONAL_AGE_WEEK_36
-        ) {
-            gaps.add(ANCGaps.ANC_WITH_DOCTOR_NOT_DONE.value + "::" + ANCGaps.ANC_WITH_DOCTOR_NOT_DONE.cultureValue)
-        }
-
-        // 4. Less than 3 ANCs completed at end of 36 weeks
-        val ancVisitNo = viewModel.pregnancyDetailLiveData.value?.ancVisitNo ?: 0L
-        if (ancVisitNo < AssessmentDefinedParams.MIN_ANC_VISITS_REQUIRED &&
-            gestationalAgeWeeks != null &&
-            gestationalAgeWeeks >= AssessmentDefinedParams.GESTATIONAL_AGE_WEEK_36
-        ) {
-            gaps.add(ANCGaps.LESS_THAN_3_ANCS.value + "::" + ANCGaps.LESS_THAN_3_ANCS.cultureValue)
-        }
-
-        // 5. Inadequate /Non consumption IFA
-        if (formGenerator.isViewVisible(AssessmentDefinedParams.IFA_TOTAL_CONSUMED)) {
-            val ifaConsumed = (getValueFromNestedMap(resultMap, AssessmentDefinedParams.IFA_TOTAL_CONSUMED) as? String)?.toIntOrNull()
-            if (ifaConsumed == null || ifaConsumed < AssessmentDefinedParams.TABLET_CONSUMPTION_THRESHOLD) {
-                gaps.add(ANCGaps.INADEQUATE_IFA.value + "::" + ANCGaps.INADEQUATE_IFA.cultureValue)
-            }
-        }
-
-        // 6. Inadequate /Non consumption Calcium
-        if (formGenerator.isViewVisible(AssessmentDefinedParams.CALCIUM_TOTAL_CONSUMED)) {
-            val calciumConsumed = (getValueFromNestedMap(resultMap, AssessmentDefinedParams.CALCIUM_TOTAL_CONSUMED) as? String)?.toIntOrNull()
-            if (calciumConsumed == null || calciumConsumed < AssessmentDefinedParams.TABLET_CONSUMPTION_THRESHOLD) {
-                gaps.add(ANCGaps.INADEQUATE_CALCIUM.value + "::" + ANCGaps.INADEQUATE_CALCIUM.cultureValue)
-            }
-        }
-
-        // 7. Facility not identified for institutional delivery
-        val facilityIdentified = getValueFromNestedMap(resultMap, AssessmentDefinedParams.FACILITY_IDENTIFIED_FOR_DELIVERY) as? String
-        if (facilityIdentified == AssessmentDefinedParams.FACILITY_NOT_IDENTIFIED) {
-            gaps.add(ANCGaps.FACILITY_NOT_IDENTIFIED.value + "::" + ANCGaps.FACILITY_NOT_IDENTIFIED.cultureValue)
-        }
-
-        // 8. Planned for Home Delivery
-        if (facilityIdentified == AssessmentDefinedParams.FACILITY_HOME_DELIVERY) {
-            gaps.add(ANCGaps.PLANNED_HOME_DELIVERY.value + "::" + ANCGaps.PLANNED_HOME_DELIVERY.cultureValue)
-        }
-
-        return gaps
     }
 
     /**

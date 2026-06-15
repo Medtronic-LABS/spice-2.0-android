@@ -183,8 +183,15 @@ object PNCAssessmentEvaluator {
             val isKnownHtn = isValueEquals(maternalAssessment[RMNCH.ID_KNOWN_HTN], DefinedParams.YES)
             val isEclampsia = isValueEquals(maternalAssessment[RMNCH.ID_ECLAMPSIA], DefinedParams.YES)
             val isOnTreatmentHtn = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_HTN_ECLAMPSIA], DefinedParams.YES)
+            val systolic = CommonUtils.getInteger(maternalAssessment[AssessmentDefinedParams.SYSTOLIC])
+            val diastolic = CommonUtils.getInteger(maternalAssessment[AssessmentDefinedParams.DIASTOLIC])
 
-            // 5. On treatment for HTN or Pre-eclampsia / Eclampsia
+            // 5. Low BP
+            if (isLowBp(systolic, diastolic)) {
+                nonUrgentReferral.add(PNCNonUrgentReferrals.LOW_BP.value + "::" + PNCNonUrgentReferrals.LOW_BP.cultureValue)
+            }
+
+            // 6. On treatment for HTN or Pre-eclampsia / Eclampsia
             if ((isKnownHtn || isEclampsia) && isOnTreatmentHtn) {
                 nonUrgentReferral.add(
                     PNCNonUrgentReferrals.HTN_ECLAMPSIA_ON_TREATMENT.value + "::" + PNCNonUrgentReferrals.HTN_ECLAMPSIA_ON_TREATMENT.cultureValue,
@@ -195,12 +202,12 @@ object PNCAssessmentEvaluator {
             val gdmPatient = isValueEquals(maternalAssessment[RMNCH.ID_GDM_PATIENT], DefinedParams.YES_SMALL)
             val onTreatmentDmGdm = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_DM_GDM], DefinedParams.YES)
 
-            // 6. On treatment for DM/GDM
+            // 7. On treatment for DM/GDM
             if ((dmPatient || gdmPatient) && onTreatmentDmGdm) {
                 nonUrgentReferral.add(PNCNonUrgentReferrals.DM_GDM_ON_TREATMENT.value + "::" + PNCNonUrgentReferrals.DM_GDM_ON_TREATMENT.cultureValue)
             }
 
-            // 7. Other
+            // 8. Other
             (maternalAssessment[RMNCH.ID_POSTPARTUM_DANGER_SIGNS] as? List<*>)?.let { dangerSigns ->
                 val selectedSigns = dangerSigns
                     .filterIsInstance<Map<String, Any>>()
@@ -219,7 +226,7 @@ object PNCAssessmentEvaluator {
 
     /**
      * Identifies care gaps in supplementation and contraception for the PNC period.
-     * Supplementation gaps (Vitamin A, IFA, Calcium) are grouped into a single reason.
+     * Supplementation gaps (vitamin A, IFA, Calcium) are grouped into a single reason.
      *
      * @param resultMap The assessment result map containing maternal health and contraception data.
      * @return A list of strings representing the care gaps found.
@@ -290,9 +297,11 @@ object PNCAssessmentEvaluator {
                     hb < AssessmentDefinedParams.HEMOGLOBIN_SEVERE_ANEMIA_THRESHOLD -> {
                         level = AnemiaLevel.Severe
                     }
+
                     hb < AssessmentDefinedParams.HEMOGLOBIN_MODERATE_ANEMIA_THRESHOLD -> {
                         level = AnemiaLevel.Moderate
                     }
+
                     hb < AssessmentDefinedParams.HEMOGLOBIN_MILD_ANEMIA_THRESHOLD -> {
                         level = AnemiaLevel.Mild
                     }
@@ -326,8 +335,24 @@ object PNCAssessmentEvaluator {
         diastolic: Int,
     ): Boolean {
         if (systolic <= 0 && diastolic <= 0) return false
-        return systolic >= AssessmentDefinedParams.BP_SYSTOLIC_THRESHOLD.toInt() ||
-            diastolic >= AssessmentDefinedParams.BP_DIASTOLIC_THRESHOLD.toInt()
+        return systolic >= AssessmentDefinedParams.HIGH_BP_SYSTOLIC_THRESHOLD.toInt() ||
+            diastolic >= AssessmentDefinedParams.HIGH_BP_DIASTOLIC_THRESHOLD.toInt()
+    }
+
+    /**
+     * Checks if blood pressure below defined limits for given systolic and diastolic values.
+     *
+     * @param systolic The systolic pressure value.
+     * @param diastolic The diastolic pressure value.
+     * @return True if either value below its respective limit, false otherwise.
+     */
+    fun isLowBp(
+        systolic: Int,
+        diastolic: Int,
+    ): Boolean {
+        if (systolic <= 0 && diastolic <= 0) return false
+        return systolic <= AssessmentDefinedParams.LOW_BP_SYSTOLIC_THRESHOLD.toInt() ||
+            diastolic <= AssessmentDefinedParams.LOW_BP_DIASTOLIC_THRESHOLD.toInt()
     }
 
     /**
