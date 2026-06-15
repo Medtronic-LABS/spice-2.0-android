@@ -1,5 +1,6 @@
 package org.medtroniclabs.uhis.db.dao
 
+import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.room.Dao
@@ -17,6 +18,7 @@ import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineSyncStatus
 import org.medtroniclabs.uhis.db.entity.HouseholdEntity
 import org.medtroniclabs.uhis.db.entity.HouseholdMemberEntity
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
+import org.medtroniclabs.uhis.db.entity.MemberServiceIconRow
 import org.medtroniclabs.uhis.model.MemberDobGenderModel
 import org.medtroniclabs.uhis.model.assessment.AssessmentMemberDetails
 import org.medtroniclabs.uhis.model.services.ServiceStaticFilter
@@ -43,17 +45,11 @@ interface MemberDAO {
         SELECT
             hhm.*,
             td.diagnoses,
-            mahAgg.recent_service_date
+            (SELECT MAX(strftime('%s', visitDate) * 1000)
+             FROM MemberAssessmentHistory mah
+             WHERE mah.memberId = hhm.id) AS recent_service_date
         FROM householdmember AS hhm
         LEFT JOIN TreatmentDetailsEntity AS td ON hhm.fhir_id = td.memberId
-        LEFT JOIN (
-            SELECT
-                memberId,
-                MAX(strftime('%s', visitDate) * 1000) AS recent_service_date
-            FROM MemberAssessmentHistory
-            GROUP BY memberId
-        ) AS mahAgg
-            ON mahAgg.memberId = hhm.id
         WHERE hhm.household_id = :houseHoldId
         """,
     )
@@ -300,178 +296,29 @@ interface MemberDAO {
         allowNullHousehold: Boolean = false,
         qrCode: String? = null,
     ): LiveData<List<HouseholdMemberWithTb>> {
-        val args = mutableListOf<Any>()
-        val conditions = mutableListOf<String>()
-
-        // Check if this is an external-members scoped filter
-        val isExternalMember =
-            staticFilter == ServiceStaticFilter.EXTERNAL_MEMBERS ||
-                staticFilter == ServiceStaticFilter.EXTERNAL_PREGNANT_WOMEN
-
-        val useOptionalHouseholdJoins = isExternalMember || allowNullHousehold
-
-        if (staticFilter != ServiceStaticFilter.EXTERNAL_MEMBERS &&
-            staticFilter != ServiceStaticFilter.ALL_MEMBERS &&
-            staticFilter != ServiceStaticFilter.CHILDREN_UNDER_TWO_YEARS
-        ) {
-            conditions += ServiceFilterConditions.IS_ACTIVE
-        }
-
-        if (!searchInput.isNullOrBlank()) {
-            conditions += "(hhm.name LIKE ? OR hhm.phone_number LIKE ?)"
-            val pattern = "%${searchInput.trim()}%"
-            args += pattern
-            args += pattern
-        }
-
-        // Search by QR code
-        if (!qrCode.isNullOrBlank()) {
-            conditions += "hhm.qr_code LIKE ?"
-
-            val qrPattern = "%${qrCode.trim()}%"
-            args += qrPattern
-        }
-
-        if (filterBySubVillages.isNotEmpty() || filterBySs.isNotEmpty()) {
-            val subVillageColumn = if (useOptionalHouseholdJoins) "hhm.sub_village_id" else "hh.sub_village_id"
-            val subVillageFilterConditions = mutableListOf<String>()
-            if (filterBySubVillages.isNotEmpty()) {
-                subVillageFilterConditions += "$subVillageColumn IN (${filterBySubVillages.joinToString(",") { "?" }})"
-                args.addAll(filterBySubVillages)
-            } else {
-                val ssPlaceholders = filterBySs.joinToString(",") { "?" }
-                subVillageFilterConditions +=
-                    """
-                    $subVillageColumn IN (
-                        SELECT DISTINCT sslv.subVillageId
-                        FROM ShasthyaShebikaLinkedVillageEntity AS sslv
-                        WHERE sslv.shasthyaShebikaId IN ($ssPlaceholders)
-                    )
-                    """.trimIndent()
-                args.addAll(filterBySs)
-            }
-            conditions += "(${subVillageFilterConditions.joinToString(" OR ")})"
-        }
-
-        when (staticFilter) {
-            ServiceStaticFilter.FAMILY_PLANNING_COUNSELLING_ELIGIBLE -> {
-                conditions += ServiceFilterConditions.FAMILY_PLANNING
-            }
-            ServiceStaticFilter.PREGNANT_WOMEN -> {
-                conditions += ServiceFilterConditions.PREGNANT_WOMEN
-            }
-            ServiceStaticFilter.POSTNATAL_CARE_MOTHERS -> {
-                conditions += ServiceFilterConditions.POSTNATAL_MOTHERS
-            }
-            ServiceStaticFilter.CHILDREN_UNDER_TWO_YEARS -> {
-                conditions += ServiceFilterConditions.CHILDREN_UNDER_TWO
-            }
-            ServiceStaticFilter.EXPECTED_DELIVERIES -> {
-                conditions += ServiceFilterConditions.EXPECTED_DELIVERIES
-            }
-            ServiceStaticFilter.PENDING_DELIVERIES -> {
-                conditions += ServiceFilterConditions.PENDING_DELIVERIES
-            }
-            ServiceStaticFilter.HIGH_RISK_PREGNANT_WOMEN -> {
-                conditions += ServiceFilterConditions.HIGH_RISK_PREGNANT_WOMEN
-            }
-            ServiceStaticFilter.EXTERNAL_MEMBERS -> {
-                conditions += ServiceFilterConditions.EXTERNAL_MEMBER
-            }
-            ServiceStaticFilter.EXTERNAL_PREGNANT_WOMEN -> {
-                conditions += ServiceFilterConditions.EXTERNAL_MEMBER
-                conditions += ServiceFilterConditions.PREGNANT_WOMEN
-            }
-            ServiceStaticFilter.NCD_SERVICES -> {
-                conditions += ServiceFilterConditions.HAS_NCD_SERVICE_HISTORY
-            }
-            ServiceStaticFilter.CATARACT_SCREENING -> {
-                conditions += ServiceFilterConditions.HAS_CATARACT_SCREENING_HISTORY
-            }
-            ServiceStaticFilter.EYE_SCREENING -> {
-                conditions += ServiceFilterConditions.HAS_EYE_SCREENING_HISTORY
-            }
-            else -> {}
-        }
-
-        val whereClause = if (conditions.isEmpty()) {
-            ""
-        } else {
-            "WHERE ${conditions.joinToString(" AND ")}"
-        }
-
-        // External / FO–PO without household: LEFT JOIN so household_id may be NULL
-        val householdJoin = if (useOptionalHouseholdJoins) {
-            "LEFT JOIN Household AS hh ON hh.id = hhm.household_id"
-        } else {
-            "INNER JOIN Household AS hh ON hh.id = hhm.household_id"
-        }
-
-        val ssJoin = if (useOptionalHouseholdJoins) {
-            "LEFT JOIN ShasthyaShebikaEntity AS ss ON hhm.shasthya_shebika_id = ss.id"
-        } else {
-            "INNER JOIN ShasthyaShebikaEntity AS ss ON ss.id = hh.shasthya_shebika_id"
-        }
-
-        val svJoin = if (useOptionalHouseholdJoins) {
-            "LEFT JOIN SubVillageEntity AS sv ON hhm.sub_village_id = sv.id"
-        } else {
-            "INNER JOIN SubVillageEntity AS sv ON sv.id = hh.sub_village_id"
-        }
-
-        val latestPregnancyEddExpr =
-            """
-            (
-                SELECT substr(lp.estimatedDeliveryDate, 1, 10)
-                FROM (${ServiceFilterConditions.LATEST_PREGNANCY_SUBQUERY}) AS lp
-            )
-            """.trimIndent()
-
-        val orderByClause = when (staticFilter) {
-            ServiceStaticFilter.EXPECTED_DELIVERIES -> {
-                "ORDER BY $latestPregnancyEddExpr ASC, hhm.id DESC"
-            }
-            ServiceStaticFilter.PENDING_DELIVERIES -> {
-                "ORDER BY $latestPregnancyEddExpr DESC, hhm.id DESC"
-            }
-            else -> {
-                "ORDER BY COALESCE(mahAgg.recent_service_date, hhm.created_at) DESC, hhm.id DESC"
-            }
-        }
-
-        val query =
-            """
-            SELECT
-                hhm.*, td.diagnoses,
-                mahAgg.recent_service_date,
-                COALESCE(ss.name, '') AS shasthya_shebika_name,
-                COALESCE(ss.ssId, '') AS shasthya_shebika_ssId,
-                COALESCE(sv.name, '') AS sub_village_name
-            FROM householdmember AS hhm
-
-            $householdJoin
-
-            $ssJoin
-
-            $svJoin
-
-            LEFT JOIN TreatmentDetailsEntity AS td
-                ON hhm.fhir_id = td.memberId
-
-            LEFT JOIN (
-                SELECT
-                    memberId,
-                    MAX(strftime('%s', visitDate) * 1000) AS recent_service_date
-                FROM MemberAssessmentHistory
-                GROUP BY memberId
-            ) AS mahAgg
-                ON mahAgg.memberId = hhm.id
-
-            $whereClause
-            $orderByClause
-            """.trimIndent()
-        return attachAssessmentHistoryToMembers(getServiceMembersRaw(SimpleSQLiteQuery(query, args.toTypedArray())))
+        val query = ServiceMemberQueryBuilder.buildListQuery(
+            searchInput = searchInput,
+            filterBySs = filterBySs,
+            filterBySubVillages = filterBySubVillages,
+            staticFilter = staticFilter,
+            allowNullHousehold = allowNullHousehold,
+            qrCode = qrCode,
+        )
+        return attachAssessmentHistoryToMembers(getServiceMembersRaw(query))
     }
+
+    @Query(
+        """
+        SELECT memberId, serviceProvided, visitDate
+        FROM MemberAssessmentHistory
+        WHERE memberId IN (:memberIds)
+            AND serviceProvided IS NOT NULL AND serviceProvided != ''
+        ORDER BY visitDate DESC, id DESC
+        """,
+    )
+    fun getServiceIconsForMembers(
+        memberIds: List<Long>,
+    ): LiveData<List<MemberServiceIconRow>>
 
     @Query(
         """
@@ -489,13 +336,22 @@ interface MemberDAO {
     ): LiveData<List<HouseholdMemberWithTb>> {
         val result = MediatorLiveData<List<HouseholdMemberWithTb>>()
         var latestMembers: List<HouseholdMemberWithTb> = emptyList()
-        var historySource: LiveData<List<MemberAssessmentHistoryEntity>>? = null
+        var historySource: LiveData<List<MemberServiceIconRow>>? = null
 
-        fun attachHistory(history: List<MemberAssessmentHistoryEntity>?) {
+        fun attachHistory(history: List<MemberServiceIconRow>?) {
             val grouped = history.orEmpty().groupBy { it.memberId }
             result.value = latestMembers.map { member ->
                 member.apply {
-                    assessmentHistory = grouped[member.id] ?: emptyList()
+                    assessmentHistory = grouped[member.id].orEmpty().map { row ->
+                        MemberAssessmentHistoryEntity(
+                            memberId = row.memberId,
+                            visitDate = row.visitDate,
+                            serviceProvided = row.serviceProvided,
+                            latestVisit = false,
+                            referralStatus = null,
+                            referralReason = null,
+                        )
+                    }
                 }
             }
         }
@@ -508,7 +364,7 @@ interface MemberDAO {
                 result.value = emptyList()
                 return@addSource
             }
-            val newHistorySource = getAssessmentHistoryForMembers(memberIds)
+            val newHistorySource = getServiceIconsForMembers(memberIds)
             historySource = newHistorySource
             result.addSource(newHistorySource, ::attachHistory)
         }
@@ -517,32 +373,45 @@ interface MemberDAO {
     }
 
     /**
-     * Internal raw-query entry point for a single filter count. Use [getServiceMemberCountForFilter].
+     * Combined count query: returns a single row with one `cnt_<index>` column per requested
+     * filter (see [ServiceMemberCountQueryBuilder]). Read via [getServiceMemberCounts].
      */
-    @RawQuery(observedEntities = [HouseholdEntity::class, HouseholdMemberEntity::class, MemberAssessmentHistoryEntity::class])
-    suspend fun getServiceMemberCountRaw(query: SimpleSQLiteQuery): Int
+    @RawQuery
+    fun getServiceMemberCountsCursor(query: SimpleSQLiteQuery): Cursor
 
     /**
-     * Returns the member count for one static service filter.
+     * Returns counts for [filters] in a single pass over the member table.
      * Dynamic filters match [getServiceMembers].
      */
-    suspend fun getServiceMemberCountForFilter(
-        staticFilter: ServiceStaticFilter,
+    suspend fun getServiceMemberCounts(
+        filters: List<ServiceStaticFilter>,
         searchInput: String = "",
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
-        allowNullHousehold: Boolean,
-        qrCode: String?,
-    ): Int {
-        val query = ServiceMemberCountQueryBuilder.buildCountQuery(
-            staticFilter = staticFilter,
+        allowNullHousehold: Boolean = false,
+        qrCode: String? = null,
+    ): Map<ServiceStaticFilter, Int> {
+        if (filters.isEmpty()) return emptyMap()
+        val query = ServiceMemberCountQueryBuilder.buildCombinedCountQuery(
+            filters = filters,
             searchInput = searchInput,
             filterBySs = filterBySs,
             filterBySubVillages = filterBySubVillages,
             allowNullHousehold = allowNullHousehold,
             qrCode = qrCode,
         )
-        return getServiceMemberCountRaw(query)
+        val counts = LinkedHashMap<ServiceStaticFilter, Int>()
+        getServiceMemberCountsCursor(query).use { cursor ->
+            if (cursor.moveToFirst()) {
+                filters.forEachIndexed { index, filter ->
+                    val columnIndex = cursor.getColumnIndex("${ServiceMemberCountQueryBuilder.COUNT_COLUMN_PREFIX}$index")
+                    counts[filter] = if (columnIndex >= 0) cursor.getInt(columnIndex) else 0
+                }
+            } else {
+                filters.forEach { counts[it] = 0 }
+            }
+        }
+        return counts
     }
 
     /**

@@ -31,7 +31,9 @@ import org.medtroniclabs.uhis.ui.membersearch.datasource.MemberSearchDataSource
 import org.medtroniclabs.uhis.ui.membersearch.model.MemberSearchListItem
 import org.medtroniclabs.uhis.ui.membersearch.model.MemberSearchParams
 import org.medtroniclabs.uhis.ui.membersearch.repo.MemberSearchRepository
+import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.measureTimedValue
 
 /**
  * ViewModel for FO/PO member search.
@@ -155,14 +157,18 @@ class MemberSearchViewModel @Inject constructor(
 
     private suspend fun refreshStaticFilterCounts(params: MemberSearchParams) {
         if (staticFilters.isEmpty()) return
-        _staticFilterCounts.value = memberSearchRepository.getStaticFilterCounts(
-            filters = staticFilters.toList(),
-            searchInput = params.searchInput.orEmpty(),
-            filterBySs = params.effectiveSsIds,
-            filterBySubVillages = params.effectiveSubVillageIds,
-            allowNullHousehold = params.allowNullHousehold,
-            qrCode = params.qrCode,
-        )
+        val counts = measureTimedValue {
+            memberSearchRepository.getStaticFilterCounts(
+                filters = staticFilters.toList(),
+                searchInput = params.searchInput.orEmpty(),
+                filterBySs = params.effectiveSsIds,
+                filterBySubVillages = params.effectiveSubVillageIds,
+                allowNullHousehold = params.allowNullHousehold,
+                qrCode = params.qrCode,
+            )
+        }
+        Timber.tag("bug_n_bug").d("Time taken for count in seconds : " + counts.duration.inWholeSeconds)
+        _staticFilterCounts.value = counts.value
     }
 
     private var lastLoadedFoPoKormiId: Long? = null

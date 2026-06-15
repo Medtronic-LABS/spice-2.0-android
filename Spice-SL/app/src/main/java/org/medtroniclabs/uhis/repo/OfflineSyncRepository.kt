@@ -19,6 +19,7 @@ import org.medtroniclabs.uhis.appextensions.SIGNATURE_FOLDER
 import org.medtroniclabs.uhis.appextensions.convertToUtcDateTime
 import org.medtroniclabs.uhis.appextensions.postError
 import org.medtroniclabs.uhis.appextensions.postSuccess
+import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.CBS
 import org.medtroniclabs.uhis.common.DefinedParams.COMMUNITY_REGISTERED_DATE
@@ -292,32 +293,64 @@ class OfflineSyncRepository @Inject constructor(
         }
         onProgress?.invoke(ResourceLoadingSyncProgress.SYNCED_PAYLOAD_RECEIVED)
 
-        val assessmentHistoryResponse = fetchMemberAssessmentHistory(villageIds, serverLastSyncedAt)
-        if (!assessmentHistoryResponse.isSuccessful) {
-            return false
+        val responseInitialDownload = parseSyncedDataResponse(syncedResponse.body()?.string()) ?: return false
+
+        val assessmentHistory = if (CommonUtils.isFoOrPo()) {
+            val memberIds = extractSyncedMemberIds(responseInitialDownload.members)
+            val history = mutableListOf<MemberAssessmentHistoryEntity>()
+            // First fetch based on member ids
+            if (memberIds.isNotEmpty()) {
+                val assessmentHistoryResponse = fetchMemberAssessmentHistory(
+                    lastSyncedAt = serverLastSyncedAt,
+                    memberIds = memberIds,
+                )
+                if (!assessmentHistoryResponse.isSuccessful) {
+                    return false
+                }
+                history.addAll(assessmentHistoryResponse.body() ?: emptyList())
+            }
+
+            // Now fetch based on practitioner id
+            val assessmentHistoryResponse = fetchMemberAssessmentHistory(
+                lastSyncedAt = serverLastSyncedAt,
+                practitionerId = SecuredPreference.getUserFhirId(),
+            )
+            if (!assessmentHistoryResponse.isSuccessful) {
+                return false
+            }
+            history.addAll(assessmentHistoryResponse.body() ?: emptyList())
+
+            history
+        } else {
+            val assessmentHistoryResponse = fetchMemberAssessmentHistory(
+                villageList = villageIds,
+                lastSyncedAt = serverLastSyncedAt,
+            )
+            if (!assessmentHistoryResponse.isSuccessful) {
+                return false
+            }
+            assessmentHistoryResponse.body() ?: emptyList()
         }
         onProgress?.invoke(ResourceLoadingSyncProgress.ASSESSMENT_HISTORY_RECEIVED)
 
-        val response = syncedResponse.body()?.string()
-        response?.let {
-            try {
-                val gson = Gson()
-                val type: Type = object : TypeToken<ResponseInitialDownload>() {}.type
-                val responseInitialDownload: ResponseInitialDownload? = gson.fromJson(it, type)
-                if (responseInitialDownload == null) {
-                    return false
-                } else {
-                    saveRequestInitialDownload(responseInitialDownload, assessmentHistoryResponse.body() ?: emptyList())
-                    onProgress?.invoke(ResourceLoadingSyncProgress.LOCAL_PERSIST_COMPLETE)
-                    return true
-                }
-            } catch (e: Exception) {
-                Timber.d("Exception ${e.localizedMessage}")
-                return false
-            }
-        }
-        return false
+        saveRequestInitialDownload(responseInitialDownload, assessmentHistory)
+        onProgress?.invoke(ResourceLoadingSyncProgress.LOCAL_PERSIST_COMPLETE)
+        return true
     }
+
+    private fun parseSyncedDataResponse(response: String?): ResponseInitialDownload? {
+        if (response == null) return null
+        return try {
+            val gson = Gson()
+            val type: Type = object : TypeToken<ResponseInitialDownload>() {}.type
+            gson.fromJson(response, type)
+        } catch (e: Exception) {
+            Timber.d("Exception ${e.localizedMessage}")
+            null
+        }
+    }
+
+    private fun extractSyncedMemberIds(members: List<HouseHoldMember>?): List<Long> = members.orEmpty().mapNotNull { it.id?.toLongOrNull() }
 
     suspend fun fetchAndSaveMemberDetails(memberId: String): SavedMemberDetails? {
         val response = apiHelper.getMemberDetails(RequestMemberDetails(memberId))
@@ -366,7 +399,7 @@ class OfflineSyncRepository @Inject constructor(
 
     private suspend fun saveAssessmentHistory(assessmentHistory: List<MemberAssessmentHistoryEntity>) {
         if (assessmentHistory.isEmpty()) return
-        val updatedHistoryList = assessmentHistory.map { history ->
+        assessmentHistory.forEach { history ->
             val memberId = roomHelper.getHouseholdMemberIdByFhirId(history.memberFhirId)
             val existingHistory = roomHelper.getMemberAssessmentHistory(
                 history.memberFhirId,
@@ -374,13 +407,13 @@ class OfflineSyncRepository @Inject constructor(
                 history.visitDate,
                 history.serviceProvided?.uppercase(Locale.ENGLISH),
             )
-            if (existingHistory != null) {
+            val updatedHistory = if (existingHistory != null) {
                 history.copy(id = existingHistory.id, memberId = memberId)
             } else {
                 history.copy(memberId = memberId)
             }
+            roomHelper.insertMemberAssessmentHistory(updatedHistory)
         }
-        roomHelper.insertMemberAssessmentHistory(updatedHistoryList)
     }
 
     private suspend fun saveRequestInitialDownload(
@@ -588,10 +621,17 @@ class OfflineSyncRepository @Inject constructor(
     }
 
     private suspend fun fetchMemberAssessmentHistory(
-        villageList: List<Long>,
+        villageList: List<Long> = emptyList(),
         lastSyncedAt: String? = null,
+        memberIds: List<Long> = emptyList(),
+        practitionerId: String? = null,
     ): Response<List<MemberAssessmentHistoryEntity>> {
-        val request = RequestAllEntities(villageList, lastSyncedAt)
+        val request = RequestAllEntities(
+            villageIds = villageList,
+            lastSyncTime = lastSyncedAt,
+            memberIds = memberIds,
+            practitionerId = practitionerId,
+        )
         return apiHelper.fetchMemberAssessmentHistory(request)
     }
 

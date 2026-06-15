@@ -946,17 +946,17 @@ interface RoomHelper {
     ): LiveData<List<HouseholdMemberWithTb>>
 
     /**
-     * Returns the count for one static service filter.
+     * Returns counts for the given static filters in a single combined query.
      * Dynamic filters match [getServiceMembers].
      */
-    suspend fun getServiceMemberCountForFilter(
-        staticFilter: ServiceStaticFilter,
+    suspend fun getServiceMemberCounts(
+        filters: List<ServiceStaticFilter>,
         searchInput: String = "",
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
         allowNullHousehold: Boolean = false,
         qrCode: String? = null,
-    ): Int
+    ): Map<ServiceStaticFilter, Int>
 
     suspend fun getMemberAssessmentHistory(
         memberFhirId: String?,

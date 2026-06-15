@@ -22,7 +22,10 @@ import androidx.room.PrimaryKey
  */
 @Entity(
     tableName = EntitiesName.PREGNANCY_DETAIL,
-    indices = [Index(value = ["pregnancyEpisodeId"], unique = true)],
+    indices = [
+        Index(value = ["pregnancyEpisodeId"], unique = true),
+        Index(value = ["householdMemberLocalId", "endAt"], name = "idx_pregnancy_detail_member_local_id"),
+    ],
 )
 data class PregnancyDetail(
     @PrimaryKey(autoGenerate = true)

@@ -15,6 +15,8 @@ import org.medtroniclabs.uhis.db.entity.EntitiesName.MEMBER_ASSESSMENT_HISTORY_E
     indices = [
         Index(value = ["visitDate"], name = "idx_member_assessment_history_visit_date"),
         Index(value = ["memberId"], name = "idx_member_assessment_history_member_id"),
+        Index(value = ["memberId", "visitDate"], name = INDEX_MAH_MEMBER_VISIT),
+        Index(value = ["memberFhirId"], name = "idx_member_assessment_history_member_fhir_id"),
         Index(value = ["serviceProvided"], name = "idx_member_assessment_history_service_provided"),
         Index(value = [COLUMN_PRACTITIONER_ID], name = INDEX_PRACTITIONER_ID),
     ],
@@ -42,3 +44,4 @@ data class MemberAssessmentHistoryEntity(
 
 const val COLUMN_PRACTITIONER_ID = "practitionerId"
 const val INDEX_PRACTITIONER_ID = "idx_member_assessment_history_practitioner_id"
+const val INDEX_MAH_MEMBER_VISIT = "idx_mah_member_visit"

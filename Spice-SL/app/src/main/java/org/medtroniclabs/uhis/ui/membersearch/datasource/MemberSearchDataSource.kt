@@ -7,6 +7,8 @@ import org.medtroniclabs.uhis.ui.membersearch.model.MemberSearchListItem
 import org.medtroniclabs.uhis.ui.membersearch.model.MemberSearchParams
 import org.medtroniclabs.uhis.ui.membersearch.repo.MemberSearchRepository
 import org.medtroniclabs.uhis.ui.membersearch.repo.RemotePatientSearchResult
+import timber.log.Timber
+import kotlin.time.measureTimedValue
 
 private const val PAGE_INDEX = 0
 
@@ -42,14 +44,18 @@ class MemberSearchDataSource(
     }
 
     private suspend fun loadLocalPage(): LoadResult<Int, MemberSearchListItem> {
-        val localMembers = memberSearchRepository.getLocalMembers(
-            searchInput = params.searchInput,
-            filterBySs = params.effectiveSsIds,
-            filterBySubVillages = params.effectiveSubVillageIds,
-            staticFilter = params.staticFilter,
-            allowNullHousehold = params.allowNullHousehold,
-            qrCode = params.qrCode,
-        )
+        val localMembersTimed = measureTimedValue {
+            memberSearchRepository.getLocalMembers(
+                searchInput = params.searchInput,
+                filterBySs = params.effectiveSsIds,
+                filterBySubVillages = params.effectiveSubVillageIds,
+                staticFilter = params.staticFilter,
+                allowNullHousehold = params.allowNullHousehold,
+                qrCode = params.qrCode,
+            )
+        }
+        Timber.tag("bug_n_bug").d("Time taken for filtered data in seconds : " + localMembersTimed.duration.inWholeSeconds)
+        val localMembers = localMembersTimed.value
         localFhirIds = memberSearchRepository.extractLocalFhirIds(localMembers)
         val localItems = localMembers.map { MemberSearchListItem.Local(it) }
         val earlyReturn = (!params.qrCode.isNullOrBlank() && localMembers.isNotEmpty()) || !shouldFetchRemote()

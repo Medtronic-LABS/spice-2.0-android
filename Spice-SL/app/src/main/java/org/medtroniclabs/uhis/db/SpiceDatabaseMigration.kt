@@ -9,6 +9,8 @@ import org.medtroniclabs.uhis.db.entity.EntitiesName.FOLLOW_UP
 import org.medtroniclabs.uhis.db.entity.EntitiesName.FOLLOW_UP_CALL
 import org.medtroniclabs.uhis.db.entity.EntitiesName.HOUSEHOLD_MEMBER
 import org.medtroniclabs.uhis.db.entity.EntitiesName.MEMBER_ASSESSMENT_HISTORY_ENTITY
+import org.medtroniclabs.uhis.db.entity.EntitiesName.PREGNANCY_DETAIL
+import org.medtroniclabs.uhis.db.entity.INDEX_MAH_MEMBER_VISIT
 import org.medtroniclabs.uhis.db.entity.INDEX_PRACTITIONER_ID
 
 object SpiceDatabaseMigration {
@@ -58,6 +60,10 @@ object SpiceDatabaseMigration {
             db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN serviceProvidedByRole TEXT;")
             db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN observations TEXT;")
             db.execSQL("ALTER TABLE $HOUSEHOLD_MEMBER ADD COLUMN created_by_role_name TEXT;")
+
+            db.execSQL("CREATE INDEX IF NOT EXISTS idx_pregnancy_detail_member_local_id ON $PREGNANCY_DETAIL(householdMemberLocalId, endAt)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS idx_member_assessment_history_member_fhir_id ON $MEMBER_ASSESSMENT_HISTORY_ENTITY(memberFhirId)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS $INDEX_MAH_MEMBER_VISIT ON $MEMBER_ASSESSMENT_HISTORY_ENTITY(memberId, visitDate)")
         }
     }
 }

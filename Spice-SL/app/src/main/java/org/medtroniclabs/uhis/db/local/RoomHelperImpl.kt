@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import androidx.room.Transaction
 import androidx.sqlite.db.SimpleSQLiteQuery
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.CulturesEntity
@@ -1346,22 +1348,24 @@ class RoomHelperImpl @Inject constructor(
         qrCode: String?,
     ) = memberDAO.getServiceMembers(searchInput, filterBySs, filterBySubVillages, staticFilter, allowNullHousehold, qrCode)
 
-    override suspend fun getServiceMemberCountForFilter(
-        staticFilter: ServiceStaticFilter,
+    override suspend fun getServiceMemberCounts(
+        filters: List<ServiceStaticFilter>,
         searchInput: String,
         filterBySs: List<Long>,
         filterBySubVillages: List<Long>,
         allowNullHousehold: Boolean,
         qrCode: String?,
-    ): Int =
-        memberDAO.getServiceMemberCountForFilter(
-            staticFilter = staticFilter,
-            searchInput = searchInput,
-            filterBySs = filterBySs,
-            filterBySubVillages = filterBySubVillages,
-            allowNullHousehold = allowNullHousehold,
-            qrCode = qrCode,
-        )
+    ): Map<ServiceStaticFilter, Int> =
+        withContext(Dispatchers.IO) {
+            memberDAO.getServiceMemberCounts(
+                filters = filters,
+                searchInput = searchInput,
+                filterBySs = filterBySs,
+                filterBySubVillages = filterBySubVillages,
+                allowNullHousehold = allowNullHousehold,
+                qrCode = qrCode,
+            )
+        }
 
     override suspend fun getMemberAssessmentHistory(
         memberFhirId: String?,

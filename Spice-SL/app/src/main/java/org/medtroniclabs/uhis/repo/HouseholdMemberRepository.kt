@@ -2,11 +2,6 @@ package org.medtroniclabs.uhis.repo
 
 import android.location.Location
 import androidx.lifecycle.LiveData
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.CommonUtils.getStringOrEmptyString
 import org.medtroniclabs.uhis.common.DefinedParams.CHIEF_DOM_CODE_LENGTH
@@ -507,7 +502,7 @@ class HouseholdMemberRepository @Inject constructor(
     ) = roomHelper.getServiceMembers(searchInput, filterBySs, filterBySubVillages, staticFilter, allowNullHousehold, qrCode)
 
     /**
-     * Fetches counts for the given static filters using capped parallel COUNT queries.
+     * Fetches counts for the given static filters in a single combined query.
      * Dynamic filters match [getServiceMembers].
      */
     suspend fun getServiceMemberCounts(
@@ -517,29 +512,15 @@ class HouseholdMemberRepository @Inject constructor(
         filterBySubVillages: List<Long> = emptyList(),
         allowNullHousehold: Boolean = false,
         qrCode: String? = null,
-    ): Map<ServiceStaticFilter, Int> {
-        if (filters.isEmpty()) return emptyMap()
-        val semaphore = Semaphore(SERVICE_MEMBER_COUNT_PARALLELISM)
-        return coroutineScope {
-            filters
-                .map { filter ->
-                    async {
-                        semaphore.withPermit {
-                            filter to
-                                roomHelper.getServiceMemberCountForFilter(
-                                    staticFilter = filter,
-                                    searchInput = searchInput,
-                                    filterBySs = filterBySs,
-                                    filterBySubVillages = filterBySubVillages,
-                                    allowNullHousehold = allowNullHousehold,
-                                    qrCode = qrCode,
-                                )
-                        }
-                    }
-                }.awaitAll()
-                .toMap()
-        }
-    }
+    ): Map<ServiceStaticFilter, Int> =
+        roomHelper.getServiceMemberCounts(
+            filters = filters,
+            searchInput = searchInput,
+            filterBySs = filterBySs,
+            filterBySubVillages = filterBySubVillages,
+            allowNullHousehold = allowNullHousehold,
+            qrCode = qrCode,
+        )
 
     /**
      * Retrieves all National IDs for the specified ID type from the Room database.
@@ -552,9 +533,4 @@ class HouseholdMemberRepository @Inject constructor(
     suspend fun getPregnancyDetails(id: Long) = roomHelper.getPregnancyDetailByPatientId(id)
 
     suspend fun getMemberByQRCode(qrCode: String): List<HouseholdMemberEntity> = roomHelper.getMemberByQRCode(qrCode)
-
-    companion object {
-        /** Max concurrent COUNT queries (tuned for low-end devices). */
-        private const val SERVICE_MEMBER_COUNT_PARALLELISM = 4
-    }
 }

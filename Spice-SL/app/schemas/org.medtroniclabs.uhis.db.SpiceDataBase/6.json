@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "ee4f4a2a842965739647d151594f38f7",
+    "identityHash": "177acb8f9e9b392733f042b6ea0bf94f",
     "entities": [
       {
         "tableName": "Household",
@@ -1825,6 +1825,16 @@
             ],
             "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_PregnancyDetail_pregnancyEpisodeId` ON `${TABLE_NAME}` (`pregnancyEpisodeId`)"
+          },
+          {
+            "name": "idx_pregnancy_detail_member_local_id",
+            "unique": false,
+            "columnNames": [
+              "householdMemberLocalId",
+              "endAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_pregnancy_detail_member_local_id` ON `${TABLE_NAME}` (`householdMemberLocalId`, `endAt`)"
           }
         ],
         "foreignKeys": []
@@ -3958,6 +3968,25 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `idx_member_assessment_history_member_id` ON `${TABLE_NAME}` (`memberId`)"
           },
           {
+            "name": "idx_mah_member_visit",
+            "unique": false,
+            "columnNames": [
+              "memberId",
+              "visitDate"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_mah_member_visit` ON `${TABLE_NAME}` (`memberId`, `visitDate`)"
+          },
+          {
+            "name": "idx_member_assessment_history_member_fhir_id",
+            "unique": false,
+            "columnNames": [
+              "memberFhirId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_member_assessment_history_member_fhir_id` ON `${TABLE_NAME}` (`memberFhirId`)"
+          },
+          {
             "name": "idx_member_assessment_history_service_provided",
             "unique": false,
             "columnNames": [
@@ -4544,7 +4573,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ee4f4a2a842965739647d151594f38f7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '177acb8f9e9b392733f042b6ea0bf94f')"
     ]
   }
 }
