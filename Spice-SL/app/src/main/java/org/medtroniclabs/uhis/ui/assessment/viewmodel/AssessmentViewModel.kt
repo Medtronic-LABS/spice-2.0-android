@@ -1261,9 +1261,9 @@ class AssessmentViewModel @Inject constructor(
         }
     }
 
-    fun getNearestHealthFacility(userSitesOnly: Boolean = false) {
+    fun getNearestHealthFacility() {
         viewModelScope.launch(dispatcherIO) {
-            nearestFacilityLiveData.postValue(assessmentRepository.getNearestHealthFacility(userSitesOnly))
+            nearestFacilityLiveData.postValue(assessmentRepository.getNearestHealthFacility())
         }
     }
 

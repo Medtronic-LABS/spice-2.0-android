@@ -203,12 +203,8 @@ class AssessmentRepository @Inject constructor(
             Resource(state = ResourceState.ERROR)
         }
 
-    suspend fun getNearestHealthFacility(userSitesOnly: Boolean = false): Resource<ArrayList<Map<String, Any>>> {
-        val healthFacilityList = if (userSitesOnly) {
-            roomHelper.getUserHealthFacility(true)
-        } else {
-            roomHelper.getNearestHealthFacility()
-        }
+    suspend fun getNearestHealthFacility(): Resource<ArrayList<Map<String, Any>>> {
+        val healthFacilityList = roomHelper.getNearestHealthFacility()
         val dropDownList = ArrayList<Map<String, Any>>()
         for ((_, healthFacilityEntity) in healthFacilityList.withIndex()) {
             dropDownList.add(
