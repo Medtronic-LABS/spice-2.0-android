@@ -335,6 +335,7 @@
     <style name="Activities_Card_Style">
         <item name="android:layout_width">@dimen/_80sdp</item>
         <item name="android:layout_height">@dimen/_80sdp</item>
+        <item name="android:scaleType">fitCenter</item>
     </style>
 
     <style name="Activities_Text_Style" parent="TextStyle_Bold_16_NoBG">

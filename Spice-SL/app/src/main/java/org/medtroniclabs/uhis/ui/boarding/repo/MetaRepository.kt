@@ -142,8 +142,13 @@ class MetaRepository @Inject constructor(
                 if (response.isSuccessful && response.body()?.status == true) {
                     with(roomHelper) {
                         response.body()?.entity?.apply {
+                            val nurseVillages = filterVillagesForNurse(villages)
+                            val nurseVillageIds = nurseVillages?.map { it.id }?.toSet() ?: emptySet()
                             saveHealthFacilityInDb(
-                                nearestHealthFacilities,
+                                filterNearestHealthFacilitiesByLinkedVillages(
+                                    nearestHealthFacilities,
+                                    nurseVillageIds,
+                                ),
                                 defaultHealthFacility?.id ?: 0,
                                 userHealthFacilities,
                             )
@@ -158,8 +163,6 @@ class MetaRepository @Inject constructor(
                                 roomHelper.saveChiefDoms(filterChiefdomsForNurse(chiefdomList))
                             }
 
-                            val nurseVillages = filterVillagesForNurse(villages)
-                            val nurseVillageIds = nurseVillages?.map { it.id }?.toSet() ?: emptySet()
                             deleteAllVillages()
                             saveVillage(modifiedVillages(nurseVillages, userProfile.villages))
                             if (CommonUtils.isNurse()) {
@@ -639,6 +642,16 @@ class MetaRepository @Inject constructor(
                     ),
                 )
             }
+        }
+    }
+
+    private fun filterNearestHealthFacilitiesByLinkedVillages(
+        nearestHealthFacilities: List<HealthFacility>,
+        villageIds: Set<Long>,
+    ): List<HealthFacility> {
+        if (villageIds.isEmpty()) return nearestHealthFacilities
+        return nearestHealthFacilities.filter { facility ->
+            facility.linkedVillages.any { linkedVillage -> linkedVillage.id in villageIds }
         }
     }
 

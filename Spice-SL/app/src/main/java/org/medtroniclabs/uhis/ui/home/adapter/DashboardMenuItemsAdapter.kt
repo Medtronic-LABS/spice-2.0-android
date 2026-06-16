@@ -103,9 +103,14 @@ class DashboardMenuItemsAdapter(
                 R.drawable.ic_household,
             )
 
-            MenuConstants.MY_PATIENTS_MENU_ID, MenuConstants.SERVICE_RECIPIENT -> ContextCompat.getDrawable(
+            MenuConstants.MY_PATIENTS_MENU_ID -> ContextCompat.getDrawable(
                 context,
                 R.drawable.ic_my_patient,
+            )
+
+            MenuConstants.SERVICE_RECIPIENT -> ContextCompat.getDrawable(
+                context,
+                R.drawable.ic_service_recipient,
             )
 
             MenuConstants.SCREENER_MENU_ID -> ContextCompat.getDrawable(
