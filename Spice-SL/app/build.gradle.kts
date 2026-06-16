@@ -27,8 +27,8 @@ android {
         applicationId = "org.medtroniclabs.uhis"
         minSdk = 23
         targetSdk = 36
-        versionCode = 23
-        versionName = "1.0.3"
+        versionCode = 25
+        versionName = "1.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
         missingDimensionStrategy("version", "production")
