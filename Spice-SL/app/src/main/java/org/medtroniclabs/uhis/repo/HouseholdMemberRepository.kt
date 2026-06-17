@@ -499,7 +499,16 @@ class HouseholdMemberRepository @Inject constructor(
         staticFilter: ServiceStaticFilter,
         allowNullHousehold: Boolean = false,
         qrCode: String? = null,
-    ) = roomHelper.getServiceMembers(searchInput, filterBySs, filterBySubVillages, staticFilter, allowNullHousehold, qrCode)
+        restrictExternalToSkCreator: Boolean = false,
+    ) = roomHelper.getServiceMembers(
+        searchInput,
+        filterBySs,
+        filterBySubVillages,
+        staticFilter,
+        allowNullHousehold,
+        qrCode,
+        restrictExternalToSkCreator,
+    )
 
     /**
      * Fetches counts for the given static filters in a single combined query.
@@ -512,6 +521,7 @@ class HouseholdMemberRepository @Inject constructor(
         filterBySubVillages: List<Long> = emptyList(),
         allowNullHousehold: Boolean = false,
         qrCode: String? = null,
+        restrictExternalToSkCreator: Boolean = false,
     ): Map<ServiceStaticFilter, Int> =
         roomHelper.getServiceMemberCounts(
             filters = filters,
@@ -520,6 +530,7 @@ class HouseholdMemberRepository @Inject constructor(
             filterBySubVillages = filterBySubVillages,
             allowNullHousehold = allowNullHousehold,
             qrCode = qrCode,
+            restrictExternalToSkCreator = restrictExternalToSkCreator,
         )
 
     /**

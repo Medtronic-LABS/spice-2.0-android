@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.DateUtils
+import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
 import org.medtroniclabs.uhis.common.DateUtils.DATE_ddMMyyyy
 import org.medtroniclabs.uhis.common.SecuredPreference
@@ -168,11 +169,51 @@ object AssessmentUtil {
             }
 
             MenuConstants.NCD_MENU_ID, MenuConstants.CATARACT_MENU_ID -> {
-                referralStatus ?: context.getString(R.string.na)
+                when {
+                    isReferredReferralStatus(referralStatus) -> ReferralStatus.Referred.name
+                    !referralStatus.isNullOrBlank() -> referralStatus
+                    else -> context.getString(R.string.na)
+                }
             }
 
             else -> context.getString(R.string.na)
         } ?: run { context.getString(R.string.separator_double_hyphen) }
+
+    /**
+     * Returns referred location (facility type) for NCD service history when available.
+     */
+    fun getReferredLocation(
+        service: String,
+        referralFacilityType: String?,
+        referralStatus: String?,
+    ): String? =
+        when (service.lowercase()) {
+            MenuConstants.NCD_MENU_ID.lowercase() -> {
+                referralFacilityType?.takeIf { it.isNotBlank() }
+                    ?: legacyReferredLocationFromStatus(referralStatus)
+            }
+
+            else -> null
+        }
+
+    fun shouldShowReferredLocation(
+        service: String,
+        referredLocation: String?,
+    ): Boolean =
+        !referredLocation.isNullOrBlank() &&
+            service.equals(MenuConstants.NCD_MENU_ID, true)
+
+    private fun isReferredReferralStatus(referralStatus: String?): Boolean {
+        if (referralStatus.isNullOrBlank()) return false
+        return ReferralStatus.Referred.name.equals(referralStatus, true) ||
+            referralStatus.startsWith("Referred To", ignoreCase = true)
+    }
+
+    private fun legacyReferredLocationFromStatus(referralStatus: String?): String? {
+        val prefix = "Referred To "
+        if (!referralStatus.orEmpty().startsWith(prefix, ignoreCase = true)) return null
+        return referralStatus?.substring(prefix.length)?.takeIf { it.isNotBlank() }
+    }
 
     /**
      * Returns display follow-up date based on service
@@ -275,7 +316,7 @@ object AssessmentUtil {
     ): List<String> {
         val statuses = customStatus?.toMutableList() ?: mutableListOf()
         if (serviceProvided?.lowercase() != MenuConstants.NCD_MENU_ID.lowercase()) return statuses
-        if (ReferralStatus.Referred.name.equals(referralStatus, true)) return statuses
+        if (isReferredReferralStatus(referralStatus)) return statuses
         if (statuses.contains(AssessmentStatus.UNCONTROLLED_BP.name) ||
             statuses.contains(AssessmentStatus.UNCONTROLLED_BG.name)
         ) {
@@ -566,14 +607,17 @@ object AssessmentUtil {
     fun formatServiceHistoryBloodGlucose(
         context: Context,
         bg: String?,
+        bgType: String? = null,
     ): String {
         val value = bg?.trim()?.takeIf { it.isNotEmpty() }
         return value?.let {
-            if (it.contains("mmol", ignoreCase = true)) {
+            val formatted = if (it.contains("mmol", ignoreCase = true)) {
                 it
             } else {
                 "$it $MMOLL"
             }
+            val type = bgType?.trim()?.takeIf { typeValue -> typeValue.isNotEmpty() }
+            if (type != null) "$formatted ($type)" else formatted
         } ?: context.getString(R.string.separator_double_hyphen)
     }
 

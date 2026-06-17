@@ -250,15 +250,17 @@ object AssessmentStatusGenerator {
 
             map.containsKey(MenuConstants.NCD_MENU_ID) -> {
                 val statusList = arrayListOf<AssessmentStatus>()
+                val extraTokens = mutableListOf<String>()
                 addHighBpBgStatusesFromReferral(statusList, referralResult?.second ?: listOf())
                 addNcdNormalStatusIfApplicable(statusList, referralResult)
                 val ncdMap = map[MenuConstants.NCD_MENU_ID] as Map<*, *>
                 val eyeCareMap = ncdMap[EYE_CARE] as? Map<*, *>
                 addEyeProblemStatuses(statusList, eyeCareMap, skipNoProblem = true)
+                addGlassPowerToken(extraTokens, eyeCareMap)
                 if (YES.equals(eyeCareMap?.get(ID_HAVE_THE_GLASSES_BEEN_SOLD)?.toString(), true)) {
                     statusList.add(AssessmentStatus.GLASSES_SOLD)
                 }
-                statusList.toStatusStrings()
+                statusList.toStatusStrings(extraTokens)
             }
 
             map.containsKey(MenuConstants.CATARACT_MENU_ID) -> buildCataractStatuses(map, referralResult)

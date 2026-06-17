@@ -943,6 +943,7 @@ interface RoomHelper {
         staticFilter: ServiceStaticFilter,
         allowNullHousehold: Boolean = false,
         qrCode: String? = null,
+        restrictExternalToSkCreator: Boolean = false,
     ): LiveData<List<HouseholdMemberWithTb>>
 
     /**
@@ -956,6 +957,7 @@ interface RoomHelper {
         filterBySubVillages: List<Long> = emptyList(),
         allowNullHousehold: Boolean = false,
         qrCode: String? = null,
+        restrictExternalToSkCreator: Boolean = false,
     ): Map<ServiceStaticFilter, Int>
 
     suspend fun getMemberAssessmentHistory(

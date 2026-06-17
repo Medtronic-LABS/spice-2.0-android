@@ -136,6 +136,7 @@ object MemberAssessmentHistoryAdapterUtil {
                         AssessmentUtil.formatServiceHistoryBloodGlucose(
                             context,
                             observations?.bg,
+                            observations?.bgType,
                         ),
                     ),
                 )
@@ -196,6 +197,19 @@ object MemberAssessmentHistoryAdapterUtil {
                     referralStatus,
                 ),
             )
+            val referredLocation = AssessmentUtil.getReferredLocation(
+                service,
+                history.referralFacilityType,
+                history.referralStatus,
+            )
+            if (AssessmentUtil.shouldShowReferredLocation(service, referredLocation)) {
+                summaryItems.add(
+                    SummaryItem(
+                        context.getString(R.string.referred_location),
+                        referredLocation ?: context.getString(R.string.separator_double_hyphen),
+                    ),
+                )
+            }
         }
         if (shouldShowNextFollowUpDate(service)) {
             val nextFollowUpDate = AssessmentUtil.getNextFollowUpDate(

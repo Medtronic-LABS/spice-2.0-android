@@ -105,8 +105,6 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.EYE_DISEASE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.EYE_DISEASE_
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.EYE_TEST_OUTCOME
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.EYE_TEST_OUTCOMES
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FACILITY_TYPE_COMMUNITY_CLINIC
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FACILITY_TYPE_UPAZILA
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FamilyPlanning
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FamilyPlanningDetails
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_LOG
@@ -118,8 +116,6 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.OPERATION_NA
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.REASON_
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.REFERRAL_FACILITY_TYPE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.REFERRED_SITE
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.STATUS_FACILITY_TYPE_COMMUNITY_CLINIC
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.STATUS_FACILITY_TYPE_UPAZILA
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.TBContactTracing
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.TBRxBuddyFollowUp
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.TBRxBuddyRegister
@@ -378,7 +374,8 @@ class AssessmentViewModel @Inject constructor(
                         serviceProvided = menuId?.uppercase(Locale.ENGLISH),
                         customStatus = status,
                         latestVisit = true,
-                        referralStatus = getReferralStatus(referralStatus, assessmentMap),
+                        referralStatus = referralStatus,
+                        referralFacilityType = resolveReferralFacilityType(referralStatus, assessmentMap),
                         referralReason = referralReason.toString(),
                         nextFollowUpDate = getNextFollowUpDate(otherDetails),
                         serviceProvidedByName = serviceProvider.first,
@@ -1611,27 +1608,25 @@ class AssessmentViewModel @Inject constructor(
         }
     }
 
-    private fun getReferralStatus(
+    private fun resolveReferralFacilityType(
         status: String?,
         assessmentMap: HashMap<String, Any>,
     ): String? {
-        if (status != ReferralStatus.Referred.name) return status
+        if (status != ReferralStatus.Referred.name) return null
 
-        var type: String? = null
         if (assessmentMap.containsKey(NCD_MENU_ID)) {
-            type = (assessmentMap[NCD_MENU_ID] as? Map<*, *>)
-                ?.get(REFERRAL_FACILITY_TYPE) as? String
-        } else if (assessmentMap.containsKey(CATARACT_MENU_ID)) {
-            val catMap = assessmentMap[CATARACT_MENU_ID] as HashMap<Any, Any>
-            type = (catMap[NCD_MENU_ID] as? Map<*, *>)
+            return (assessmentMap[NCD_MENU_ID] as? Map<*, *>)
                 ?.get(REFERRAL_FACILITY_TYPE) as? String
         }
 
-        return when (type) {
-            FACILITY_TYPE_UPAZILA -> STATUS_FACILITY_TYPE_UPAZILA
-            FACILITY_TYPE_COMMUNITY_CLINIC -> STATUS_FACILITY_TYPE_COMMUNITY_CLINIC
-            else -> status
+        if (assessmentMap.containsKey(CATARACT_MENU_ID)) {
+            val catMap = assessmentMap[CATARACT_MENU_ID] as? HashMap<*, *> ?: return null
+            return (catMap[NCD_MENU_ID] as? Map<*, *>)
+                ?.get(REFERRAL_FACILITY_TYPE) as? String
+                ?: catMap[REFERRAL_FACILITY_TYPE] as? String
         }
+
+        return null
     }
 
     fun fetchCurrentLocation(context: Context) {

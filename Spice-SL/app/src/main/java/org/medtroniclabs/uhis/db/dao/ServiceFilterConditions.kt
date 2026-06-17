@@ -1,6 +1,7 @@
 package org.medtroniclabs.uhis.db.dao
 
 import org.medtroniclabs.uhis.common.DefinedParams
+import org.medtroniclabs.uhis.common.RoleConstant
 import org.medtroniclabs.uhis.mappingkey.MemberRegistration
 import org.medtroniclabs.uhis.model.services.ServiceStaticFilter
 
@@ -65,6 +66,21 @@ object ServiceFilterConditions {
     const val CHILDREN_UNDER_TWO = "substr(hhm.date_of_birth, 1, 10) > date('now', '-2 years')"
 
     const val EXTERNAL_MEMBER = "hhm.household_id IS NULL"
+
+    /** SK Service Recipient: external members created by SK or with no creator role recorded. */
+    val SK_SCOPED_EXTERNAL_CREATOR =
+        "(hhm.created_by_role_name IS NULL OR TRIM(hhm.created_by_role_name) = '' " +
+            "OR LOWER(hhm.created_by_role_name) = LOWER('${RoleConstant.SHASTIYA_KORMI}'))"
+
+    fun isSkScopedExternalFilter(
+        staticFilter: ServiceStaticFilter,
+        restrictExternalToSkCreator: Boolean,
+    ): Boolean =
+        restrictExternalToSkCreator &&
+            (
+                staticFilter == ServiceStaticFilter.EXTERNAL_MEMBERS ||
+                    staticFilter == ServiceStaticFilter.EXTERNAL_PREGNANT_WOMEN
+                )
 
     const val IS_ACTIVE = "hhm.isActive = 1"
 

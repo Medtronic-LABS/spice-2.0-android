@@ -56,6 +56,7 @@ internal object ServiceMemberQueryBuilder {
         staticFilter: ServiceStaticFilter,
         allowNullHousehold: Boolean,
         qrCode: String?,
+        restrictExternalToSkCreator: Boolean = false,
     ): SimpleSQLiteQuery {
         val args = mutableListOf<Any>()
         val conditions = mutableListOf<String>()
@@ -88,9 +89,15 @@ internal object ServiceMemberQueryBuilder {
         when (staticFilter) {
             ServiceStaticFilter.EXTERNAL_MEMBERS -> {
                 conditions += ServiceFilterConditions.EXTERNAL_MEMBER
+                if (ServiceFilterConditions.isSkScopedExternalFilter(staticFilter, restrictExternalToSkCreator)) {
+                    conditions += ServiceFilterConditions.SK_SCOPED_EXTERNAL_CREATOR
+                }
             }
             ServiceStaticFilter.EXTERNAL_PREGNANT_WOMEN -> {
                 conditions += ServiceFilterConditions.EXTERNAL_MEMBER
+                if (ServiceFilterConditions.isSkScopedExternalFilter(staticFilter, restrictExternalToSkCreator)) {
+                    conditions += ServiceFilterConditions.SK_SCOPED_EXTERNAL_CREATOR
+                }
                 conditions += ServiceFilterConditions.ACTIVE_PREGNANCY
             }
             ServiceStaticFilter.CHILDREN_UNDER_TWO_YEARS -> {

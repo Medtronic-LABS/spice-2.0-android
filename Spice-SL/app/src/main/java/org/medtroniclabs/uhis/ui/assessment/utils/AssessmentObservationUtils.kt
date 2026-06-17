@@ -18,12 +18,14 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FamilyPlanni
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FamilyPlanningMethods
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_LOG
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_TYPE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GROUP_MEDICAL_HISTORY_PHYSICAL_EXAMINATION
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GROUP_POINT_OF_CARE_INVESTIGATIONS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HEIGHT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HEMOGLOBIN
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_DELIVERY_OUTCOMES
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_MODE_OF_DELIVERY
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NAME
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NUMBER_OF_LIVING_CHILDREN
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.WEIGHT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ncd
@@ -94,6 +96,7 @@ object AssessmentObservationUtils {
         val weight = resolveObservationWeight(vitalsMap)
         val bp = resolveObservationBloodPressure(vitalsMap)
         val bg = resolveObservationBloodGlucose(vitalsMap)
+        val bgType = resolveObservationBloodGlucoseType(vitalsMap)
 
         if (height == null && weight == null && bp == null && bg == null) return null
 
@@ -102,6 +105,7 @@ object AssessmentObservationUtils {
             weight = weight,
             bp = bp,
             bg = bg,
+            bgType = bgType,
         )
     }
 
@@ -339,4 +343,25 @@ object AssessmentObservationUtils {
         if (glucose.toDouble() <= 0) return null
         return formatObservationNumber(glucose)
     }
+
+    private fun resolveObservationBloodGlucoseType(map: HashMap<String, Any>): String? {
+        val glucoseLogs = map[GLUCOSE_LOG] as? HashMap<*, *>
+        return resolveGlucoseTypeValue(glucoseLogs?.get(GLUCOSE_TYPE))
+            ?: resolveGlucoseTypeValue(map[GLUCOSE_TYPE])
+            ?: resolveGlucoseTypeValue(map["bgType"])
+    }
+
+    private fun resolveGlucoseTypeValue(value: Any?): String? =
+        when (value) {
+            is String -> value.trim().takeIf { it.isNotEmpty() }
+            is Map<*, *> -> {
+                sequenceOf(
+                    value[DefinedParams.ID],
+                    value["id"],
+                    value["name"],
+                    value[NAME],
+                ).firstNotNullOfOrNull { resolveGlucoseTypeValue(it) }
+            }
+            else -> null
+        }
 }

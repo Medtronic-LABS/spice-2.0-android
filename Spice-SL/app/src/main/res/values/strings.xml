@@ -232,7 +232,7 @@
     <string name="dashboard_ncd_in_cataract_camp">NCD services in cataract camp</string>
     <string name="dashboard_referred_for_operation">Patients referred for operation</string>
     <string name="dashboard_glasses_sold">Glasses sold</string>
-    <string name="assessment_status_ncd_service_cataract_camp">NCD service at cataract camp</string>
+    <string name="assessment_status_ncd_service_cataract_camp">NCD in Cataract Camp</string>
     <string name="assessment_status_referred_for_operation">Referred for operation</string>
     <string name="assessment_status_glasses_sold">Glasses sold</string>
     <string name="assessment_status_eye_problem">Eye Problem - %1$s</string>
@@ -1729,6 +1729,7 @@
     <string name="service_date">Service Date</string>
     <string name="service_provided_by">Service Provided By</string>
     <string name="referral_status">Referral Status</string>
+    <string name="referred_location">Referred Location</string>
     <string name="error_person_name">Please enter valid name</string>
     <string name="emergency_referral">⚠️ Emergency referral</string>
     <string name="non_emergency_referral">ⓘ Non-Emergency referral</string>

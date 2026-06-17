@@ -5,6 +5,7 @@ data class MemberAssessmentObservations(
     val weight: String? = null,
     val bp: String? = null,
     val bg: String? = null,
+    val bgType: String? = null,
     val gravida: String? = null,
     val parity: String? = null,
     val modeOfDelivery: String? = null,

@@ -1347,7 +1347,16 @@ class RoomHelperImpl @Inject constructor(
         staticFilter: ServiceStaticFilter,
         allowNullHousehold: Boolean,
         qrCode: String?,
-    ) = memberDAO.getServiceMembers(searchInput, filterBySs, filterBySubVillages, staticFilter, allowNullHousehold, qrCode)
+        restrictExternalToSkCreator: Boolean,
+    ) = memberDAO.getServiceMembers(
+        searchInput,
+        filterBySs,
+        filterBySubVillages,
+        staticFilter,
+        allowNullHousehold,
+        qrCode,
+        restrictExternalToSkCreator,
+    )
 
     override suspend fun getServiceMemberCounts(
         filters: List<ServiceStaticFilter>,
@@ -1356,6 +1365,7 @@ class RoomHelperImpl @Inject constructor(
         filterBySubVillages: List<Long>,
         allowNullHousehold: Boolean,
         qrCode: String?,
+        restrictExternalToSkCreator: Boolean,
     ): Map<ServiceStaticFilter, Int> =
         withContext(Dispatchers.IO) {
             memberDAO.getServiceMemberCounts(
@@ -1365,6 +1375,7 @@ class RoomHelperImpl @Inject constructor(
                 filterBySubVillages = filterBySubVillages,
                 allowNullHousehold = allowNullHousehold,
                 qrCode = qrCode,
+                restrictExternalToSkCreator = restrictExternalToSkCreator,
             )
         }
 

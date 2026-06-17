@@ -21,6 +21,7 @@ internal object ServiceMemberCountQueryBuilder {
         filterBySubVillages: List<Long>,
         allowNullHousehold: Boolean,
         qrCode: String?,
+        restrictExternalToSkCreator: Boolean = false,
     ): SimpleSQLiteQuery {
         val args = mutableListOf<Any>()
 
@@ -28,7 +29,7 @@ internal object ServiceMemberCountQueryBuilder {
 
         val selectColumns =
             filters.mapIndexed { index, filter ->
-                val predicate = buildFilterPredicate(filter, allowNullHousehold, area)
+                val predicate = buildFilterPredicate(filter, allowNullHousehold, area, restrictExternalToSkCreator)
                 "SUM(CASE WHEN $predicate THEN 1 ELSE 0 END) AS $COUNT_COLUMN_PREFIX$index"
             }
 
@@ -66,8 +67,15 @@ internal object ServiceMemberCountQueryBuilder {
         staticFilter: ServiceStaticFilter,
         allowNullHousehold: Boolean,
         area: ServiceMemberQueryBuilder.AreaFilter,
+        restrictExternalToSkCreator: Boolean,
     ): String {
         val conditions = mutableListOf<String>()
+
+        fun addSkExternalCreatorScope() {
+            if (ServiceFilterConditions.isSkScopedExternalFilter(staticFilter, restrictExternalToSkCreator)) {
+                conditions += ServiceFilterConditions.SK_SCOPED_EXTERNAL_CREATOR
+            }
+        }
 
         fun addHouseholdScope() {
             conditions += ServiceFilterConditions.HAS_HOUSEHOLD
@@ -85,10 +93,12 @@ internal object ServiceMemberCountQueryBuilder {
             ServiceStaticFilter.EXTERNAL_MEMBERS -> {
                 conditions += ServiceFilterConditions.EXTERNAL_MEMBER
                 addExternalScope()
+                addSkExternalCreatorScope()
             }
             ServiceStaticFilter.EXTERNAL_PREGNANT_WOMEN -> {
                 conditions += ServiceFilterConditions.EXTERNAL_MEMBER
                 addExternalScope()
+                addSkExternalCreatorScope()
                 conditions += ServiceFilterConditions.IS_ACTIVE
                 conditions += ServiceFilterConditions.ACTIVE_PREGNANCY
             }

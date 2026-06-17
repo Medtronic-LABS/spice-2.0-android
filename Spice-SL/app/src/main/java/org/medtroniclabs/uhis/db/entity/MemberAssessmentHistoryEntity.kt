@@ -33,6 +33,8 @@ data class MemberAssessmentHistoryEntity(
     val customStatus: ArrayList<String>? = null,
     val latestVisit: Boolean,
     val referralStatus: String?,
+    @ColumnInfo(name = "referralFacilityType")
+    val referralFacilityType: String? = null,
     val referralReason: String?,
     var nextFollowUpDate: String? = null,
     val serviceProvidedByName: String? = null,

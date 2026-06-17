@@ -1649,6 +1649,7 @@
     <string name="service_date">সেবার তারিখ</string>
     <string name="service_provided_by">সেবা প্রদানকারী</string>
     <string name="referral_status">রেফারেলের অবস্থা</string>
+    <string name="referred_location">রেফারেলের স্থান</string>
     <string name="error_person_name">অনুগ্রহ করে সঠিক নাম লিখুন</string>
     <string name="emergency_referral">⚠️ জরুরি ভিত্তিতে রেফার করুন</string>
     <string name="non_emergency_referral">ⓘ নিয়মিত চেকআপের পরামর্শ</string>

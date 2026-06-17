@@ -11,7 +11,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.appextensions.postLoading
 import org.medtroniclabs.uhis.common.CommonUtils
-import org.medtroniclabs.uhis.common.RoleConstant
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberWithTb
 import org.medtroniclabs.uhis.di.IoDispatcher
@@ -85,6 +84,7 @@ class ServicesViewModel @Inject constructor(
                         state = ResourceState.LOADING,
                     ),
                 )
+                val restrictExternalToSkCreator = CommonUtils.isSk()
                 val counts = measureTimedValue {
                     memberRepository.getServiceMemberCounts(
                         filters = staticFilters.toList(),
@@ -93,6 +93,7 @@ class ServicesViewModel @Inject constructor(
                         filterBySubVillages = filter.filterBySubVillages.map { it.id!! },
                         allowNullHousehold = isFoPo,
                         qrCode = filter.qrCode,
+                        restrictExternalToSkCreator = restrictExternalToSkCreator,
                     )
                 }
                 Timber.tag("bug_n_bug").d("Time taken for count in seconds : " + counts.duration.inWholeSeconds)
@@ -105,22 +106,17 @@ class ServicesViewModel @Inject constructor(
                             filter.staticFilter,
                             allowNullHousehold = isFoPo,
                             qrCode = filter.qrCode,
+                            restrictExternalToSkCreator = restrictExternalToSkCreator,
                         )
                 }
                 Timber.tag("bug_n_bug").d("Time taken for filtered data in seconds : " + members.duration.inWholeSeconds)
                 emitSource(
                     members.value.map { memberList ->
-                        val displayMembers =
-                            filterExternalMembersForSkIfNeeded(memberList, filter.staticFilter)
-                        val displayCounts = counts.value.toMutableMap()
-                        if (CommonUtils.isSk() && isSkScopedExternalFilter(filter.staticFilter)) {
-                            displayCounts[filter.staticFilter] = displayMembers.size
-                        }
                         Resource(
                             state = ResourceState.SUCCESS,
                             FilteredMembersUiData(
-                                members = displayMembers,
-                                counts = displayCounts,
+                                members = memberList,
+                                counts = counts.value,
                             ),
                         )
                     },
@@ -260,20 +256,5 @@ class ServicesViewModel @Inject constructor(
             qrCode = qrCodeString
         }
         filterLiveData.postValue(filter)
-    }
-
-    private fun isSkScopedExternalFilter(staticFilter: ServiceStaticFilter): Boolean =
-        staticFilter == ServiceStaticFilter.EXTERNAL_MEMBERS ||
-            staticFilter == ServiceStaticFilter.EXTERNAL_PREGNANT_WOMEN
-
-    private fun filterExternalMembersForSkIfNeeded(
-        members: List<HouseholdMemberWithTb>,
-        staticFilter: ServiceStaticFilter,
-    ): List<HouseholdMemberWithTb> {
-        if (!CommonUtils.isSk() || !isSkScopedExternalFilter(staticFilter)) return members
-        return members.filter { member ->
-            member.createdByRoleName.isNullOrBlank() ||
-                member.createdByRoleName.equals(RoleConstant.SHASTIYA_KORMI, ignoreCase = true)
-        }
     }
 }

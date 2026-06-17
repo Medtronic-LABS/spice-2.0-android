@@ -175,7 +175,8 @@ class MemberSearchAdapter(
         holder.binding.tvRecentServiceDateValue.gone()
 
         holder.binding.tvDiagnosis.setText(R.string.national_id)
-        holder.binding.tvDiagnosisStatus.text = item.nationalId ?: context.getString(R.string.separator_double_hyphen)
+        holder.binding.tvDiagnosisStatus.text =
+            item.resolvedNationalId() ?: context.getString(R.string.separator_double_hyphen)
         holder.binding.tvDiagnosisStatus.setTextColor(ContextCompat.getColor(context, R.color.grey_black))
 
         val name = item.name ?: context.getString(R.string.separator_hyphen)

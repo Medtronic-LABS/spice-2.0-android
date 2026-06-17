@@ -295,6 +295,7 @@ interface MemberDAO {
         /** FO/PO: members may have no household; use member-level joins and sub-village like external flow. */
         allowNullHousehold: Boolean = false,
         qrCode: String? = null,
+        restrictExternalToSkCreator: Boolean = false,
     ): LiveData<List<HouseholdMemberWithTb>> {
         val query = ServiceMemberQueryBuilder.buildListQuery(
             searchInput = searchInput,
@@ -303,6 +304,7 @@ interface MemberDAO {
             staticFilter = staticFilter,
             allowNullHousehold = allowNullHousehold,
             qrCode = qrCode,
+            restrictExternalToSkCreator = restrictExternalToSkCreator,
         )
         return attachAssessmentHistoryToMembers(getServiceMembersRaw(query))
     }
@@ -391,6 +393,7 @@ interface MemberDAO {
         filterBySubVillages: List<Long> = emptyList(),
         allowNullHousehold: Boolean = false,
         qrCode: String? = null,
+        restrictExternalToSkCreator: Boolean = false,
     ): Map<ServiceStaticFilter, Int> {
         if (filters.isEmpty()) return emptyMap()
         val query = ServiceMemberCountQueryBuilder.buildCombinedCountQuery(
@@ -400,6 +403,7 @@ interface MemberDAO {
             filterBySubVillages = filterBySubVillages,
             allowNullHousehold = allowNullHousehold,
             qrCode = qrCode,
+            restrictExternalToSkCreator = restrictExternalToSkCreator,
         )
         val counts = LinkedHashMap<ServiceStaticFilter, Int>()
         getServiceMemberCountsCursor(query).use { cursor ->

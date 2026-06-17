@@ -442,7 +442,7 @@
       },
       {
         "id": "patientReferredForOperation",
-        "title": "Has the patient is referred for operation?",
+        "title": "Has the patient been referred for operation?",
         "family": "cataract",
         "orderId": 2,
         "viewType": "SingleSelectionView",
@@ -458,7 +458,7 @@
             "visibility": "visible"
           }
         ],
-        "fieldName": "Has the patient is referred for operation?",
+        "fieldName": "Has the patient been referred for operation?",
         "isEnabled": true,
         "isSummary": true,
         "isEditable": true,

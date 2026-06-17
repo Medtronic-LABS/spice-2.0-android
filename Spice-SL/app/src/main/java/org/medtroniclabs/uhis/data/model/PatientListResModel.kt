@@ -31,4 +31,8 @@ data class PatientListResModel(
     val identityValue: String? = null,
     val memberReference: String? = null,
     val qrCode: String? = null,
-)
+) {
+    fun resolvedNationalId(): String? =
+        nationalId?.takeIf { it.isNotBlank() }
+            ?: identityValue?.takeIf { it.isNotBlank() }
+}
