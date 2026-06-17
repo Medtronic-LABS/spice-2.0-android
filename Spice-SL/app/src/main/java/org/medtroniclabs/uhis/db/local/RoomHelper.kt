@@ -1109,4 +1109,10 @@ interface RoomHelper {
     suspend fun getSubVillage(villageId: Long): List<SubVillageEntity>
 
     suspend fun getMemberByQRCode(qrCode: String): List<HouseholdMemberEntity>
+
+    suspend fun getLatestMemberServiceBAfterServiceA(
+        memberId: Long,
+        serviceA: String,
+        serviceB: String,
+    ): MemberAssessmentHistoryEntity?
 }

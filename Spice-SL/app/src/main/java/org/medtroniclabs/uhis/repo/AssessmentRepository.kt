@@ -307,4 +307,10 @@ class AssessmentRepository @Inject constructor(
         memberLocalId: Long,
         serviceTypeFor: String,
     ): MemberAssessmentHistoryEntity? = roomHelper.getLastServiceHistory(memberLocalId, serviceTypeFor)
+
+    suspend fun getLatestMemberServiceBAfterServiceA(
+        memberId: Long,
+        serviceA: String,
+        serviceB: String,
+    ) = roomHelper.getLatestMemberServiceBAfterServiceA(memberId, serviceA, serviceB)
 }

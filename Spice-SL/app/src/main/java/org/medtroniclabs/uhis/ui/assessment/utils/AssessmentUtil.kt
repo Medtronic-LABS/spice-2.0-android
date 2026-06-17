@@ -1,7 +1,12 @@
 package org.medtroniclabs.uhis.ui.assessment.utils
 
 import android.content.Context
+import android.graphics.Color
 import android.view.View
+import android.widget.TextView
+import androidx.core.text.buildSpannedString
+import androidx.core.text.color
+import androidx.core.text.italic
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
@@ -34,6 +39,8 @@ import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
 import org.medtroniclabs.uhis.ui.assessment.statuslogic.AssessmentStatus
 import java.util.Locale
 import kotlin.math.roundToInt
+import kotlin.text.lastIndexOf
+import kotlin.text.substring
 
 object AssessmentUtil {
     fun calculateAverageBloodPressure(resultMap: HashMap<String, Any>): Pair<Int, Int> {
@@ -618,6 +625,81 @@ object AssessmentUtil {
             val type = bgType?.trim()?.takeIf { typeValue -> typeValue.isNotEmpty() }
             if (type != null) "$formatted ($type)" else formatted
         } ?: context.getString(R.string.separator_double_hyphen)
+    }
+
+    /**
+     * Updates field title with status text in red color
+     * If statusText is null, restores original title
+     */
+    fun updateFieldTitleWithStatus(
+        formGenerator: FormGenerator,
+        originalTitles: HashMap<String, String>,
+        isTranslationEnabled: Boolean,
+        fieldId: String,
+        statusText: String? = null,
+        statusTextCulture: String? = null,
+        textLabelFieldIds: List<String> = emptyList(),
+        previousValue: String? = null,
+    ) {
+        val tag = if (fieldId in textLabelFieldIds) {
+            // For TextLabel, the title TextView is tagged with just the fieldId
+            fieldId
+        } else {
+            // For other fields, use fieldId + titleSuffix
+            fieldId + AssessmentDefinedParams.TITLE_SUFFIX
+        }
+
+        val titleView = formGenerator.getViewByTag(tag) as? TextView
+        titleView?.let { tv ->
+            // Get original title (store it first time if not stored)
+            var originalTitle = originalTitles[fieldId] ?: run {
+                // Since status is always added last, this will only remove the status, preserving unit measurements
+                val currentText = tv.text.toString()
+                // Remove only the last status pattern at the end: " (Status Text)"
+                // Since status is always added last, this will remove only the status, keeping the rest of the title intact
+                val statusPattern = "\\s+\\([^)]+\\)\\s*$".toRegex()
+                val original = currentText.replace(statusPattern, "")
+                originalTitles[fieldId] = original
+                original
+            }
+            val displayStatus = if (isTranslationEnabled && !statusTextCulture.isNullOrBlank()) {
+                statusTextCulture
+            } else {
+                statusText
+            }
+
+            // Find if the title contains *(mandatory) mark
+            val starIndex = originalTitle.lastIndexOf(" *")
+            // If mandatory mark is there remove it from title
+            // We will append it later with red color.
+            if (starIndex != -1) {
+                originalTitle = originalTitle.substring(0, starIndex)
+            }
+
+            tv.text = buildSpannedString {
+                append(originalTitle)
+                // Append mandatory mark
+                if (starIndex != -1) {
+                    color(Color.RED) {
+                        append(" *")
+                    }
+                }
+                // Append previous value
+                if (!previousValue.isNullOrBlank()) {
+                    color(Color.GRAY) {
+                        italic {
+                            append(" ($previousValue)")
+                        }
+                    }
+                }
+                // Append status
+                if (!displayStatus.isNullOrBlank()) {
+                    color(Color.RED) {
+                        append(" ($displayStatus)")
+                    }
+                }
+            }
+        }
     }
 
     private val EYE_PROBLEM_STATUSES = setOf(

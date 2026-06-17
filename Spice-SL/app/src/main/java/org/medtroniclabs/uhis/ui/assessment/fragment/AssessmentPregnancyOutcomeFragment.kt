@@ -1,6 +1,5 @@
 package org.medtroniclabs.uhis.ui.assessment.fragment
 
-import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.InputType
@@ -10,8 +9,6 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.text.buildSpannedString
-import androidx.core.text.color
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,6 +40,7 @@ import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.ReferralResultGenerator
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
+import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 import org.medtroniclabs.uhis.ui.assessment.viewmodel.AssessmentViewModel
 
 /**
@@ -965,8 +963,12 @@ class AssessmentPregnancyOutcomeFragment :
     private fun checkAndUpdatePretermStatus() {
         val dateOfDelivery = formGenerator.getResult(AssessmentDefinedParams.DATE_OF_DELIVERY) as? String
         if (dateOfDelivery.isNullOrBlank()) {
-            // No date selected, restore original title
-            updateDateOfDeliveryTitleWithPretermStatus(null)
+            AssessmentUtil.updateFieldTitleWithStatus(
+                formGenerator,
+                originalTitles,
+                isTranslationEnabled,
+                AssessmentDefinedParams.DATE_OF_DELIVERY,
+            )
             return
         }
 
@@ -975,48 +977,24 @@ class AssessmentPregnancyOutcomeFragment :
 
         if (edd.isNullOrBlank()) {
             // No EDD available, can't determine preterm
-            updateDateOfDeliveryTitleWithPretermStatus(null)
+            AssessmentUtil.updateFieldTitleWithStatus(
+                formGenerator,
+                originalTitles,
+                isTranslationEnabled,
+                AssessmentDefinedParams.DATE_OF_DELIVERY,
+            )
             return
         }
 
         // Check if preterm
         val isPreterm = isPretermDelivery(dateOfDelivery, edd)
-        updateDateOfDeliveryTitleWithPretermStatus(if (isPreterm) getString(R.string.preterm_birth) else null)
-    }
-
-    /**
-     * Updates the Date of Delivery field title with preterm status in red (like ANC pattern)
-     */
-    private fun updateDateOfDeliveryTitleWithPretermStatus(statusText: String?) {
-        val fieldId = AssessmentDefinedParams.DATE_OF_DELIVERY
-        val tag = fieldId + formGenerator.titleSuffix
-        val titleView = formGenerator.getViewByTag(tag) as? TextView
-
-        titleView?.let { tv ->
-            // Get original title (store it first time if not stored)
-            val originalTitle = originalTitles[fieldId] ?: run {
-                val currentText = tv.text.toString()
-                // Remove any existing status pattern: " (Status Text)"
-                val statusPattern = "\\s+\\([^)]+\\)\\s*$".toRegex()
-                val original = currentText.replace(statusPattern, "")
-                originalTitles[fieldId] = original
-                original
-            }
-
-            // Build title with status
-            if (statusText != null && statusText.isNotEmpty()) {
-                tv.text = buildSpannedString {
-                    append(originalTitle)
-                    append(" ")
-                    color(Color.RED) {
-                        append("($statusText)")
-                    }
-                }
-            } else {
-                // No status, show original title
-                tv.text = originalTitle
-            }
-        }
+        AssessmentUtil.updateFieldTitleWithStatus(
+            formGenerator,
+            originalTitles,
+            isTranslationEnabled,
+            AssessmentDefinedParams.DATE_OF_DELIVERY,
+            if (isPreterm) getString(R.string.preterm_birth) else null,
+        )
     }
 
     /**

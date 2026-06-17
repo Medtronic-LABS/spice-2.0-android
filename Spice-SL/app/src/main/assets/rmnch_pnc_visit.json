@@ -123,7 +123,7 @@
             "minValue": 10,
             "maxValue": 250,
             "naValue": 0,
-            "maxLength": 5,
+            "maxLength": 6,
             "orderId": 2,
             "title": "Weight",
             "titleCulture": "ওজন(কেজি)",

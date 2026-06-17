@@ -3,15 +3,17 @@ package org.medtroniclabs.uhis.db
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import org.medtroniclabs.uhis.common.SecuredPreference
-import org.medtroniclabs.uhis.db.entity.COLUMN_PRACTITIONER_ID
-import org.medtroniclabs.uhis.db.entity.COLUMN_REFERRAL_FACILITY_TYPE
 import org.medtroniclabs.uhis.db.entity.EntitiesName.FOLLOW_UP
 import org.medtroniclabs.uhis.db.entity.EntitiesName.FOLLOW_UP_CALL
 import org.medtroniclabs.uhis.db.entity.EntitiesName.HOUSEHOLD_MEMBER
 import org.medtroniclabs.uhis.db.entity.EntitiesName.MEMBER_ASSESSMENT_HISTORY_ENTITY
 import org.medtroniclabs.uhis.db.entity.EntitiesName.PREGNANCY_DETAIL
+import org.medtroniclabs.uhis.db.entity.FU_COLUMN_REFERRAL_FACILITY_TYPE
+import org.medtroniclabs.uhis.db.entity.INDEX_MAH_MEMBER_SERVICE_VISIT
 import org.medtroniclabs.uhis.db.entity.INDEX_MAH_MEMBER_VISIT
-import org.medtroniclabs.uhis.db.entity.INDEX_PRACTITIONER_ID
+import org.medtroniclabs.uhis.db.entity.INDEX_MAH_PRACTITIONER_ID
+import org.medtroniclabs.uhis.db.entity.MAH_COLUMN_PRACTITIONER_ID
+import org.medtroniclabs.uhis.db.entity.MAH_COLUMN_REFERRAL_FACILITY_TYPE
 
 object SpiceDatabaseMigration {
     /**
@@ -30,7 +32,7 @@ object SpiceDatabaseMigration {
      * - Drop patientStatus and reason as are not required
      * - Add callType, isWillingToVisitUHC, visitRejectReason, otherVisitRejectReason, unSuccessfulCallReason
      * - Add wrongNumber, calledByUserId, calledByUserName, calledByUserRole
-     * - Add [COLUMN_PRACTITIONER_ID], serviceProvidedByName, serviceProvidedByRole, observations to [MEMBER_ASSESSMENT_HISTORY_ENTITY]
+     * - Add [MAH_COLUMN_PRACTITIONER_ID], serviceProvidedByName, serviceProvidedByRole, observations, [MAH_COLUMN_REFERRAL_FACILITY_TYPE] to [MEMBER_ASSESSMENT_HISTORY_ENTITY]
      * - Tracks which role registered the member; used to scope SK external-member lists.
      */
     val MIGRATION_5_6 = object : Migration(5, 6) {
@@ -51,10 +53,10 @@ object SpiceDatabaseMigration {
             db.execSQL("ALTER TABLE $FOLLOW_UP_CALL ADD COLUMN calledByUserName TEXT NOT NULL;")
             db.execSQL("ALTER TABLE $FOLLOW_UP_CALL ADD COLUMN calledByUserRole TEXT NOT NULL;")
 
-            db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN $COLUMN_PRACTITIONER_ID TEXT;")
-            db.execSQL("CREATE INDEX IF NOT EXISTS $INDEX_PRACTITIONER_ID ON $MEMBER_ASSESSMENT_HISTORY_ENTITY($COLUMN_PRACTITIONER_ID)")
+            db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN $MAH_COLUMN_PRACTITIONER_ID TEXT;")
+            db.execSQL("CREATE INDEX IF NOT EXISTS $INDEX_MAH_PRACTITIONER_ID ON $MEMBER_ASSESSMENT_HISTORY_ENTITY($MAH_COLUMN_PRACTITIONER_ID)")
 
-            db.execSQL("ALTER TABLE $FOLLOW_UP ADD COLUMN $COLUMN_REFERRAL_FACILITY_TYPE TEXT;")
+            db.execSQL("ALTER TABLE $FOLLOW_UP ADD COLUMN $FU_COLUMN_REFERRAL_FACILITY_TYPE TEXT;")
 
             db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN serviceProvidedByName TEXT;")
             db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN serviceProvidedByRole TEXT;")
@@ -64,6 +66,10 @@ object SpiceDatabaseMigration {
             db.execSQL("CREATE INDEX IF NOT EXISTS idx_pregnancy_detail_member_local_id ON $PREGNANCY_DETAIL(householdMemberLocalId, endAt)")
             db.execSQL("CREATE INDEX IF NOT EXISTS idx_member_assessment_history_member_fhir_id ON $MEMBER_ASSESSMENT_HISTORY_ENTITY(memberFhirId)")
             db.execSQL("CREATE INDEX IF NOT EXISTS $INDEX_MAH_MEMBER_VISIT ON $MEMBER_ASSESSMENT_HISTORY_ENTITY(memberId, visitDate)")
+
+            db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN $MAH_COLUMN_REFERRAL_FACILITY_TYPE TEXT;")
+
+            db.execSQL("CREATE INDEX IF NOT EXISTS $INDEX_MAH_MEMBER_SERVICE_VISIT ON $MEMBER_ASSESSMENT_HISTORY_ENTITY(memberId, serviceProvided, visitDate)")
         }
     }
 }

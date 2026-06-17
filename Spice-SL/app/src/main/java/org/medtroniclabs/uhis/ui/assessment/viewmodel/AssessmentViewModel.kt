@@ -93,6 +93,7 @@ import org.medtroniclabs.uhis.ui.MenuConstants.EYE_CARE_MENU_ID
 import org.medtroniclabs.uhis.ui.MenuConstants.ICCM_MENU_ID
 import org.medtroniclabs.uhis.ui.MenuConstants.NCD_MENU_ID
 import org.medtroniclabs.uhis.ui.MenuConstants.OTHER_SYMPTOMS
+import org.medtroniclabs.uhis.ui.MenuConstants.PNC_MOTHER
 import org.medtroniclabs.uhis.ui.MenuConstants.PREGNANCY_OUTCOME
 import org.medtroniclabs.uhis.ui.MenuConstants.PREGNANT_WOMEN_PROFILE
 import org.medtroniclabs.uhis.ui.MenuConstants.TB_MENU_ID
@@ -133,21 +134,21 @@ import org.medtroniclabs.uhis.ui.assessment.referrallogic.utils.ReferralStatus
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH.ANC
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH.DEATH_OF_MOTHER
+import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH.PNC
 import org.medtroniclabs.uhis.ui.assessment.statuslogic.AssessmentStatusGenerator
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentObservationUtils
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 import org.medtroniclabs.uhis.ui.boarding.repo.MetaRepository
+import timber.log.Timber
 import java.lang.reflect.Type
 import java.time.LocalDate
 import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.Any
-import kotlin.collections.HashMap
 
 @HiltViewModel
 class AssessmentViewModel @Inject constructor(
-    @IoDispatcher override var dispatcherIO: CoroutineDispatcher,
+    @param:IoDispatcher override var dispatcherIO: CoroutineDispatcher,
     private var memberRegistrationRepository: HouseholdMemberRepository,
     private var assessmentRepository: AssessmentRepository,
     private val metaRepository: MetaRepository,
@@ -216,19 +217,7 @@ class AssessmentViewModel @Inject constructor(
 
     var dangerSingsKey: String? = null
 
-    @Inject
-    lateinit var connectivityManager: ConnectivityManager
-
     var isAssessmentCancelLiveData = MutableLiveData<Boolean>()
-
-    init {
-        SecuredPreference.getFollowUpCriteria()?.let { followUpCriteria ->
-            treatmentDays[ReferralReasons.Pneumonia.name] = followUpCriteria.pneumonia
-            treatmentDays[ReferralReasons.Diarrhoea.name] = followUpCriteria.diarrhea
-            treatmentDays[ReferralReasons.MUAC.name] = followUpCriteria.muac
-            treatmentDays[ReferralReasons.Malaria.name] = followUpCriteria.malaria
-        }
-    }
 
     var nameOfDangerSignClicked: String? = null
 
@@ -242,6 +231,24 @@ class AssessmentViewModel @Inject constructor(
      * Live data storing pregnancy details
      */
     val pregnancyDetailLiveData = MutableLiveData<PregnancyDetail?>()
+
+    /**
+     * Latest assessment based on menu/workflow
+     */
+    var previousAssessment: MemberAssessmentHistoryEntity? = null
+        private set
+
+    @Inject
+    lateinit var connectivityManager: ConnectivityManager
+
+    init {
+        SecuredPreference.getFollowUpCriteria()?.let { followUpCriteria ->
+            treatmentDays[ReferralReasons.Pneumonia.name] = followUpCriteria.pneumonia
+            treatmentDays[ReferralReasons.Diarrhoea.name] = followUpCriteria.diarrhea
+            treatmentDays[ReferralReasons.MUAC.name] = followUpCriteria.muac
+            treatmentDays[ReferralReasons.Malaria.name] = followUpCriteria.malaria
+        }
+    }
 
     fun getMemberDetailsById() {
         if (selectedHouseholdMemberId == -1L) {
@@ -1179,14 +1186,17 @@ class AssessmentViewModel @Inject constructor(
                 if (!CommonUtils.isFoOrPo()) return
                 revealBdCampFields(layout, showCampDate = true, showCampType = false)
             }
+
             EYE_CARE_MENU_ID -> {
                 if (!CommonUtils.isFoOrPo()) return
                 revealBdCampFields(layout, showCampDate = false, showCampType = true)
             }
+
             NCD_MENU_ID -> {
                 if (!CommonUtils.isFoOrPo()) return
                 revealBdCampFields(layout, showCampDate = false, showCampType = true)
             }
+
             else -> return
         }
     }
@@ -1204,11 +1214,13 @@ class AssessmentViewModel @Inject constructor(
                         field.visibility = "visible"
                     }
                 }
+
                 AssessmentDefinedParams.CAMP_DATE -> {
                     if (showCampDate) {
                         field.visibility = "visible"
                     }
                 }
+
                 AssessmentDefinedParams.CAMP_TYPE -> {
                     if (showCampType) {
                         field.visibility = "visible"
@@ -2110,5 +2122,35 @@ class AssessmentViewModel @Inject constructor(
             getLastServiceHistory(MenuConstants.CATARACT_MENU_ID),
         )
         return AssessmentUtil.getLatestHeightWeightFromHistories(histories)
+    }
+
+    /**
+     * Fetches latest assessment based on menu/workflow
+     */
+    fun fetchLatestAssessment(type: String) {
+        launch(dispatcherIO) {
+            previousAssessment = when (type.lowercase()) {
+                ANC.lowercase() -> {
+                    assessmentRepository.getLatestMemberServiceBAfterServiceA(
+                        selectedHouseholdMemberId,
+                        PREGNANT_WOMEN_PROFILE.uppercase(),
+                        ANC.uppercase(),
+                    )
+                }
+
+                PNC.lowercase() -> {
+                    assessmentRepository.getLatestMemberServiceBAfterServiceA(
+                        selectedHouseholdMemberId,
+                        PREGNANCY_OUTCOME.uppercase(),
+                        PNC_MOTHER.uppercase(),
+                    )
+                }
+
+                else -> {
+                    null
+                }
+            }
+            Timber.tag("bug_n_bug").d("Latest Assessment $previousAssessment")
+        }
     }
 }

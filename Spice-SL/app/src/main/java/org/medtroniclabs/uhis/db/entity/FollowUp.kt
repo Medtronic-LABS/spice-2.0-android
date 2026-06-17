@@ -30,7 +30,7 @@ data class FollowUp(
     val encounterDate: String? = null,
     val nextVisitDate: String? = null,
     val referredSiteId: String? = null,
-    @ColumnInfo(COLUMN_REFERRAL_FACILITY_TYPE)
+    @ColumnInfo(FU_COLUMN_REFERRAL_FACILITY_TYPE)
     val referralFacilityType: String? = null,
     val villageId: String,
     var isCompleted: Boolean = false,
@@ -46,4 +46,4 @@ data class FollowUp(
     var provenance: ProvanceDto = ProvanceDto(modifiedDate = System.currentTimeMillis().convertToUtcDateTime())
 }
 
-const val COLUMN_REFERRAL_FACILITY_TYPE = "referralFacilityType"
+const val FU_COLUMN_REFERRAL_FACILITY_TYPE = "referralFacilityType"

@@ -18,7 +18,8 @@ import org.medtroniclabs.uhis.db.entity.EntitiesName.MEMBER_ASSESSMENT_HISTORY_E
         Index(value = ["memberId", "visitDate"], name = INDEX_MAH_MEMBER_VISIT),
         Index(value = ["memberFhirId"], name = "idx_member_assessment_history_member_fhir_id"),
         Index(value = ["serviceProvided"], name = "idx_member_assessment_history_service_provided"),
-        Index(value = [COLUMN_PRACTITIONER_ID], name = INDEX_PRACTITIONER_ID),
+        Index(value = [MAH_COLUMN_PRACTITIONER_ID], name = INDEX_MAH_PRACTITIONER_ID),
+        Index(value = ["memberId", "serviceProvided", "visitDate"], name = INDEX_MAH_MEMBER_SERVICE_VISIT),
     ],
 )
 data class MemberAssessmentHistoryEntity(
@@ -33,17 +34,19 @@ data class MemberAssessmentHistoryEntity(
     val customStatus: ArrayList<String>? = null,
     val latestVisit: Boolean,
     val referralStatus: String?,
-    @ColumnInfo(name = "referralFacilityType")
+    @ColumnInfo(name = MAH_COLUMN_REFERRAL_FACILITY_TYPE)
     val referralFacilityType: String? = null,
     val referralReason: String?,
     var nextFollowUpDate: String? = null,
     val serviceProvidedByName: String? = null,
     val serviceProvidedByRole: String? = null,
-    @ColumnInfo(COLUMN_PRACTITIONER_ID)
+    @ColumnInfo(MAH_COLUMN_PRACTITIONER_ID)
     var practitionerId: String? = null,
     val observations: MemberAssessmentObservations? = null,
 )
 
-const val COLUMN_PRACTITIONER_ID = "practitionerId"
-const val INDEX_PRACTITIONER_ID = "idx_member_assessment_history_practitioner_id"
+const val MAH_COLUMN_PRACTITIONER_ID = "practitionerId"
+const val MAH_COLUMN_REFERRAL_FACILITY_TYPE = "referralFacilityType"
+const val INDEX_MAH_PRACTITIONER_ID = "idx_mah_practitioner_id"
 const val INDEX_MAH_MEMBER_VISIT = "idx_mah_member_visit"
+const val INDEX_MAH_MEMBER_SERVICE_VISIT = "idx_mah_member_service_visit"

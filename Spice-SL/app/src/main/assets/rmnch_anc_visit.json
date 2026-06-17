@@ -223,7 +223,7 @@
             "errorMessage": "Please enter a valid weight",
             "cultureErrorMessage": "অনুগ্রহ করে ওজনের বৈধ মান লিখুন",
             "visibility": "visible",
-            "maxLength": 5,
+            "maxLength": 6,
             "minValue": 10,
             "maxValue": 250,
             "naValue": 0,
@@ -396,7 +396,7 @@
             "errorMessage": "Please enter a valid fundal height",
             "cultureErrorMessage": "অনুগ্রহ করে জরায়ুর উচ্চতার বৈধ মান লিখুন",
             "visibility": "visible",
-            "maxLength": 3,
+            "maxLength": 5,
             "minValue": 0,
             "maxValue": 50,
             "unitMeasurement": "cm"

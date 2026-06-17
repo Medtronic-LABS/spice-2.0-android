@@ -1,7 +1,6 @@
 package org.medtroniclabs.uhis.ui.assessment.fragment
 
 import android.content.res.Configuration
-import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,8 +9,6 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.TextView
-import androidx.core.text.buildSpannedString
-import androidx.core.text.color
 import androidx.core.view.children
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
@@ -59,6 +56,7 @@ import org.medtroniclabs.uhis.ui.assessment.referrallogic.PostpartumDangerSigns
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.ReferralResultGenerator
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH.AncPncReferralType
+import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 import org.medtroniclabs.uhis.ui.assessment.viewmodel.AssessmentViewModel
 import java.util.Calendar
 import java.util.Locale
@@ -270,6 +268,7 @@ class AssessmentRMNCHFragment :
             },
         )
         fetchWorkFlowData()
+        fetchLatestAssessment()
     }
 
     /**
@@ -567,6 +566,12 @@ class AssessmentRMNCHFragment :
     private fun fetchWorkFlowData() {
         viewModel.workflowName?.let { name ->
             viewModel.getFormData(name)
+        }
+    }
+
+    private fun fetchLatestAssessment() {
+        viewModel.workflowName?.let { type ->
+            viewModel.fetchLatestAssessment(type)
         }
     }
 
@@ -1296,6 +1301,48 @@ class AssessmentRMNCHFragment :
         }
     }
 
+    private fun evaluateAncPreviousValue(
+        fieldId: String,
+        value: Any?,
+    ): String? =
+        when (fieldId) {
+            AssessmentDefinedParams.WEIGHT -> {
+                val currentValue = CommonUtils.getDoubleOrNull(value)
+                val previousValue = CommonUtils.getDoubleOrNull(viewModel.previousAssessment?.observations?.weight)
+                if (previousValue == null || currentValue == null) {
+                    null
+                } else if (currentValue < previousValue) {
+                    previousValue.toString()
+                } else {
+                    null
+                }
+            }
+            AssessmentDefinedParams.HEMOGLOBIN -> {
+                val currentValue = CommonUtils.getDoubleOrNull(value)
+                val previousValue = CommonUtils.getDoubleOrNull(viewModel.previousAssessment?.observations?.hemoglobin)
+                if (previousValue == null || currentValue == null) {
+                    null
+                } else if (currentValue < previousValue) {
+                    previousValue.toString()
+                } else {
+                    null
+                }
+            }
+            AssessmentDefinedParams.FUNDAL_HEIGHT -> {
+                val currentValue = CommonUtils.getDoubleOrNull(value)
+                val previousValue = CommonUtils.getDoubleOrNull(viewModel.previousAssessment?.observations?.fundalHeight)
+                if (previousValue == null || currentValue == null) {
+                    null
+                } else if (currentValue < previousValue) {
+                    previousValue.toString()
+                } else {
+                    null
+                }
+            }
+
+            else -> null
+        }
+
     /**
      * PNC : Evaluates status condition for a field and returns status text if condition matches
      * Returns Pair<statusText, statusTextCulture> or null if no condition matches
@@ -1358,6 +1405,26 @@ class AssessmentRMNCHFragment :
             -> {
                 if (isValueEquals(value, DefinedParams.YES)) {
                     AssessmentDefinedParams.STATUS_HIGH_RISK to AssessmentDefinedParams.BN_STATUS_HIGH_RISK
+                } else {
+                    null
+                }
+            }
+
+            else -> null
+        }
+
+    private fun evaluatePncPreviousValue(
+        fieldId: String,
+        value: Any?,
+    ): String? =
+        when (fieldId) {
+            RMNCH.ID_HEMOGLOBIN -> {
+                val currentValue = CommonUtils.getDoubleOrNull(value)
+                val previousValue = CommonUtils.getDoubleOrNull(viewModel.previousAssessment?.observations?.hemoglobin)
+                if (previousValue == null || currentValue == null) {
+                    null
+                } else if (currentValue < previousValue) {
+                    previousValue.toString()
                 } else {
                     null
                 }
@@ -1779,74 +1846,12 @@ class AssessmentRMNCHFragment :
     }
 
     /**
-     * Updates field title with status text in red color
-     * If statusText is null, restores original title
-     */
-    private fun updateFieldTitleWithStatus(
-        fieldId: String,
-        textLabelFieldIds: List<String>,
-        statusText: String?,
-        statusTextCulture: String?,
-    ) {
-        val tag = if (fieldId in textLabelFieldIds) {
-            // For TextLabel, the title TextView is tagged with just the fieldId
-            fieldId
-        } else {
-            // For other fields, use fieldId + titleSuffix
-            fieldId + formGenerator.titleSuffix
-        }
-
-        val titleView = formGenerator.getViewByTag(tag) as? TextView
-        titleView?.let { tv ->
-            // Get original title (store it first time if not stored)2
-            var originalTitle = originalTitles[fieldId] ?: run {
-                // Since status is always added last, this will only remove the status, preserving unit measurements
-                val currentText = tv.text.toString()
-                // Remove only the last status pattern at the end: " (Status Text)"
-                // Since status is always added last, this will remove only the status, keeping the rest of the title intact
-                val statusPattern = "\\s+\\([^)]+\\)\\s*$".toRegex()
-                val original = currentText.replace(statusPattern, "")
-                originalTitles[fieldId] = original
-                original
-            }
-            val displayStatus = if (isTranslationEnabled && !statusTextCulture.isNullOrBlank()) {
-                statusTextCulture
-            } else {
-                statusText
-            }
-
-            // Find if the title contains *(mandatory) mark
-            val starIndex = originalTitle.lastIndexOf(" *")
-            // If mandatory mark is there remove it from title
-            // We will append it later with red color.
-            if (starIndex != -1) {
-                originalTitle = originalTitle.substring(0, starIndex)
-            }
-
-            tv.text = buildSpannedString {
-                append(originalTitle)
-                if (starIndex != -1) {
-                    color(Color.RED) {
-                        append(" *")
-                    }
-                }
-                // Append status
-                if (!displayStatus.isNullOrBlank()) {
-                    color(Color.RED) {
-                        append(" ($displayStatus)")
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Handles status evaluation and title update for ANC field
      */
     private fun handleAncFieldStatusUpdate(fieldId: String) {
         // TextLabel fields (folicAcidTablets, ifaTablets, calciumTablets) use just 'id' as tag, not 'id + titleSuffix'
         val textLabelFields = listOf(AssessmentDefinedParams.FOLIC_ACID_TABLETS, AssessmentDefinedParams.IFA_TABLETS, AssessmentDefinedParams.CALCIUM_TABLETS)
-        handleFieldStatusUpdate(fieldId, textLabelFields, ::evaluateAncFieldStatus)
+        handleFieldStatusUpdate(fieldId, textLabelFields, ::evaluateAncFieldStatus, ::evaluateAncPreviousValue)
     }
 
     /**
@@ -1854,7 +1859,7 @@ class AssessmentRMNCHFragment :
      */
     private fun handlePncFieldStatusUpdate(fieldId: String) {
         val textLabelFields = listOf(RMNCH.ID_IFA_TABLETS, RMNCH.ID_CALCIUM_TABLETS)
-        handleFieldStatusUpdate(fieldId, textLabelFields, ::evaluatePncFieldStatus)
+        handleFieldStatusUpdate(fieldId, textLabelFields, ::evaluatePncFieldStatus, ::evaluatePncPreviousValue)
     }
 
     /**
@@ -1877,45 +1882,78 @@ class AssessmentRMNCHFragment :
 
         // Systolic
         if (systolic > 0 && (bpHighRiskTrigger || isLowBp)) {
-            updateFieldTitleWithStatus(
+            AssessmentUtil.updateFieldTitleWithStatus(
+                formGenerator,
+                originalTitles,
+                isTranslationEnabled,
                 AssessmentDefinedParams.SYSTOLIC,
-                emptyList(),
                 AssessmentDefinedParams.STATUS_HIGH_RISK,
                 AssessmentDefinedParams.BN_STATUS_HIGH_RISK,
             )
         } else {
-            updateFieldTitleWithStatus(AssessmentDefinedParams.SYSTOLIC, emptyList(), null, null)
+            AssessmentUtil.updateFieldTitleWithStatus(
+                formGenerator,
+                originalTitles,
+                isTranslationEnabled,
+                AssessmentDefinedParams.SYSTOLIC,
+            )
         }
 
         // Diastolic
         if (diastolic > 0 && (bpHighRiskTrigger || isLowBp)) {
-            updateFieldTitleWithStatus(
+            AssessmentUtil.updateFieldTitleWithStatus(
+                formGenerator,
+                originalTitles,
+                isTranslationEnabled,
                 AssessmentDefinedParams.DIASTOLIC,
-                emptyList(),
                 AssessmentDefinedParams.STATUS_HIGH_RISK,
                 AssessmentDefinedParams.BN_STATUS_HIGH_RISK,
             )
         } else {
-            updateFieldTitleWithStatus(AssessmentDefinedParams.DIASTOLIC, emptyList(), null, null)
+            AssessmentUtil.updateFieldTitleWithStatus(
+                formGenerator,
+                originalTitles,
+                isTranslationEnabled,
+                AssessmentDefinedParams.DIASTOLIC,
+            )
         }
 
         // Edema (Point 2)
         if (isEdemaPresent && (isHighBp || isAlbuminPositive)) {
-            updateFieldTitleWithStatus(RMNCH.ID_EDEMA, emptyList(), AssessmentDefinedParams.STATUS_HIGH_RISK, AssessmentDefinedParams.BN_STATUS_HIGH_RISK)
-        } else {
-            updateFieldTitleWithStatus(RMNCH.ID_EDEMA, emptyList(), null, null)
-        }
-
-        // Urinary Albumin (Point 3)
-        if (isAlbuminPositive && (isHighBp || isEdemaPresent)) {
-            updateFieldTitleWithStatus(
-                RMNCH.ID_URINARY_ALBUMIN,
-                emptyList(),
+            AssessmentUtil.updateFieldTitleWithStatus(
+                formGenerator,
+                originalTitles,
+                isTranslationEnabled,
+                RMNCH.ID_EDEMA,
                 AssessmentDefinedParams.STATUS_HIGH_RISK,
                 AssessmentDefinedParams.BN_STATUS_HIGH_RISK,
             )
         } else {
-            updateFieldTitleWithStatus(RMNCH.ID_URINARY_ALBUMIN, emptyList(), null, null)
+            AssessmentUtil.updateFieldTitleWithStatus(
+                formGenerator,
+                originalTitles,
+                isTranslationEnabled,
+                RMNCH.ID_EDEMA,
+            )
+        }
+
+        // Urinary Albumin (Point 3)
+        if (isAlbuminPositive && (isHighBp || isEdemaPresent)) {
+            AssessmentUtil.updateFieldTitleWithStatus(
+                formGenerator,
+                originalTitles,
+                isTranslationEnabled,
+                RMNCH.ID_URINARY_ALBUMIN,
+                AssessmentDefinedParams.STATUS_HIGH_RISK,
+                AssessmentDefinedParams.BN_STATUS_HIGH_RISK,
+            )
+        } else {
+            AssessmentUtil.updateFieldTitleWithStatus(
+                formGenerator,
+                originalTitles,
+                isTranslationEnabled,
+                RMNCH.ID_URINARY_ALBUMIN,
+            )
         }
     }
 
@@ -1929,26 +1967,40 @@ class AssessmentRMNCHFragment :
 
         // Fasting (Point 1)
         if (fastingSugar >= 7.0) {
-            updateFieldTitleWithStatus(
+            AssessmentUtil.updateFieldTitleWithStatus(
+                formGenerator,
+                originalTitles,
+                isTranslationEnabled,
                 RMNCH.ID_FASTING_BLOOD_SUGAR,
-                emptyList(),
                 AssessmentDefinedParams.STATUS_HIGH_RISK,
                 AssessmentDefinedParams.BN_STATUS_HIGH_RISK,
             )
         } else {
-            updateFieldTitleWithStatus(RMNCH.ID_FASTING_BLOOD_SUGAR, emptyList(), null, null)
+            AssessmentUtil.updateFieldTitleWithStatus(
+                formGenerator,
+                originalTitles,
+                isTranslationEnabled,
+                RMNCH.ID_FASTING_BLOOD_SUGAR,
+            )
         }
 
         // Random (Point 2)
         if (randomSugar >= 11.1) {
-            updateFieldTitleWithStatus(
+            AssessmentUtil.updateFieldTitleWithStatus(
+                formGenerator,
+                originalTitles,
+                isTranslationEnabled,
                 RMNCH.ID_RANDOM_BLOOD_SUGAR,
-                emptyList(),
                 AssessmentDefinedParams.STATUS_HIGH_RISK,
                 AssessmentDefinedParams.BN_STATUS_HIGH_RISK,
             )
         } else {
-            updateFieldTitleWithStatus(RMNCH.ID_RANDOM_BLOOD_SUGAR, emptyList(), null, null)
+            AssessmentUtil.updateFieldTitleWithStatus(
+                formGenerator,
+                originalTitles,
+                isTranslationEnabled,
+                RMNCH.ID_RANDOM_BLOOD_SUGAR,
+            )
         }
     }
 
@@ -1962,17 +2014,23 @@ class AssessmentRMNCHFragment :
             fieldId: String,
             value: Any?,
         ) -> Pair<String?, String?>?,
+        evaluatePreviousValue: (fieldId: String, value: Any?) -> String?,
     ) {
         val resultMap = formGenerator.getResultMap()
         val value = resultMap[fieldId]
 
         val status = evaluateStatus(fieldId, value)
-        if (status != null) {
-            updateFieldTitleWithStatus(fieldId, textLabelFieldIds, status.first, status.second)
-        } else {
-            // No status condition matched, remove status from title
-            updateFieldTitleWithStatus(fieldId, textLabelFieldIds, null, null)
-        }
+        val previousValue = evaluatePreviousValue(fieldId, value)
+        AssessmentUtil.updateFieldTitleWithStatus(
+            formGenerator,
+            originalTitles,
+            isTranslationEnabled,
+            fieldId,
+            status?.first,
+            status?.second,
+            textLabelFieldIds,
+            previousValue,
+        )
     }
 
     /**

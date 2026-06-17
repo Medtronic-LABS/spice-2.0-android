@@ -302,4 +302,28 @@ interface MemberAssessmentHistoryDao {
     @Transaction
     @Query("DELETE FROM $MEMBER_ASSESSMENT_HISTORY_ENTITY WHERE id NOT IN (SELECT MIN(id) FROM $MEMBER_ASSESSMENT_HISTORY_ENTITY GROUP BY memberId, serviceProvided, visitDate, customStatus) AND date(datetime(visitDate, 'localtime')) >= :date")
     suspend fun deleteDuplicateRecords(date: String)
+
+    /**
+     * This will return a recent service which occurred after a particular recent service
+     */
+    @Query(
+        """
+            SELECT * FROM memberassessmenthistory
+                WHERE memberId = :memberId
+                AND serviceProvided = :serviceB
+                AND visitDate > (
+                    SELECT MAX(visitDate)
+                    FROM memberassessmenthistory
+                    WHERE memberId = :memberId
+                    AND serviceProvided = :serviceA
+                )
+                ORDER BY visitDate DESC
+                LIMIT 1
+        """,
+    )
+    suspend fun getLatestMemberServiceBAfterServiceA(
+        memberId: Long,
+        serviceA: String,
+        serviceB: String,
+    ): MemberAssessmentHistoryEntity?
 }
