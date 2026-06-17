@@ -32,6 +32,13 @@ android {
         versionName = "1.0.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
+
+        // Ship arm64-v8a only. All real target devices are arm64, and the dev
+        // emulators are arm64 (Apple Silicon) too. Dropping x86_64/x86/armeabi-v7a
+        // removes ~130 MB of transitive native libs (MediaPipe, ML Kit translate,
+        // pdfium, sherpa) that would otherwise ship for every ABI.
+        ndk { abiFilters += "arm64-v8a" }
+
         missingDimensionStrategy("version", "production")
         resValue("color", "toolbar_color", "#2514BE")
 
@@ -155,6 +162,7 @@ android {
         }
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
@@ -241,10 +249,10 @@ dependencies {
     implementation(project(":analytics"))
 
     // MicroCoaching SDK (sourced from mavenLocal — see ../micro-coaching-android-sdk)
-    implementation("com.medtroniclabs.microcoaching:sdk-android:0.4.0-SNAPSHOT")
+    implementation("com.medtroniclabs.microcoaching:sdk-android:0.5.0-SNAPSHOT")
     // Optional offline-Bengali STT engine. Bundles sherpa-onnx (~30 MB)
     // and provides SherpaOnnxStt.factory which the Builder consumes below.
-    implementation("com.medtroniclabs.microcoaching:sdk-android-sherpa:0.3.7-SNAPSHOT")
+    implementation("com.medtroniclabs.microcoaching:sdk-android-sherpa:0.4.0-SNAPSHOT")
 
     // Provide Lifecycle lint to avoid detector crashes
     // lintChecks("androidx.lifecycle:lifecycle-runtime-lint:2.8.6")
