@@ -273,15 +273,19 @@ interface HouseholdDAO {
                     hh.name,
                     hh.household_no,
                     hh.updated_at,
-                    ve.name AS village_name,
-                    ss.name AS shasthya_shebika_name,
-                    sv.name AS sub_village_name
+                    COALESCE(ve.name, '') AS village_name,
+                    COALESCE(ss.name, '') AS shasthya_shebika_name,
+                    COALESCE(sv.name, '') AS sub_village_name
                 FROM Household AS hh
-                INNER JOIN VillageEntity AS ve
+                -- ve/ss/sv supply display names only; scope is enforced by the WHERE clause. A
+                -- reassigned household keeps its original SS (and possibly village) which may not be
+                -- in this device's tables — INNER joins here wrongly hide those households, so a
+                -- newly-assigned village's households never appear (UHIS-1173). Use LEFT joins.
+                LEFT JOIN VillageEntity AS ve
                     ON ve.id = hh.village_id
-                INNER JOIN ShasthyaShebikaEntity AS ss
+                LEFT JOIN ShasthyaShebikaEntity AS ss
                     ON ss.id = hh.shasthya_shebika_id
-                INNER JOIN SubVillageEntity AS sv
+                LEFT JOIN SubVillageEntity AS sv
                     ON sv.id = hh.sub_village_id
                 $whereClause
             )

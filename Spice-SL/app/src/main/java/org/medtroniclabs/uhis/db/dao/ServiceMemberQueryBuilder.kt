@@ -118,18 +118,22 @@ internal object ServiceMemberQueryBuilder {
                 "INNER JOIN Household AS hh ON hh.id = hhm.household_id"
             }
 
+        // ss/sv supply display names only (COALESCE'd below); the village scope is enforced by the
+        // WHERE areaMatch. A reassigned household keeps its original SS stamp, which may not exist in
+        // this device's ShasthyaShebikaEntity — an INNER join here wrongly hides those members, so the
+        // newly-assigned village's members never appear (UHIS-1173). Use LEFT so these never filter.
         val ssJoin =
             if (useOptionalHouseholdJoins) {
                 "LEFT JOIN ShasthyaShebikaEntity AS ss ON hhm.shasthya_shebika_id = ss.id"
             } else {
-                "INNER JOIN ShasthyaShebikaEntity AS ss ON ss.id = hh.shasthya_shebika_id"
+                "LEFT JOIN ShasthyaShebikaEntity AS ss ON ss.id = hh.shasthya_shebika_id"
             }
 
         val svJoin =
             if (useOptionalHouseholdJoins) {
                 "LEFT JOIN SubVillageEntity AS sv ON hhm.sub_village_id = sv.id"
             } else {
-                "INNER JOIN SubVillageEntity AS sv ON sv.id = hh.sub_village_id"
+                "LEFT JOIN SubVillageEntity AS sv ON sv.id = hh.sub_village_id"
             }
 
         val orderByClause =
