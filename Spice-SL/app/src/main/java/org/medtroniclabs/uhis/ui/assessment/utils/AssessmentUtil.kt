@@ -8,7 +8,6 @@ import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
 import org.medtroniclabs.uhis.common.DateUtils.DATE_ddMMyyyy
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
-import org.medtroniclabs.uhis.db.entity.MemberAssessmentObservations
 import org.medtroniclabs.uhis.formgeneration.FormGenerator
 import org.medtroniclabs.uhis.formgeneration.model.BPModel
 import org.medtroniclabs.uhis.mappingkey.Screening
@@ -17,11 +16,8 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_BLOOD_PRESSURE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_DIASTOLIC
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_SYSTOLIC
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BIOMETRIC_FAMILY
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BIO_METRICS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BP_LOG
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BP_LOG_DETAILS
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.CATARACT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FBS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_LOG
@@ -29,13 +25,10 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_TYPE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_UNIT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.Glucose_Date_Time
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HBA1C_DATE_TIME
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HEIGHT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.MMOLL
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NAME
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NCD_SYMPTOMS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.SYMPTOMS_LOG
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.WEIGHT
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ncd
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.utils.ReferralStatus
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
 import org.medtroniclabs.uhis.ui.assessment.statuslogic.AssessmentStatus
@@ -181,15 +174,6 @@ object AssessmentUtil {
             else -> context.getString(R.string.na)
         } ?: run { context.getString(R.string.separator_double_hyphen) }
 
-    fun shouldShowNextFollowUpDate(service: String): Boolean =
-        when (service.lowercase()) {
-            MenuConstants.NCD_MENU_ID.lowercase(),
-            MenuConstants.CATARACT_MENU_ID.lowercase(),
-            MenuConstants.EYE_CARE_MENU_ID.lowercase(),
-            -> false
-            else -> true
-        }
-
     /**
      * Returns display follow-up date based on service
      */
@@ -247,8 +231,10 @@ object AssessmentUtil {
         when {
             hasHighBp && hasHighBg ->
                 displayParts.add(context.getString(R.string.high_both))
+
             hasHighBp ->
                 displayParts.add(context.getString(R.string.high_bp))
+
             hasHighBg ->
                 displayParts.add(context.getString(R.string.high_bg))
         }
@@ -271,7 +257,7 @@ object AssessmentUtil {
 
     private fun isEyeProblemStatus(status: String): Boolean = status in EYE_PROBLEM_STATUSES
 
-    private fun isNcdService(serviceProvided: String?): Boolean = serviceProvided?.lowercase() == MenuConstants.NCD_MENU_ID.lowercase()
+    private fun isNcdService(serviceProvided: String?): Boolean = serviceProvided.equals(MenuConstants.NCD_MENU_ID, ignoreCase = true)
 
     private fun formatEyeProblemStatus(
         status: String,
@@ -385,6 +371,7 @@ object AssessmentUtil {
             AssessmentStatus.UNCONTROLLED_BP -> {
                 context.getString(R.string.high_bp)
             }
+
             AssessmentStatus.UNCONTROLLED_BG -> {
                 context.getString(R.string.high_bg)
             }
@@ -473,6 +460,7 @@ object AssessmentUtil {
                     R.drawable.ic_services_anc
                 }
             }
+
             RMNCH.ANC.lowercase() -> {
                 if (service.customStatus?.contains(AssessmentStatus.HIGH_RISK_PW.name) == true) {
                     R.drawable.ic_services_anc_high_risk
@@ -480,6 +468,7 @@ object AssessmentUtil {
                     R.drawable.ic_services_anc
                 }
             }
+
             MenuConstants.FP_MENU_ID.lowercase() -> R.drawable.ic_services_family_planning
             RMNCH.CHILD_MENU.lowercase() -> R.drawable.ic_services_child_health
             MenuConstants.PREGNANCY_OUTCOME.lowercase() -> R.drawable.ic_services_pnc
@@ -490,6 +479,7 @@ object AssessmentUtil {
                     R.drawable.ic_services_pnc
                 }
             }
+
             MenuConstants.NCD_MENU_ID.lowercase() -> R.drawable.ic_services_ncd
             MenuConstants.EYE_CARE_MENU_ID.lowercase() -> R.drawable.ic_services_eye_care
             MenuConstants.CATARACT_MENU_ID.lowercase() -> R.drawable.ic_cataract
@@ -558,113 +548,6 @@ object AssessmentUtil {
             }
         }
     }
-
-    fun buildMemberAssessmentObservations(
-        assessmentMap: HashMap<String, Any>,
-        menuId: String?,
-    ): MemberAssessmentObservations? {
-        val service = menuId ?: return null
-        if (!shouldShowServiceObservations(service)) return null
-
-        val vitalsMap = resolveVitalsMap(assessmentMap, service) ?: return null
-        val height = resolveObservationHeight(vitalsMap)
-        val weight = resolveObservationWeight(vitalsMap)
-        val bp = resolveObservationBloodPressure(vitalsMap)
-        val bg = resolveObservationBloodGlucose(vitalsMap)
-
-        if (height == null && weight == null && bp == null && bg == null) return null
-
-        return MemberAssessmentObservations(
-            height = height,
-            weight = weight,
-            bp = bp,
-            bg = bg,
-        )
-    }
-
-    private fun resolveVitalsMap(
-        assessmentMap: HashMap<String, Any>,
-        menuId: String,
-    ): HashMap<String, Any>? =
-        when (menuId.lowercase()) {
-            MenuConstants.NCD_MENU_ID.lowercase() ->
-                (assessmentMap[ncd] ?: assessmentMap[MenuConstants.NCD_MENU_ID]) as? HashMap<String, Any>
-            MenuConstants.CATARACT_MENU_ID.lowercase() ->
-                resolveCataractVitalsMap(assessmentMap)
-            else -> null
-        }
-
-    /** Merges cataract root with nested [ncd] vitals when NCD service is provided. */
-    private fun resolveCataractVitalsMap(assessmentMap: HashMap<String, Any>): HashMap<String, Any>? {
-        val cataractSection = (assessmentMap[CATARACT] ?: assessmentMap[MenuConstants.CATARACT_MENU_ID])
-            as? HashMap<String, Any> ?: return null
-        val ncdSection = (cataractSection[ncd] ?: cataractSection[MenuConstants.NCD_MENU_ID])
-            as? HashMap<String, Any> ?: return cataractSection
-        return HashMap<String, Any>().apply {
-            putAll(cataractSection)
-            putAll(ncdSection)
-        }
-    }
-
-    private fun resolveObservationHeight(map: HashMap<String, Any>): String? = resolveObservationNumber(map, HEIGHT)
-
-    private fun resolveObservationWeight(map: HashMap<String, Any>): String? = resolveObservationNumber(map, WEIGHT)
-
-    private fun resolveObservationNumber(
-        map: HashMap<String, Any>,
-        key: String,
-    ): String? {
-        val bpLogs = map[BP_LOG] as? HashMap<*, *>
-        (bpLogs?.get(key) as? Number)?.let { return formatObservationNumber(it) }
-        for (familyKey in listOf(BIOMETRIC_FAMILY, BIO_METRICS)) {
-            val family = map[familyKey] as? HashMap<*, *> ?: continue
-            (family[key] as? Number)?.let { return formatObservationNumber(it) }
-        }
-        return (map[key] as? Number)?.let { formatObservationNumber(it) }
-    }
-
-    private fun formatObservationNumber(value: Number): String {
-        val doubleValue = value.toDouble()
-        return if (doubleValue == doubleValue.roundToInt().toDouble()) {
-            doubleValue.roundToInt().toString()
-        } else {
-            doubleValue.toString()
-        }
-    }
-
-    private fun resolveObservationBloodPressure(map: HashMap<String, Any>): String? {
-        val bpLogs = map[BP_LOG] as? HashMap<String, Any> ?: return null
-
-        (bpLogs[AVG_BLOOD_PRESSURE] as? String)?.trim()?.takeIf { it.isNotEmpty() }?.let { return it }
-
-        val sys = (bpLogs[AVG_SYSTOLIC] as? Number)?.toInt()
-        val dia = (bpLogs[AVG_DIASTOLIC] as? Number)?.toInt()
-        if (sys != null && sys > 0 && dia != null && dia > 0) {
-            return "$sys/$dia"
-        }
-
-        val (computedSys, computedDia) = calculateAverageBloodPressure(map)
-        return if (computedSys > 0 && computedDia > 0) {
-            "$computedSys/$computedDia"
-        } else {
-            null
-        }
-    }
-
-    private fun resolveObservationBloodGlucose(map: HashMap<String, Any>): String? {
-        val glucoseLogs = map[GLUCOSE_LOG] as? HashMap<*, *> ?: return null
-        val glucose = glucoseLogs[GLUCOSE] as? Number ?: return null
-        if (glucose.toDouble() <= 0) return null
-        return formatObservationNumber(glucose)
-    }
-
-    fun shouldShowServiceObservations(service: String): Boolean =
-        when (service.lowercase()) {
-            MenuConstants.NCD_MENU_ID.lowercase(),
-            MenuConstants.CATARACT_MENU_ID.lowercase(),
-            -> true
-            else -> false
-        }
 
     fun formatServiceHistoryBloodPressure(
         context: Context,

@@ -1821,4 +1821,26 @@
         <item>ভুল নাম্বার</item>
         <item>সংযোগ স্থাপন করা সম্ভব হয়নি</item>
     </string-array>
+    <string name="complications_during_delivery">প্রসবকালীন জটিলতা</string>
+    <string name="present">হাজির</string>
+    <string name="pnc_status">প্রসবোত্তর অবস্থা</string>
+    <string name="fp_status">পরিবার পরিকল্পনা অবস্থা</string>
+    <string name="desire_for_children">আপনার কি ভবিষ্যতে সন্তান নেওয়ার ইচ্ছা আছে?</string>
+    <string name="delivery_mode">ডেলিভারির পদ্ধতি</string>
+    <string-array name="desire_for_children_options">
+        <item>হ্যাঁ, ২ বছরের মধ্যে</item>
+        <item>হ্যাঁ, ২ বছরের পরে</item>
+        <item>না</item>
+        <item>সিদ্ধান্ত নেয়নি</item>
+    </string-array>
+    <string-array name="family_planning_methods">
+        <item>পিল</item>
+        <item>ইঞ্জেকশান</item>
+        <item>নরপ্লান্ট</item>
+        <item>আই ইউ ডি  (গর্ভনিরোধক যন্ত্র)</item>
+        <item>কনডম</item>
+        <item>মহিলা বন্ধ্যাকরণ</item>
+        <item>পুরুষ বন্ধ্যাকরণ</item>
+        <item>কোনোটি নয়</item>
+    </string-array>
 </resources>

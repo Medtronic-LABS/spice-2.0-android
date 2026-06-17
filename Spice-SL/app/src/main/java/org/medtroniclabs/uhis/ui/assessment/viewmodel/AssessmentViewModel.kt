@@ -138,6 +138,7 @@ import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH.ANC
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH.DEATH_OF_MOTHER
 import org.medtroniclabs.uhis.ui.assessment.statuslogic.AssessmentStatusGenerator
+import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentObservationUtils
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 import org.medtroniclabs.uhis.ui.boarding.repo.MetaRepository
 import java.lang.reflect.Type
@@ -383,7 +384,7 @@ class AssessmentViewModel @Inject constructor(
                         serviceProvidedByName = serviceProvider.first,
                         serviceProvidedByRole = serviceProvider.second,
                         practitionerId = SecuredPreference.getUserFhirId(),
-                        observations = AssessmentUtil.buildMemberAssessmentObservations(assessmentMap, menuId),
+                        observations = AssessmentObservationUtils.buildMemberAssessmentObservations(assessmentMap, menuId),
                     )
                     assessmentHistoryResultLiveData.postValue(assessmentRepository.saveAssessmentHistory(history))
                 }
@@ -1593,6 +1594,10 @@ class AssessmentViewModel @Inject constructor(
                     serviceProvidedByName = serviceProvider.first,
                     serviceProvidedByRole = serviceProvider.second,
                     practitionerId = SecuredPreference.getUserFhirId(),
+                    observations = AssessmentObservationUtils.buildMemberAssessmentObservations(
+                        assessmentMap,
+                        RMNCH.PNC_MOTHER_MENU,
+                    ),
                 )
                 assessmentHistoryResultLiveData.postValue(assessmentRepository.saveAssessmentHistory(history))
             }

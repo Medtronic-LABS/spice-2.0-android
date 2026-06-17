@@ -1,6 +1,7 @@
 package org.medtroniclabs.uhis.db.local
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.map
 import androidx.room.Transaction
 import androidx.sqlite.db.SimpleSQLiteQuery
@@ -1379,15 +1380,40 @@ class RoomHelperImpl @Inject constructor(
 
     override suspend fun deleteAllMemberAssessmentHistory() = memberAssessmentHistoryDao.deleteMemberAssessmentHistory()
 
-    override fun getMemberWithAssessmentHistory(memberId: Long): LiveData<MemberAssessmentHistoryResponse?> =
-        memberDAO.getMemberWithAssessmentHistory(memberId).map { result ->
-            if (!result.isNullOrEmpty()) {
-                val entry = result.entries.first()
+    override fun getMemberWithAssessmentHistory(memberId: Long): LiveData<MemberAssessmentHistoryResponse?> {
+        val result = MediatorLiveData<MemberAssessmentHistoryResponse?>()
+        var latestResponse: MemberAssessmentHistoryResponse? = null
+        var latestPregnancy: PregnancyDetail? = null
+
+        fun emit() {
+            result.value = latestResponse?.copy(recentPregnancy = latestPregnancy)
+        }
+
+        val memberSource = memberDAO.getMemberWithAssessmentHistory(memberId).map { mapResult ->
+            if (!mapResult.isNullOrEmpty()) {
+                val entry = mapResult.entries.first()
                 MemberAssessmentHistoryResponse(entry.key, entry.value)
             } else {
                 null
             }
         }
+
+        result.addSource(memberSource) { response ->
+            latestResponse = response
+            if (response == null) {
+                result.value = null
+            } else {
+                emit()
+            }
+        }
+        result.addSource(pregnancyDetailDao.observeRecentPregnancyDetail(memberId)) { pregnancy ->
+            latestPregnancy = pregnancy
+            if (latestResponse != null) {
+                emit()
+            }
+        }
+        return result
+    }
 
     override suspend fun getDashboardCounts(
         startDate: String?,

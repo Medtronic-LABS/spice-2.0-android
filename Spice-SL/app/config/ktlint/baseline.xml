@@ -769,12 +769,6 @@
         <error line="190" column="15" source="standard:property-naming" />
         <error line="191" column="15" source="standard:property-naming" />
         <error line="192" column="15" source="standard:property-naming" />
-        <error line="195" column="15" source="standard:property-naming" />
-        <error line="196" column="15" source="standard:property-naming" />
-        <error line="199" column="15" source="standard:property-naming" />
-        <error line="200" column="15" source="standard:property-naming" />
-        <error line="201" column="15" source="standard:property-naming" />
-        <error line="202" column="15" source="standard:property-naming" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/ComplianceChooseDialog.kt">
         <error line="1" column="1" source="standard:filename" />

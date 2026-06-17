@@ -1896,4 +1896,26 @@
         <item>Wrong Number</item>
         <item>Unreachable</item>
     </string-array>
+    <string name="complications_during_delivery">Complications during delivery</string>
+    <string name="present">Present</string>
+    <string name="pnc_status">PNC Status</string>
+    <string name="fp_status">FP Status</string>
+    <string name="desire_for_children">Desire for children in future</string>
+    <string name="delivery_mode">Delivery Mode</string>
+    <string-array name="desire_for_children_options">
+        <item>Yes  within 2 yrs</item>
+        <item>Yes after 2 yrs</item>
+        <item>No</item>
+        <item>Unsure</item>
+    </string-array>
+    <string-array name="family_planning_methods">
+        <item>Pills</item>
+        <item>Injectables</item>
+        <item>Implant</item>
+        <item>IUD</item>
+        <item>Condoms</item>
+        <item>Sterilization (F)</item>
+        <item>Sterilization (M)</item>
+        <item>None</item>
+    </string-array>
 </resources>

@@ -7,4 +7,5 @@ data class MemberServiceIconRow(
     val memberId: Long?,
     val serviceProvided: String?,
     val visitDate: String?,
+    val customStatus: ArrayList<String>?,
 )

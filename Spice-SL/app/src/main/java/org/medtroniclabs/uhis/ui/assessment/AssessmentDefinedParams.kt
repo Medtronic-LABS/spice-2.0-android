@@ -192,14 +192,8 @@ object AssessmentDefinedParams {
     const val otherRelationshipIC = "otherRelationshipIC"
 
     // Family Planning Field IDs
-    const val NumberOfLivingChildren = "numberOfLivingChildren"
-    const val DesireForChildrenInFuture = "desireForChildrenInFuture"
-
-    // Family Planning Desire Values
-    const val DesireYesWithin2Yrs = "yesWithin2Yrs"
-    const val DesireYesAfter2Yrs = "yesAfter2Yrs"
-    const val DesireNoMore = "noMoreChildren"
-    const val DesireUnsure = "unsure"
+    const val NUMBER_OF_LIVING_CHILDREN = "numberOfLivingChildren"
+    const val DESIRE_FOR_CHILDREN_IN_FUTURE = "desireForChildrenInFuture"
 
     // Child Health Field Ids
     const val WHAT_FED_LAST_24_HRS = "childFeedLast24Hrs"

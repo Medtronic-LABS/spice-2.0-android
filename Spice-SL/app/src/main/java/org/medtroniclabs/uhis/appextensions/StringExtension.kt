@@ -7,6 +7,8 @@ import java.time.format.DateTimeFormatter
 
 fun String?.textOrHyphen(): String = if (this.isNullOrBlank()) "-" else this.trim()
 
+fun String?.textOrDoubleHyphen(): String = if (this.isNullOrBlank()) "--" else this.trim()
+
 fun String?.textOrEmpty(): String = if (this.isNullOrBlank()) "" else this.trim()
 
 fun Int?.numberOrZero(): Int = if (this == null || this < 0) 0 else this

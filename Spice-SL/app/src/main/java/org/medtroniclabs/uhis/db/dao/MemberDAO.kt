@@ -309,7 +309,7 @@ interface MemberDAO {
 
     @Query(
         """
-        SELECT memberId, serviceProvided, visitDate
+        SELECT memberId, serviceProvided, visitDate, customStatus
         FROM MemberAssessmentHistory
         WHERE memberId IN (:memberIds)
             AND serviceProvided IS NOT NULL AND serviceProvided != ''
@@ -347,6 +347,7 @@ interface MemberDAO {
                             memberId = row.memberId,
                             visitDate = row.visitDate,
                             serviceProvided = row.serviceProvided,
+                            customStatus = row.customStatus,
                             latestVisit = false,
                             referralStatus = null,
                             referralReason = null,
@@ -417,6 +418,10 @@ interface MemberDAO {
     /**
      * Retrieves a member and their associated assessment history, sorted by visit date in descending order.
      * Uses a LEFT JOIN to combine [HouseholdMemberEntity] and [MemberAssessmentHistoryEntity] in a single query.
+     *
+     * Recent pregnancy is not included here; [org.medtroniclabs.uhis.db.local.RoomHelper.getMemberWithAssessmentHistory]
+     * composes the full [org.medtroniclabs.uhis.db.response.MemberAssessmentHistoryResponse], including the
+     * pregnancy episode with the latest [org.medtroniclabs.uhis.db.entity.PregnancyDetail.endAt].
      *
      * @param memberId The local ID of the member to retrieve.
      * @return A map where the key is the member entity and the value is a list of their assessment histories.

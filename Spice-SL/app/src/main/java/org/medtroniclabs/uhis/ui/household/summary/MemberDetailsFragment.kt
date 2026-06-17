@@ -9,11 +9,19 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.gone
+import org.medtroniclabs.uhis.appextensions.textOrDoubleHyphen
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.DateUtils
+import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_DD_MMMM_YYYY
+import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
+import org.medtroniclabs.uhis.common.DateUtils.calculateGestationalAge
+import org.medtroniclabs.uhis.common.DateUtils.formatGestationalAge
+import org.medtroniclabs.uhis.common.DateUtils.getLastMenstrualDate
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.databinding.FragmentMemberDetailsBinding
 import org.medtroniclabs.uhis.databinding.SummaryListItemBinding
+import org.medtroniclabs.uhis.db.entity.PregnancyDetail
+import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 import org.medtroniclabs.uhis.ui.externalmember.ExternalMemberRegistrationActivity
 import org.medtroniclabs.uhis.ui.externalmember.ExternalMemberRegistrationFragment
@@ -69,7 +77,7 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
             val registeredAt = DateUtils.formatDateToDisplayFormat(memberDetails.member.createdAt)
             val servicesProvided = if (memberDetails.history.isNotEmpty()) {
                 memberDetails.history.distinctBy { history -> history.serviceProvided }.joinToString { history ->
-                    AssessmentUtil.mapServiceToServiceName(history.serviceProvided ?: "", requireContext())
+                    AssessmentUtil.mapServiceToServiceName(history.serviceProvided.orEmpty(), requireContext())
                 }
             } else {
                 getString(R.string.separator_double_hyphen)
@@ -79,12 +87,27 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
             addSummaryView(getString(R.string.mobile_number), memberDetails.member.phoneNumber ?: getString(R.string.separator_double_hyphen))
             addSummaryView(getString(R.string.last_visit_date), lastActivity)
             addSummaryView(getString(R.string.services_provided), servicesProvided)
-            addSummaryView(
-                getString(R.string.recent_status),
-                memberDetails.history.firstOrNull()?.let { history ->
-                    AssessmentUtil.mapServiceToServiceName(history.serviceProvided ?: "", requireContext())
-                } ?: getString(R.string.separator_double_hyphen),
-            )
+            val recentService = memberDetails.history
+                .firstOrNull()
+                ?.serviceProvided
+                ?.lowercase()
+                .orEmpty()
+            when (recentService) {
+                MenuConstants.PREGNANT_WOMEN_PROFILE.lowercase(),
+                MenuConstants.ANC.lowercase(),
+                -> {
+                    addPregnancySummaryViews(memberDetails.recentPregnancy)
+                }
+
+                else -> {
+                    addSummaryView(
+                        getString(R.string.recent_status),
+                        memberDetails.history.firstOrNull()?.let { history ->
+                            AssessmentUtil.mapServiceToServiceName(history.serviceProvided.orEmpty(), requireContext())
+                        } ?: getString(R.string.separator_double_hyphen),
+                    )
+                }
+            }
             if (memberDetails.member.isActive) {
                 binding.tvEdit.visible()
             } else {
@@ -95,6 +118,38 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
 
     private fun setListeners() {
         binding.tvEdit.setOnClickListener(this)
+    }
+
+    /**
+     * Binds Gestational age and EDD in case of PW Registration or ANC
+     */
+    private fun addPregnancySummaryViews(pregnancyDetail: PregnancyDetail?) {
+        val gestationalAge = pregnancyDetail?.lastMenstrualPeriod?.let { lmp ->
+            try {
+                formatGestationalAge(
+                    calculateGestationalAge(getLastMenstrualDate(lmp)),
+                    requireContext(),
+                )
+            } catch (_: Exception) {
+                null
+            }
+        }
+        addSummaryView(
+            getString(R.string.gestational_age),
+            gestationalAge.textOrDoubleHyphen(),
+        )
+
+        val formattedEdd = pregnancyDetail?.estimatedDeliveryDate?.let { edd ->
+            DateUtils.convertDateFormat(
+                edd,
+                DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
+                DATE_FORMAT_DD_MMMM_YYYY,
+            )
+        }
+        addSummaryView(
+            getString(R.string.estimated_delivery_date),
+            formattedEdd.textOrDoubleHyphen(),
+        )
     }
 
     private fun addSummaryView(
