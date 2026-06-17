@@ -5,10 +5,14 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.Recomposer
+import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.medtroniclabs.microcoaching.ui.components.CoachingGridTile
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
@@ -39,6 +43,26 @@ class DashboardMenuItemsAdapter(
     class CoachingViewHolder(val binding: RowCoachingTileBinding) :
         RecyclerView.ViewHolder(binding.root)
 
+    /**
+     * Parent composition context for the coaching tile's [ComposeView].
+     *
+     * On tablets this RecyclerView uses FlexboxLayoutManager, which measures item
+     * views inside `calculateFlexLines` BEFORE attaching them to the window.
+     * `AbstractComposeView.onMeasure` unconditionally creates its composition, and
+     * with no explicit parent context it resolves one from the window recomposer —
+     * which doesn't exist while the view is detached, so it throws
+     * "Cannot locate windowRecomposer ... not attached to a window" (crash seen on
+     * tablets; phones use GridLayoutManager, which attaches before measuring, so
+     * they never hit it).
+     *
+     * Supplying an explicit, lifecycle-scoped [Recomposer] via
+     * `setParentCompositionContext` short-circuits that window lookup, so the tile
+     * composes safely even when measured detached. Created when the adapter is
+     * attached to the RecyclerView and cancelled when it detaches.
+     */
+    private var recomposer: Recomposer? = null
+    private var recomposeScope: CoroutineScope? = null
+
     override fun getItemViewType(position: Int): Int =
         if (roleBasedActivitiesList[position]
                 .menuId
@@ -49,6 +73,26 @@ class DashboardMenuItemsAdapter(
             VIEW_TYPE_DEFAULT
         }
 
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        // AndroidUiDispatcher.CurrentThread supplies a Choreographer-backed frame
+        // clock; the Recomposer drives the coaching tile's composition off it.
+        // Created on the main thread (RecyclerView callbacks are main-thread).
+        val dispatcher = AndroidUiDispatcher.CurrentThread
+        val scope = CoroutineScope(dispatcher)
+        val newRecomposer = Recomposer(dispatcher)
+        recomposeScope = scope
+        recomposer = newRecomposer
+        scope.launch { newRecomposer.runRecomposeAndApplyChanges() }
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        recomposer?.cancel()
+        recomposer = null
+        recomposeScope = null
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -56,9 +100,14 @@ class DashboardMenuItemsAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return if (viewType == VIEW_TYPE_COACHING) {
             CoachingViewHolder(RowCoachingTileBinding.inflate(inflater, parent, false)).also {
-                it.binding.coachingTileComposeView.setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool,
-                )
+                it.binding.coachingTileComposeView.apply {
+                    // Explicit parent context — see [recomposer]. Must be set before
+                    // the first onMeasure (which is why it's here, not at bind).
+                    setParentCompositionContext(recomposer)
+                    setViewCompositionStrategy(
+                        ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool,
+                    )
+                }
             }
         } else {
             ActivitiesViewHolder(RowActivitiesBinding.inflate(inflater, parent, false))

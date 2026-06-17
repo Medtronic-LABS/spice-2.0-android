@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -119,14 +117,11 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MicroCoachingTheme {
-                    val top = sdk.getSelectedMorningModule()
-                    // sdkDismissed is set when the CHW completes or skips from the sheet;
-                    // resets on each onHomeScreenShown call (new session / re-open).
-                    val sdkDismissed by sdk.morningRefresherDismissed.collectAsState()
-                    // Local dismissed handles the session-only skip (tap Skip on the card).
-                    var localDismissed by remember { mutableStateOf(false) }
-
-                    val dismissed = sdkDismissed || localDismissed
+                    // The featured refresher comes from the shared store (the SAME
+                    // pick the modules screen shows). Collected as state so the card
+                    // advances live when the CHW skips or finishes a refresher, and
+                    // hides only when every refresher is skipped (top == null).
+                    val top by sdk.selectedMorningModule.collectAsState()
 
                     // QuickLearnViewModel provides the wrong-question count for the label.
                     val morningVm: QuickLearnViewModel = viewModel(
@@ -137,42 +132,49 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
                     )
                     val wrongCount by morningVm.wrongQuestionCount.collectAsState()
 
-                    // Populate wrongQuestionCount for the label whenever the top module changes.
+                    // Recompute the label whenever the featured module changes.
                     LaunchedEffect(top?.moduleId) {
                         morningVm.computeWrongQuestionCount()
                     }
 
-                    if (top != null && !dismissed) {
+                    val current = top
+                    if (current != null) {
                         val title = if (sdk.config.language == Language.ENGLISH) {
-                            top.titleEn ?: top.titleBn
+                            current.titleEn ?: current.titleBn
                         } else {
-                            top.titleBn
+                            current.titleBn
                         }
                         // Effective question count: wrong answers if any; total otherwise.
-                        val effectiveQuestionCount = if (wrongCount > 0) wrongCount else top.questionCount
-                        val hasCards = top.cardCount > 0
+                        val effectiveQuestionCount = if (wrongCount > 0) wrongCount else current.questionCount
+                        val hasCards = current.cardCount > 0
 
                         val onSkip: () -> Unit = {
-                            localDismissed = true
-                            // Count this as a skipped refresher → Coaching tile badge.
-                            sdk.markRefresherSkipped(top.moduleFamilyId)
-                            sdk.dismissMorningRefresher()
+                            // Skip = advance: mark this refresher skipped → the store
+                            // promotes the next pending refresher into
+                            // selectedMorningModule (the card re-renders with it), or
+                            // hides when none remain. Also feeds the Coaching tile badge.
+                            sdk.markRefresherSkipped(current.moduleFamilyId)
                         }
                         val onStart: () -> Unit = {
                             RefresherBottomSheet.show(
                                 parentFragmentManager,
                                 chwId,
                                 fromHomeScreen = true,
-                                entryMode = RefresherBottomSheet.EntryMode.QUESTION_FIRST,
+                                // Cards-first: lesson cards → quiz. The home card
+                                // never chains ("Next refresher" is suppressed by
+                                // fromHomeScreen), so it ends on the quiz → Done.
+                                entryMode = RefresherBottomSheet.EntryMode.CARDS_FIRST,
+                                // Drill the SAME featured module the card shows.
+                                targetModuleFamilyId = current.moduleFamilyId,
                             )
                         }
 
                         if (hasCards) {
                             MorningCard(
                                 moduleTitle = title,
-                                cardCount = top.cardCount,
+                                cardCount = current.cardCount,
                                 questionCount = effectiveQuestionCount,
-                                estimatedMinutes = top.estimatedMinutes,
+                                estimatedMinutes = current.estimatedMinutes,
                                 onStart = onStart,
                                 onSkip = onSkip,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -181,7 +183,7 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
                             LearnCard(
                                 moduleTitle = title,
                                 questionCount = effectiveQuestionCount,
-                                estimatedMinutes = top.estimatedMinutes,
+                                estimatedMinutes = current.estimatedMinutes,
                                 onStart = onStart,
                                 onSkip = onSkip,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
