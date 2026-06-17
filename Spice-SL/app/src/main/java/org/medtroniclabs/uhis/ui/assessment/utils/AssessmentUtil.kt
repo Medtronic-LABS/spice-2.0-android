@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.View
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.DateUtils
-import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
 import org.medtroniclabs.uhis.common.DateUtils.DATE_ddMMyyyy
 import org.medtroniclabs.uhis.common.SecuredPreference

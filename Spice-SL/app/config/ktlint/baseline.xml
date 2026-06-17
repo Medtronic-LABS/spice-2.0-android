@@ -147,9 +147,6 @@
     <file name="src/main/java/org/medtroniclabs/uhis/data/resource/labourDeliverySummaryRequest.kt">
         <error line="1" column="1" source="standard:filename" />
     </file>
-    <file name="src/main/java/org/medtroniclabs/uhis/db/dao/ServiceFilterConditions.kt">
-        <error line="83" column="1" source="standard:indent" />
-    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/db/entity/BaseEntity.kt">
         <error line="14" column="9" source="standard:property-naming" />
     </file>
@@ -834,10 +831,6 @@
         <error line="79" column="15" source="standard:property-naming" />
         <error line="86" column="15" source="standard:property-naming" />
         <error line="88" column="15" source="standard:property-naming" />
-    </file>
-    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/utils/AssessmentUtil.kt">
-        <error line="3" column="1" source="standard:import-ordering" />
-        <error line="7" column="1" source="standard:no-unused-imports" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/boarding/MenuTypeEnums.kt">
         <error line="4" column="5" source="standard:enum-entry-name-case" />

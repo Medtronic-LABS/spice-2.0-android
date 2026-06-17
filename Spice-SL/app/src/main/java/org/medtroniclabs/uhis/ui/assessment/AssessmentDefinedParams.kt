@@ -584,6 +584,11 @@ object AssessmentDefinedParams {
     const val FP_METHOD_STERILIZATION_FEMALE = "sterilizationFemale"
 
     /**
+     * Spinner : Pregnancy Outcome
+     */
+    const val ID_PREGNANCY_OUTCOME_TYPE = "pregnancyOutcomeType"
+
+    /**
      * CardView : Abortion
      */
     const val ID_ABORTION = "abortion"
@@ -608,10 +613,23 @@ object AssessmentDefinedParams {
      */
     const val ID_MODE_OF_DELIVERY = "modeOfDelivery"
 
+    /**
+     * Spinner : Birth Attendant
+     */
+    const val ID_BIRTH_ATTENDANT = "birthAttendant"
+
     enum class ModeOfDelivery(val value: String) {
         NORMAL_DELIVERY("normalDelivery"),
         ASSISTED_DELIVERY("assistedDelivery"),
         CESAREAN_SECTION("cesareanSection"),
+    }
+
+    enum class PregnancyOutcomeType(val value: String) {
+        LIVE_BIRTH("liveBirth"),
+    }
+
+    enum class PlaceOfDelivery(val value: String) {
+        HOME("home"),
     }
 
     const val FAMILY_PLANNING_FORM = "family_planning_form"

@@ -19,6 +19,8 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.model.UserDetail
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsUtils
+import org.medtroniclabs.uhis.appextensions.gone
+import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
 import org.medtroniclabs.uhis.databinding.CardLayoutBinding
@@ -137,12 +139,49 @@ class AssessmentPregnancyOutcomeFragment :
             binding.scrollView,
             translate = isTranslationEnabled,
             callback = { resultMap, changedFieldId ->
-                if (changedFieldId == AssessmentDefinedParams.ID_LIVE_BIRTH_NUMBERS) {
-                    val count = (resultMap[AssessmentDefinedParams.ID_LIVE_BIRTH_NUMBERS] as? Number)?.toInt() ?: 0
-                    updateBabySections(count)
-                }
-                if (changedFieldId == AssessmentDefinedParams.DATE_OF_DELIVERY) {
-                    checkAndUpdatePretermStatus()
+                when (changedFieldId) {
+                    AssessmentDefinedParams.ID_LIVE_BIRTH_NUMBERS -> {
+                        val count = (resultMap[AssessmentDefinedParams.ID_LIVE_BIRTH_NUMBERS] as? Number)?.toInt() ?: 0
+                        updateBabySections(count)
+                    }
+
+                    AssessmentDefinedParams.DATE_OF_DELIVERY -> {
+                        checkAndUpdatePretermStatus()
+                    }
+
+                    AssessmentDefinedParams.ID_PREGNANCY_OUTCOME_TYPE -> {
+                        val outcomeType = resultMap[changedFieldId].toString()
+                        if (outcomeType == AssessmentDefinedParams.PregnancyOutcomeType.LIVE_BIRTH.value) {
+                            // If the user selected maternal death and then selects live birth,
+                            // then there is some conflict happens(because delivery outcome has dependency with maternal death) due to which delivery outcome is not getting visible.
+                            // Hence, added post callback to make the view visible
+                            binding.llForm.post {
+                                formGenerator.getViewByTag(AssessmentDefinedParams.ID_DELIVERY_OUTCOMES + formGenerator.rootSuffix)?.visible()
+                            }
+                        }
+                    }
+
+                    AssessmentDefinedParams.PLACE_OF_DELIVERY,
+                    AssessmentDefinedParams.ID_MODE_OF_DELIVERY,
+                    -> {
+                        val placeOfDelivery = resultMap[AssessmentDefinedParams.PLACE_OF_DELIVERY].toString()
+                        val modeOfDelivery = resultMap[AssessmentDefinedParams.ID_MODE_OF_DELIVERY].toString()
+                        binding.llForm.post {
+                            formGenerator.getViewByTag(AssessmentDefinedParams.ID_BIRTH_ATTENDANT + formGenerator.rootSuffix)?.let {
+                                if (placeOfDelivery == AssessmentDefinedParams.PlaceOfDelivery.HOME.value) {
+                                    if (modeOfDelivery == AssessmentDefinedParams.ModeOfDelivery.CESAREAN_SECTION.value) {
+                                        formGenerator.resetChildViews(it)
+                                        it.gone()
+                                    } else {
+                                        it.visible()
+                                    }
+                                } else {
+                                    formGenerator.resetChildViews(it)
+                                    it.gone()
+                                }
+                            }
+                        }
+                    }
                 }
             },
         )
@@ -741,12 +780,14 @@ class AssessmentPregnancyOutcomeFragment :
                         result[key] = cleaned
                     }
                 }
+
                 is Map<*, *> -> {
                     val cleaned = removeEmptyObjects(value as HashMap<String, Any>)
                     if (cleaned.isNotEmpty()) {
                         result[key] = cleaned
                     }
                 }
+
                 else -> {
                     if (value != null) {
                         result[key] = value
@@ -822,6 +863,7 @@ class AssessmentPregnancyOutcomeFragment :
                 timeOfDeathResult[DefinedParams.ID]?.toString()
                     ?: timeOfDeathResult[DefinedParams.ID]?.toString()
             }
+
             is String -> timeOfDeathResult
             else -> null
         }
@@ -869,10 +911,7 @@ class AssessmentPregnancyOutcomeFragment :
      * Updates the form result and UI if invalid selections are found
      */
     private fun validateCauseOfDeathOnTimeOfDeathChange() {
-        val causeOfDeathResult = formGenerator.getResult(AssessmentDefinedParams.CAUSE_OF_DEATH)
-        if (causeOfDeathResult == null) {
-            return
-        }
+        val causeOfDeathResult = formGenerator.getResult(AssessmentDefinedParams.CAUSE_OF_DEATH) ?: return
 
         // Get the formLayout for causeOfDeath to validate selections
         val serverData = formGenerator.getServerData()

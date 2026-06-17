@@ -168,8 +168,6 @@ import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import kotlin.collections.get
-import kotlin.text.equals
 
 class FormGenerator(
     var context: Context,
@@ -226,6 +224,7 @@ class FormGenerator(
                         val t = current.take(100)
                         "\"$t\"${if (current.length > 100) "…" else ""}"
                     }
+
                 else -> "${current.javaClass.simpleName}: ${current.toString().take(120)}"
             }
         val reason = message ?: formLayout.errorMessage ?: formLayout.cultureErrorMessage ?: "validation failed"
@@ -2558,12 +2557,14 @@ class FormGenerator(
                     } else {
                         context.getString(R.string.days)
                     }
+
                 AgeOrDobDisplay.AgeOrDobUnit.MONTH ->
                     if (v == 1) {
                         context.getString(R.string.month)
                     } else {
                         context.getString(R.string.months)
                     }
+
                 AgeOrDobDisplay.AgeOrDobUnit.YEAR ->
                     if (v == 1) {
                         context.getString(R.string.year)
@@ -3387,13 +3388,21 @@ class FormGenerator(
         view?.apply {
             val model = serverData?.find { it.id == tag }
             when (model?.viewType) {
-                VIEW_TYPE_FORM_DATEPICKER,
+                VIEW_TYPE_FORM_DATEPICKER -> {
+                    resetEditTextDatePicker(
+                        this,
+                        model,
+                    )
+                    resultHashMap.remove(model.id)
+                }
+
                 VIEW_TYPE_FORM_SPINNER,
                 VIEW_TYPE_FORM_EDITTEXT, VIEW_TYPE_NO_OF_DAYS,
                 -> resetEditTextDatePicker(
                     this,
                     model,
                 )
+
                 VIEW_TYPE_FORM_AGE -> resetAgeView(this, model)
                 VIEW_TYPE_FORM_AGE_YMD -> resetAgeYMDView(this, model)
                 VIEW_TYPE_FORM_AGE_OR_DOB -> resetAgeOrDobView(this, model)
@@ -3401,6 +3410,7 @@ class FormGenerator(
                 VIEW_INFORMATION_LABEL -> {
                     resetInformationLabel(this, model)
                 }
+
                 VIEW_TYPE_FORM_CARD_FAMILY -> resetCardView(model)
                 else -> {
                     if (view.tag
@@ -3454,12 +3464,20 @@ class FormGenerator(
             if (restrictReset(model)) return@apply
             model?.let {
                 when (model.viewType) {
-                    VIEW_TYPE_FORM_DATEPICKER,
+                    VIEW_TYPE_FORM_DATEPICKER -> {
+                        resetEditTextDatePicker(
+                            this,
+                            model,
+                        )
+                        resultHashMap.remove(model.id)
+                    }
+
                     VIEW_TYPE_FORM_EDITTEXT, VIEW_TYPE_NO_OF_DAYS,
                     -> resetEditTextDatePicker(
                         this,
                         model,
                     )
+
                     VIEW_TYPE_FORM_CARD_FAMILY -> resetCardView(model)
                     VIEW_TYPE_FORM_MULTI_SELECT_SPINNER -> resetMultiSelectSpinner(this)
                     VIEW_TYPE_FORM_SPINNER -> resetSpinner(this)

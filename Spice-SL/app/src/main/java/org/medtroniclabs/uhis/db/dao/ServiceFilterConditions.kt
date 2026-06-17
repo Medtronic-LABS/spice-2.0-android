@@ -80,7 +80,7 @@ object ServiceFilterConditions {
             (
                 staticFilter == ServiceStaticFilter.EXTERNAL_MEMBERS ||
                     staticFilter == ServiceStaticFilter.EXTERNAL_PREGNANT_WOMEN
-                )
+            )
 
     const val IS_ACTIVE = "hhm.isActive = 1"
 
