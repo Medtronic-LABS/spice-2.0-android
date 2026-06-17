@@ -80,6 +80,7 @@ class PatientListAdapter(private val callback: (Int, FollowUpPatientModel) -> Un
                 when (data.type) {
                     FU_TYPE_HH_VISIT -> {
                         groupVisitDate.visible()
+                        groupPatientStatus.visible()
                         groupLastCall.gone()
                         tvNextVisitDate.text = data.nextVisitDate?.let {
                             DateUtils.convertDateFormat(
