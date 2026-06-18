@@ -232,6 +232,10 @@ private fun AssessmentEntity.buildActualBranch(): Map<String, Any?> =
         // by the referral_location_* gaps (mismatch_eq). Must be in the same
         // vocabulary as the recommended tier ("Upazila Health Complex" /
         // "Community Clinic"); see COMPLIANCE_TEST_SPEC.md for the vocab caveat.
+        // NOTE: when the picked facility has no synced tier (nearestHealthFacilities
+        // ship type = null), the picker stores the facility NAME here instead, so a
+        // deviation to an untyped facility mismatches the recommended tier and is
+        // flagged as a wrong-tier referral rather than silently passing as correct.
         (other?.get(AssessmentDefinedParams.PICKED_FACILITY_TYPE) as? String)
             ?.let { put("destinationTier", it) }
     }

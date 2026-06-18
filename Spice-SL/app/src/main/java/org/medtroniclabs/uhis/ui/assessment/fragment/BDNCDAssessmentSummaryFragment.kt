@@ -272,11 +272,23 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
                         if (selectedId != DefaultID) {
                             viewModel.otherAssessmentDetails[ReferredPHUSiteID] = selectedId.toString()
                             // Capture the picked facility's tier → actual.destinationTier
-                            // for the MicroCoaching referral_location_* gaps. Blank
-                            // (e.g. pre-resync, type not yet synced) → don't store.
-                            val pickedTier = it[AssessmentDefinedParams.PICKED_FACILITY_TYPE] as? String
-                            if (!pickedTier.isNullOrBlank()) {
-                                viewModel.otherAssessmentDetails[AssessmentDefinedParams.PICKED_FACILITY_TYPE] = pickedTier
+                            // for the MicroCoaching referral_location_* gaps.
+                            //
+                            // Only the user's own facilities carry a synced tier;
+                            // `nearestHealthFacilities` ship with type = null. When the
+                            // tier is blank, fall back to the facility NAME: a name can
+                            // never equal a recommended tier string ("Upazila Health
+                            // Complex" / "Community Clinic"), so a referral that deviates
+                            // to an untyped facility is flagged as a wrong-tier referral
+                            // rather than silently passing as correct. (A correctly-picked
+                            // facility — the user's own — has a real tier and still
+                            // matches.)
+                            val pickedTier = (it[AssessmentDefinedParams.PICKED_FACILITY_TYPE] as? String)
+                                ?.takeIf { tier -> tier.isNotBlank() }
+                            val tierOrName = pickedTier
+                                ?: (it[DefinedParams.NAME] as? String)?.takeIf { name -> name.isNotBlank() }
+                            if (tierOrName != null) {
+                                viewModel.otherAssessmentDetails[AssessmentDefinedParams.PICKED_FACILITY_TYPE] = tierOrName
                             } else {
                                 viewModel.otherAssessmentDetails.remove(AssessmentDefinedParams.PICKED_FACILITY_TYPE)
                             }
