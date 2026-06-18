@@ -139,6 +139,28 @@ object ANCAssessmentEvaluator {
         }
     }
 
+    private fun isLowHeight(resultMap: HashMap<String, Any>): Boolean {
+        val height = CommonUtils.getDoubleOrNull(
+            getValueFromNestedMap(
+                resultMap,
+                AssessmentDefinedParams.HEIGHT,
+            ),
+        )
+
+        return height != null && height > 0.0 && height < 145.0
+    }
+
+    private fun isLowWeight(resultMap: HashMap<String, Any>): Boolean {
+        val weight = CommonUtils.getDoubleOrNull(
+            getValueFromNestedMap(
+                resultMap,
+                AssessmentDefinedParams.WEIGHT,
+            ),
+        )
+
+        return weight != null && weight > 0.0 && weight < 45.0
+    }
+
     /**
      * Calculate member age from date of birth
      */
@@ -403,6 +425,23 @@ object ANCAssessmentEvaluator {
             )
         }
 
+        // Low Height (<145 cm)
+        if (isLowHeight(resultMap)) {
+            conditions.add(
+                ANCNonUrgentReferrals.LOW_HEIGHT.value +
+                    "::" +
+                    ANCNonUrgentReferrals.LOW_HEIGHT.cultureValue,
+            )
+        }
+
+        // Low Weight (<45 kg)
+        if (isLowWeight(resultMap)) {
+            conditions.add(
+                ANCNonUrgentReferrals.LOW_WEIGHT.value +
+                    "::" +
+                    ANCNonUrgentReferrals.LOW_WEIGHT.cultureValue,
+            )
+        }
         // 9. Any Other - if "other" option is selected in danger signs
         if (hasOtherSelected) {
             conditions.add(ANCNonUrgentReferrals.OTHER.value + "::" + ANCNonUrgentReferrals.OTHER.cultureValue)

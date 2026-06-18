@@ -32,6 +32,8 @@ enum class ANCNonUrgentReferrals(val value: String, val cultureValue: String) {
     ),
     MILD_FEVER("Mild Fever", "হালকা জ্বর"),
     PREGNANCY_RELATED_MEDICAL_COMPLICATIONS("H/O Preg related medical complications", "গর্ভকালীন জটিলতার ইতিহাস"),
+    LOW_HEIGHT("Low Height", "কম উচ্চতা"),
+    LOW_WEIGHT("Low Weight", "কম ওজন"),
     OTHER(CONDITION_ANY_OTHER, BN_CONDITION_ANY_OTHER),
 }
 

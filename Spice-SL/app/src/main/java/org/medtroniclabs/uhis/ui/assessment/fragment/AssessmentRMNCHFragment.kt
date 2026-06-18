@@ -405,6 +405,7 @@ class AssessmentRMNCHFragment :
                 if (formGenerator.isViewVisible(AssessmentDefinedParams.BMI)) {
                     viewModel.renderBMIValue(requireContext(), formGenerator, map)
                 }
+                handleAncFieldStatusUpdate(id)
             }
         }
     }
@@ -1296,7 +1297,8 @@ class AssessmentRMNCHFragment :
             AssessmentDefinedParams.BLOOD_SUGAR_FASTING -> evaluateBloodSugarFastingStatus(value)
             AssessmentDefinedParams.BLOOD_SUGAR_RANDOM -> evaluateBloodSugarRandomStatus(value)
             AssessmentDefinedParams.FACILITY_IDENTIFIED_FOR_DELIVERY -> evaluateFacilityIdentifiedForDeliveryStatus(value)
-            Screening.Weight -> ANCAssessmentEvaluator.evaluateAncWeightStatus(value, getANCVisitNumber(), viewModel.pregnancyDetailLiveData.value)
+            AssessmentDefinedParams.HEIGHT -> evaluateHeightStatus(value)
+            AssessmentDefinedParams.WEIGHT -> evaluateWeightStatus(value)
             else -> null
         }
     }
@@ -1769,6 +1771,35 @@ class AssessmentRMNCHFragment :
             Pair(AssessmentDefinedParams.STATUS_HIGH_RISK, AssessmentDefinedParams.BN_STATUS_HIGH_RISK)
         } else {
             null
+        }
+    }
+
+    private fun evaluateHeightStatus(value: Any?): Pair<String?, String?>? {
+        val height = CommonUtils.getDoubleOrNull(value)
+        return if (height != null && height < 145.0) {
+            AssessmentDefinedParams.STATUS_HIGH_RISK to
+                AssessmentDefinedParams.BN_STATUS_HIGH_RISK
+        } else {
+            null
+        }
+    }
+
+    private fun evaluateWeightStatus(value: Any?): Pair<String?, String?>? {
+        val weight = CommonUtils.getDoubleOrNull(value) ?: return null
+
+        if (weight == 0.0) return null
+
+        return if (weight < 45.0) {
+            Pair(
+                AssessmentDefinedParams.STATUS_HIGH_RISK,
+                AssessmentDefinedParams.BN_STATUS_HIGH_RISK,
+            )
+        } else {
+            ANCAssessmentEvaluator.evaluateAncWeightStatus(
+                value,
+                getANCVisitNumber(),
+                viewModel.pregnancyDetailLiveData.value,
+            )
         }
     }
 
