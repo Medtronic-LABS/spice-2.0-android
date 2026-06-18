@@ -311,6 +311,14 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
                         R.drawable.ic_ncd_tool,
                     ),
                 )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_LINKED_TO_CARE,
+                        getString(R.string.linked_to_care),
+                        it.linkedToCareCount,
+                        R.drawable.ic_referred,
+                    ),
+                )
             }
             if (shouldShowEyeCareKpis()) {
                 userDashboardList.add(
@@ -352,16 +360,6 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
                         CARD_REFERRED_FOR_OPERATION,
                         getString(R.string.dashboard_referred_for_operation),
                         it.patientsReferredForOperationCount,
-                        R.drawable.ic_referred,
-                    ),
-                )
-            }
-            if (shouldShowNcdKpis()) {
-                userDashboardList.add(
-                    DashboardCardItem(
-                        CARD_LINKED_TO_CARE,
-                        getString(R.string.linked_to_care),
-                        it.linkedToCareCount,
                         R.drawable.ic_referred,
                     ),
                 )

@@ -577,29 +577,37 @@ class OfflineSyncRepository @Inject constructor(
         return hhMap
     }
 
+    // Resolves the local household id: by FHIR id (map or DB), else the household reference id
+    // (used when the server returns a null FHIR id right after a member is uploaded).
+    private suspend fun resolveLocalHouseholdId(
+        member: HouseHoldMember,
+        hhIdMap: Map<String, Long>,
+    ): Long? {
+        member.householdId?.let { householdFhirId ->
+            hhIdMap[householdFhirId]?.let { return it }
+            roomHelper.getHouseholdIdByFhirId(householdFhirId)?.let { return it }
+        }
+        return member.householdReferenceId?.toLongOrNull()?.takeIf { it > 0L }
+    }
+
     private suspend fun insertHouseholdMembers(
         householdMembers: List<HouseHoldMember>?,
         hhIdMap: Map<String, Long>,
     ) {
         householdMembers?.forEach { member ->
-            if (hhIdMap.containsKey(member.householdId)) {
-                roomHelper.insertOrUpdateHHMFromBE(
-                    member.toHouseholdMemberEntity(
-                        hhIdMap[member.householdId]!!,
-                        OfflineSyncStatus.Success,
-                    ),
-                )
-            } else {
-                if (member.householdId != null) {
-                    roomHelper.getHouseholdIdByFhirId(member.householdId)?.let {
-                        roomHelper.insertOrUpdateHHMFromBE(
-                            member.toHouseholdMemberEntity(
-                                it,
-                                OfflineSyncStatus.Success,
-                            ),
-                        )
-                    }
-                } else {
+            val localHouseholdId = resolveLocalHouseholdId(member, hhIdMap)
+            when {
+                localHouseholdId != null -> {
+                    roomHelper.insertOrUpdateHHMFromBE(
+                        member.toHouseholdMemberEntity(
+                            localHouseholdId,
+                            OfflineSyncStatus.Success,
+                        ),
+                    )
+                }
+                // Household FHIR id not mapped locally yet; skip until a later sync.
+                member.householdId != null -> Unit
+                else -> {
                     roomHelper.insertOrUpdateHHMFromBE(
                         member.toHouseholdMemberEntity(
                             null,

@@ -80,7 +80,16 @@ interface MemberAssessmentHistoryDao {
                     ELSE 0
                 END
             ) AS highRiskPregnantWomenCount,
-            SUM(CASE WHEN LOWER(h.serviceProvided) = 'ncd' THEN 1 ELSE 0 END) AS totalNcdServicesCount,
+            SUM(
+                CASE
+                    WHEN LOWER(h.serviceProvided) = 'ncd' THEN 1
+                    WHEN LOWER(h.serviceProvided) = 'cataract'
+                        AND h.customStatus IS NOT NULL
+                        AND INSTR(h.customStatus, 'NCD_SERVICE_IN_CATARACT_CAMP') > 0
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS totalNcdServicesCount,
             SUM(
                 CASE
                     WHEN LOWER(h.serviceProvided) = 'ncd'
@@ -121,23 +130,18 @@ interface MemberAssessmentHistoryDao {
             ) AS ncdFollowUpAssessmentCount,
             SUM(
                 CASE
-                    WHEN LOWER(h.serviceProvided) = 'ncd'
-                    AND EXISTS (
-                        SELECT 1 FROM memberassessmenthistory p
-                        WHERE p.memberId = h.memberId
-                        AND LOWER(p.serviceProvided) = 'ncd'
-                        AND (
-                            date(datetime(p.visitDate, 'localtime')) < date(datetime(h.visitDate, 'localtime'))
-                            OR (
-                                date(datetime(p.visitDate, 'localtime')) = date(datetime(h.visitDate, 'localtime'))
-                                AND p.id < h.id
-                            )
-                        )
-                    )
-                    AND h.referralStatus IS NOT NULL
+                    WHEN h.referralStatus IS NOT NULL
                     AND (
                         h.referralStatus = 'Referred'
                         OR h.referralStatus LIKE 'Referred To%'
+                    )
+                    AND (
+                        LOWER(h.serviceProvided) = 'ncd'
+                        OR (
+                            LOWER(h.serviceProvided) = 'cataract'
+                            AND h.customStatus IS NOT NULL
+                            AND INSTR(h.customStatus, 'NCD_SERVICE_IN_CATARACT_CAMP') > 0
+                        )
                     )
                     THEN 1
                     ELSE 0

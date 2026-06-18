@@ -129,6 +129,7 @@ interface MemberDAO {
     @Query("SELECT * FROM HouseholdMember WHERE fhir_id = :fhirId LIMIT 1")
     suspend fun getByUniqueField(fhirId: String): HouseholdMemberEntity?
 
+    // Merges a backend member into the local row. Keeps the local copy if it's NotSynced.
     @Transaction
     suspend fun insertOrUpdateFromBE(entity: HouseholdMemberEntity): Long {
         if (!entity.isActive && entity.fhirId != null) {
@@ -138,7 +139,14 @@ interface MemberDAO {
             getByUniqueField(it)
         }
         if (existingEntity?.sync_status != OfflineSyncStatus.NotSynced) {
-            val entityToInsert = existingEntity?.let { entity.copy(id = it.id) } ?: entity
+            val entityToInsert = existingEntity?.let { existing ->
+                entity.copy(id = existing.id).apply {
+                    // Keep the local household link when the server sends a null householdId.
+                    if (householdId == null && existing.householdId != null) {
+                        householdId = existing.householdId
+                    }
+                }
+            } ?: entity
             entityToInsert.sync_status = existingEntity?.sync_status ?: OfflineSyncStatus.Success
             entityToInsert.fhirId = entity.fhirId
             entityToInsert.createdAt = entity.createdAt
