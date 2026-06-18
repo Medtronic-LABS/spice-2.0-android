@@ -1828,6 +1828,7 @@
     <string name="fp_status">পরিবার পরিকল্পনা অবস্থা</string>
     <string name="desire_for_children">আপনার কি ভবিষ্যতে সন্তান নেওয়ার ইচ্ছা আছে?</string>
     <string name="delivery_mode">ডেলিভারির পদ্ধতি</string>
+    <string name="family">পরিবার</string>
     <string-array name="desire_for_children_options">
         <item>হ্যাঁ, ২ বছরের মধ্যে</item>
         <item>হ্যাঁ, ২ বছরের পরে</item>

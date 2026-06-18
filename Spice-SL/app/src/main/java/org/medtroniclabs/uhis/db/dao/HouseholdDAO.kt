@@ -438,4 +438,7 @@ interface HouseholdDAO {
         syncStatus: String = OfflineSyncStatus.NotSynced.name,
         updatedAt: Long = System.currentTimeMillis(),
     ): Int
+
+    @Query("SELECT name FROM Household WHERE id = :householdId")
+    fun observeHouseholdHeadName(householdId: Long): LiveData<String?>
 }

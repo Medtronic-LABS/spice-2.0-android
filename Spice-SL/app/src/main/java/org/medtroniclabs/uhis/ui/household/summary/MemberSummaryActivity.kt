@@ -59,6 +59,7 @@ class MemberSummaryActivity : BaseActivity(), View.OnClickListener {
         setMainContentView(
             binding.root,
             isToolbarVisible = true,
+            homeAndBackVisibility = true to true,
         )
         memberSummaryViewModel.initialize(intent)
         showLoading()

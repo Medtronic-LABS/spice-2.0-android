@@ -1,6 +1,8 @@
 package org.medtroniclabs.uhis.ui.household.summary
 
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +28,7 @@ import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 import org.medtroniclabs.uhis.ui.externalmember.ExternalMemberRegistrationActivity
 import org.medtroniclabs.uhis.ui.externalmember.ExternalMemberRegistrationFragment
 import org.medtroniclabs.uhis.ui.household.HouseholdActivity
+import org.medtroniclabs.uhis.ui.household.HouseholdDefinedParams.IS_FROM_HOUSEHOLD_REGISTRATION
 import org.medtroniclabs.uhis.ui.household.viewmodel.MemberSummaryViewModel
 
 class MemberDetailsFragment : Fragment(), View.OnClickListener {
@@ -55,9 +58,10 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
         memberSummaryViewModel.memberDetails.observe(viewLifecycleOwner) { memberDetails ->
             memberDetails ?: return@observe
             binding.llDetails.removeAllViews()
-            isExternalMember = memberDetails.member.householdId == null
+            val householdId = memberDetails.member.householdId
+            isExternalMember = householdId == null
             val recentHistoryDate = memberDetails.history.firstOrNull()?.let {
-                DateUtils.getLastMenstrualDate(it.visitDate ?: "").timeInMillis
+                getLastMenstrualDate(it.visitDate ?: "").timeInMillis
             } ?: 0
             val updatedAt = memberDetails.member.updatedAt
             val lastActivity = when {
@@ -83,7 +87,25 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
                 getString(R.string.separator_double_hyphen)
             }
             addSummaryView(getString(R.string.registration_date), registeredAt ?: getString(R.string.separator_double_hyphen))
-            addSummaryView(getString(R.string.patient_id), memberDetails.member.patientId ?: getString(R.string.separator_double_hyphen))
+            val householdHeadName = memberDetails.householdHeadName
+            if (householdHeadName.isNullOrBlank()) {
+                addSummaryView(getString(R.string.patient_id), memberDetails.member.patientId ?: getString(R.string.separator_double_hyphen))
+            } else {
+                val familyBinding = addSummaryView(getString(R.string.family), getString(R.string.household_family, householdHeadName))
+                val tvValue = familyBinding.tvValue
+                tvValue.setTextColor(Color.BLUE)
+                tvValue.paintFlags = tvValue.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+                tvValue.setOnClickListener {
+                    activity?.let { safeActivity ->
+                        val intent = Intent(safeActivity, HouseholdSummaryActivity::class.java)
+                        intent.putExtra(DefinedParams.householdId, householdId)
+                        intent.putExtra(IS_FROM_HOUSEHOLD_REGISTRATION, false)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(intent)
+                        safeActivity.finish()
+                    }
+                }
+            }
             addSummaryView(getString(R.string.mobile_number), memberDetails.member.phoneNumber ?: getString(R.string.separator_double_hyphen))
             addSummaryView(getString(R.string.last_visit_date), lastActivity)
             addSummaryView(getString(R.string.services_provided), servicesProvided)
@@ -155,11 +177,12 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
     private fun addSummaryView(
         name: String,
         value: String,
-    ) {
-        val view = SummaryListItemBinding.inflate(LayoutInflater.from(context))
-        view.tvLabel.text = name
-        view.tvValue.text = value
-        binding.llDetails.addView(view.root)
+    ): SummaryListItemBinding {
+        val itemBinding = SummaryListItemBinding.inflate(LayoutInflater.from(context))
+        itemBinding.tvLabel.text = name
+        itemBinding.tvValue.text = value
+        binding.llDetails.addView(itemBinding.root)
+        return itemBinding
     }
 
     override fun onClick(view: View) {

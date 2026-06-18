@@ -1395,9 +1395,34 @@ class RoomHelperImpl @Inject constructor(
         val result = MediatorLiveData<MemberAssessmentHistoryResponse?>()
         var latestResponse: MemberAssessmentHistoryResponse? = null
         var latestPregnancy: PregnancyDetail? = null
+        var latestHouseholdHeadName: String? = null
+        var householdHeadNameSource: LiveData<String?>? = null
 
         fun emit() {
-            result.value = latestResponse?.copy(recentPregnancy = latestPregnancy)
+            result.value = latestResponse?.copy(
+                recentPregnancy = latestPregnancy,
+                householdHeadName = latestHouseholdHeadName,
+            )
+        }
+
+        fun updateHouseholdHeadNameSource(householdId: Long?) {
+            householdHeadNameSource?.let { result.removeSource(it) }
+            householdHeadNameSource = null
+            latestHouseholdHeadName = null
+            if (householdId == null) {
+                if (latestResponse != null) {
+                    emit()
+                }
+                return
+            }
+            val source = householdDAO.observeHouseholdHeadName(householdId)
+            householdHeadNameSource = source
+            result.addSource(source) { headName ->
+                latestHouseholdHeadName = headName
+                if (latestResponse != null) {
+                    emit()
+                }
+            }
         }
 
         val memberSource = memberDAO.getMemberWithAssessmentHistory(memberId).map { mapResult ->
@@ -1412,8 +1437,10 @@ class RoomHelperImpl @Inject constructor(
         result.addSource(memberSource) { response ->
             latestResponse = response
             if (response == null) {
+                updateHouseholdHeadNameSource(null)
                 result.value = null
             } else {
+                updateHouseholdHeadNameSource(response.member.householdId)
                 emit()
             }
         }

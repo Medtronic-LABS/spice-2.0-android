@@ -1903,6 +1903,7 @@
     <string name="fp_status">FP Status</string>
     <string name="desire_for_children">Desire for children in future</string>
     <string name="delivery_mode">Delivery Mode</string>
+    <string name="family">Family</string>
     <string-array name="desire_for_children_options">
         <item>Yes  within 2 yrs</item>
         <item>Yes after 2 yrs</item>
