@@ -9,6 +9,23 @@
             "viewType": "CardView"
         },
         {
+            "family": "bioData",
+            "fieldName": "Name",
+            "hint": "Enter Name",
+            "hintCulture": "নাম লিখুন",
+            "id": "name",
+            "inputType": 60,
+            "isEnabled": true,
+            "isMandatory": true,
+            "isNeededDefault": true,
+            "orderId": 0,
+            "title": "Name",
+            "titleCulture": "নাম",
+            "optionType": "personName",
+            "viewType": "EditText",
+            "visibility": "visible"
+        },
+        {
             "condition":
             [
                 {
@@ -51,7 +68,7 @@
             ],
             "title": "ID Type",
             "titleCulture": "আইডির ধরন",
-            "orderId": 0,
+            "orderId": 1,
             "viewType": "Spinner",
             "visibility": "visible"
         },
@@ -65,28 +82,11 @@
             "isEnabled": true,
             "isMandatory": true,
             "isNeededDefault": true,
-            "orderId": 1,
+            "orderId": 2,
             "title": "National ID",
             "titleCulture": "জাতীয় পরিচয়পত্র (NID) (≥১৮ বছর)",
             "viewType": "EditText",
             "visibility": "gone"
-        },
-        {
-            "family": "bioData",
-            "fieldName": "Name",
-            "hint": "Enter Name",
-            "hintCulture": "নাম লিখুন",
-            "id": "name",
-            "inputType": 60,
-            "isEnabled": true,
-            "isMandatory": true,
-            "isNeededDefault": true,
-            "orderId": 2,
-            "title": "Name",
-            "titleCulture": "নাম",
-            "optionType": "personName",
-            "viewType": "EditText",
-            "visibility": "visible"
         },
         {
             "condition":
