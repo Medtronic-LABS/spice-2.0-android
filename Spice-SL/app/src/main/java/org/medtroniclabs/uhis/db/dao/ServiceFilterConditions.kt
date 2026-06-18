@@ -37,11 +37,11 @@ object ServiceFilterConditions {
         ) AS lp ON lp.householdMemberLocalId = hhm.id AND lp.rn = 1
         """.trimIndent()
 
-    /** Latest pregnancy is ongoing: valid LMP, no delivery/abortion, and EDD not long past. */
+    /** Latest pregnancy is ongoing: valid LMP, no delivery/abortion; EDD not more than [PregnancyCohortRules.OVERDUE_GRACE_DAYS] overdue. */
     const val ACTIVE_PREGNANCY =
         "lp.lastMenstrualPeriod IS NOT NULL AND lp.lastMenstrualPeriod != '' " +
             "AND (lp.dateOfDelivery IS NULL OR lp.dateOfDelivery = '') " +
-            "AND (lp.estimatedDeliveryDate IS NULL OR substr(lp.estimatedDeliveryDate, 1, 10) >= date('now', '-45 days')) " +
+            "AND (lp.estimatedDeliveryDate IS NULL OR substr(lp.estimatedDeliveryDate, 1, 10) > date('now', '-45 days')) " +
             "AND (lp.typeOfAbortion IS NULL OR lp.typeOfAbortion = '')"
 
     const val HIGH_RISK_PREGNANT =
@@ -60,8 +60,11 @@ object ServiceFilterConditions {
         "$AWAITING_DELIVERY " +
             "AND substr(lp.estimatedDeliveryDate, 1, 10) BETWEEN date('now') AND date('now', '+30 days')"
 
+    /** Past-due delivery within 45 days after EDD (day after EDD through EDD + 45 days). */
     const val PENDING_DELIVERY =
-        "$AWAITING_DELIVERY AND substr(lp.estimatedDeliveryDate, 1, 10) < date('now', '-45 days')"
+        "$AWAITING_DELIVERY " +
+            "AND substr(lp.estimatedDeliveryDate, 1, 10) < date('now') " +
+            "AND substr(lp.estimatedDeliveryDate, 1, 10) > date('now', '-45 days')"
 
     const val CHILDREN_UNDER_TWO = "substr(hhm.date_of_birth, 1, 10) > date('now', '-2 years')"
 

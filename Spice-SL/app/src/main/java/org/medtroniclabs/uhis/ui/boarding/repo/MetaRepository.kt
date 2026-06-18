@@ -70,6 +70,7 @@ import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FamilyPlanningMethods
+import org.medtroniclabs.uhis.ui.assessment.rmnch.PregnancyCohortRules
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
 import org.medtroniclabs.uhis.ui.boarding.ResourceLoadingSyncProgress
 import org.medtroniclabs.uhis.ui.medicalreview.motherneonate.anc.MotherNeonateUtil
@@ -957,19 +958,22 @@ class MetaRepository @Inject constructor(
     }
 
     fun getANCPNCStatus(pregnancyDetail: PregnancyDetail?): String? {
-        pregnancyDetail?.let { memberPregnancyDetail ->
-            val ddDay = getDayCountFromDD(memberPregnancyDetail)
-            if (memberPregnancyDetail.typeOfAbortion.isNullOrBlank() && (ddDay == null || ddDay <= 42)) {
-                val dd = getDayCountFromDD(memberPregnancyDetail)
-                val lmp = getDayCountFromLMP(memberPregnancyDetail)
-                if (lmp != null && lmp >= PregnantWomen.LMP_THRESHOLD_DAYS && dd == null) {
-                    return RMNCH.ANC
-                } else if (dd != null && dd <= 42) {
-                    return RMNCH.PNC
-                }
-            }
-        }
+        pregnancyDetail ?: return null
+        if (!PregnancyCohortRules.isRelevantForRmnchMenus(pregnancyDetail)) return null
 
+        val daysFromDelivery = getDayCountFromDD(pregnancyDetail)
+        val daysFromLmp = getDayCountFromLMP(pregnancyDetail)
+        if (
+            PregnancyCohortRules.isActivePregnancy(pregnancyDetail) &&
+            daysFromLmp != null &&
+            daysFromLmp >= PregnantWomen.LMP_THRESHOLD_DAYS &&
+            daysFromDelivery == null
+        ) {
+            return RMNCH.ANC
+        }
+        if (PregnancyCohortRules.isPostnatal(pregnancyDetail)) {
+            return RMNCH.PNC
+        }
         return null
     }
 
@@ -1021,8 +1025,7 @@ class MetaRepository @Inject constructor(
     ) {
         var memberPregnancyDetail: PregnancyDetail? = null
         roomHelper.getPregnancyDetailByPatientId(selectedHouseholdMemberID)?.let { pregnancyDetail ->
-            val ddDay = getDayCountFromDD(pregnancyDetail)
-            if (pregnancyDetail.typeOfAbortion.isNullOrBlank() && (ddDay == null || ddDay <= 42)) {
+            if (PregnancyCohortRules.isRelevantForRmnchMenus(pregnancyDetail)) {
                 memberPregnancyDetail = pregnancyDetail
             }
         }

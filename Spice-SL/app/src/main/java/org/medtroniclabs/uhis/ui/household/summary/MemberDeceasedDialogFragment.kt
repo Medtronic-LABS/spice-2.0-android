@@ -213,7 +213,7 @@ class MemberDeceasedDialogFragment : DialogFragment(), View.OnClickListener {
     private fun evaluateSelectedMemberFlow(item: MemberDetailsSpinnerModel) {
         lifecycleScope.launch {
             val selectedMemberId = item.id
-            val isNeonate = isWithinPastDays(item.dob, NEONATE_DAYS_LIMIT)
+            val isNeonate = isWithinPastDays(item.dob, NEONATE_DAYS_LIMIT, maxInclusive = false)
             val isRecentDeliveryCase =
                 !isNeonate &&
                     item.gender.equals(DefinedParams.GENDER_FEMALE, true) &&
@@ -244,15 +244,17 @@ class MemberDeceasedDialogFragment : DialogFragment(), View.OnClickListener {
 
     /**
      * Checks if a date string is within [daysLimit] days from today.
+     * When [maxInclusive] is false, valid range is 0 until [daysLimit] (exclusive), e.g. 0–27 for limit 28.
      */
     private fun isWithinPastDays(
         date: String?,
         daysLimit: Long,
+        maxInclusive: Boolean = true,
     ): Boolean {
         val localDate = DateUtils.parseDate(date) ?: return false
         val localDateMilli = localDate.getLongTime()
         val days = DateUtils.getDaysDifference(localDateMilli) ?: return false
-        return days in 0..daysLimit
+        return if (maxInclusive) days in 0..daysLimit else days in 0..<daysLimit.toInt()
     }
 
     /**
@@ -455,8 +457,8 @@ class MemberDeceasedDialogFragment : DialogFragment(), View.OnClickListener {
     companion object {
         const val TAG = "MemberEditDialogFragment"
 
-        /** Maximum age in days to classify selected member as neonate. */
-        private const val NEONATE_DAYS_LIMIT = 30L
+        /** Maximum age in days (exclusive) to classify selected member as neonate; valid range is 0–27. */
+        private const val NEONATE_DAYS_LIMIT = 28L
 
         /** Maximum days since latest delivery to classify as maternal case. */
         private const val MOTHER_DELIVERY_DAYS_LIMIT = 50L

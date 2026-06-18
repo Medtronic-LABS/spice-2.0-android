@@ -217,59 +217,114 @@ interface MemberAssessmentHistoryDao {
         filtered_members AS (
             SELECT
                 hm.id AS memberId,
+                hm.fhir_id AS memberFhirId,
                 COALESCE(hm.shasthya_shebika_id, hh.shasthya_shebika_id) AS ssId,
                 COALESCE(hm.sub_village_id, hh.sub_village_id) AS subVillageId
             FROM HouseholdMember AS hm
             LEFT JOIN Household AS hh ON hh.id = hm.household_id
         )
         SELECT
-            SUM(
-                CASE
-                    WHEN EXISTS (
-                        SELECT 1
-                        FROM MemberAssessmentHistory AS h
-                        WHERE h.memberId = lp.householdMemberLocalId
-                          AND LOWER(h.serviceProvided) = 'anc'
-                          AND (:startDate IS NULL OR date(datetime(h.visitDate, 'localtime')) >= :startDate)
-                          AND (:endDate IS NULL OR date(datetime(h.visitDate, 'localtime')) <= :endDate)
-                          AND date(datetime(h.visitDate, 'localtime')) >= substr(lp.lastMenstrualPeriod, 1, 10)
-                          AND date(datetime(h.visitDate, 'localtime')) <= date(substr(lp.lastMenstrualPeriod, 1, 10), '+4 months')
-                          AND (practitionerId IS NULL OR practitionerId IS :userId)
+            COALESCE(
+                (
+                    SELECT SUM(
+                        CASE
+                            WHEN EXISTS (
+                                SELECT 1
+                                FROM MemberAssessmentHistory AS h
+                                WHERE h.memberId = lp.householdMemberLocalId
+                                  AND LOWER(h.serviceProvided) = 'anc'
+                                  AND (:startDate IS NULL OR date(datetime(h.visitDate, 'localtime')) >= :startDate)
+                                  AND (:endDate IS NULL OR date(datetime(h.visitDate, 'localtime')) <= :endDate)
+                                  AND date(datetime(h.visitDate, 'localtime')) >= substr(lp.lastMenstrualPeriod, 1, 10)
+                                  AND date(datetime(h.visitDate, 'localtime')) <= date(substr(lp.lastMenstrualPeriod, 1, 10), '+4 months')
+                                  AND (h.practitionerId IS NULL OR h.practitionerId IS :userId)
+                            )
+                            THEN 1 ELSE 0
+                        END
                     )
-                    THEN 1 ELSE 0
-                END
+                    FROM latest_pregnancy AS lp
+                    INNER JOIN filtered_members AS fm ON fm.memberId = lp.householdMemberLocalId
+                    WHERE (lp.dateOfDelivery IS NULL OR lp.dateOfDelivery = '')
+                    AND (lp.lastMenstrualPeriod IS NOT NULL AND lp.lastMenstrualPeriod != '')
+                    AND (lp.estimatedDeliveryDate IS NULL OR substr(lp.estimatedDeliveryDate, 1, 10) > date('now', '-45 days'))
+                    AND (
+                        CASE
+                            WHEN :subVillageIdsSize > 0
+                            THEN fm.subVillageId IN (:subVillageIds)
+
+                            WHEN :ssIdsSize > 0
+                            THEN fm.subVillageId IN (
+                                SELECT DISTINCT sslv.subVillageId
+                                FROM ShasthyaShebikaLinkedVillageEntity AS sslv
+                                WHERE sslv.shasthyaShebikaId IN (:ssIds)
+                            )
+
+                            ELSE 1
+                        END
+                    )
+                ),
+                0
             ) AS pwIdentifiedFirst4MonthsWithAncCount,
-            SUM(
-                CASE
-                    WHEN (
-                        SELECT COUNT(1)
+            COALESCE(
+                (
+                    SELECT COUNT(DISTINCT exactly_3.memberFhirId)
+                    FROM (
+                        SELECT h.memberFhirId
                         FROM MemberAssessmentHistory AS h
-                        WHERE h.memberId = lp.householdMemberLocalId
-                          AND LOWER(h.serviceProvided) = 'anc'
-                          AND (:startDate IS NULL OR date(datetime(h.visitDate, 'localtime')) >= :startDate)
-                          AND (:endDate IS NULL OR date(datetime(h.visitDate, 'localtime')) <= :endDate)
-                          AND (practitionerId IS NULL OR practitionerId IS :userId)
-                    ) >= 3
-                    THEN 1 ELSE 0
-                END
+                        INNER JOIN filtered_members AS fm ON fm.memberFhirId = h.memberFhirId
+                        WHERE LOWER(h.serviceProvided) = 'anc'
+                          AND h.memberFhirId IS NOT NULL
+                          AND h.memberFhirId != ''
+                          AND (h.practitionerId IS NULL OR h.practitionerId IS :userId)
+                          AND (
+                              CASE
+                                  WHEN :subVillageIdsSize > 0
+                                  THEN fm.subVillageId IN (:subVillageIds)
+
+                                  WHEN :ssIdsSize > 0
+                                  THEN fm.subVillageId IN (
+                                      SELECT DISTINCT sslv.subVillageId
+                                      FROM ShasthyaShebikaLinkedVillageEntity AS sslv
+                                      WHERE sslv.shasthyaShebikaId IN (:ssIds)
+                                  )
+
+                                  ELSE 1
+                              END
+                          )
+                        GROUP BY h.memberFhirId
+                        HAVING COUNT(*) = 3
+                    ) AS exactly_3
+                    INNER JOIN (
+                        SELECT h.memberFhirId, MAX(h.visitDate) AS latest_visit_date
+                        FROM MemberAssessmentHistory AS h
+                        INNER JOIN filtered_members AS fm ON fm.memberFhirId = h.memberFhirId
+                        WHERE LOWER(h.serviceProvided) = 'anc'
+                          AND h.memberFhirId IS NOT NULL
+                          AND h.memberFhirId != ''
+                          AND (h.practitionerId IS NULL OR h.practitionerId IS :userId)
+                          AND (
+                              CASE
+                                  WHEN :subVillageIdsSize > 0
+                                  THEN fm.subVillageId IN (:subVillageIds)
+
+                                  WHEN :ssIdsSize > 0
+                                  THEN fm.subVillageId IN (
+                                      SELECT DISTINCT sslv.subVillageId
+                                      FROM ShasthyaShebikaLinkedVillageEntity AS sslv
+                                      WHERE sslv.shasthyaShebikaId IN (:ssIds)
+                                  )
+
+                                  ELSE 1
+                              END
+                          )
+                        GROUP BY h.memberFhirId
+                    ) AS latest ON latest.memberFhirId = exactly_3.memberFhirId
+                    WHERE (:startDate IS NULL OR date(datetime(latest.latest_visit_date, 'localtime')) >= :startDate)
+                      AND (:endDate IS NULL OR date(datetime(latest.latest_visit_date, 'localtime')) <= :endDate)
+                ),
+                0
             ) AS anc3PlusCount,
             0 AS highRiskPregnantWomenCount
-        FROM latest_pregnancy AS lp
-        INNER JOIN filtered_members AS fm ON fm.memberId = lp.householdMemberLocalId
-        WHERE (lp.dateOfDelivery IS NULL OR lp.dateOfDelivery = '')
-        AND (lp.lastMenstrualPeriod IS NOT NULL AND lp.lastMenstrualPeriod != '')
-        AND (lp.estimatedDeliveryDate IS NULL OR substr(lp.estimatedDeliveryDate, 1, 10) >= date('now', '-45 days'))
-        AND (
-            CASE
-                WHEN :subVillageIdsSize > 0
-                THEN fm.subVillageId IN (:subVillageIds)
-
-                WHEN :ssIdsSize > 0
-                THEN fm.subVillageId IN (SELECT DISTINCT sslv.subVillageId FROM ShasthyaShebikaLinkedVillageEntity AS sslv WHERE sslv.shasthyaShebikaId IN (:ssIds))
-
-                ELSE 1
-            END
-        )
         """,
     )
     suspend fun getMaternalDashboardCounts(

@@ -32,7 +32,6 @@ android {
         versionName = "1.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
-        missingDimensionStrategy("version", "production")
         resValue("color", "toolbar_color", "#2514BE")
     }
 
