@@ -44,6 +44,7 @@ import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
  * @param maxValueForMinute Maximum minute validation for **TimeView** view type.
  * @param pulseMinValue Minimum value validation for pulse validation for **BP** view type.
  * @param pulseMaxValue Maximum value validation for pulse validation for **BP** view type.
+ * @param showPulse When explicitly false, hides the pulse column in the **BP** view type. Defaults to showing pulse.
  * @param totalCount Total number of BP readings to take view type **BP**.
  * @param contentLength Max length for input fields for **EditText** view type. If contentLength is given it precedes [maxLength].
  * @param localDataCache Key for fetching options from local DB for view types **Spinner**, **MentalHealthView**, **RadioGroup**.
@@ -130,6 +131,7 @@ data class FormLayout(
     var maxValueForMinute: Int? = null,
     var pulseMinValue: Double? = null,
     var pulseMaxValue: Double? = null,
+    var showPulse: Boolean? = null,
     var totalCount: Int? = null,
     var contentLength: Int? = null,
     var localDataCache: String? = null,

@@ -920,12 +920,32 @@ class FormGenerator(
                 checkInputsAndEnableNextField(binding.tvSnoReadingThree.text, binding, list)
             }
 
+            if (showPulse == false) {
+                hidePulseColumn(binding)
+            }
+
             getFamilyView(family)?.addView(binding.root) ?: run {
                 parentLayout.addView(binding.root)
             }
             setViewVisibility(visibility, binding.root)
             // setViewEnableDisable(isEnabled, binding.root)
         }
+    }
+
+    /**
+     * Hides the pulse column for a [VIEW_TYPE_FORM_BP] view when the form config disables it.
+     * The BP layout is a weighted constraint chain, so setting the pulse header, spacers, and
+     * pulse inputs to GONE lets the remaining columns redistribute and fill the row.
+     */
+    private fun hidePulseColumn(binding: BpReadingLayoutBinding) {
+        binding.textView13.gone()
+        binding.space02.gone()
+        binding.spaceRow12.gone()
+        binding.etPulseOne.gone()
+        binding.spaceRow22.gone()
+        binding.etPulseTwo.gone()
+        binding.spaceRow33.gone()
+        binding.etPulseThree.gone()
     }
 
     private fun checkInputsAndEnableNextField(

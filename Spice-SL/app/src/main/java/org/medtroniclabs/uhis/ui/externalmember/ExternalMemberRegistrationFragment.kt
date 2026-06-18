@@ -365,14 +365,17 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                             jsonString,
                             object : TypeToken<FormResponse>() {}.type,
                         )
-                        if (CommonUtils.isFoOrPo()) {
+                        val formLayouts = if (CommonUtils.isFoOrPo()) {
                             formResponse.formLayout.forEach { field ->
                                 if (field.id == SHASTHYA_KORMI_ID) {
                                     field.visibility = "visible"
                                 }
                             }
+                            formResponse.formLayout.filterNot { it.id == MemberRegistration.ID_MARITAL_STATUS }
+                        } else {
+                            formResponse.formLayout
                         }
-                        formGenerator.populateViews(formResponse.formLayout)
+                        formGenerator.populateViews(formLayouts)
                         if (editMemberId != -1L) {
                             memberRegistrationViewModel.getMemberDetailsByID(editMemberId)
                         }

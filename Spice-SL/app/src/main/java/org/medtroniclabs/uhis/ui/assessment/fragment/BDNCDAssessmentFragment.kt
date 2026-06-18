@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CVDRiskCalculator
+import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.EntityMapper
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
@@ -28,9 +29,12 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ANY_NEW_OR_W
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.EYE_CARE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_DIAGNOSED_BP
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_DIAGNOSED_GLUCOSE
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HAS_SYMPTOMS
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.IS_REGULAR_SMOKER
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_NCD_SYMPTOMS_MEDICATION
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NAME
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NEW_WORSENING_SYMPTOMS
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.SYMPTOMS_LOG
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ncd
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.rootSuffix
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.ReferralResultGenerator
@@ -229,6 +233,13 @@ class BDNCDAssessmentFragment : BaseFragment(), FormEventListener {
                 formGenerator.getViewByTag(ID_NCD_SYMPTOMS_MEDICATION + rootSuffix)?.visible()
                 formGenerator.getViewByTag(ID_DIAGNOSED_BP + rootSuffix)?.gone()
                 formGenerator.getViewByTag(ID_DIAGNOSED_GLUCOSE + rootSuffix)?.gone()
+                // Smoking history is captured on the first visit only; lock it from the 2nd visit onwards.
+                formGenerator.disableSingleSelection(IS_REGULAR_SMOKER)
+            } else if (CommonUtils.isFoOrPo()) {
+                // FO/PO users see the symptoms question only from the 2nd visit onwards,
+                // so hide the section on the first visit.
+                formGenerator.getViewByTag(SYMPTOMS_LOG + rootSuffix)?.gone()
+                formGenerator.getViewByTag(HAS_SYMPTOMS + rootSuffix)?.gone()
             }
             prefillHeightAndWeightFromObservations()
         }

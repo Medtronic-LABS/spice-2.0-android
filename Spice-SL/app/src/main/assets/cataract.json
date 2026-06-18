@@ -922,6 +922,7 @@
         "titleCulture": "রক্তচাপ",
         "pulseMaxValue": 300,
         "pulseMinValue": 35,
+        "showPulse": false,
         "mandatoryCount": 1,
         "isNeededDefault": true,
         "cultureErrorMessage": "অনুগ্রহ করে রক্তচাপের ভ্যালু লিখুন",

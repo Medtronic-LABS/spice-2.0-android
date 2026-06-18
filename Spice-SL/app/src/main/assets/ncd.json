@@ -12,7 +12,7 @@
           {
             "id": "camp_type",
             "title": "Camp Type",
-            "family": "generalInformation",
+        "family": "generalInformation",
             "orderId": 0,
             "viewType": "SingleSelectionView",
             "condition": [],
@@ -130,7 +130,7 @@
                     "value": "blurryVision"
                 },
                 {
-                    "cultureValue": "দ্বিগুণ দেখা",
+                    "cultureValue": "একই জিনিস দুইটা দেখা",
                     "id": 6,
                     "name": "Double vision",
                     "value": "doubleVision"
@@ -146,12 +146,6 @@
                     "id": 8,
                     "name": "Chest pain",
                     "value": "chest_pain"
-                },
-                {
-                    "cultureValue": "দুর্ঘটনা ছাড়া আপনার কি আগে কখনো রক্তক্ষরণ হয়েছে",
-                    "id": 9,
-                    "name": "History of bleeding",
-                    "value": "historyOfBleeding"
                 },
                 {
                     "cultureValue": "মাথাব্যথা",
@@ -373,6 +367,7 @@
             "orderId": 3,
             "pulseMaxValue": 300.0,
             "pulseMinValue": 35.0,
+            "showPulse": false,
             "title": "Blood Pressure",
             "titleCulture": "রক্তচাপ",
             "titleSummary": "Average Blood Pressure",
