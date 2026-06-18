@@ -240,9 +240,17 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
         } else {
             R.string.coaching_model_download_message
         }
+        // Dynamic download size from the SDK's configured model variant, formatted
+        // locale-aware — tracks the selected model instead of a hard-coded "~600 MB".
+        val sizeLabel = runCatching {
+            android.text.format.Formatter.formatShortFileSize(
+                requireContext(),
+                MicroCoachingSDK.getInstance().selectedModelVariant().sizeInBytes,
+            )
+        }.getOrDefault("")
         activity.showErrorDialogue(
             title = getString(R.string.coaching_model_download_title),
-            message = getString(messageRes),
+            message = getString(messageRes, sizeLabel),
             isNegativeButtonNeed = true,
             positiveButtonName = getString(R.string.yes),
             cancelBtnName = getString(R.string.no),

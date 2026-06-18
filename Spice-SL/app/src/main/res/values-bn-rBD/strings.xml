@@ -1666,9 +1666,9 @@
     <!-- MicroCoaching SDK — CHW Assistant -->
     <string name="chw_assistant">সিএইচডব্লিউ সহকারী</string>
     <string name="coaching_model_download_title">AI মডেল প্রয়োজন</string>
-    <string name="coaching_model_download_message">AI মডেল ডাউনলোড করতে হবে (~৬০০ এমবি)। এখন ডাউনলোড করবেন?</string>
-    <string name="coaching_model_download_message_metered">AI মডেল ডাউনলোড করতে হবে (~৬০০ এমবি) এবং আপনি মোবাইল ডেটায় আছেন। প্রায় ৬০০ এমবি ব্যবহার হবে। চালিয়ে যাবেন?</string>
+    <string name="coaching_model_download_message">AI মডেল ডাউনলোড করতে হবে (~%1$s)। এখন ডাউনলোড করবেন?</string>
+    <string name="coaching_model_download_message_metered">AI মডেল ডাউনলোড করতে হবে (~%1$s) এবং আপনি মোবাইল ডেটায় আছেন। প্রায় %1$s ব্যবহার হবে। চালিয়ে যাবেন?</string>
     <string name="coaching_metered_network_title">মোবাইল ডেটা সতর্কতা</string>
-    <string name="coaching_metered_network_message">আপনি মোবাইল ডেটায় আছেন। প্রায় ৬০০ এমবি ডেটা ব্যবহার হবে। চালিয়ে যাবেন?</string>
+    <string name="coaching_metered_network_message">আপনি মোবাইল ডেটায় আছেন। প্রায় %1$s ডেটা ব্যবহার হবে। চালিয়ে যাবেন?</string>
     <string name="coaching_download_started">ডাউনলোড শুরু হয়েছে। মডেল প্রস্তুত হলে চ্যাট খুলবে।</string>
 </resources>
