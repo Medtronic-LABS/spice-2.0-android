@@ -540,39 +540,6 @@
         },
         {
             "family": "pointOfCareInvestigations",
-            "fieldName": "Urinary Sugar",
-            "id": "urinarySugar",
-            "orderId": 6,
-            "isSummary": false,
-            "viewType": "SingleSelectionView",
-            "isMandatory": false,
-            "isEnabled": true,
-            "title": "Urinary Sugar",
-            "titleCulture": "প্রস্রাব পরীক্ষায় গ্লুকোজ আছে কিনা",
-            "errorMessage": "Please select a valid option",
-            "cultureErrorMessage": "অনুগ্রহ করে বৈধ নির্বাচন করুন",
-            "visibility": "visible",
-            "optionsList":
-            [
-                {
-                    "name": "Present",
-                    "cultureValue": "রয়েছে",
-                    "id": "present"
-                },
-                {
-                    "name": "Absent",
-                    "cultureValue": "নেই",
-                    "id": "absent"
-                },
-                {
-                    "id": "NA",
-                    "name": "N/A",
-                    "cultureValue": "প্রযোজ্য নয়"
-                }
-            ]
-        },
-        {
-            "family": "pointOfCareInvestigations",
             "fieldName": "Urinary Bilirubin",
             "id": "urinaryBilirubin",
             "orderId": 7,
