@@ -27,11 +27,11 @@ import org.medtroniclabs.uhis.ui.BaseFragment
 import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ANY_NEW_OR_WORSENING_SYMPTOMS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.EYE_CARE
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HAS_SYMPTOMS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_DIAGNOSED_BP
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_DIAGNOSED_GLUCOSE
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HAS_SYMPTOMS
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.IS_REGULAR_SMOKER
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_NCD_SYMPTOMS_MEDICATION
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.IS_REGULAR_SMOKER
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NAME
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NEW_WORSENING_SYMPTOMS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.SYMPTOMS_LOG

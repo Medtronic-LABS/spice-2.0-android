@@ -2,6 +2,29 @@
     "formLayout": [
         {
             "familyOrder": 1,
+            "id": "ancServicesBirthPreparedness",
+            "title": "ANC services and Birth Preparedness",
+            "titleCulture": "ANC সেবা এবং প্রসবের প্রস্তুতি",
+            "viewType": "CardView"
+        },
+        {
+            "family": "ancServicesBirthPreparedness",
+            "id": "ancVisitsOtherProviders",
+            "orderId": 1,
+            "isSummary": false,
+            "viewType": "EditText",
+            "inputType": 3,
+            "isMandatory": true,
+            "isEnabled": true,
+            "title": "No. of ANC visits conducted with other providers",
+            "titleCulture": "অন্য কোন সেবাকেন্দ্র/সেবাদাতার কাছ থেকে কতবার এএনসি সেবা নিয়েছেন?",
+            "errorMessage": "Please enter a valid number",
+            "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ মান লিখুন",
+            "maxLength": 2,
+            "minValue": 0
+        },
+        {
+            "familyOrder": 2,
             "id": "pregnancyOutcome",
             "title": "Pregnancy Outcome",
             "titleCulture": "ডেলিভারি রেজিস্ট্রেশন",
@@ -54,29 +77,6 @@
                     "visibility": "visible"
                 }
             ]
-        },
-        {
-            "familyOrder": 2,
-            "id": "ancServicesBirthPreparedness",
-            "title": "ANC services and Birth Preparedness",
-            "titleCulture": "ANC সেবা এবং প্রসবের প্রস্তুতি",
-            "viewType": "CardView"
-        },
-        {
-            "family": "ancServicesBirthPreparedness",
-            "id": "ancVisitsOtherProviders",
-            "orderId": 1,
-            "isSummary": false,
-            "viewType": "EditText",
-            "inputType": 3,
-            "isMandatory": true,
-            "isEnabled": true,
-            "title": "No. of ANC visits conducted with other providers",
-            "titleCulture": "অন্য কোন সেবাকেন্দ্র/সেবাদাতার কাছ থেকে কতবার এএনসি সেবা নিয়েছেন?",
-            "errorMessage": "Please enter a valid number",
-            "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ মান লিখুন",
-            "maxLength": 2,
-            "minValue": 0
         },
         {
             "familyOrder": 3,

@@ -183,13 +183,6 @@ object PNCAssessmentEvaluator {
             val isKnownHtn = isValueEquals(maternalAssessment[RMNCH.ID_KNOWN_HTN], DefinedParams.YES)
             val isEclampsia = isValueEquals(maternalAssessment[RMNCH.ID_ECLAMPSIA], DefinedParams.YES)
             val isOnTreatmentHtn = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_HTN_ECLAMPSIA], DefinedParams.YES)
-            val systolic = CommonUtils.getInteger(maternalAssessment[AssessmentDefinedParams.SYSTOLIC])
-            val diastolic = CommonUtils.getInteger(maternalAssessment[AssessmentDefinedParams.DIASTOLIC])
-
-            // 5. Low BP
-            if (isLowBp(systolic, diastolic)) {
-                nonUrgentReferral.add(PNCNonUrgentReferrals.LOW_BP.value + "::" + PNCNonUrgentReferrals.LOW_BP.cultureValue)
-            }
 
             // 6. On treatment for HTN or Pre-eclampsia / Eclampsia
             if ((isKnownHtn || isEclampsia) && isOnTreatmentHtn) {
@@ -337,22 +330,6 @@ object PNCAssessmentEvaluator {
         if (systolic <= 0 && diastolic <= 0) return false
         return systolic >= AssessmentDefinedParams.HIGH_BP_SYSTOLIC_THRESHOLD.toInt() ||
             diastolic >= AssessmentDefinedParams.HIGH_BP_DIASTOLIC_THRESHOLD.toInt()
-    }
-
-    /**
-     * Checks if blood pressure below defined limits for given systolic and diastolic values.
-     *
-     * @param systolic The systolic pressure value.
-     * @param diastolic The diastolic pressure value.
-     * @return True if either value below its respective limit, false otherwise.
-     */
-    fun isLowBp(
-        systolic: Int,
-        diastolic: Int,
-    ): Boolean {
-        if (systolic <= 0 && diastolic <= 0) return false
-        return systolic <= AssessmentDefinedParams.LOW_BP_SYSTOLIC_THRESHOLD.toInt() ||
-            diastolic <= AssessmentDefinedParams.LOW_BP_DIASTOLIC_THRESHOLD.toInt()
     }
 
     /**

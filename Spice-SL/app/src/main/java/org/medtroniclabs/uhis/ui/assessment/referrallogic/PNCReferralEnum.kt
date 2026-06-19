@@ -49,7 +49,6 @@ enum class PNCNonUrgentReferrals(val value: String, val cultureValue: String) {
     MILD_ANEMIA("Mild Anemia", "মৃদু রক্তসল্পতা"),
     BREAST_ISSUES("Cracked nipples / painful / swollen breasts with or without fever", "নিপল ফেটে যাওয়া / স্তনে ব্যথা বা ফোলা এবং সাথে জ্বর থাকা বা না থাকা"),
     FEVER("Fever", "জ্বর"),
-    LOW_BP("LOW BP", "নিম্ন রক্তচাপ"),
     HTN_ECLAMPSIA_ON_TREATMENT("On treatment for HTN or Pre-eclampsia / Eclampsia", "উচ্চ রক্তচাপ বা প্রি-এক্লাম্পসিয়া/এক্লাম্পসিয়ার চিকিৎসা নিচ্ছেন"),
     DM_GDM_ON_TREATMENT("On treatment for DM/GDM", "ডায়াবেটিস বা গর্ভকালীন ডায়াবেটিসের চিকিৎসাধীন আছেন"),
     OTHER(CONDITION_ANY_OTHER, BN_CONDITION_ANY_OTHER),

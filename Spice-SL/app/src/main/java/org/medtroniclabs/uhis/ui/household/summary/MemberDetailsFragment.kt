@@ -114,21 +114,27 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
                 ?.serviceProvided
                 ?.lowercase()
                 .orEmpty()
+            var showRecentStatus = true
             when (recentService) {
                 MenuConstants.PREGNANT_WOMEN_PROFILE.lowercase(),
                 MenuConstants.ANC.lowercase(),
                 -> {
-                    addPregnancySummaryViews(memberDetails.recentPregnancy)
+                    showRecentStatus = !addPregnancySummaryViews(memberDetails.recentPregnancy)
                 }
 
-                else -> {
-                    addSummaryView(
-                        getString(R.string.recent_status),
-                        memberDetails.history.firstOrNull()?.let { history ->
-                            AssessmentUtil.mapServiceToServiceName(history.serviceProvided.orEmpty(), requireContext())
-                        } ?: getString(R.string.separator_double_hyphen),
-                    )
+                MenuConstants.PREGNANCY_OUTCOME.lowercase(),
+                MenuConstants.PNC_MOTHER.lowercase(),
+                -> {
+                    showRecentStatus = !addDeliveryDate(memberDetails.recentPregnancy)
                 }
+            }
+            if (showRecentStatus) {
+                addSummaryView(
+                    getString(R.string.recent_status),
+                    memberDetails.history.firstOrNull()?.let { history ->
+                        AssessmentUtil.mapServiceToServiceName(history.serviceProvided.orEmpty(), requireContext())
+                    } ?: getString(R.string.separator_double_hyphen),
+                )
             }
             if (memberDetails.member.isActive) {
                 binding.tvEdit.visible()
@@ -144,9 +150,11 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
 
     /**
      * Binds Gestational age and EDD in case of PW Registration or ANC
+     * Returns true if it is able to add pregnancy summary view
      */
-    private fun addPregnancySummaryViews(pregnancyDetail: PregnancyDetail?) {
-        val gestationalAge = pregnancyDetail?.lastMenstrualPeriod?.let { lmp ->
+    private fun addPregnancySummaryViews(pregnancyDetail: PregnancyDetail?): Boolean {
+        pregnancyDetail ?: return false
+        val gestationalAge = pregnancyDetail.lastMenstrualPeriod?.let { lmp ->
             try {
                 formatGestationalAge(
                     calculateGestationalAge(getLastMenstrualDate(lmp)),
@@ -161,7 +169,7 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
             gestationalAge.textOrDoubleHyphen(),
         )
 
-        val formattedEdd = pregnancyDetail?.estimatedDeliveryDate?.let { edd ->
+        val formattedEdd = pregnancyDetail.estimatedDeliveryDate?.let { edd ->
             DateUtils.convertDateFormat(
                 edd,
                 DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
@@ -172,6 +180,30 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
             getString(R.string.estimated_delivery_date),
             formattedEdd.textOrDoubleHyphen(),
         )
+        return true
+    }
+
+    /**
+     * Binds delivery date in case of pregnancy outcome or PNC
+     * Returns true if it is able to add delivery date
+     */
+    private fun addDeliveryDate(pregnancyDetail: PregnancyDetail?): Boolean {
+        pregnancyDetail ?: return false
+        if (pregnancyDetail.typeOfAbortion.isNullOrBlank() && !pregnancyDetail.dateOfDelivery.isNullOrBlank()) {
+            val formattedDeliveryDate = pregnancyDetail.dateOfDelivery?.let { dateOfDelivery ->
+                DateUtils.convertDateFormat(
+                    dateOfDelivery,
+                    DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
+                    DATE_FORMAT_DD_MMMM_YYYY,
+                )
+            }
+            addSummaryView(
+                getString(R.string.date_of_delivery),
+                formattedDeliveryDate.textOrDoubleHyphen(),
+            )
+            return true
+        }
+        return false
     }
 
     private fun addSummaryView(

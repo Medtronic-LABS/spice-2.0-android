@@ -320,9 +320,6 @@ object AssessmentDefinedParams {
     const val HIGH_BP_SYSTOLIC_THRESHOLD = 140.0
     const val HIGH_BP_DIASTOLIC_THRESHOLD = 90.0
 
-    const val LOW_BP_SYSTOLIC_THRESHOLD = 90.0
-    const val LOW_BP_DIASTOLIC_THRESHOLD = 50.0
-
     // RMNCH Blood Sugar Thresholds
     const val BLOOD_SUGAR_FASTING_THRESHOLD = 5.1
     const val BLOOD_SUGAR_RANDOM_THRESHOLD = 8.5

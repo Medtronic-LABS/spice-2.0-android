@@ -391,15 +391,6 @@ object ANCAssessmentEvaluator {
             conditions.add(ANCNonUrgentReferrals.SUSPECTED_DIABETES.value + "::" + ANCNonUrgentReferrals.SUSPECTED_DIABETES.cultureValue)
         }
 
-        val systolic = CommonUtils.getDoubleOrNull(getValueFromNestedMap(resultMap, AssessmentDefinedParams.SYSTOLIC))?.takeIf { it > 0.0 }
-        val diastolic = CommonUtils.getDoubleOrNull((getValueFromNestedMap(resultMap, AssessmentDefinedParams.DIASTOLIC)))?.takeIf { it > 0.0 }
-        // 5. Low BP
-        if ((systolic != null && systolic <= AssessmentDefinedParams.LOW_BP_SYSTOLIC_THRESHOLD) ||
-            (diastolic != null && diastolic <= AssessmentDefinedParams.LOW_BP_DIASTOLIC_THRESHOLD)
-        ) {
-            conditions.add(ANCNonUrgentReferrals.LOW_BP.value + "::" + ANCNonUrgentReferrals.LOW_BP.cultureValue)
-        }
-
         // 6. PW with existing chronic illnesses with treatment
         if (hasChronicIllnessWithTreatment(resultMap)) {
             conditions.add(

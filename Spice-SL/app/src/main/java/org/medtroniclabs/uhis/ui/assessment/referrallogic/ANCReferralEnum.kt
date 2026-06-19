@@ -25,7 +25,6 @@ enum class ANCNonUrgentReferrals(val value: String, val cultureValue: String) {
     MODERATE_ANEMIA("Moderate Anemia", "মাঝারি রক্তসল্পতা"),
     MILD_ANEMIA("Mild Anemia", "মৃদু রক্তসল্পতা"),
     SUSPECTED_DIABETES("Suspected/Existing Case of Diabetes", "সম্ভাব্য/চিহ্নিত ডায়াবেটিস রোগী"),
-    LOW_BP("LOW BP", "নিম্ন রক্তচাপ"),
     CHRONIC_ILLNESS_WITH_TREATMENT(
         "PW with existing chronic illnesses with treatment",
         "দীর্ঘমেয়াদী রোগে চিকিৎসাধীন গর্ভবতী মা",

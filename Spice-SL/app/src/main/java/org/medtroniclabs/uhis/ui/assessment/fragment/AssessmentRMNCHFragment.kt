@@ -1187,7 +1187,7 @@ class AssessmentRMNCHFragment :
         // Show previous pregnancy complications only for 1st visit
         updateFieldVisibility(
             AssessmentDefinedParams.PREVIOUS_PREGNANCY_COMPLICATIONS,
-            visitNumber == AssessmentDefinedParams.ANC_VISIT_NUMBER_1 && (pregnancyDetail?.gravida ?: 0) > 1
+            visitNumber == AssessmentDefinedParams.ANC_VISIT_NUMBER_1 && (pregnancyDetail?.gravida ?: 0) > 1,
         )
 
         // 1. Height - show only if ANC visit is 1
@@ -1532,7 +1532,7 @@ class AssessmentRMNCHFragment :
     private fun evaluateSystolicStatus(value: Any?): Pair<String?, String?>? {
         val systolic = CommonUtils.getDoubleOrNull(value) ?: return null
         if (systolic == 0.0) return null
-        return if (systolic >= AssessmentDefinedParams.HIGH_BP_SYSTOLIC_THRESHOLD || systolic <= AssessmentDefinedParams.LOW_BP_SYSTOLIC_THRESHOLD) {
+        return if (systolic >= AssessmentDefinedParams.HIGH_BP_SYSTOLIC_THRESHOLD) {
             Pair(AssessmentDefinedParams.STATUS_HIGH_RISK, AssessmentDefinedParams.BN_STATUS_HIGH_RISK)
         } else {
             null
@@ -1545,7 +1545,7 @@ class AssessmentRMNCHFragment :
     private fun evaluateDiastolicStatus(value: Any?): Pair<String?, String?>? {
         val diastolic = CommonUtils.getDoubleOrNull(value) ?: return null
         if (diastolic == 0.0) return null
-        return if (diastolic >= AssessmentDefinedParams.HIGH_BP_DIASTOLIC_THRESHOLD || diastolic <= AssessmentDefinedParams.LOW_BP_DIASTOLIC_THRESHOLD) {
+        return if (diastolic >= AssessmentDefinedParams.HIGH_BP_DIASTOLIC_THRESHOLD) {
             Pair(AssessmentDefinedParams.STATUS_HIGH_RISK, AssessmentDefinedParams.BN_STATUS_HIGH_RISK)
         } else {
             null
@@ -1908,7 +1908,6 @@ class AssessmentRMNCHFragment :
         val urinaryAlbumin = resultMap[RMNCH.ID_URINARY_ALBUMIN] as? String
 
         val isHighBp = PNCAssessmentEvaluator.isHighBp(systolic, diastolic)
-        val isLowBp = PNCAssessmentEvaluator.isLowBp(systolic, diastolic)
         val isEdemaPresent = isValueEquals(edema)
         val isAlbuminPositive = isValueEquals(urinaryAlbumin)
 
@@ -1916,7 +1915,7 @@ class AssessmentRMNCHFragment :
         val bpHighRiskTrigger = isHighBp || (isEdemaPresent && isAlbuminPositive)
 
         // Systolic
-        if (systolic > 0 && (bpHighRiskTrigger || isLowBp)) {
+        if (systolic > 0 && (bpHighRiskTrigger)) {
             AssessmentUtil.updateFieldTitleWithStatus(
                 formGenerator,
                 originalTitles,
@@ -1935,7 +1934,7 @@ class AssessmentRMNCHFragment :
         }
 
         // Diastolic
-        if (diastolic > 0 && (bpHighRiskTrigger || isLowBp)) {
+        if (diastolic > 0 && (bpHighRiskTrigger)) {
             AssessmentUtil.updateFieldTitleWithStatus(
                 formGenerator,
                 originalTitles,
