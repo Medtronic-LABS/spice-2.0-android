@@ -1161,12 +1161,13 @@ class AssessmentRMNCHFragment :
      * Updates field visibility based on ANC visit number and gestational age conditions
      */
     private fun updateANCConditionalFieldVisibility() {
+        val pregnancyDetail = viewModel.pregnancyDetailLiveData.value
         val visitNumber = getANCVisitNumber()
         val gestationalAgeWeeks = calculateGestationalAgeInWeeks()
 
         // Pre-fill existing illness from last visit
         if (visitNumber > 1) {
-            viewModel.pregnancyDetailLiveData.value?.pregnantWomanExistingIllness?.let { existingIllness ->
+            pregnancyDetail?.pregnantWomanExistingIllness?.let { existingIllness ->
                 val existingIllnessList = StringConverter.convertStringToList<String>(existingIllness)
                 formGenerator.getFormLayout(AssessmentDefinedParams.PREGNANT_WOMAN_EXISTING_ILLNESS)?.let { formLayout ->
                     formLayout.optionsList?.filter { existingIllnessList.contains(it[DefinedParams.Value]) }?.let { existingIllnessValue ->
@@ -1184,7 +1185,10 @@ class AssessmentRMNCHFragment :
         }
 
         // Show previous pregnancy complications only for 1st visit
-        updateFieldVisibility(AssessmentDefinedParams.PREVIOUS_PREGNANCY_COMPLICATIONS, visitNumber == AssessmentDefinedParams.ANC_VISIT_NUMBER_1)
+        updateFieldVisibility(
+            AssessmentDefinedParams.PREVIOUS_PREGNANCY_COMPLICATIONS,
+            visitNumber == AssessmentDefinedParams.ANC_VISIT_NUMBER_1 && (pregnancyDetail?.gravida ?: 0) > 1
+        )
 
         // 1. Height - show only if ANC visit is 1
         updateFieldVisibility(AssessmentDefinedParams.HEIGHT, visitNumber == AssessmentDefinedParams.ANC_VISIT_NUMBER_1)
