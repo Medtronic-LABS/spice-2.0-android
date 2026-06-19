@@ -998,7 +998,7 @@ class MetaRepository @Inject constructor(
                 if (months > 24) {
                     setCustomStatus(menuList, selectedHouseholdMemberID)
                 } else {
-                    setChildCustomStatus(menuList, selectedHouseholdMemberID)
+                    setChildCustomStatus(menuList, selectedHouseholdMemberID, memberData.dateOfBirth)
                 }
 
                 Resource(
@@ -1055,11 +1055,12 @@ class MetaRepository @Inject constructor(
     private suspend fun setChildCustomStatus(
         menu: List<MenuEntity>,
         selectedHouseholdMemberID: Long,
+        dateOfBirth: String?,
     ) {
         menu.forEach { item ->
             when (item.menuId) {
                 MenuConstants.RMNCH_MENU_ID -> {
-                    val childVisit = isChildVisitMenuDisable(selectedHouseholdMemberID)
+                    val childVisit = isChildVisitMenuDisable(selectedHouseholdMemberID, dateOfBirth)
                     item.isDisabled = childVisit.first
                     item.subModule = childVisit.second
                 }
@@ -1140,8 +1141,26 @@ class MetaRepository @Inject constructor(
         return (pregnancyDetail == null) to null
     }
 
-    private suspend fun isChildVisitMenuDisable(selectedHouseholdMemberID: Long): Pair<Boolean, String> =
-        checkIfLastServiceProvidedIsAfter(selectedHouseholdMemberID, MenuConstants.CHILDHOOD_VISIT, 15) to RMNCH.ChildHoodVisit
+    private suspend fun isChildVisitMenuDisable(
+        selectedHouseholdMemberID: Long,
+        dateOfBirth: String?,
+    ): Pair<Boolean, String> {
+        val ageInDays = DateUtils.calculateAgeInDays(dateOfBirth)
+
+        return if (ageInDays < 42) {
+            checkIfLastServiceProvidedIsAfter(
+                selectedHouseholdMemberID,
+                MenuConstants.CHILDHOOD_VISIT,
+                1,
+            ) to RMNCH.ChildHoodVisit
+        } else {
+            checkIfLastServiceProvidedIsAfter(
+                selectedHouseholdMemberID,
+                MenuConstants.CHILDHOOD_VISIT,
+                15,
+            ) to RMNCH.ChildHoodVisit
+        }
+    }
 
     private suspend fun isPOMenuDisable(
         pregnancyDetail: PregnancyDetail?,

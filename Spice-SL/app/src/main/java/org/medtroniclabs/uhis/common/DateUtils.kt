@@ -319,6 +319,13 @@ object DateUtils {
         return currentYear - birthYear
     }
 
+    fun calculateAgeInDays(birthDateStr: String?): Int {
+        val birthDate = parseDate(birthDateStr)
+        return birthDate?.let {
+            ChronoUnit.DAYS.between(it, LocalDate.now()).toInt()
+        } ?: 0
+    }
+
     fun calculateAgeInMonths(birthDateString: String): Pair<Int, Date>? {
         val startDate = formatStringToDate(
             birthDateString,
