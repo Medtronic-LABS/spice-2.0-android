@@ -596,10 +596,7 @@
         <error line="68" column="21" source="standard:no-consecutive-comments" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/offlinesync/ScheduledSyncWork.kt">
-        <error line="155" column="13" source="standard:no-consecutive-comments" />
-    </file>
-    <file name="src/main/java/org/medtroniclabs/uhis/repo/OfflineSyncRepository.kt">
-        <error line="614" column="30" source="standard:trailing-comma-on-call-site" />
+        <error line="156" column="13" source="standard:no-consecutive-comments" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/signature/view/SignatureView.kt">
         <error line="58" column="17" source="standard:property-naming" />
