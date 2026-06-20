@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.flexbox.FlexDirection
@@ -33,12 +34,16 @@ import com.medtroniclabs.microcoaching.ui.learn.modules.QuickLearnViewModel
 import com.medtroniclabs.microcoaching.ui.learn.modules.bottomsheet.RefresherBottomSheet
 import com.medtroniclabs.microcoaching.ui.theme.MicroCoachingTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.databinding.FragmentHomeScreenBinding
+import org.medtroniclabs.uhis.db.dao.FollowUpDao
 import org.medtroniclabs.uhis.db.entity.MenuEntity
+import org.medtroniclabs.uhis.microcoaching.toTodaysVisit
 import org.medtroniclabs.uhis.ncd.followup.activity.NCDFollowUpActivity
 import org.medtroniclabs.uhis.ncd.screening.ui.ScreeningActivity
 import org.medtroniclabs.uhis.network.resource.ResourceState
@@ -54,6 +59,8 @@ import org.medtroniclabs.uhis.ui.household.HouseholdSearchActivity
 import org.medtroniclabs.uhis.ui.landing.viewmodel.LandingViewModel
 import org.medtroniclabs.uhis.ui.peersupervisor.PerformanceMonitoringActivity
 import org.medtroniclabs.uhis.ui.services.ServicesActivity
+import java.time.LocalDate
+import javax.inject.Inject
 import android.net.ConnectivityManager as AndroidConnectivityManager
 
 @AndroidEntryPoint
@@ -61,6 +68,9 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
     private lateinit var binding: FragmentHomeScreenBinding
 
     private val viewModel: LandingViewModel by activityViewModels()
+
+    @Inject
+    lateinit var followUpDao: FollowUpDao
 
     private val chwId: String
         get() = runCatching { SecuredPreference.getUserId().toString() }.getOrDefault("")
@@ -105,6 +115,7 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
         val sdk = MicroCoachingSDK.getInstance()
 
         sdk.onHomeScreenShown(chwId)
+        pushTodaysVisits(sdk)
         // The Coaching grid tile + its skipped-refresher badge are rendered by the
         // SDK's CoachingGridTile (see DashboardMenuItemsAdapter) — no host badge
         // wiring needed; the tile observes the count internally.
@@ -204,6 +215,25 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
                     )
                 }
             }
+        }
+    }
+
+    /**
+     * Push the CHW's patient visits due today into the coaching SDK so it can
+     * surface visit-relevant refreshers at cold-start (no behavioural gaps and no
+     * backend morning cards). Only the clinical-type signal is sent — no patient
+     * identifiers (see [org.medtroniclabs.uhis.microcoaching.TodaysVisitRow]).
+     * Best-effort and off the main thread; failures are non-fatal. Applies from the
+     * next on-device morning recompute.
+     */
+    private fun pushTodaysVisits(sdk: MicroCoachingSDK) {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            runCatching {
+                val today = LocalDate.now().toString() // yyyy-MM-dd, device-local
+                val visits = followUpDao.getVisitsDueOn(today).map { it.toTodaysVisit() }
+                sdk.onTodaysVisitsUpdated(visits)
+                Log.d(TAG, "MicroCoaching: pushed ${visits.size} visit(s) due today")
+            }.onFailure { Log.w(TAG, "MicroCoaching: failed to push today's visits", it) }
         }
     }
 

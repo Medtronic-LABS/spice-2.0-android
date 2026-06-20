@@ -9,6 +9,7 @@ import androidx.room.Transaction
 import org.medtroniclabs.uhis.data.FollowUpPatientModel
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineSyncStatus
 import org.medtroniclabs.uhis.db.entity.FollowUp
+import org.medtroniclabs.uhis.microcoaching.TodaysVisitRow
 
 @Dao
 interface FollowUpDao {
@@ -55,6 +56,19 @@ interface FollowUpDao {
 
     @Query("SELECT * FROM FollowUp WHERE syncStatus IN (:syncStatus)")
     suspend fun getAllFollowUps(syncStatus: List<String> = listOf(OfflineSyncStatus.NotSynced.name, OfflineSyncStatus.NetworkError.name)): List<FollowUp>
+
+    /**
+     * Minimal, PII-free projection of follow-ups due on [today] (`yyyy-MM-dd`)
+     * that aren't completed — the MicroCoaching SDK's today's-visit refresher
+     * source. The local DB only holds this CHW's villages' follow-ups, so no CHW/
+     * village filter is needed; `date(nextVisitDate)` mirrors the existing
+     * follow-up "today" filters above.
+     */
+    @Query(
+        "SELECT type, encounterType, nextVisitDate, villageId FROM FollowUp " +
+            "WHERE isCompleted = 0 AND nextVisitDate IS NOT NULL AND date(nextVisitDate) = :today",
+    )
+    suspend fun getVisitsDueOn(today: String): List<TodaysVisitRow>
 
     @Query("SELECT COUNT(referenceId) FROM FollowUp where syncStatus IN (:syncStatus)")
     suspend fun getUnSyncedCount(syncStatus: List<String> = listOf(OfflineSyncStatus.NotSynced.name, OfflineSyncStatus.NetworkError.name)): Int
