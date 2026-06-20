@@ -297,6 +297,14 @@ class FollowUpMyPatientActivity : BaseActivity() {
             if (!it.ncdSelectedReferralTo.isNullOrEmpty()) {
                 count++
             }
+            if (it.type == FollowUpDefinedParams.FU_TYPE_REFERRED) {
+                if (it.remainingAttempt != null) {
+                    count++
+                }
+                if (!it.callStatus.isNullOrBlank()) {
+                    count++
+                }
+            }
 
             if (count > 0) {
                 binding.llFilter.btnFilter.text = this.getString(R.string.filter_count, CommonUtils.formatCountForCurrentLocale(count))

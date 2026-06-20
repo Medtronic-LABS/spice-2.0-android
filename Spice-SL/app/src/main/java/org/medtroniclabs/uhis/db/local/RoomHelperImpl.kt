@@ -585,6 +585,9 @@ class RoomHelperImpl @Inject constructor(
         ncdSelectedReferralTo: String?,
         fromDate: String,
         toDate: String,
+        screeningRetryAttempts: Int,
+        remainingAttempt: Int?,
+        callStatus: String?,
     ): LiveData<List<FollowUpPatientModel>> {
         if (type == FollowUpDefinedParams.FU_TYPE_REFERRED) {
             return followUpDao.getReferredFollowUpPatientListLiveData(
@@ -600,6 +603,9 @@ class RoomHelperImpl @Inject constructor(
                 ncdSelectedReferralTo = ncdSelectedReferralTo,
                 fromDate = fromDate,
                 toDate = toDate,
+                screeningRetryAttempts = screeningRetryAttempts,
+                remainingAttempt = remainingAttempt,
+                callStatus = callStatus,
             )
         } else {
             return followUpDao.getOtherFollowUpPatientListLiveData(
@@ -615,6 +621,7 @@ class RoomHelperImpl @Inject constructor(
                 ncdSelectedReferralTo = ncdSelectedReferralTo,
                 fromDate = fromDate,
                 toDate = toDate,
+                screeningRetryAttempts = screeningRetryAttempts,
             )
         }
     }
@@ -636,15 +643,11 @@ class RoomHelperImpl @Inject constructor(
     }
 
     override suspend fun addCallHistory(
-        oldFollowUp: FollowUp,
+        followUp: FollowUp,
         history: FollowUpCall,
-        newFollowUp: FollowUp?,
     ) {
-        followUpCallsDao.insertFollowUpCall(history)
-        followUpDao.insertFollowUp(oldFollowUp)
-        newFollowUp?.let {
-            followUpDao.insertFollowUp(it)
-        }
+        insertFollowUpCall(history)
+        followUpDao.insertFollowUp(followUp)
     }
 
     override suspend fun getAllFollowUpRequests(): List<FollowUp> = followUpDao.getAllFollowUps()
@@ -1690,4 +1693,12 @@ class RoomHelperImpl @Inject constructor(
         serviceA: String,
         serviceB: String,
     ) = memberAssessmentHistoryDao.getLatestMemberServiceBAfterServiceA(memberId, serviceA, serviceB)
+
+    override suspend fun getFollowupCall(
+        followUpId: Long,
+        callDate: String,
+        userId: String,
+    ) = followUpCallsDao.getFollowupCall(followUpId, callDate, userId)
+
+    override suspend fun insertFollowUpCall(followUpCall: FollowUpCall) = followUpCallsDao.insertFollowUpCall(followUpCall)
 }

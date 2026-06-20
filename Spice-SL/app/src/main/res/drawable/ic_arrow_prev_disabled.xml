@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Blue circle background -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/btn_disable_grey" />
+            <size android:width="@dimen/_24sdp" android:height="@dimen/_24sdp" />
+        </shape>
+    </item>
+
+    <!-- Centered arrow icon -->
+    <item
+        android:drawable="@drawable/ic_arrow_prev"
+        android:gravity="center" />
+</layer-list>

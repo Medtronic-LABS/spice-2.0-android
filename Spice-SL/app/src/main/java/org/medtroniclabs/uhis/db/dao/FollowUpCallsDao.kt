@@ -18,4 +18,11 @@ interface FollowUpCallsDao {
 
     @Query("UPDATE FollowUpCall SET isSynced = 1 WHERE id IN (:ids)")
     suspend fun updateSyncSuccess(ids: List<Long>)
+
+    @Query("SELECT * FROM FollowUpCall WHERE followUpId = :followUpId AND callDate = :callDate AND calledByUserId =:userId")
+    suspend fun getFollowupCall(
+        followUpId: Long,
+        callDate: String,
+        userId: String,
+    ): FollowUpCall?
 }

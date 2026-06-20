@@ -2,6 +2,7 @@ package org.medtroniclabs.uhis.common
 
 import org.medtroniclabs.uhis.common.RoleConstant.COMMUNITY_HEALTH_CARE_PROVIDER
 import org.medtroniclabs.uhis.common.RoleConstant.HEALTH_EDUCATOR
+import kotlin.collections.get
 
 object RoleConstant {
     const val SHASTIYA_KORMI = "SHASTIYA_KORMI"
@@ -47,4 +48,45 @@ object RoleConstant {
     const val HE = "HE"
     const val PARAMEDIC = "NON_TECH_TELECOUNSELOR"
     const val MEDICAL_DOCTOR = "TECH_TELECOUNSELOR"
+
+    private val DisplayNames = mapOf(
+        HEALTH_SCREENER to "SK",
+        HRIO to "HRIO",
+        LAB_TECHNICIAN to "Lab Technician",
+        NUTRITIONIST to "Nutritionist",
+        PHARMACIST to "Pharmacist",
+        PROVIDER to "Provider",
+        NURSE to "Nurse",
+        PHYSICIAN_PRESCRIBER to "Physician Prescriber",
+        COMMUNITY_HEALTH_CARE_PROVIDER to "CHCP",
+        CHCP to "CHCP",
+        PARA_COUNSELLOR to "Paracounsellor",
+        PROGRAM_ORGANIZER to "Program Organizer",
+        MEDICAL_DOCTOR to "TC Tech",
+        HEALTH_EDUCATOR to "Health Educator",
+        HE to "Health Educator",
+        PSYCHOLOGIST to "Psychologist",
+        PARAMEDIC to "TC Non Tech",
+        FIELD_ORGANIZER to "FO",
+        SHASTIYA_KORMI to "Shashtiya Kormi",
+        PO to "Program Organizer",
+        FO to "Field Organizer",
+        COMMUNITY_HEALTH_WORKER to "Community Health Worker",
+        PEER_SUPERVISOR to "Peer Supervisor",
+        SECHN to "SECHN",
+        MCHA to "MCHA",
+        CHA to "CHA",
+        MID_WIFE to "Midwife",
+        LAB_ASSISTANT to "Lab Assistant",
+        SRN to "SRN",
+        COUNSELOR to "Counselor",
+        TIBERBU_PROVIDER to "Tiberbu Provider",
+        COMMUNITY_HEALTH_PROMOTER to "Community Health Promoter",
+        COMMUNITY_HEALTH_ASSISTANT to "Community Health Assistant",
+    )
+
+    fun getRoleInDisplayFormatWithBraces(role: String?): String {
+        val value = DisplayNames[role] ?: return ""
+        return "($value)"
+    }
 }

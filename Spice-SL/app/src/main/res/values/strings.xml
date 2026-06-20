@@ -1920,4 +1920,13 @@
         <item>Sterilization (M)</item>
         <item>None</item>
     </string-array>
+    <string name="patient_record">Patient Record</string>
+    <string name="call_date">Call Date</string>
+    <string name="call_information">Call Information</string>
+    <string name="called_by">Called By</string>
+    <string name="call_category">Call Category</string>
+    <string name="agreed_to_visit">Agreed to visit</string>
+    <string name="call_status">Call Status</string>
+    <string name="mm_HG" translatable="false">mmHg</string>
+    <string name="days_due_string">Days Due</string>
 </resources>

@@ -14,9 +14,11 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
+import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.ViewUtils
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
+import org.medtroniclabs.uhis.data.offlinesync.model.FollowUpCallStatus
 import org.medtroniclabs.uhis.databinding.FollowupFilterBottomSheetDialogBinding
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.ui.TagListCustomView
@@ -33,6 +35,8 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
     private lateinit var referralReasonTagView: TagListCustomView
     private lateinit var ncdReasonTagView: TagListCustomView
     private lateinit var ncdReferralToTagView: TagListCustomView
+    private lateinit var remainingAttemptTagView: TagListCustomView
+    private lateinit var callStatusTagView: TagListCustomView
     private var datePickerDialog: DatePickerDialog? = null
     private val viewModel: FollowUpViewModel by activityViewModels()
 
@@ -115,7 +119,35 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
             ncdReferralToTagView.getSelectedTags().isNotEmpty()
         }
 
-        binding.btnApply.isEnabled = isSSValid || isVillageValid || isDateRangeValid || isValidReferralReasons || isValidReason || isValidReferralTo
+        val isValidRemainingAttempt = if (isReferredTab()) {
+            if (isCustomizedOptionSelected) {
+                isDateRangeValid && remainingAttemptTagView.getSelectedTags().isNotEmpty()
+            } else {
+                remainingAttemptTagView.getSelectedTags().isNotEmpty()
+            }
+        } else {
+            false
+        }
+
+        val isValidCallStatus = if (isReferredTab()) {
+            if (isCustomizedOptionSelected) {
+                isDateRangeValid && callStatusTagView.getSelectedTags().isNotEmpty()
+            } else {
+                callStatusTagView.getSelectedTags().isNotEmpty()
+            }
+        } else {
+            false
+        }
+
+        binding.btnApply.isEnabled =
+            isSSValid ||
+            isVillageValid ||
+            isDateRangeValid ||
+            isValidReferralReasons ||
+            isValidReason ||
+            isValidReferralTo ||
+            isValidRemainingAttempt ||
+            isValidCallStatus
     }
 
     private fun initializeListeners() {
@@ -153,6 +185,11 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
         hideReason()
         // Hide NCD referral to initially
         hideReferredTo()
+        if (isReferredTab()) {
+            showReferredFilters()
+        } else {
+            hideReferredFilters()
+        }
 
         ssListTagView = TagListCustomView(binding.root.context, binding.ssChipGroup, true) { _, _, _ ->
             val selectedTags = ssListTagView.getSelectedTags()
@@ -191,6 +228,14 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
         }
 
         ncdReferralToTagView = TagListCustomView(binding.root.context, binding.cgNcdReferral, true) { _, _, _ ->
+            enableConfirm()
+        }
+
+        remainingAttemptTagView = TagListCustomView(binding.root.context, binding.cgRemainingAttempt, true) { _, _, _ ->
+            enableConfirm()
+        }
+
+        callStatusTagView = TagListCustomView(binding.root.context, binding.cgCallStatus, true) { _, _, _ ->
             enableConfirm()
         }
 
@@ -247,9 +292,24 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
         binding.cgNcdReferral.clearCheck()
     }
 
-    /**
-     * Hide date picker and clear content
-     */
+    private fun showReferredFilters() {
+        binding.tvRemainingAttemptTitle.visible()
+        binding.cgRemainingAttempt.visible()
+        binding.tvCallStatusTitle.visible()
+        binding.cgCallStatus.visible()
+    }
+
+    private fun hideReferredFilters() {
+        binding.tvRemainingAttemptTitle.gone()
+        binding.cgRemainingAttempt.gone()
+        binding.cgRemainingAttempt.clearCheck()
+        binding.tvCallStatusTitle.gone()
+        binding.cgCallStatus.gone()
+        binding.cgCallStatus.clearCheck()
+    }
+
+    private fun isReferredTab(): Boolean = viewModel.getFilterData()?.type == FollowUpDefinedParams.FU_TYPE_REFERRED
+
     private fun goneDatePicker() {
         binding.etFromDate.text = ""
         binding.etToDate.text = ""
@@ -295,6 +355,39 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
             viewModel.getNcdReferralFacility(),
             viewModel.getFilterData()?.ncdSelectedReferralTo,
         )
+
+        if (isReferredTab()) {
+            val remainingAttemptItems = (1..viewModel.screeningRetryAttempts).map { attempt ->
+                ChipViewItemModel(
+                    id = attempt.toLong(),
+                    name = CommonUtils.formatCountForCurrentLocale(attempt),
+                )
+            }
+            val selectedRemainingAttempt = viewModel.getFilterData()?.remainingAttempt?.let { attempt ->
+                listOf(
+                    ChipViewItemModel(
+                        id = attempt.toLong(),
+                        name = CommonUtils.formatCountForCurrentLocale(attempt),
+                    ),
+                )
+            }
+            remainingAttemptTagView.addChipItemList(remainingAttemptItems, selectedRemainingAttempt)
+
+            val callStatusItems = listOf(
+                ChipViewItemModel(
+                    name = getString(R.string.successful),
+                    type = FollowUpCallStatus.SUCCESSFUL.name,
+                ),
+                ChipViewItemModel(
+                    name = getString(R.string.unsuccessful),
+                    type = FollowUpCallStatus.UNSUCCESSFUL.name,
+                ),
+            )
+            val selectedCallStatus = viewModel.getFilterData()?.callStatus?.let { status ->
+                callStatusItems.filter { it.type == status }
+            }
+            callStatusTagView.addChipItemList(callStatusItems, selectedCallStatus)
+        }
     }
 
     override fun onClick(view: View) {
@@ -333,6 +426,10 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
                     ncdSelectedReferralTo = listOf(),
                     fromDate = "",
                     toDate = "",
+                    remainingAttempt = null,
+                    callStatus = null,
+                    updateRemainingAttempt = true,
+                    updateCallStatus = true,
                 )
                 ssListTagView.clearSelection()
                 villageListTagView.clearSelection()
@@ -340,6 +437,8 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
                 referralReasonTagView.clearSelection()
                 ncdReasonTagView.clearSelection()
                 ncdReferralToTagView.clearSelection()
+                remainingAttemptTagView.clearSelection()
+                callStatusTagView.clearSelection()
                 dismiss()
             }
         }
@@ -355,6 +454,14 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
             ncdSelectedReferralTo = ncdReferralToTagView.getSelectedTags(),
             fromDate = binding.etFromDate.text.toString(),
             toDate = binding.etToDate.text.toString(),
+            remainingAttempt = remainingAttemptTagView
+                .getSelectedTags()
+                .firstOrNull()
+                ?.id
+                ?.toInt(),
+            callStatus = callStatusTagView.getSelectedTags().firstOrNull()?.type,
+            updateRemainingAttempt = isReferredTab(),
+            updateCallStatus = isReferredTab(),
         )
         viewModel.setUserJourney(AnalyticsDefinedParams.APPLYBUTTONTRIGGERED)
         dismiss()

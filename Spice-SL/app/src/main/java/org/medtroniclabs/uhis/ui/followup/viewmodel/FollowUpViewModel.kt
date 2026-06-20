@@ -46,14 +46,12 @@ class FollowUpViewModel @Inject constructor(
     val followUpPatientListLiveData: LiveData<List<FollowUpPatientModel>> =
         filterLiveData.switchMap {
             val referralLimit = referralDayLimitLiveData.value ?: 2
-            followUpRepository.getFollowUpListLiveData(it, referralLimit)
+            followUpRepository.getFollowUpListLiveData(it, referralLimit, screeningRetryAttempts)
         }
 
     val referralDayLimitLiveData = MutableLiveData<Int>()
-    var maxSuccessfulCallLimit: Int = 5
-    private var maxUnSuccessfulCallLimit: Int = 5
+    var screeningRetryAttempts: Int = 5
     val addCallHistoryLiveData = MutableLiveData<Resource<Boolean>>()
-    var informedCallAttempts: Int = 5
 
     var callType: String? = null
     var isSuccessful: Boolean? = null
@@ -68,9 +66,7 @@ class FollowUpViewModel @Inject constructor(
     init {
         SecuredPreference.getFollowUpCriteria()?.let { followUpCriteria ->
             referralDayLimitLiveData.postValue(followUpCriteria.referral)
-            maxSuccessfulCallLimit = followUpCriteria.successfulAttempts
-            maxUnSuccessfulCallLimit = followUpCriteria.unsuccessfulAttempts
-            informedCallAttempts = followUpCriteria.informedCallAttempts
+            screeningRetryAttempts = followUpCriteria.screeningRetryAttempts
         }
 
         viewModelScope.launch {
@@ -97,6 +93,10 @@ class FollowUpViewModel @Inject constructor(
         fromDate: String? = null,
         toDate: String? = null,
         selectedShashthyaShebikas: List<ChipViewItemModel>? = null,
+        remainingAttempt: Int? = null,
+        callStatus: String? = null,
+        updateRemainingAttempt: Boolean = false,
+        updateCallStatus: Boolean = false,
     ) {
         val filter = filterLiveData.value ?: FollowUpFilter()
         filter.apply {
@@ -144,6 +144,14 @@ class FollowUpViewModel @Inject constructor(
 
             toDate?.let {
                 this.toDate = it
+            }
+
+            if (updateRemainingAttempt) {
+                this.remainingAttempt = remainingAttempt
+            }
+
+            if (updateCallStatus) {
+                this.callStatus = callStatus
             }
 
             filterLiveData.value = this
@@ -226,6 +234,7 @@ class FollowUpViewModel @Inject constructor(
                     unSuccessfulCallReason,
                     wrongNumber,
                     calculateTotalTimeTaken(),
+                    screeningRetryAttempts,
                 )
                 setAnalyticsFollowUpData(
                     it.id,

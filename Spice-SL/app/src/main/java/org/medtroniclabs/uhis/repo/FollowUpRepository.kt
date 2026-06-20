@@ -23,6 +23,7 @@ class FollowUpRepository @Inject constructor(
     fun getFollowUpListLiveData(
         filter: FollowUpFilter,
         referralLimit: Int,
+        screeningRetryAttempts: Int,
     ): LiveData<List<FollowUpPatientModel>> {
         val villageIds = filter.selectedVillages?.map { it.id!! } ?: listOf()
         val villageIdsSize = villageIds.size
@@ -56,6 +57,9 @@ class FollowUpRepository @Inject constructor(
             ncdSelectedReferralTo,
             fromAndToDate.first,
             fromAndToDate.second,
+            screeningRetryAttempts,
+            filter.remainingAttempt,
+            filter.callStatus,
         )
 
         return result
@@ -143,6 +147,7 @@ class FollowUpRepository @Inject constructor(
         unSuccessfulCallReason: String?,
         wrongNumber: Boolean,
         totalTimeTaken: Double?,
+        screeningRetryAttempts: Int,
     ) {
         val followUp = roomHelper.getFollowUpById(followUpId)
         followUp.syncStatus = OfflineSyncStatus.NotSynced
@@ -171,6 +176,12 @@ class FollowUpRepository @Inject constructor(
             handleSuccessCall(followUp)
         } else {
             handleUnSuccessfulCall(followUp, callDetail)
+        }
+
+        // Mark the followup as completed, if the total number of attempts
+        // is greater or equal to screeningRetryAttempts
+        if (followUp.attempts >= screeningRetryAttempts) {
+            followUp.isCompleted = true
         }
 
         roomHelper.addCallHistory(followUp, callDetail)

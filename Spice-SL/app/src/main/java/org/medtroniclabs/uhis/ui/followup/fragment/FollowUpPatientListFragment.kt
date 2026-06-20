@@ -26,8 +26,9 @@ import org.medtroniclabs.uhis.ui.followup.adapter.PatientListAdapter
 import org.medtroniclabs.uhis.ui.followup.viewmodel.FollowUpViewModel
 import org.medtroniclabs.uhis.ui.home.AssessmentToolsActivity
 import org.medtroniclabs.uhis.ui.household.summary.MemberSummaryActivity
+import timber.log.Timber
 
-class FollowUpPatientListFragment : BaseFragment(), FollowUpDialogFragment.FollowUpClickListener {
+class FollowUpPatientListFragment : BaseFragment() {
     private lateinit var binding: FragmentFollowUpMyPatientListBinding
     private val viewModel: FollowUpViewModel by activityViewModels()
     private lateinit var adapter: PatientListAdapter
@@ -66,14 +67,18 @@ class FollowUpPatientListFragment : BaseFragment(), FollowUpDialogFragment.Follo
 
     private fun attachListener() {
         viewModel.followUpPatientListLiveData.observe(viewLifecycleOwner) {
+            val callStatus = it.map { followUp ->
+                followUp.id to followUp.recentCallStatus
+            }
+            Timber.tag("bug_n_bug").d(callStatus.toString())
             if (!it.isNullOrEmpty()) {
                 binding.tvPatientNoFound.gone()
                 binding.rvPatientList.visible()
-                adapter.updateList(it, viewModel.maxSuccessfulCallLimit)
+                adapter.updateList(it)
             } else {
                 binding.tvPatientNoFound.visible()
                 binding.rvPatientList.gone()
-                adapter.updateList(listOf(), viewModel.maxSuccessfulCallLimit)
+                adapter.updateList(listOf())
             }
         }
 
@@ -94,10 +99,10 @@ class FollowUpPatientListFragment : BaseFragment(), FollowUpDialogFragment.Follo
                         intent.putExtra(DefinedParams.DOB, data.dateOfBirth)
                         startActivity(intent)
                     } else {
-                        FollowUpDialogFragment.newInstance(this).show(
-                            parentFragmentManager,
-                            FollowUpDialogFragment.TAG,
-                        )
+                        data.toPatientHistoryData().takeIf { it.isNotEmpty() }?.let { historyData ->
+                            val dialog = PatientDetailHistoryDialogFragment(historyData)
+                            dialog.show(childFragmentManager, PatientDetailHistoryDialogFragment::class.simpleName)
+                        }
                     }
                 }
 
@@ -114,7 +119,7 @@ class FollowUpPatientListFragment : BaseFragment(), FollowUpDialogFragment.Follo
         binding.rvPatientList.adapter = adapter
     }
 
-    override fun onCallClicked() {
+    fun onCallClicked() {
         viewModel.callStartTime = System.currentTimeMillis()
         SecuredPreference.putString(DefinedParams.FollowUpStartTiming, AnalyticsUtils.getCurrentDateTimeInLocalTime())
         viewModel.selectedFollowUpDetail?.let { data ->
@@ -127,7 +132,7 @@ class FollowUpPatientListFragment : BaseFragment(), FollowUpDialogFragment.Follo
         }
     }
 
-    override fun onLaunchAssessment() {
+    fun onLaunchAssessment() {
         viewModel.selectedFollowUpDetail?.let { data ->
             if (data.householdId != null && data.householdId != 0L) {
                 val intent = Intent(requireContext(), AssessmentToolsActivity::class.java)

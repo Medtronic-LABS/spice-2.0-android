@@ -97,8 +97,8 @@ class FollowUpDialogFragment : DialogFragment() {
                 tvMemberIDText.text = details.patientId ?: getString(R.string.hyphen_symbol)
                 tvCallsMadeText.text = getString(
                     R.string.string_slash_string,
-                    CommonUtils.formatCountForCurrentLocale(details.successfulAttempts),
-                    CommonUtils.formatCountForCurrentLocale(viewModel.maxSuccessfulCallLimit),
+                    CommonUtils.formatCountForCurrentLocale(details.attempts),
+                    CommonUtils.formatCountForCurrentLocale(viewModel.screeningRetryAttempts),
                 )
                 tvStartDateText.text = convertDateTimeToDate(
                     details.encounterDate,

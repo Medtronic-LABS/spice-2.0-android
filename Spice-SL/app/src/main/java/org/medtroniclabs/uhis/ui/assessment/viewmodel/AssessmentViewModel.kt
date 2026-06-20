@@ -139,7 +139,6 @@ import org.medtroniclabs.uhis.ui.assessment.statuslogic.AssessmentStatusGenerato
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentObservationUtils
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 import org.medtroniclabs.uhis.ui.boarding.repo.MetaRepository
-import timber.log.Timber
 import java.lang.reflect.Type
 import java.time.LocalDate
 import java.util.Locale
@@ -2150,7 +2149,6 @@ class AssessmentViewModel @Inject constructor(
                     null
                 }
             }
-            Timber.tag("bug_n_bug").d("Latest Assessment $previousAssessment")
         }
     }
 }

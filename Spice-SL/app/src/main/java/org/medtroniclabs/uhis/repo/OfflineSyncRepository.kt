@@ -59,6 +59,7 @@ import org.medtroniclabs.uhis.data.resource.RequestAllEntities
 import org.medtroniclabs.uhis.db.entity.CommunityProfile
 import org.medtroniclabs.uhis.db.entity.EntitiesName
 import org.medtroniclabs.uhis.db.entity.EntitiesName.COMMUNITY_PROFILE
+import org.medtroniclabs.uhis.db.entity.FollowUpCall
 import org.medtroniclabs.uhis.db.entity.LinkHouseholdMember
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
 import org.medtroniclabs.uhis.db.entity.RxBuddyDetails
@@ -441,6 +442,7 @@ class OfflineSyncRepository @Inject constructor(
             followUp.patientStatus = followUp.patientStatus ?: ""
             followUp.syncStatus = OfflineSyncStatus.Success
             roomHelper.insertOrUpdateFollowUp(followUp)
+            saveFollowUpCallDetails(followUp.followUpDetails)
         }
         roomHelper.deleteCompletedFollowUp()
 
@@ -495,7 +497,7 @@ class OfflineSyncRepository @Inject constructor(
         requestInitialDownload.followUpCriteria?.let {
             SecuredPreference.putFollowUpCriteria(it)
         } ?: kotlin.run {
-            val followUpCriteria = FollowUpCriteria(3, 5, 3, 7, 7, 2, 2, 2, 2, 5, 5, 5, 5)
+            val followUpCriteria = FollowUpCriteria(3, 5, 3, 7, 7, 2, 2, 2, 2, 5, 5, 5, 5, 5)
             SecuredPreference.putFollowUpCriteria(followUpCriteria)
         }
         saveAssessmentHistory(assessmentHistory)
@@ -504,6 +506,19 @@ class OfflineSyncRepository @Inject constructor(
             SecuredPreference.EnvironmentKey.SERVER_LAST_SYNCED.name,
             requestInitialDownload.lastSyncTime,
         )
+    }
+
+    private suspend fun saveFollowUpCallDetails(callDetails: List<FollowUpCall>?) {
+        if (callDetails.isNullOrEmpty()) return
+        callDetails.forEach { callDetail ->
+            val existingCall = roomHelper.getFollowupCall(callDetail.followUpId, callDetail.callDate, callDetail.calledByUserId)
+            val updatedCall = if (existingCall != null) {
+                callDetail.copy(id = existingCall.id, followUpId = existingCall.followUpId)
+            } else {
+                callDetail.copy(followUpId = callDetail.callRegisterId)
+            }
+            roomHelper.insertFollowUpCall(updatedCall)
+        }
     }
 
     private suspend fun insertOrUpdateTreatmentDetails(treatmentDetails: List<TreatmentDetails>?) {

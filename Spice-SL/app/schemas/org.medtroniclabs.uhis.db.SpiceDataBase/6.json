@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "35b2fd035cf0d933aadf96318de19f19",
+    "identityHash": "48a2305bcbccf9bb6a748ff9fb54faf0",
     "entities": [
       {
         "tableName": "Household",
@@ -1341,7 +1341,7 @@
       },
       {
         "tableName": "FollowUpCall",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `followUpId` INTEGER NOT NULL, `callDate` TEXT NOT NULL, `duration` REAL, `attempts` INTEGER NOT NULL, `status` TEXT NOT NULL, `callType` TEXT, `isWillingToVisitUHC` INTEGER, `visitRejectReason` TEXT, `otherVisitRejectReason` TEXT, `unSuccessfulCallReason` TEXT, `wrongNumber` INTEGER NOT NULL, `isSynced` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `calledByUserId` TEXT NOT NULL, `calledByUserName` TEXT NOT NULL, `calledByUserRole` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `followUpId` INTEGER NOT NULL, `callDate` TEXT NOT NULL, `duration` REAL, `attempts` INTEGER NOT NULL, `status` TEXT NOT NULL, `callType` TEXT, `isWillingToVisitUHC` INTEGER, `visitRejectReason` TEXT, `otherVisitRejectReason` TEXT, `unSuccessfulCallReason` TEXT, `wrongNumber` INTEGER NOT NULL, `isSynced` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `calledByUserId` TEXT NOT NULL, `calledByUserFullName` TEXT, `calledByUserRole` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -1434,10 +1434,9 @@
             "notNull": true
           },
           {
-            "fieldPath": "calledByUserName",
-            "columnName": "calledByUserName",
-            "affinity": "TEXT",
-            "notNull": true
+            "fieldPath": "calledByUserFullName",
+            "columnName": "calledByUserFullName",
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "calledByUserRole",
@@ -4187,7 +4186,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '35b2fd035cf0d933aadf96318de19f19')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '48a2305bcbccf9bb6a748ff9fb54faf0')"
     ]
   }
 }

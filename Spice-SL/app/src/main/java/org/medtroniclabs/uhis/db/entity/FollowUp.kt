@@ -40,7 +40,7 @@ data class FollowUp(
     var updatedAt: Long = System.currentTimeMillis(),
 ) {
     @Ignore
-    var followUpDetails: List<FollowUpCall> = listOf()
+    var followUpDetails: List<FollowUpCall>? = null
 
     @Ignore
     var provenance: ProvanceDto = ProvanceDto(modifiedDate = System.currentTimeMillis().convertToUtcDateTime())

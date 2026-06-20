@@ -259,6 +259,62 @@
                 app:layout_constraintStart_toStartOf="@id/tvNcdReferral"
                 app:layout_constraintTop_toBottomOf="@id/tvNcdReferral" />
 
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvRemainingAttemptTitle"
+                style="@style/TextStyle_Medium_16_NoBG"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:text="@string/retry_attempts"
+                android:textColor="@color/grey_black"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cgNcdReferral"
+                tools:visibility="visible" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/cgRemainingAttempt"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_16sdp"
+                android:layout_marginBottom="@dimen/_20sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/tvRemainingAttemptTitle"
+                app:layout_constraintTop_toBottomOf="@id/tvRemainingAttemptTitle"
+                app:singleSelection="true"
+                tools:visibility="visible" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCallStatusTitle"
+                style="@style/TextStyle_Medium_16_NoBG"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:text="@string/call_status"
+                android:textColor="@color/grey_black"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cgRemainingAttempt"
+                tools:visibility="visible" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/cgCallStatus"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_16sdp"
+                android:layout_marginBottom="@dimen/_20sdp"
+                android:paddingVertical="@dimen/_10sdp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/tvCallStatusTitle"
+                app:layout_constraintTop_toBottomOf="@id/tvCallStatusTitle"
+                app:singleSelection="true"
+                tools:visibility="visible" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>

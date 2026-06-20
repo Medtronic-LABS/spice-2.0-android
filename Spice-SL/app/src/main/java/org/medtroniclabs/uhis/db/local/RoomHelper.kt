@@ -382,6 +382,9 @@ interface RoomHelper {
         ncdSelectedReferralTo: String?,
         fromDate: String = "",
         toDate: String = "",
+        screeningRetryAttempts: Int,
+        remainingAttempt: Int? = null,
+        callStatus: String? = null,
     ): LiveData<List<FollowUpPatientModel>>
 
     suspend fun getAllSubVillageIds(): List<Long>
@@ -395,9 +398,8 @@ interface RoomHelper {
     suspend fun insertUpdatePregnancyDetailFromBE(pregnancyDetail: PregnancyDetail)
 
     suspend fun addCallHistory(
-        oldFollowUp: FollowUp,
+        followUp: FollowUp,
         history: FollowUpCall,
-        newFollowUp: FollowUp? = null,
     )
 
     suspend fun deleteAllFollowUpCalls()
@@ -1115,4 +1117,12 @@ interface RoomHelper {
         serviceA: String,
         serviceB: String,
     ): MemberAssessmentHistoryEntity?
+
+    suspend fun getFollowupCall(
+        followUpId: Long,
+        callDate: String,
+        userId: String,
+    ): FollowUpCall?
+
+    suspend fun insertFollowUpCall(followUpCall: FollowUpCall)
 }

@@ -38,20 +38,15 @@ class PatientListAdapter(private val callback: (Int, FollowUpPatientModel) -> Un
     }
 
     private val listOfPatient = mutableListOf<FollowUpPatientModel>()
-    private var maxSuccessfulCallLimit: Int = 0
     private var referralDayLimit = 2
 
     fun updateReferralDayLimit(limit: Int) {
         referralDayLimit = limit
     }
 
-    fun updateList(
-        list: List<FollowUpPatientModel>,
-        maxSuccessfulCallLimit: Int,
-    ) {
+    fun updateList(list: List<FollowUpPatientModel>) {
         listOfPatient.clear()
         listOfPatient.addAll(list)
-        this.maxSuccessfulCallLimit = maxSuccessfulCallLimit
         notifyDataSetChanged()
     }
 
@@ -125,7 +120,7 @@ class PatientListAdapter(private val callback: (Int, FollowUpPatientModel) -> Un
                 tvReason.text = data.getReason(context.getString(R.string.hyphen_symbol))
                 tvPatientStatus.text = context.getPatientStatus(data.patientStatus) ?: context.getString(R.string.hyphen_symbol)
                 tvLastCallAtValue.text = data.calledAt?.convertToLocalDateTime(format = DATE_TIME_CALL_DISPLAY_FORMAT) ?: "--"
-                tvRemainingCount.text = CommonUtils.formatCountForCurrentLocale(maxSuccessfulCallLimit - data.successfulAttempts)
+                tvRemainingCount.text = CommonUtils.formatCountForCurrentLocale(data.remainingAttempts)
 
                 root.safeClickListener {
                     callback(ConstantPatientListAdapter.PATIENT_DETAIL, data)

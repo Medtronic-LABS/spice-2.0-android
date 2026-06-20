@@ -1845,4 +1845,12 @@
         <item>পুরুষ বন্ধ্যাকরণ</item>
         <item>কোনোটি নয়</item>
     </string-array>
+    <string name="patient_record">রোগীর তথ্য</string>
+    <string name="call_date">কল প্রদানের তারিখ</string>
+    <string name="call_information">কলের তথ্য</string>
+    <string name="called_by">কল প্রদানকারীর নাম</string>
+    <string name="call_category">কলের ধরণ</string>
+    <string name="agreed_to_visit">যেতে রাজি হয়েছে</string>
+    <string name="call_status">কলের তথ্য</string>
+    <string name="days_due_string">দিন বাকী</string>
 </resources>

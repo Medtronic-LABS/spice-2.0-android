@@ -15,7 +15,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
 import org.medtroniclabs.uhis.R
-import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.setDialogPercent
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
@@ -81,7 +80,6 @@ class CallResultDialogFragment : DialogFragment(), View.OnClickListener {
         binding.etOtherNotes.doOnTextChanged { _, _, _, _ ->
             updateSubmitButtonState()
         }
-        binding.btnViewPatientDetail.gone()
     }
 
     private fun setObserver() {
@@ -178,14 +176,12 @@ class CallResultDialogFragment : DialogFragment(), View.OnClickListener {
     }
 
     private fun setListeners() {
-//        binding.btnViewPatientDetail.setOnClickListener {
-//            patientHistoryDetail?.let {
-//                val type = object : TypeToken<ArrayList<PatientHistoryData>>() {}.type
-//                val historyList: List<PatientHistoryData> = Gson().fromJson(it, type)
-//                val dialog = PatientDetailHistoryDialogFragment(historyList)
-//                dialog.show(childFragmentManager, "Test_Tag")
-//            }
-//        }
+        binding.btnViewPatientDetail.setOnClickListener {
+            callViewModel.selectedFollowUpDetail?.toPatientHistoryData()?.takeIf { it.isNotEmpty() }?.let { historyData ->
+                val dialog = PatientDetailHistoryDialogFragment(historyData)
+                dialog.show(childFragmentManager, PatientDetailHistoryDialogFragment::class.simpleName)
+            }
+        }
 
         binding.labelHeader.ivClose.visibility = View.INVISIBLE
         binding.tvSuccessful.safeClickListener(this)
@@ -228,7 +224,7 @@ class CallResultDialogFragment : DialogFragment(), View.OnClickListener {
                 if (callViewModel.isSuccessful == true) {
                     updateValueForSuccessful()
                 } else {
-                    callViewModel.callResultStatus = FollowUpCallStatus.UN_SUCCESSFUL
+                    callViewModel.callResultStatus = FollowUpCallStatus.UNSUCCESSFUL
                     callViewModel.visitRejectReason = null
                     callViewModel.otherVisitRejectReason = null
                     val reasonsArray = arrayOf(
@@ -315,7 +311,7 @@ class CallResultDialogFragment : DialogFragment(), View.OnClickListener {
                 }
 
                 if (CommonUtils.isHealthScreener()) {
-                    callViewModel.callResultStatus = FollowUpCallStatus.UN_SUCCESSFUL
+                    callViewModel.callResultStatus = FollowUpCallStatus.UNSUCCESSFUL
                     binding.tvSuccessful.isSelected = false
                     binding.tvUnsuccessful.isSelected = true
                     binding.tvWrongNumber.isSelected = false

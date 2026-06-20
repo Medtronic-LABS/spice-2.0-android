@@ -1038,6 +1038,23 @@ object DateUtils {
             null
         }
 
+    fun getDaysDifference(dateString: String?): Long {
+        if (dateString.isNullOrEmpty()) return -1
+
+        return try {
+            val sdf = SimpleDateFormat(DATE_FORMAT_yyyyMMddHHmmssZZZZZ, Locale.ENGLISH)
+            val givenDate = sdf.parse(dateString) ?: return 0
+
+            // Today date
+            val today = Date()
+
+            val diffMillis = today.time - givenDate.time
+            diffMillis / (1000 * 60 * 60 * 24)
+        } catch (ex: Exception) {
+            -1
+        }
+    }
+
     fun getCurrentDayMonthYear(): Triple<Int, Int, Int> {
         val currentDate = LocalDate.now()
         return Triple(currentDate.dayOfMonth, currentDate.monthValue, currentDate.year)
