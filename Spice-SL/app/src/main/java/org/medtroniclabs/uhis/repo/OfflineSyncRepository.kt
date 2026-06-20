@@ -611,7 +611,7 @@ class OfflineSyncRepository @Inject constructor(
                             member.toHouseholdMemberEntity(
                                 it,
                                 OfflineSyncStatus.Success,
-                            )
+                            ),
                         )
                     }
                 } else {

@@ -7,6 +7,7 @@ import androidx.core.view.setPadding
 import androidx.recyclerview.widget.RecyclerView
 import org.medtroniclabs.uhis.databinding.SummaryListItemBinding
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
+import org.medtroniclabs.uhis.db.entity.PregnancyDetail
 import org.medtroniclabs.uhis.formgeneration.extension.px
 
 /**
@@ -14,6 +15,7 @@ import org.medtroniclabs.uhis.formgeneration.extension.px
  */
 class MemberAssessmentHistoryAdapter(
     val historyList: List<MemberAssessmentHistoryEntity>,
+    val memberPregnancyDetails: List<PregnancyDetail>?,
 ) : RecyclerView.Adapter<MemberAssessmentHistoryAdapter.ViewHolder>() {
     override fun onCreateViewHolder(
         viewGroup: ViewGroup,
@@ -34,16 +36,19 @@ class MemberAssessmentHistoryAdapter(
         viewHolder: ViewHolder,
         position: Int,
     ) {
-        viewHolder.bindData(historyList[position])
+        viewHolder.bindData(historyList[position], memberPregnancyDetails)
     }
 
     override fun getItemCount() = historyList.size
 
     class ViewHolder(private val view: LinearLayout) : RecyclerView.ViewHolder(view) {
-        fun bindData(history: MemberAssessmentHistoryEntity) {
+        fun bindData(
+            history: MemberAssessmentHistoryEntity,
+            memberPregnancyDetails: List<PregnancyDetail>?,
+        ) {
             val context = view.context
             view.removeAllViews()
-            val summaryItems = MemberAssessmentHistoryAdapterUtil.constructHistoryAdapterBindItems(context, history)
+            val summaryItems = MemberAssessmentHistoryAdapterUtil.constructHistoryAdapterBindItems(context, history, memberPregnancyDetails)
             summaryItems.forEach { summaryItem ->
                 addSummaryView(summaryItem.name, summaryItem.value, summaryItem.valueColor)
             }

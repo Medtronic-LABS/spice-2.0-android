@@ -94,7 +94,7 @@ class MemberSummaryActivity : BaseActivity(), View.OnClickListener {
             } else {
                 binding.rvServiceHistory.visible()
                 binding.emptyErrorMessage.gone()
-                adapter = MemberAssessmentHistoryAdapter(history)
+                adapter = MemberAssessmentHistoryAdapter(history, it.memberPregnancyDetails)
                 binding.rvServiceHistory.adapter = adapter
                 if (history.size > 1) {
                     binding.ivLeftArrow.visible()

@@ -1397,13 +1397,13 @@ class RoomHelperImpl @Inject constructor(
     override fun getMemberWithAssessmentHistory(memberId: Long): LiveData<MemberAssessmentHistoryResponse?> {
         val result = MediatorLiveData<MemberAssessmentHistoryResponse?>()
         var latestResponse: MemberAssessmentHistoryResponse? = null
-        var latestPregnancy: PregnancyDetail? = null
+        var latestPregnancy: List<PregnancyDetail>? = null
         var latestHouseholdHeadName: String? = null
         var householdHeadNameSource: LiveData<String?>? = null
 
         fun emit() {
             result.value = latestResponse?.copy(
-                recentPregnancy = latestPregnancy,
+                memberPregnancyDetails = latestPregnancy,
                 householdHeadName = latestHouseholdHeadName,
             )
         }
@@ -1447,7 +1447,7 @@ class RoomHelperImpl @Inject constructor(
                 emit()
             }
         }
-        result.addSource(pregnancyDetailDao.observeRecentPregnancyDetail(memberId)) { pregnancy ->
+        result.addSource(pregnancyDetailDao.observePregnancyDetails(memberId)) { pregnancy ->
             latestPregnancy = pregnancy
             if (latestResponse != null) {
                 emit()

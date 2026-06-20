@@ -18,4 +18,11 @@ data class MemberAssessmentObservations(
     val familyPlanningMethods: String? = null,
     val desireForChildrenInFuture: String? = null,
     val numberOfLivingChildren: String? = null,
+    val ancVisitsOtherProviders: String? = null,
+    val liveBirthNumbers: String? = null,
+    val stillbirthNumbers: String? = null,
+    val maternalDeath: String? = null,
+    val abortion: String? = null,
+    val newbornDeathNumbers: String? = null,
+    val pregnancyEpisodeId: String? = null,
 )

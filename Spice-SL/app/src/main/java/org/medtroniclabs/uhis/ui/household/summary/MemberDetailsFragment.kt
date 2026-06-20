@@ -13,6 +13,7 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.textOrDoubleHyphen
 import org.medtroniclabs.uhis.appextensions.visible
+import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_DD_MMMM_YYYY
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
@@ -22,6 +23,7 @@ import org.medtroniclabs.uhis.common.DateUtils.getLastMenstrualDate
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.databinding.FragmentMemberDetailsBinding
 import org.medtroniclabs.uhis.databinding.SummaryListItemBinding
+import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
 import org.medtroniclabs.uhis.db.entity.PregnancyDetail
 import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
@@ -109,23 +111,29 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
             addSummaryView(getString(R.string.mobile_number), memberDetails.member.phoneNumber ?: getString(R.string.separator_double_hyphen))
             addSummaryView(getString(R.string.last_visit_date), lastActivity)
             addSummaryView(getString(R.string.services_provided), servicesProvided)
-            val recentService = memberDetails.history
-                .firstOrNull()
-                ?.serviceProvided
-                ?.lowercase()
-                .orEmpty()
+            if (memberDetails.member.isActive) {
+                binding.tvEdit.visible()
+            } else {
+                binding.tvEdit.gone()
+            }
+            val recentHistory = memberDetails.history.firstOrNull() ?: return@observe
+            val recentService = recentHistory.serviceProvided?.lowercase().orEmpty()
             var showRecentStatus = true
             when (recentService) {
                 MenuConstants.PREGNANT_WOMEN_PROFILE.lowercase(),
                 MenuConstants.ANC.lowercase(),
                 -> {
-                    showRecentStatus = !addPregnancySummaryViews(memberDetails.recentPregnancy)
+                    showRecentStatus = !addPregnancySummaryViews(memberDetails.memberPregnancyDetails?.firstOrNull())
                 }
 
                 MenuConstants.PREGNANCY_OUTCOME.lowercase(),
                 MenuConstants.PNC_MOTHER.lowercase(),
                 -> {
-                    showRecentStatus = !addDeliveryDate(memberDetails.recentPregnancy)
+                    showRecentStatus = !addDeliveryOutcomeSummaryViews(memberDetails.history, memberDetails.memberPregnancyDetails?.firstOrNull())
+                }
+
+                MenuConstants.FP_MENU_ID.lowercase() -> {
+                    showRecentStatus = !addFPSummaryView(recentHistory)
                 }
             }
             if (showRecentStatus) {
@@ -135,11 +143,6 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
                         AssessmentUtil.mapServiceToServiceName(history.serviceProvided.orEmpty(), requireContext())
                     } ?: getString(R.string.separator_double_hyphen),
                 )
-            }
-            if (memberDetails.member.isActive) {
-                binding.tvEdit.visible()
-            } else {
-                binding.tvEdit.gone()
             }
         }
     }
@@ -184,11 +187,58 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
     }
 
     /**
-     * Binds delivery date in case of pregnancy outcome or PNC
+     * Binds pregnancy outcome and delivery date in case of pregnancy outcome or PNC
      * Returns true if it is able to add delivery date
      */
-    private fun addDeliveryDate(pregnancyDetail: PregnancyDetail?): Boolean {
+    private fun addDeliveryOutcomeSummaryViews(
+        recentHistory: List<MemberAssessmentHistoryEntity>?,
+        pregnancyDetail: PregnancyDetail?,
+    ): Boolean {
+        // Pregnacy Outcome - Live Births (Number) /Still Births (Number)/Maternal Death/Abortion/Newborn Death (Number)
         pregnancyDetail ?: return false
+        var returnResult = false
+        val observations = recentHistory
+            ?.find {
+                it.observations?.pregnancyEpisodeId == pregnancyDetail.pregnancyEpisodeId &&
+                    MenuConstants.PREGNANCY_OUTCOME.equals(it.serviceProvided.orEmpty(), true)
+            }?.observations
+        val pregnancyOutcomeValues = mutableListOf<String>()
+        if (DefinedParams.YES.equals(observations?.abortion.orEmpty(), true)) {
+            pregnancyOutcomeValues.add(getString(R.string.abortion))
+        } else {
+            if (!observations?.modeOfDelivery.isNullOrBlank()) {
+                pregnancyOutcomeValues.add(
+                    getString(
+                        R.string.live_birth_s,
+                        CommonUtils.formatCountForCurrentLocale(CommonUtils.getInteger(observations.liveBirthNumbers)),
+                    ),
+                )
+                pregnancyOutcomeValues.add(
+                    getString(
+                        R.string.still_birth_s,
+                        CommonUtils.formatCountForCurrentLocale(CommonUtils.getInteger(observations.stillbirthNumbers)),
+                    ),
+                )
+                if (DefinedParams.YES.equals(observations.maternalDeath.orEmpty(), true)) {
+                    pregnancyOutcomeValues.add(getString(R.string.maternal_death))
+                }
+                pregnancyOutcomeValues.add(
+                    getString(
+                        R.string.newborn_death_s,
+                        CommonUtils.formatCountForCurrentLocale(CommonUtils.getInteger(observations.newbornDeathNumbers)),
+                    ),
+                )
+            } else if (DefinedParams.YES.equals(observations?.maternalDeath.orEmpty(), true)) {
+                pregnancyOutcomeValues.add(getString(R.string.maternal_death))
+            }
+        }
+        if (pregnancyOutcomeValues.isNotEmpty()) {
+            addSummaryView(
+                getString(R.string.pregnancy_outcome),
+                pregnancyOutcomeValues.joinToString("/"),
+            )
+            returnResult = true
+        }
         if (pregnancyDetail.typeOfAbortion.isNullOrBlank() && !pregnancyDetail.dateOfDelivery.isNullOrBlank()) {
             val formattedDeliveryDate = pregnancyDetail.dateOfDelivery?.let { dateOfDelivery ->
                 DateUtils.convertDateFormat(
@@ -201,7 +251,17 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
                 getString(R.string.date_of_delivery),
                 formattedDeliveryDate.textOrDoubleHyphen(),
             )
-            return true
+            returnResult = true
+        }
+        return returnResult
+    }
+
+    private fun addFPSummaryView(recentHistory: MemberAssessmentHistoryEntity): Boolean {
+        if (!recentHistory.observations?.numberOfLivingChildren.isNullOrBlank()) {
+            addSummaryView(
+                getString(R.string.no_of_living_children),
+                CommonUtils.formatCountForCurrentLocale(CommonUtils.getInteger(recentHistory.observations.numberOfLivingChildren)),
+            )
         }
         return false
     }

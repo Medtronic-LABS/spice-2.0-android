@@ -237,6 +237,11 @@ class AssessmentViewModel @Inject constructor(
     var previousAssessment: MemberAssessmentHistoryEntity? = null
         private set
 
+    /**
+     * Pregnancy detail pregnancy episodeId
+     */
+    private var pregnancyEpisodeId: String? = ""
+
     @Inject
     lateinit var connectivityManager: ConnectivityManager
 
@@ -369,6 +374,25 @@ class AssessmentViewModel @Inject constructor(
                     status = status,
                 )
 
+                if (menuId == PREGNANT_WOMEN_PROFILE &&
+                    assessmentResult.isSuccess()
+                ) {
+                    savePregnancyDetails(details, assessmentMap)
+                }
+
+                if (menuId == PREGNANCY_OUTCOME &&
+                    assessmentResult.isSuccess()
+                ) {
+                    savePregnancyOutcomeDetails(details, assessmentMap)
+                }
+
+                if (
+                    menuId == ANC.uppercase(Locale.getDefault()) &&
+                    assessmentResult.isSuccess()
+                ) {
+                    saveAncPregnancyDetails(details, assessmentMap)
+                }
+
                 assessmentResult.data?.let {
                     val serviceProvider = getServiceProviderInfo()
                     val history = MemberAssessmentHistoryEntity(
@@ -387,28 +411,9 @@ class AssessmentViewModel @Inject constructor(
                         serviceProvidedByName = serviceProvider.first,
                         serviceProvidedByRole = serviceProvider.second,
                         practitionerId = SecuredPreference.getUserFhirId(),
-                        observations = AssessmentObservationUtils.buildMemberAssessmentObservations(assessmentMap, menuId),
+                        observations = AssessmentObservationUtils.buildMemberAssessmentObservations(assessmentMap, menuId, pregnancyEpisodeId),
                     )
                     assessmentHistoryResultLiveData.postValue(assessmentRepository.saveAssessmentHistory(history))
-                }
-
-                if (menuId == PREGNANT_WOMEN_PROFILE &&
-                    assessmentResult.isSuccess()
-                ) {
-                    savePregnancyDetails(details, assessmentMap)
-                }
-
-                if (menuId == PREGNANCY_OUTCOME &&
-                    assessmentResult.isSuccess()
-                ) {
-                    savePregnancyOutcomeDetails(details, assessmentMap)
-                }
-
-                if (
-                    menuId == ANC.uppercase(Locale.getDefault()) &&
-                    assessmentResult.isSuccess()
-                ) {
-                    saveAncPregnancyDetails(details, assessmentMap)
                 }
 
                 assessmentSaveLiveData.postValue(
@@ -1329,6 +1334,7 @@ class AssessmentViewModel @Inject constructor(
         if (pregnancyDetail.pregnancyEpisodeId.isNullOrBlank()) {
             pregnancyDetail.pregnancyEpisodeId = UUID.randomUUID().toString()
         }
+        pregnancyEpisodeId = pregnancyDetail.pregnancyEpisodeId
 
         // Set startAt when creating new pregnancyEpisodeId (first time)
         if (pregnancyDetail.startAt.isNullOrBlank() && !pregnancyDetail.pregnancyEpisodeId.isNullOrBlank()) {
@@ -1605,6 +1611,7 @@ class AssessmentViewModel @Inject constructor(
                     observations = AssessmentObservationUtils.buildMemberAssessmentObservations(
                         assessmentMap,
                         RMNCH.PNC_MOTHER_MENU,
+                        pregnancyEpisodeId,
                     ),
                 )
                 assessmentHistoryResultLiveData.postValue(assessmentRepository.saveAssessmentHistory(history))

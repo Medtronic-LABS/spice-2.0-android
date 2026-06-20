@@ -16,18 +16,29 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FUNDAL_HEIGH
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FamilyPlanning
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FamilyPlanningDetails
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FamilyPlanningMethods
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GESTATION_MONTH_AT_ABORTION
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_LOG
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_TYPE
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GROUP_ANC_SERVICES_BIRTH_PREPAREDNESS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GROUP_MEDICAL_HISTORY_PHYSICAL_EXAMINATION
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GROUP_POINT_OF_CARE_INVESTIGATIONS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HEIGHT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HEMOGLOBIN
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_ABORTION
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_DELIVERY_OUTCOMES
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_LIVE_BIRTH_NUMBERS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_MODE_OF_DELIVERY
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_PREGNANCY_OUTCOME_TYPE
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_STILL_BIRTH_NUMBERS
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.IS_BABY_ALIVE
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.MATERNAL_DEATH
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NAME
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NUMBER_OF_LIVING_CHILDREN
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.TIME_OF_DEATH
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.TYPE_OF_ABORTION
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.WEIGHT
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.YES
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ncd
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil.calculateAverageBloodPressure
@@ -46,6 +57,7 @@ import kotlin.math.roundToInt
 object AssessmentObservationUtils {
     private const val ANY_COMPLICATIONS_DURING_DELIVERY = "anyComplicationsDuringDelivery"
     private const val COMPLICATIONS_DURING_DELIVERY = "complicationsDuringDelivery"
+    private const val ANC_VISITS_OTHER_PROVIDERS = "ancVisitsOtherProviders"
 
     /**
      * Maps [assessmentMap] to [MemberAssessmentObservations] for [menuId].
@@ -56,6 +68,7 @@ object AssessmentObservationUtils {
     fun buildMemberAssessmentObservations(
         assessmentMap: HashMap<String, Any>,
         menuId: String?,
+        pregnancyEpisodeId: String?,
     ): MemberAssessmentObservations? {
         val service = menuId ?: return null
         return when (service.lowercase()) {
@@ -69,7 +82,7 @@ object AssessmentObservationUtils {
                 buildPregnantWomenProfileObservations(assessmentMap)
 
             MenuConstants.PREGNANCY_OUTCOME.lowercase() ->
-                buildPregnancyOutcomeObservations(assessmentMap)
+                buildPregnancyOutcomeObservations(assessmentMap, pregnancyEpisodeId)
 
             MenuConstants.ANC.lowercase() ->
                 buildAncObservations(assessmentMap)
@@ -127,23 +140,116 @@ object AssessmentObservationUtils {
     }
 
     /**
-     * Mode of delivery and complication fields from delivery outcomes.
+     * Pregnancy outcome counts, flags, delivery details, and episode id.
      */
-    private fun buildPregnancyOutcomeObservations(assessmentMap: HashMap<String, Any>): MemberAssessmentObservations? {
+    private fun buildPregnancyOutcomeObservations(
+        assessmentMap: HashMap<String, Any>,
+        pregnancyEpisodeId: String?,
+    ): MemberAssessmentObservations? {
         val outcome = assessmentMap[MenuConstants.PREGNANCY_OUTCOME] as? Map<*, *> ?: return null
-        val deliveryOutcomes = outcome[ID_DELIVERY_OUTCOMES] as? Map<*, *> ?: return null
-        val modeOfDelivery = stringValue(deliveryOutcomes[ID_MODE_OF_DELIVERY])
-        val anyComplications = stringValue(deliveryOutcomes[ANY_COMPLICATIONS_DURING_DELIVERY])
-        val complications = joinListValue(deliveryOutcomes[COMPLICATIONS_DURING_DELIVERY])
 
-        if (modeOfDelivery == null && anyComplications == null && complications == null) return null
+        val ancGroup = outcome[GROUP_ANC_SERVICES_BIRTH_PREPAREDNESS] as? Map<*, *>
+        val ancVisitsOtherProviders = formatNumericValue(ancGroup?.get(ANC_VISITS_OTHER_PROVIDERS))
+
+        val deliveryOutcomes = outcome[ID_DELIVERY_OUTCOMES] as? Map<*, *>
+        val liveBirthNumbers = formatNumericValue(deliveryOutcomes?.get(ID_LIVE_BIRTH_NUMBERS))
+        val stillbirthNumbers = formatNumericValue(deliveryOutcomes?.get(ID_STILL_BIRTH_NUMBERS))
+        val modeOfDelivery = stringValue(deliveryOutcomes?.get(ID_MODE_OF_DELIVERY))
+        val anyComplications = stringValue(deliveryOutcomes?.get(ANY_COMPLICATIONS_DURING_DELIVERY))
+        val complications = joinListValue(deliveryOutcomes?.get(COMPLICATIONS_DURING_DELIVERY))
+
+        val maternalDeath = resolveYesNoFlag(isMaternalDeathOutcome(outcome))
+        val abortion = resolveYesNoFlag(isAbortionOutcome(outcome))
+        val newbornDeathNumbers = formatNewbornDeathCount(outcome)
+        val episodeId = pregnancyEpisodeId?.trim()?.takeIf { it.isNotEmpty() }
+
+        if (
+            ancVisitsOtherProviders == null &&
+            liveBirthNumbers == null &&
+            stillbirthNumbers == null &&
+            modeOfDelivery == null &&
+            anyComplications == null &&
+            complications == null &&
+            maternalDeath == null &&
+            abortion == null &&
+            newbornDeathNumbers == null &&
+            episodeId == null
+        ) {
+            return null
+        }
 
         return MemberAssessmentObservations(
             modeOfDelivery = modeOfDelivery,
             anyComplicationsDuringDelivery = anyComplications,
             complicationsDuringDelivery = complications,
+            ancVisitsOtherProviders = ancVisitsOtherProviders,
+            liveBirthNumbers = liveBirthNumbers,
+            stillbirthNumbers = stillbirthNumbers,
+            maternalDeath = maternalDeath,
+            abortion = abortion,
+            newbornDeathNumbers = newbornDeathNumbers,
+            pregnancyEpisodeId = episodeId,
         )
     }
+
+    private fun resolveYesNoFlag(condition: Boolean): String? = if (condition) YES else null
+
+    private fun isMaternalDeathOutcome(outcome: Map<*, *>): Boolean {
+        if (pregnancyOutcomeType(outcome).equals(MATERNAL_DEATH, ignoreCase = true)) {
+            return true
+        }
+        val maternalDeathMap = outcome[MATERNAL_DEATH] as? Map<*, *>
+        return resolveOptionId(maternalDeathMap?.get(TIME_OF_DEATH)) != null
+    }
+
+    private fun isAbortionOutcome(outcome: Map<*, *>): Boolean {
+        if (pregnancyOutcomeType(outcome).equals(ID_ABORTION, ignoreCase = true)) {
+            return true
+        }
+        val abortionMap = outcome[ID_ABORTION] as? Map<*, *>
+        val typeOfAbortion = stringValue(abortionMap?.get(TYPE_OF_ABORTION))
+        val gestationMonth = formatNumericValue(abortionMap?.get(GESTATION_MONTH_AT_ABORTION))
+        return typeOfAbortion != null || gestationMonth != null
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun formatNewbornDeathCount(outcome: Map<*, *>): String? {
+        val newbornDetailsList = AssessmentUtil.findNewbornDetailsFromMap(outcome as Map<String, Any?>) ?: return null
+        val deathCount = newbornDetailsList.count { babyData ->
+            babyData is Map<*, *> && isNewbornDead(babyData)
+        }
+        return if (deathCount > 0) formatNumericValue(deathCount) else null
+    }
+
+    private fun isNewbornDead(babyData: Map<*, *>): Boolean {
+        return when (val isBabyAlive = babyData[IS_BABY_ALIVE]) {
+            is String -> !isBabyAlive.equals(YES, ignoreCase = true)
+
+            is Boolean -> !isBabyAlive
+
+            else -> {
+                val value = isBabyAlive?.toString() ?: return false
+                !value.equals(DefinedParams.YES, ignoreCase = true)
+            }
+        }
+    }
+
+    private fun pregnancyOutcomeType(outcome: Map<*, *>): String? {
+        val outcomeTypeCard = outcome[MenuConstants.PREGNANCY_OUTCOME] as? Map<*, *>
+        return stringValue(outcomeTypeCard?.get(ID_PREGNANCY_OUTCOME_TYPE))
+            ?: resolveOptionId(outcomeTypeCard?.get(ID_PREGNANCY_OUTCOME_TYPE))
+    }
+
+    private fun resolveOptionId(value: Any?): String? =
+        when (value) {
+            is String -> value.trim().takeIf { it.isNotEmpty() && it != DefinedParams.DEFAULT_ID }
+            is Map<*, *> -> {
+                val id = (value[DefinedParams.ID] ?: value["id"])?.toString()?.trim()
+                id?.takeIf { it.isNotEmpty() && it != DefinedParams.DEFAULT_ID }
+            }
+
+            else -> null
+        }
 
     /**
      * ANC visit number, weight, fundal height, and hemoglobin.
@@ -362,6 +468,7 @@ object AssessmentObservationUtils {
                     value[NAME],
                 ).firstNotNullOfOrNull { resolveGlucoseTypeValue(it) }
             }
+
             else -> null
         }
 }

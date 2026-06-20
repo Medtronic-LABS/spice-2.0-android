@@ -7,9 +7,12 @@ import org.medtroniclabs.uhis.appextensions.textOrDoubleHyphen
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
+import org.medtroniclabs.uhis.db.entity.MemberAssessmentObservations
+import org.medtroniclabs.uhis.db.entity.PregnancyDetail
 import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
 import org.medtroniclabs.uhis.ui.assessment.FamilyPlanning
+import org.medtroniclabs.uhis.ui.assessment.PregnancyOutcome
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 import org.medtroniclabs.uhis.ui.household.adapter.MemberAssessmentHistoryAdapterUtil.shouldShowNextFollowUpDate
 import org.medtroniclabs.uhis.ui.household.adapter.MemberAssessmentHistoryAdapterUtil.shouldShowReferralStatus
@@ -39,11 +42,12 @@ object MemberAssessmentHistoryAdapterUtil {
     fun constructHistoryAdapterBindItems(
         context: Context,
         history: MemberAssessmentHistoryEntity,
+        memberPregnancyDetails: List<PregnancyDetail>?,
     ): List<SummaryItem> {
         val summaryItems = mutableListOf<SummaryItem>()
         val service = history.serviceProvided?.lowercase().orEmpty()
         val observations = history.observations
-        val visitNumber = getVisitNumber(history)
+        val visitNumber = getVisitNumber(service, observations)
         val serviceName = AssessmentUtil.mapServiceToServiceName(service, context) +
             if (visitNumber.isNotBlank()) {
                 " ($visitNumber)"
@@ -79,6 +83,13 @@ object MemberAssessmentHistoryAdapterUtil {
                 FamilyPlanning.FamilyPlanningMethods,
                 R.array.family_planning_methods,
                 observations?.familyPlanningMethods,
+            )
+        } else if (service.equals(MenuConstants.PREGNANCY_OUTCOME, true)) {
+            resolveArrayValue(
+                context,
+                PregnancyOutcome.ModeOfDelivery,
+                R.array.mode_of_delivery,
+                observations?.modeOfDelivery,
             )
         } else {
             AssessmentUtil.formatServiceHistoryCurrentStatus(
@@ -143,6 +154,18 @@ object MemberAssessmentHistoryAdapterUtil {
             }
 
             MenuConstants.PREGNANCY_OUTCOME.lowercase() -> {
+                val bracAnc = memberPregnancyDetails?.find { it.pregnancyEpisodeId == observations?.pregnancyEpisodeId }?.ancVisitNo?.toInt() ?: 0
+                val otherProvider = CommonUtils.getInteger(observations?.ancVisitsOtherProviders)
+                summaryItems.add(
+                    SummaryItem(
+                        context.getString(R.string.anc_received),
+                        context.getString(
+                            R.string.anc_received_value,
+                            CommonUtils.formatCountForCurrentLocale(bracAnc),
+                            CommonUtils.formatCountForCurrentLocale(bracAnc + otherProvider),
+                        ),
+                    ),
+                )
                 summaryItems.add(
                     SummaryItem(
                         context.getString(R.string.complications_during_delivery),
@@ -274,24 +297,25 @@ object MemberAssessmentHistoryAdapterUtil {
         }
 
     /**
-     * Returns the ANC or PNC visit number from [history.observations], or an empty string.
+     * Returns the ANC or PNC visit number from [observations], or an empty string.
      */
-    fun getVisitNumber(history: MemberAssessmentHistoryEntity): String {
-        val service = history.serviceProvided?.lowercase().orEmpty()
-        return when (service) {
+    fun getVisitNumber(
+        service: String,
+        observations: MemberAssessmentObservations?,
+    ): String =
+        when (service) {
             MenuConstants.ANC.lowercase() -> {
-                history.observations?.ancVisitNumber.orEmpty()
+                observations?.ancVisitNumber.orEmpty()
             }
 
             MenuConstants.PNC_MOTHER.lowercase() -> {
-                history.observations?.pncVisitNumber.orEmpty()
+                observations?.pncVisitNumber.orEmpty()
             }
 
             else -> {
                 ""
             }
         }
-    }
 
     /**
      * Returns the localized status column label for ANC, PNC, FP, or the generic current status.
@@ -312,6 +336,10 @@ object MemberAssessmentHistoryAdapterUtil {
 
             MenuConstants.FP_MENU_ID.lowercase() -> {
                 context.getString(R.string.fp_status)
+            }
+
+            MenuConstants.PREGNANCY_OUTCOME.lowercase() -> {
+                context.getString(R.string.delivery_mode)
             }
 
             else -> context.getString(R.string.current_status)

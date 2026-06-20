@@ -1929,4 +1929,15 @@
     <string name="call_status">Call Status</string>
     <string name="mm_HG" translatable="false">mmHg</string>
     <string name="days_due_string">Days Due</string>
+    <string name="anc_received">ANC received</string>
+    <string name="anc_received_value">From BRAC (%1$s) / Total (%2$s)</string>
+    <string name="live_birth_s">Live Births (%1$s)</string>
+    <string name="still_birth_s">Still Birth (%1$s)</string>
+    <string name="newborn_death_s">Newborn Death (%1$s)</string>
+    <string name="no_of_living_children">Number of Living Children</string>
+    <string-array name="mode_of_delivery">
+        <item>Normal Delivery</item>
+        <item>Assisted Delivery</item>
+        <item>Cesarean Section</item>
+    </string-array>
 </resources>
