@@ -234,7 +234,7 @@ class BDNCDAssessmentFragment : BaseFragment(), FormEventListener {
                 formGenerator.getViewByTag(ID_DIAGNOSED_BP + rootSuffix)?.gone()
                 formGenerator.getViewByTag(ID_DIAGNOSED_GLUCOSE + rootSuffix)?.gone()
                 // Smoking history is captured on the first visit only; lock it from the 2nd visit onwards.
-                formGenerator.disableSingleSelection(IS_REGULAR_SMOKER)
+                formGenerator.getViewByTag(IS_REGULAR_SMOKER + rootSuffix)?.gone()
             } else if (CommonUtils.isFoOrPo()) {
                 // FO/PO users see the symptoms question only from the 2nd visit onwards,
                 // so hide the section on the first visit.

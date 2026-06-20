@@ -139,13 +139,8 @@ interface MemberDAO {
             getByUniqueField(it)
         }
         if (existingEntity?.sync_status != OfflineSyncStatus.NotSynced) {
-            val entityToInsert = existingEntity?.let { existing ->
-                entity.copy(id = existing.id).apply {
-                    // Keep the local household link when the server sends a null householdId.
-                    if (householdId == null && existing.householdId != null) {
-                        householdId = existing.householdId
-                    }
-                }
+            val entityToInsert = existingEntity?.let {
+                entity.copy(id = it.id)
             } ?: entity
             entityToInsert.sync_status = existingEntity?.sync_status ?: OfflineSyncStatus.Success
             entityToInsert.fhirId = entity.fhirId

@@ -190,6 +190,15 @@ class HouseholdMemberRepository @Inject constructor(
 
         householdMemberEntity.householdId = householdId
 
+        // Ensure the member carries its household's FHIR id so it can be linked on the
+        // backend when uploaded standalone (i.e. added to an already-synced household).
+        if (householdMemberEntity.householdFhirId.isNullOrEmpty() && householdId != null) {
+            val householdFhir = runCatching { roomHelper.getHouseHoldDetailsById(householdId) }.getOrNull()?.fhirId
+            if (!householdFhir.isNullOrEmpty()) {
+                householdMemberEntity.householdFhirId = householdFhir
+            }
+        }
+
         val maritalStatus = map[ID_MARITAL_STATUS]
         if (maritalStatus != null && maritalStatus is String) {
             householdMemberEntity.maritalStatus = maritalStatus

@@ -598,6 +598,9 @@
     <file name="src/main/java/org/medtroniclabs/uhis/offlinesync/ScheduledSyncWork.kt">
         <error line="155" column="13" source="standard:no-consecutive-comments" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/repo/OfflineSyncRepository.kt">
+        <error line="599" column="30" source="standard:trailing-comma-on-call-site" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/signature/view/SignatureView.kt">
         <error line="58" column="17" source="standard:property-naming" />
         <error line="59" column="17" source="standard:property-naming" />
@@ -772,9 +775,6 @@
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/ComplianceChooseDialog.kt">
         <error line="1" column="1" source="standard:filename" />
-    </file>
-    <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/fragment/BDNCDAssessmentFragment.kt">
-        <error line="3" column="1" source="standard:import-ordering" />
     </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/assessment/referrallogic/model/ReferralDefinedParams.kt">
         <error line="4" column="15" source="standard:property-naming" />
