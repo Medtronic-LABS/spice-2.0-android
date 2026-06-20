@@ -497,7 +497,7 @@ class OfflineSyncRepository @Inject constructor(
         requestInitialDownload.followUpCriteria?.let {
             SecuredPreference.putFollowUpCriteria(it)
         } ?: kotlin.run {
-            val followUpCriteria = FollowUpCriteria(3, 5, 3, 7, 7, 2, 2, 2, 2, 5, 5, 5, 5, 5)
+            val followUpCriteria = FollowUpCriteria(3, 5, 3, 7, 7, 5)
             SecuredPreference.putFollowUpCriteria(followUpCriteria)
         }
         saveAssessmentHistory(assessmentHistory)
