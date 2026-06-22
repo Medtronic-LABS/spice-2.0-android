@@ -747,7 +747,7 @@ class ReferralResultGenerator {
                     FOLLOW_UP_RBS_MAXIMUM_MGDL_VALUE.toDouble(),
                 )
             } else {
-                isGlucoseAboveThreshold(
+                isGlucoseAtOrAboveThreshold(
                     glucoseType,
                     bgValue,
                     FBS_MAXIMUM_MGDL_VALUE.toDouble(),
@@ -764,7 +764,7 @@ class ReferralResultGenerator {
                 FOLLOW_UP_RBS_MAXIMUM_VALUE_BD,
             )
         } else {
-            isGlucoseAboveThreshold(
+            isGlucoseAtOrAboveThreshold(
                 glucoseType,
                 bgValue,
                 FBS_MAXIMUM_VALUE_BD,
@@ -785,18 +785,6 @@ class ReferralResultGenerator {
             else -> bgValue >= fbsThreshold || bgValue >= rbsThreshold
         }
 
-    private fun isGlucoseAboveThreshold(
-        glucoseType: String?,
-        bgValue: Double,
-        fbsThreshold: Double,
-        rbsThreshold: Double,
-    ): Boolean =
-        when (glucoseType?.lowercase()) {
-            FBS -> bgValue > fbsThreshold
-            RBS -> bgValue > rbsThreshold
-            else -> bgValue > fbsThreshold || bgValue > rbsThreshold
-        }
-
     private fun isBPReferredForUpazila(
         avgSys: Int,
         avgDia: Int,
@@ -804,5 +792,5 @@ class ReferralResultGenerator {
         avgSys >= UPAZILA_UPPER_LIMIT_SYSTOLIC ||
             avgDia >= UPAZILA_UPPER_LIMIT_DIASTOLIC
 
-    private fun isBGReferredForUpazila(bg: Double?): Boolean = bg != null && bg >= UPAZILA_FBS_RBS_MAXIMUM_VALUE_BD
+    private fun isBGReferredForUpazila(bg: Double?): Boolean = bg != null && bg > UPAZILA_FBS_RBS_MAXIMUM_VALUE_BD
 }
