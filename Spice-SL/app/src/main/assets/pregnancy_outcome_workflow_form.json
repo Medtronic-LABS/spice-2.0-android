@@ -320,7 +320,7 @@
             "hintCulture": "সংখ্যা লিখুন",
             "maxLength": 1,
             "minValue": 0,
-            "maxValue": 5,
+            "maxValue": 4,
             "condition": []
         },
         {
@@ -340,8 +340,9 @@
             "visibility": "visible",
             "hint": "Enter number",
             "hintCulture": "সংখ্যা লিখুন",
-            "maxLength": 2,
-            "minValue": 0
+            "maxLength": 1,
+            "minValue": 0,
+            "maxValue": 4
         },
         {
             "family": "deliveryOutcomes",

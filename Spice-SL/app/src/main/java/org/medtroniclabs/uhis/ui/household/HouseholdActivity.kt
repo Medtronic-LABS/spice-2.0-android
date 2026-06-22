@@ -61,6 +61,8 @@ class HouseholdActivity : BaseActivity(), OnDialogDismissListener {
         // phuMemberRegistration()
     }
 
+    override fun consumeImeInsets() = true
+
     private fun validateFormInputs(): Boolean {
         val fragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
         if (fragment is HouseHoldRegistrationFragment) {

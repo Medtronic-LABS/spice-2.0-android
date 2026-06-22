@@ -48,6 +48,8 @@ class ExternalMemberRegistrationActivity : BaseActivity(), OnDialogDismissListen
         initializeView()
     }
 
+    override fun consumeImeInsets() = true
+
     private fun validateFormInputs(): Boolean {
         val fragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
         if (fragment is ExternalMemberRegistrationFragment) {

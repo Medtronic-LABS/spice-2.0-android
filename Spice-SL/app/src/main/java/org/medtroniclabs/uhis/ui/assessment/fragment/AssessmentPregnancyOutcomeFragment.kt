@@ -67,6 +67,8 @@ class AssessmentPregnancyOutcomeFragment :
 
     private val babyAliveOptions = AssessmentDefinedParams.pregnancyOutcomeBabyAliveOptions
 
+    private var maximumBabyAllowed = 4
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -103,6 +105,10 @@ class AssessmentPregnancyOutcomeFragment :
                     resourceState.data?.let { data ->
                         // Filter out fields marked as isSummary to hide them in form view
                         val filteredFormLayout = data.formLayout.filter { it.isSummary != true }
+                        // Find maximum baby allowed
+                        data.formLayout.firstOrNull { it.id == AssessmentDefinedParams.ID_LIVE_BIRTH_NUMBERS }?.maxValue?.toInt()?.let {
+                            maximumBabyAllowed = it
+                        }
                         formGenerator.populateViews(filteredFormLayout)
                         // Store original title for date of delivery
                         storeOriginalDateOfDeliveryTitle()
@@ -190,13 +196,13 @@ class AssessmentPregnancyOutcomeFragment :
      * Creates or updates the dynamic baby sections based on liveBirthNumbers value
      */
     private fun updateBabySections(count: Int) {
-        val effectiveCount = count.coerceIn(0, MAX_BABIES)
+        val effectiveCount = count.coerceIn(0, maximumBabyAllowed)
 
-        if (count > MAX_BABIES) {
+        if (count > maximumBabyAllowed) {
             Toast
                 .makeText(
                     requireContext(),
-                    getString(R.string.max_babies_allowed, MAX_BABIES),
+                    getString(R.string.max_babies_allowed, maximumBabyAllowed),
                     Toast.LENGTH_SHORT,
                 ).show()
         }
@@ -269,7 +275,7 @@ class AssessmentPregnancyOutcomeFragment :
         // 3. Birth Weight - Removed (no longer needed)
 
         // 4. Cause of neonatal death - DialogCheckbox (initially hidden)
-        addCauseOfDeathField(familyRoot, babyIndex, translate)
+        addCauseOfDeathField(familyRoot, babyIndex)
 
         return cardBinding.root
     }
@@ -377,7 +383,6 @@ class AssessmentPregnancyOutcomeFragment :
             babyDataMap[babyIndex]?.set(AssessmentDefinedParams.SEX, selectedId ?: "")
             // Clear error message when value is selected
             selectionBinding.tvErrorMessage.visibility = View.GONE
-            Unit
         }
 
         selectionBinding.selectionGroup.addView(singleSelectionView)
@@ -419,7 +424,6 @@ class AssessmentPregnancyOutcomeFragment :
     private fun addCauseOfDeathField(
         parent: LinearLayout,
         babyIndex: Int,
-        translate: Boolean,
     ) {
         val checkboxBinding = CheckboxDialogSpinnerLayoutBinding.inflate(
             LayoutInflater.from(requireContext()),
@@ -528,7 +532,7 @@ class AssessmentPregnancyOutcomeFragment :
             // Handle causeOfDeath field with conditional filtering based on timeOfDeath
             if (id == AssessmentDefinedParams.CAUSE_OF_DEATH) {
                 val filteredInputData = getFilteredCauseOfDeathOptions(formLayout, dialogKey)
-                val validatedResultMap = validateCauseOfDeathSelections(resultMap, formLayout)
+                val validatedResultMap = validateCauseOfDeathSelections(resultMap)
                 CheckBoxDialog
                     .newInstance(dialogKey, validatedResultMap, title = title, inputData = filteredInputData) { map ->
                         formGenerator.validateCheckboxDialogue(id, formLayout, map)
@@ -787,9 +791,7 @@ class AssessmentPregnancyOutcomeFragment :
                 }
 
                 else -> {
-                    if (value != null) {
-                        result[key] = value
-                    }
+                    result[key] = value
                 }
             }
         }
@@ -853,9 +855,8 @@ class AssessmentPregnancyOutcomeFragment :
     /**
      * Gets the current timeOfDeath value from form result
      */
-    private fun getTimeOfDeathValue(): String? {
-        val timeOfDeathResult = formGenerator.getResult(AssessmentDefinedParams.TIME_OF_DEATH)
-        return when (timeOfDeathResult) {
+    private fun getTimeOfDeathValue(): String? =
+        when (val timeOfDeathResult = formGenerator.getResult(AssessmentDefinedParams.TIME_OF_DEATH)) {
             is Map<*, *> -> {
                 // If it's a Map, extract the "id" value
                 timeOfDeathResult[DefinedParams.ID]?.toString()
@@ -865,16 +866,12 @@ class AssessmentPregnancyOutcomeFragment :
             is String -> timeOfDeathResult
             else -> null
         }
-    }
 
     /**
      * Validates and filters existing causeOfDeath selections based on current timeOfDeath
      * Removes invalid selections that should be hidden
      */
-    private fun validateCauseOfDeathSelections(
-        resultMap: Any?,
-        formLayout: FormLayout,
-    ): Any? {
+    private fun validateCauseOfDeathSelections(resultMap: Any?): Any? {
         val timeOfDeathValue = getTimeOfDeathValue()
         if (timeOfDeathValue == null || resultMap == null) {
             return resultMap
@@ -916,7 +913,7 @@ class AssessmentPregnancyOutcomeFragment :
         val causeOfDeathLayout = serverData?.find { it.id == AssessmentDefinedParams.CAUSE_OF_DEATH }
 
         if (causeOfDeathLayout != null) {
-            val validatedResult = validateCauseOfDeathSelections(causeOfDeathResult, causeOfDeathLayout)
+            val validatedResult = validateCauseOfDeathSelections(causeOfDeathResult)
 
             // Update the result map if selections were removed
             if (validatedResult != causeOfDeathResult) {
@@ -1007,7 +1004,7 @@ class AssessmentPregnancyOutcomeFragment :
         try {
             val gestationalWeeks = calculateGestationalAgeAtDelivery(dateOfDelivery, edd)
             return gestationalWeeks != null && gestationalWeeks < 37
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             return false
         }
     }
@@ -1034,7 +1031,7 @@ class AssessmentPregnancyOutcomeFragment :
                 org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMdd,
             )
 
-            if (deliveryDateStr.isNullOrBlank() || eddDateStr.isNullOrBlank()) {
+            if (deliveryDateStr.isBlank() || eddDateStr.isBlank()) {
                 return null
             }
 
@@ -1063,14 +1060,13 @@ class AssessmentPregnancyOutcomeFragment :
             val gestationalWeeks = 40 - weeksFromEDD
 
             return gestationalWeeks
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             return null
         }
     }
 
     companion object {
         const val TAG = "AssessmentPregnancyOutcomeFragment"
-        private const val MAX_BABIES = 5
         private const val NEWBORN_CONTAINER_TAG = "newbornDynamicContainer"
     }
 }
