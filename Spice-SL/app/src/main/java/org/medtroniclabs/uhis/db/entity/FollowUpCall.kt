@@ -35,7 +35,7 @@ data class FollowUpCall(
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
     val calledByUserId: String = SecuredPreference.getUserId().toString(),
-    val calledByUserFullName: String? = AssessmentUtil.getLocalServiceProvidedByName(),
+    val calledByUserFullName: String = AssessmentUtil.getLocalServiceProvidedByName() ?: "",
     val calledByUserRole: String = SecuredPreference.getRole(),
 ) {
     @Ignore
