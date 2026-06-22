@@ -262,6 +262,7 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
                 getString(R.string.no_of_living_children),
                 CommonUtils.formatCountForCurrentLocale(CommonUtils.getInteger(recentHistory.observations.numberOfLivingChildren)),
             )
+            return true
         }
         return false
     }
