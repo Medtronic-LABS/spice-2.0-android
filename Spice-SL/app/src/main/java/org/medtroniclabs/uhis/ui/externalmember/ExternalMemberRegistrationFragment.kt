@@ -829,6 +829,9 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                 intent.putExtra(MEMBER_ID, it ?: -1)
             }
             intent.putExtra(DOB, memberRegistrationViewModel.memberDob)
+            requireActivity().intent.getStringExtra(DefinedParams.ENTRY_POINT)?.let { entryPoint ->
+                intent.putExtra(DefinedParams.ENTRY_POINT, entryPoint)
+            }
             startActivity(intent)
             requireActivity().finish()
         } else {

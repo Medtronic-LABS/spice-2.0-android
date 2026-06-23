@@ -417,8 +417,17 @@ class SymptomsAdherenceFragment : BaseFragment() {
                         completeList?.find { it.cultureValue == bengaliDiagnosis }?.name
 
                     if (selectedItem[DefinedParams.NAME] != DefinedParams.DEFAULT_ID_LABEL && !englishDiagnosis.isNullOrBlank()) {
+                        // A "None" selection (or the default) means no new NCD developed,
+                        // so send an empty list instead of ["none"].
                         nurseMedicalReviewViewModel.nurseMrRequestModel.confirmDiagnosis =
-                            arrayListOf(englishDiagnosis)
+                            if (englishDiagnosis.equals(DefinedParams.NONE, ignoreCase = true)) {
+                                arrayListOf()
+                            } else {
+                                arrayListOf(englishDiagnosis)
+                            }
+                    } else {
+                        nurseMedicalReviewViewModel.nurseMrRequestModel.confirmDiagnosis =
+                            arrayListOf()
                     }
                 }
 

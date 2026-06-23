@@ -327,7 +327,11 @@ class MemberSearchActivity : BaseActivity(), View.OnClickListener, MemberSelecti
             R.id.btnAddMember -> {
                 withLocationCheck {
                     viewModel.setUserJourney("ADD_MEMBER_BUTTON_FO_PO")
-                    startActivity(Intent(this, ExternalMemberRegistrationActivity::class.java))
+                    startActivity(
+                        Intent(this, ExternalMemberRegistrationActivity::class.java).apply {
+                            putExtra(CommonDefinedParams.ENTRY_POINT, ENTRY_POINT_MEMBER_SEARCH)
+                        },
+                    )
                 }
             }
 
