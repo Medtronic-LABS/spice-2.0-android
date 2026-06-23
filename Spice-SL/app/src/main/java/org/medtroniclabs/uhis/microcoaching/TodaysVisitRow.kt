@@ -5,13 +5,14 @@ import com.medtroniclabs.microcoaching.domain.context.TodaysVisit
 /**
  * Minimal, PII-free projection of a `FollowUp` row due today — only the clinical-
  * type signal the MicroCoaching SDK needs to match a visit to a coaching module via
- * the synced `VISIT_DUE` trigger bindings. Deliberately carries NO patient name /
- * phone / id. Column names match the `FollowUp` entity so Room maps it directly.
+ * the synced `assessment_due` trigger bindings. Deliberately carries NO patient name /
+ * phone / id. `isPregnant` is derived (an open pregnancy episode), not a raw column.
  */
 data class TodaysVisitRow(
     val type: String,
     val encounterType: String?,
     val nextVisitDate: String?,
+    val isPregnant: Boolean,
     val villageId: String,
 )
 
@@ -24,5 +25,6 @@ fun TodaysVisitRow.toTodaysVisit(): TodaysVisit =
         type = type,
         encounterType = encounterType,
         dueDateIso = nextVisitDate.orEmpty(),
+        isPregnant = isPregnant,
         villageId = villageId,
     )
