@@ -26,7 +26,6 @@ import org.medtroniclabs.uhis.ui.followup.adapter.PatientListAdapter
 import org.medtroniclabs.uhis.ui.followup.viewmodel.FollowUpViewModel
 import org.medtroniclabs.uhis.ui.home.AssessmentToolsActivity
 import org.medtroniclabs.uhis.ui.household.summary.MemberSummaryActivity
-import timber.log.Timber
 
 class FollowUpPatientListFragment : BaseFragment() {
     private lateinit var binding: FragmentFollowUpMyPatientListBinding
@@ -67,10 +66,6 @@ class FollowUpPatientListFragment : BaseFragment() {
 
     private fun attachListener() {
         viewModel.followUpPatientListLiveData.observe(viewLifecycleOwner) {
-            val callStatus = it.map { followUp ->
-                followUp.id to followUp.recentCallStatus
-            }
-            Timber.tag("bug_n_bug").d(callStatus.toString())
             if (!it.isNullOrEmpty()) {
                 binding.tvPatientNoFound.gone()
                 binding.rvPatientList.visible()
@@ -84,6 +79,12 @@ class FollowUpPatientListFragment : BaseFragment() {
 
         viewModel.referralDayLimitLiveData.observe(viewLifecycleOwner) {
             adapter.updateReferralDayLimit(it)
+        }
+        viewModel.triggerCallLiveData.observe(viewLifecycleOwner) {
+            if (it) {
+                onCallClicked()
+                viewModel.callTriggered()
+            }
         }
     }
 
@@ -99,8 +100,8 @@ class FollowUpPatientListFragment : BaseFragment() {
                         intent.putExtra(DefinedParams.DOB, data.dateOfBirth)
                         startActivity(intent)
                     } else {
-                        data.toPatientHistoryData().takeIf { it.isNotEmpty() }?.let { historyData ->
-                            val dialog = PatientDetailHistoryDialogFragment(historyData)
+                        data.toPatientHistoryData(requireContext()).takeIf { it.isNotEmpty() }?.let { historyData ->
+                            val dialog = PatientDetailHistoryDialogFragment.newInstance(historyData, true)
                             dialog.show(childFragmentManager, PatientDetailHistoryDialogFragment::class.simpleName)
                         }
                     }

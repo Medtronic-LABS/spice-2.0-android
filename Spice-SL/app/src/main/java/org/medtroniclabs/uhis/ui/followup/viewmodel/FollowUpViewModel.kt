@@ -20,6 +20,7 @@ import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.data.offlinesync.model.FollowUpCallStatus
 import org.medtroniclabs.uhis.di.IoDispatcher
 import org.medtroniclabs.uhis.model.followup.FollowUpFilter
+import org.medtroniclabs.uhis.model.followup.FollowUpSortOrder
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.repo.FollowUpRepository
 import org.medtroniclabs.uhis.ui.BaseFilterViewModel
@@ -62,6 +63,7 @@ class FollowUpViewModel @Inject constructor(
     var isWillingToVisitUHC: Boolean? = null
     var callStartTime: Long? = null
     var callEndTime: Long? = null
+    val triggerCallLiveData = MutableLiveData<Boolean>()
 
     init {
         SecuredPreference.getFollowUpCriteria()?.let { followUpCriteria ->
@@ -93,8 +95,9 @@ class FollowUpViewModel @Inject constructor(
         fromDate: String? = null,
         toDate: String? = null,
         selectedShashthyaShebikas: List<ChipViewItemModel>? = null,
-        remainingAttempt: Int? = null,
-        callStatus: String? = null,
+        remainingAttempt: List<ChipViewItemModel>? = null,
+        callStatus: List<ChipViewItemModel>? = null,
+        sortOrder: FollowUpSortOrder? = null,
         updateRemainingAttempt: Boolean = false,
         updateCallStatus: Boolean = false,
     ) {
@@ -154,11 +157,15 @@ class FollowUpViewModel @Inject constructor(
                 this.callStatus = callStatus
             }
 
+            sortOrder?.let {
+                this.sortOrder = sortOrder
+            }
+
             filterLiveData.value = this
         }
     }
 
-    private fun getFollowUpType(type: Int): String =
+    fun getFollowUpType(type: Int): String =
         when (type) {
             1 -> FU_TYPE_REFERRED
             2 -> FU_TYPE_MEDICAL_REVIEW
@@ -258,4 +265,12 @@ class FollowUpViewModel @Inject constructor(
             val durationInMillis = endTime - startTime
             durationInMillis / TimeUnit.MINUTES.toMillis(1).toDouble()
         }
+
+    fun triggerCall() {
+        triggerCallLiveData.value = true
+    }
+
+    fun callTriggered() {
+        triggerCallLiveData.value = false
+    }
 }

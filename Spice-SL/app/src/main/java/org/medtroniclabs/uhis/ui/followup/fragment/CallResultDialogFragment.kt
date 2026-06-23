@@ -177,10 +177,13 @@ class CallResultDialogFragment : DialogFragment(), View.OnClickListener {
 
     private fun setListeners() {
         binding.btnViewPatientDetail.setOnClickListener {
-            callViewModel.selectedFollowUpDetail?.toPatientHistoryData()?.takeIf { it.isNotEmpty() }?.let { historyData ->
-                val dialog = PatientDetailHistoryDialogFragment(historyData)
-                dialog.show(childFragmentManager, PatientDetailHistoryDialogFragment::class.simpleName)
-            }
+            callViewModel.selectedFollowUpDetail
+                ?.toPatientHistoryData(requireContext())
+                ?.takeIf { it.isNotEmpty() }
+                ?.let { historyData ->
+                    val dialog = PatientDetailHistoryDialogFragment.newInstance(historyData)
+                    dialog.show(childFragmentManager, PatientDetailHistoryDialogFragment::class.simpleName)
+                }
         }
 
         binding.labelHeader.ivClose.visibility = View.INVISIBLE

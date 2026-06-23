@@ -58,8 +58,12 @@ class FollowUpRepository @Inject constructor(
             fromAndToDate.first,
             fromAndToDate.second,
             screeningRetryAttempts,
-            filter.remainingAttempt,
-            filter.callStatus,
+            filter.remainingAttempt
+                ?.firstOrNull()
+                ?.id
+                ?.toInt(),
+            filter.callStatus?.firstOrNull()?.type,
+            filter.sortOrder,
         )
 
         return result

@@ -122,6 +122,7 @@ import org.medtroniclabs.uhis.db.response.MemberAssessmentHistoryResponse
 import org.medtroniclabs.uhis.model.MemberDobGenderModel
 import org.medtroniclabs.uhis.model.assessment.AssessmentDetails
 import org.medtroniclabs.uhis.model.assessment.AssessmentMemberDetails
+import org.medtroniclabs.uhis.model.followup.FollowUpSortOrder
 import org.medtroniclabs.uhis.model.services.ServiceStaticFilter
 import org.medtroniclabs.uhis.ui.assessment.AssessmentNCDEntity
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
@@ -588,6 +589,7 @@ class RoomHelperImpl @Inject constructor(
         screeningRetryAttempts: Int,
         remainingAttempt: Int?,
         callStatus: String?,
+        sortOrder: FollowUpSortOrder,
     ): LiveData<List<FollowUpPatientModel>> {
         if (type == FollowUpDefinedParams.FU_TYPE_REFERRED) {
             return followUpDao.getReferredFollowUpPatientListLiveData(
@@ -606,6 +608,7 @@ class RoomHelperImpl @Inject constructor(
                 screeningRetryAttempts = screeningRetryAttempts,
                 remainingAttempt = remainingAttempt,
                 callStatus = callStatus,
+                sortOrder = sortOrder,
             )
         } else {
             return followUpDao.getOtherFollowUpPatientListLiveData(

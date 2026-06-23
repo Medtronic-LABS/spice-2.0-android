@@ -1,7 +1,9 @@
 package org.medtroniclabs.uhis.data
 
+import android.content.Context
 import androidx.room.Relation
 import org.medtroniclabs.uhis.R
+import org.medtroniclabs.uhis.appextensions.getPatientStatus
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
 import org.medtroniclabs.uhis.common.DateUtils.DATE_ddMMyyyy
@@ -11,6 +13,7 @@ import org.medtroniclabs.uhis.data.servicerecipient.PatientHistoryDataItem
 import org.medtroniclabs.uhis.db.entity.FollowUpCall
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.MMOLL
+import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 
 data class FollowUpPatientModel(
     val id: Long,
@@ -56,7 +59,7 @@ data class FollowUpPatientModel(
             default
         }
 
-    fun toPatientHistoryData(): List<PatientHistoryData> {
+    fun toPatientHistoryData(context: Context): List<PatientHistoryData> {
         val historyData = mutableListOf<PatientHistoryData>()
         historyData.add(
             PatientHistoryData(
@@ -66,10 +69,42 @@ data class FollowUpPatientModel(
                         phoneNumber?.let {
                             add(PatientHistoryDataItem(R.string.mobile_number, it))
                         }
+                        village?.let {
+                            add(PatientHistoryDataItem(R.string.village, it))
+                        }
                         reason?.let {
                             add(PatientHistoryDataItem(R.string.referred_reason, it))
                         }
-                        memberAssessmentHistory.firstOrNull()?.observations?.let { safeObservation ->
+                        encounterDate?.let {
+                            add(
+                                PatientHistoryDataItem(
+                                    R.string.screened_date,
+                                    DateUtils.convertDateFormat(
+                                        encounterDate,
+                                        DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
+                                        DATE_ddMMyyyy,
+                                    ),
+                                ),
+                            )
+                        }
+                        val assessment = memberAssessmentHistory.firstOrNull()
+                        assessment?.let { safeAssessment ->
+                            PatientHistoryDataItem(
+                                R.string.screened_by,
+                                AssessmentUtil.formatServiceProviderDisplay(
+                                    context,
+                                    safeAssessment.serviceProvidedByName,
+                                    safeAssessment.serviceProvidedByRole,
+                                ),
+                            )
+                        }
+                        add(
+                            PatientHistoryDataItem(
+                                R.string.current_status,
+                                context.getPatientStatus(patientStatus) ?: context.getString(R.string.hyphen_symbol),
+                            ),
+                        )
+                        assessment?.observations?.let { safeObservation ->
                             safeObservation.bp?.let {
                                 add(PatientHistoryDataItem(R.string.average_blood_pressure, it, R.string.mm_HG))
                             }
@@ -86,34 +121,6 @@ data class FollowUpPatientModel(
                                         PatientHistoryDataItem(R.string.blood_glucose_rbs, formatted)
                                     },
                                 )
-                            }
-                        }
-                        encounterDate?.let {
-                            add(
-                                PatientHistoryDataItem(
-                                    R.string.last_visit_date,
-                                    DateUtils.convertDateFormat(
-                                        encounterDate,
-                                        DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
-                                        DATE_ddMMyyyy,
-                                    ),
-                                ),
-                            )
-                        }
-                        nextVisitDate?.let {
-                            add(
-                                PatientHistoryDataItem(
-                                    R.string.next_visit_date,
-                                    DateUtils.convertDateFormat(
-                                        nextVisitDate,
-                                        DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
-                                        DATE_ddMMyyyy,
-                                    ),
-                                ),
-                            )
-                            val daysDiff = DateUtils.getDaysDifference(nextVisitDate)
-                            if (daysDiff > 0) {
-                                add(PatientHistoryDataItem(R.string.days_due_string, daysDiff.toString()))
                             }
                         }
                     },

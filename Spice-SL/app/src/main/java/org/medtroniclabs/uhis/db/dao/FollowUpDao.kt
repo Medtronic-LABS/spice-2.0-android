@@ -9,6 +9,7 @@ import androidx.room.Transaction
 import org.medtroniclabs.uhis.data.FollowUpPatientModel
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineSyncStatus
 import org.medtroniclabs.uhis.db.entity.FollowUp
+import org.medtroniclabs.uhis.model.followup.FollowUpSortOrder
 import org.medtroniclabs.uhis.ui.followup.FollowUpDefinedParams
 
 @Dao
@@ -38,7 +39,10 @@ interface FollowUpDao {
             "CASE WHEN :fromDate = '' THEN 1 ELSE date(fu.encounterDate) BETWEEN :fromDate AND :toDate END AND " +
             "CASE WHEN :remainingAttempt IS NULL THEN 1 ELSE (CASE WHEN (:screeningRetryAttempts - fu.attempts) < 1 THEN 1 ELSE (:screeningRetryAttempts - fu.attempts) END) = :remainingAttempt END AND " +
             "CASE WHEN :callStatus IS NULL OR :callStatus = '' THEN 1 ELSE recentCallStatus = :callStatus END " +
-            "ORDER BY fu.encounterDate",
+            "ORDER BY " +
+            "CASE WHEN :sortOrder = 'DEFAULT' THEN remainingAttempts END DESC, " +
+            "CASE WHEN :sortOrder = 'LATEST_SCREENING_DATE' THEN fu.encounterDate END DESC, " +
+            "CASE WHEN :sortOrder = 'OLDEST_SCREENING_DATE' THEN fu.encounterDate END ASC",
     )
     fun getReferredFollowUpPatientListLiveData(
         type: String,
@@ -56,6 +60,7 @@ interface FollowUpDao {
         screeningRetryAttempts: Int,
         remainingAttempt: Int? = null,
         callStatus: String? = null,
+        sortOrder: FollowUpSortOrder,
     ): LiveData<List<FollowUpPatientModel>>
 
     @Transaction

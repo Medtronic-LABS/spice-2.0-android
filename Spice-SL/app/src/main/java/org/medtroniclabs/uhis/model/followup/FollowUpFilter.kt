@@ -14,6 +14,7 @@ data class FollowUpFilter(
     var ncdSelectedReferralTo: List<ChipViewItemModel>? = null,
     var fromDate: String = "",
     var toDate: String = "",
-    var remainingAttempt: Int? = null,
-    var callStatus: String? = null,
+    var remainingAttempt: List<ChipViewItemModel>? = null,
+    var callStatus: List<ChipViewItemModel>? = null,
+    var sortOrder: FollowUpSortOrder = FollowUpSortOrder.DEFAULT,
 )

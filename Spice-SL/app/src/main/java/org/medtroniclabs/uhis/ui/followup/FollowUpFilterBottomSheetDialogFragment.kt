@@ -363,15 +363,7 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
                     name = CommonUtils.formatCountForCurrentLocale(attempt),
                 )
             }
-            val selectedRemainingAttempt = viewModel.getFilterData()?.remainingAttempt?.let { attempt ->
-                listOf(
-                    ChipViewItemModel(
-                        id = attempt.toLong(),
-                        name = CommonUtils.formatCountForCurrentLocale(attempt),
-                    ),
-                )
-            }
-            remainingAttemptTagView.addChipItemList(remainingAttemptItems, selectedRemainingAttempt)
+            remainingAttemptTagView.addChipItemList(remainingAttemptItems, viewModel.getFilterData()?.remainingAttempt)
 
             val callStatusItems = listOf(
                 ChipViewItemModel(
@@ -383,10 +375,7 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
                     type = FollowUpCallStatus.UNSUCCESSFUL.name,
                 ),
             )
-            val selectedCallStatus = viewModel.getFilterData()?.callStatus?.let { status ->
-                callStatusItems.filter { it.type == status }
-            }
-            callStatusTagView.addChipItemList(callStatusItems, selectedCallStatus)
+            callStatusTagView.addChipItemList(callStatusItems, viewModel.getFilterData()?.callStatus)
         }
     }
 
@@ -454,12 +443,8 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
             ncdSelectedReferralTo = ncdReferralToTagView.getSelectedTags(),
             fromDate = binding.etFromDate.text.toString(),
             toDate = binding.etToDate.text.toString(),
-            remainingAttempt = remainingAttemptTagView
-                .getSelectedTags()
-                .firstOrNull()
-                ?.id
-                ?.toInt(),
-            callStatus = callStatusTagView.getSelectedTags().firstOrNull()?.type,
+            remainingAttempt = remainingAttemptTagView.getSelectedTags(),
+            callStatus = callStatusTagView.getSelectedTags(),
             updateRemainingAttempt = isReferredTab(),
             updateCallStatus = isReferredTab(),
         )

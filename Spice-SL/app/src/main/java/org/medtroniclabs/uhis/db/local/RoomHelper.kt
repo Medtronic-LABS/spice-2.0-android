@@ -86,6 +86,7 @@ import org.medtroniclabs.uhis.db.response.MemberAssessmentHistoryResponse
 import org.medtroniclabs.uhis.model.MemberDobGenderModel
 import org.medtroniclabs.uhis.model.assessment.AssessmentDetails
 import org.medtroniclabs.uhis.model.assessment.AssessmentMemberDetails
+import org.medtroniclabs.uhis.model.followup.FollowUpSortOrder
 import org.medtroniclabs.uhis.model.services.ServiceStaticFilter
 import org.medtroniclabs.uhis.ui.assessment.AssessmentNCDEntity
 
@@ -385,6 +386,7 @@ interface RoomHelper {
         screeningRetryAttempts: Int,
         remainingAttempt: Int? = null,
         callStatus: String? = null,
+        sortOrder: FollowUpSortOrder,
     ): LiveData<List<FollowUpPatientModel>>
 
     suspend fun getAllSubVillageIds(): List<Long>
