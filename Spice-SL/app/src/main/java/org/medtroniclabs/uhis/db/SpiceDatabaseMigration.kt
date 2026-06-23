@@ -30,15 +30,37 @@ object SpiceDatabaseMigration {
     }
 
     /**
-     * Migration for changing [FOLLOW_UP_CALL]
-     * - Drop patientStatus and reason as are not required
-     * - Add callType, isWillingToVisitUHC, visitRejectReason, otherVisitRejectReason, unSuccessfulCallReason
-     * - Add wrongNumber, calledByUserId, calledByUserName, calledByUserRole
-     * - Add [MAH_COLUMN_PRACTITIONER_ID], serviceProvidedByName, serviceProvidedByRole, observations, [MAH_COLUMN_REFERRAL_FACILITY_TYPE] to [MEMBER_ASSESSMENT_HISTORY_ENTITY]
-     * - Tracks which role registered the member; used to scope SK external-member lists.
+     * Database migration from version 5 to 6.
+     *
+     * Clears [SecuredPreference.EnvironmentKey.SERVER_LAST_SYNCED] so assessment history is
+     * refetched from the server with the new schema.
+     *
+     * [FOLLOW_UP_CALL]:
+     * - Drop patientStatus, reason, and duration (duration is re-added as REAL).
+     * - Add callType, isWillingToVisitUHC, visitRejectReason, otherVisitRejectReason,
+     *   unSuccessfulCallReason.
+     * - Add wrongNumber, calledByUserId, calledByUserFullName, calledByUserRole.
+     *
+     * [MEMBER_ASSESSMENT_HISTORY_ENTITY]:
+     * - Add [MAH_COLUMN_PRACTITIONER_ID], serviceProvidedByName, serviceProvidedByRole,
+     *   observations, [MAH_COLUMN_REFERRAL_FACILITY_TYPE].
+     * - Add indexes on practitionerId, memberFhirId, (memberId, visitDate), and
+     *   (memberId, serviceProvided, visitDate).
+     *
+     * [FOLLOW_UP]: add [FU_COLUMN_REFERRAL_FACILITY_TYPE].
+     *
+     * [HOUSEHOLD_MEMBER]: add created_by_role_name — tracks which role registered the member;
+     * used to scope SK external-member lists.
+     *
+     * [HOUSEHOLD]: add [HH_COLUMN_MONTHLY_INCOME_RANGE].
+     *
+     * [PREGNANCY_DETAIL]: add index on (householdMemberLocalId, endAt).
      */
     val MIGRATION_5_6 = object : Migration(5, 6) {
         override fun migrate(db: SupportSQLiteDatabase) {
+            // Clear last synced time, so that the assessment history will get refetched with latest data
+            SecuredPreference.remove(SecuredPreference.EnvironmentKey.SERVER_LAST_SYNCED)
+
             db.execSQL("ALTER TABLE $FOLLOW_UP_CALL DROP COLUMN patientStatus;")
             db.execSQL("ALTER TABLE $FOLLOW_UP_CALL DROP COLUMN reason;")
             db.execSQL("ALTER TABLE $FOLLOW_UP_CALL DROP COLUMN duration;")
