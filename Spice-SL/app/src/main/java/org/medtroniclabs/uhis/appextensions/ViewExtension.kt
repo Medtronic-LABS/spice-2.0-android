@@ -4,9 +4,15 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.Rect
+import android.graphics.RectF
 import android.text.Editable
 import android.text.SpannableString
 import android.text.Spanned
@@ -22,20 +28,28 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.core.graphics.createBitmap
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
+import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.ui.BaseActivity
+import java.io.File
+import java.io.FileOutputStream
 import kotlin.math.sqrt
 
 fun Context.hideKeyboard(view: View) {
@@ -315,4 +329,136 @@ fun RecyclerView.adjustHeightToView(view: View) {
             requestLayout() // Forces the parent to re-layout with new dimensions
         }
     }
+}
+
+/**
+ * Captures the current view hierarchy as a bitmap, stores it in cache, and opens the
+ * platform share sheet with the generated image.
+ *
+ * This method renders the view on the main thread and performs file I/O on a background
+ * dispatcher before launching the share intent.
+ *
+ * @param context Context used to access cache storage and start the share chooser.
+ */
+suspend fun View.captureAndShare(context: Context) {
+    val bitmap = withContext(Dispatchers.Main) {
+        createBitmap(width, height).also {
+            val canvas = Canvas(it)
+            canvas.drawColor(Color.WHITE)
+            drawShadows(this@captureAndShare, this@captureAndShare, canvas)
+            draw(canvas)
+        }
+    }
+
+    val uri = withContext(Dispatchers.IO) {
+        val file = File(context.cacheDir, "sk_dashboard.png")
+
+        FileOutputStream(file).use {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+        }
+        bitmap.recycle()
+
+        FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.provider",
+            file,
+        )
+    }
+
+    withContext(Dispatchers.Main) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "image/png"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+
+        context.startActivity(Intent.createChooser(intent, "Share"))
+    }
+}
+
+/**
+ * Traverses the supplied view hierarchy and draws synthetic shadows for each [CardView]
+ * onto the provided [canvas].
+ *
+ * @param rootView The root view used as the coordinate reference for child bounds.
+ * @param view The current view being inspected for shadow rendering.
+ * @param canvas The canvas that receives the shadow drawing.
+ */
+fun drawShadows(
+    rootView: View,
+    view: View,
+    canvas: Canvas,
+) {
+    if (view is CardView) {
+        drawCardWithShadow(canvas, rootView, view, view.radius, view.cardElevation)
+    }
+
+    if (view is ViewGroup) {
+        for (i in 0 until view.childCount) {
+            drawShadows(rootView, view.getChildAt(i), canvas)
+        }
+    }
+}
+
+/**
+ * Draws a rounded rectangle shadow that matches the visible content area of a [CardView].
+ *
+ * @param canvas The canvas that receives the shadow drawing.
+ * @param rootView The root view used to translate the card bounds into local coordinates.
+ * @param view The card view whose shadow should be rendered.
+ * @param cornerRadius The corner radius used for the rounded rectangle shadow.
+ * @param cardElevation The elevation value used to approximate shadow blur and offset.
+ */
+fun drawCardWithShadow(
+    canvas: Canvas,
+    rootView: View,
+    view: CardView,
+    cornerRadius: Float,
+    cardElevation: Float,
+) {
+    val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.WHITE
+        setShadowLayer(
+            cardElevation, // blur radius
+            0f, // dx
+            cardElevation / 2, // dy
+            Color.argb(80, 0, 0, 0),
+        )
+    }
+
+    val finalView = if (view.isNotEmpty()) {
+        view.getChildAt(0)
+    } else {
+        view
+    }
+
+    val rect = finalView.boundsRelativeTo(rootView)
+
+    canvas.drawRoundRect(
+        rect,
+        cornerRadius,
+        cornerRadius,
+        shadowPaint,
+    )
+}
+
+/**
+ * Returns this view's bounds relative to the supplied root view.
+ *
+ * @param root The root view used as the coordinate reference.
+ * @return A [RectF] describing this view's position and size within the root view.
+ */
+fun View.boundsRelativeTo(root: View): RectF {
+    val viewLoc = IntArray(2)
+    val rootLoc = IntArray(2)
+
+    getLocationInWindow(viewLoc)
+    root.getLocationInWindow(rootLoc)
+
+    return RectF(
+        (viewLoc[0] - rootLoc[0]).toFloat(),
+        (viewLoc[1] - rootLoc[1]).toFloat(),
+        (viewLoc[0] - rootLoc[0] + width).toFloat(),
+        (viewLoc[1] - rootLoc[1] + height).toFloat(),
+    )
 }

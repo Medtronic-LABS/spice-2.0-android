@@ -5,10 +5,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.R
+import org.medtroniclabs.uhis.appextensions.captureAndShare
+import org.medtroniclabs.uhis.appextensions.gone
+import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
@@ -138,6 +144,18 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
                 }
             }
         }
+        viewModel.triggerShareLiveData.observe(viewLifecycleOwner) {
+            if (it) {
+                binding.tvDateRange?.visible()
+                binding.llActivities?.doOnPreDraw {
+                    lifecycleScope.launch {
+                        binding.llActivities?.captureAndShare(requireContext())
+                        viewModel.shareDone()
+                        binding.tvDateRange?.gone()
+                    }
+                }
+            }
+        }
     }
 
     private fun clickListeners() {
@@ -164,6 +182,7 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
         val today = DateUtils.getTodayDateDDMMYYYY(DATE_ddMMyyyy)
         binding.etFromDate.text = today
         binding.etToDate.text = today
+        binding.tvDateRange?.text = "${binding.etFromDate.text} - ${binding.etToDate.text}"
     }
 
     private fun hasCompleteDateRange(): Boolean =
@@ -428,7 +447,7 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun loadDashboardWithCustomDateRange() {
-        if (!hasCompleteDateRange()) return
+        binding.tvDateRange?.text = "${binding.etFromDate.text} - ${binding.etToDate.text}"
         val endDate =
             DateUtils.convertStringToDate(binding.etToDate.text.toString(), DATE_ddMMyyyy)
         viewModel.fetchDashboardForDateRange(

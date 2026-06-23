@@ -1935,6 +1935,7 @@
     <string name="still_birth_s">Still Birth (%1$s)</string>
     <string name="newborn_death_s">Newborn Death (%1$s)</string>
     <string name="no_of_living_children">Number of Living Children</string>
+    <string name="share">Share</string>
     <string-array name="mode_of_delivery">
         <item>Normal Delivery</item>
         <item>Assisted Delivery</item>

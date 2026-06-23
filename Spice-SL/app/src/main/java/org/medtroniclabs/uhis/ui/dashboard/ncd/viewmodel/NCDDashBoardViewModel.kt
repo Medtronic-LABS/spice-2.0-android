@@ -36,6 +36,7 @@ class NCDDashBoardViewModel @Inject constructor(
     val clinicalWorkflowNamesLowerLiveData = MutableLiveData<Set<String>>()
     val filterUiData = MutableLiveData<Resource<HouseHoldFilterUiData>>()
     private val filterLiveData = MutableLiveData(DashboardSearchFilter())
+    val triggerShareLiveData = MutableLiveData<Boolean>()
 
     val isFoPo = CommonUtils.isFoOrPo()
 
@@ -148,6 +149,14 @@ class NCDDashBoardViewModel @Inject constructor(
             filterUiData.postLoading()
             filterUiData.postValue(houseHoldRepository.getHouseHoldFilterUiDataForShasthyaKormi(kormiId))
         }
+    }
+
+    fun triggerShare() {
+        triggerShareLiveData.value = true
+    }
+
+    fun shareDone() {
+        triggerShareLiveData.postValue(false)
     }
 }
 

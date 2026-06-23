@@ -1859,6 +1859,7 @@
     <string name="still_birth_s">মৃত জন্ম (%1$s)</string>
     <string name="newborn_death_s">নবজাতকের মৃত্যু (%1$s)</string>
     <string name="no_of_living_children">জীবিত সন্তান সংখ্যা</string>
+    <string name="share">শেয়ার করুন</string>
     <string-array name="mode_of_delivery">
         <item>স্বাভাবিক</item>
         <item>প্রসবে সহায়তা নিয়ে প্রসব করাতে হয়েছে (ভ্যাকুয়াম কাপ বা ফোরসেপ ব্যবহার করে প্রসব)</item>
