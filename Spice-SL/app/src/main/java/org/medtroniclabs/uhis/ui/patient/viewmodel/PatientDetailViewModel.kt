@@ -18,6 +18,7 @@ import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.APIResponse
 import org.medtroniclabs.uhis.data.LocalSpinnerResponse
 import org.medtroniclabs.uhis.data.ShortageReasonEntity
+import org.medtroniclabs.uhis.data.medicalreview.ReqBPBGLogList
 import org.medtroniclabs.uhis.data.model.MedicalReviewBaseRequest
 import org.medtroniclabs.uhis.data.registration.AssessmentListRequest
 import org.medtroniclabs.uhis.data.registration.BPLogListResponse
@@ -48,6 +49,7 @@ import org.medtroniclabs.uhis.db.entity.SiteEntity
 import org.medtroniclabs.uhis.di.IoDispatcher
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
 import org.medtroniclabs.uhis.formgeneration.model.FormLayout
+import org.medtroniclabs.uhis.model.PatientDetailRequest
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.utils.ConnectivityManager
 import org.medtroniclabs.uhis.repo.MedicalReviewRepository
@@ -187,7 +189,7 @@ class PatientDetailViewModel @Inject constructor(
                 request.apply {
                     tenantId = SecuredPreference.getTenantId()
                 }
-                val response = medicalReviewRepo.getPatientDetails(request)
+                val response = medicalReviewRepo.getPatientDetails(PatientDetailRequest(patientId = null))
                 handleResponseState(response, showLoader)
             } catch (e: Exception) {
                 if (showLoader) {
@@ -216,7 +218,7 @@ class PatientDetailViewModel @Inject constructor(
 
     fun getPatientBPLogList(
         context: Context,
-        request: AssessmentListRequest,
+        request: ReqBPBGLogList,
     ) {
         if (connectivityManager.isNetworkAvailable()) {
             viewModelScope.launch(dispatcherIO) {
@@ -244,7 +246,7 @@ class PatientDetailViewModel @Inject constructor(
 
     fun getPatientBPLogListForGraph(
         context: Context,
-        request: AssessmentListRequest,
+        request: ReqBPBGLogList,
         forward: Boolean? = null,
     ) {
         if (connectivityManager.isNetworkAvailable()) {
@@ -273,7 +275,7 @@ class PatientDetailViewModel @Inject constructor(
 
     fun getPatientBloodGlucoseList(
         context: Context,
-        request: AssessmentListRequest,
+        request: ReqBPBGLogList,
     ) {
         if (connectivityManager.isNetworkAvailable()) {
             viewModelScope.launch(dispatcherIO) {
@@ -985,7 +987,7 @@ class PatientDetailViewModel @Inject constructor(
                                 isLifestyleRequired = false,
                                 tenantId = SecuredPreference.getTenantId(),
                             )
-                        val response = medicalReviewRepo.getPatientDetails(apiRequest)
+                        val response = medicalReviewRepo.getPatientDetails(PatientDetailRequest(patientId = null))
                         if (response.isSuccessful) {
                             val entity = response.body()?.entity
                             if (entity == null) {

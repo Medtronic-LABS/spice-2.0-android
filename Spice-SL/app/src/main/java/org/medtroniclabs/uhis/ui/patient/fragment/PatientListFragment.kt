@@ -39,16 +39,18 @@ import org.medtroniclabs.uhis.common.qrscanner.QRScanContract
 import org.medtroniclabs.uhis.common.qrscanner.QRScanResult
 import org.medtroniclabs.uhis.common.qrscanner.QRScannerActivity
 import org.medtroniclabs.uhis.data.model.FilterModel
-import org.medtroniclabs.uhis.data.model.MedicalReviewBaseRequest
 import org.medtroniclabs.uhis.data.model.PatientDetails
 import org.medtroniclabs.uhis.data.model.PatientListResModel
 import org.medtroniclabs.uhis.data.model.SortModel
 import org.medtroniclabs.uhis.databinding.FragmentPatientListBinding
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
+import org.medtroniclabs.uhis.common.DefinedParams as CommonDefinedParams
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
+import org.medtroniclabs.uhis.ncd.medicalreview.NCDMRUtil
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
 import org.medtroniclabs.uhis.ui.BaseFragment
+import org.medtroniclabs.uhis.ui.medicalreview.pharmacist.activity.NCDPharmacistActivity
 import org.medtroniclabs.uhis.ui.patient.CallRegisterInterface
 import org.medtroniclabs.uhis.ui.patient.EnrollmentFormBuilderActivity
 import org.medtroniclabs.uhis.ui.patient.FilterSortInterface
@@ -458,7 +460,7 @@ class PatientListFragment() : BaseFragment(), PatientSelectionListener, CallRegi
             }
 
             else -> {
-                if (CommonUtils.isNurse() && !item.patientStatus.equals(DefinedParams.ENROLLED, true)) {
+                if (CommonUtils.isNurse() && !item.isConfirmDiagnosis) {
                     proceedRegistration(item)
                 } else {
                     selectedPatientAction(item)
@@ -547,7 +549,13 @@ class PatientListFragment() : BaseFragment(), PatientSelectionListener, CallRegi
     }
 
     private fun selectedPatientAction(item: PatientListResModel) {
-        createPatientVisit(item.initialReview, item.id, item.age)
+        item.id?.let { patientRef ->
+            item.memberReference?.let { memberRef ->
+                item.patientId?.let { patientId ->
+                    fragmentVm.createPatientVisit(requireContext(), patientRef, memberRef, patientId)
+                }
+            }
+        }
 
 //        if (CommonUtils.isHRIO() && fragmentVm.origin == UIConstants.MY_PATIENTS_UNIQUE_ID) {
 //            val intent = Intent(requireContext(), PatientEditActivity::class.java)
@@ -573,22 +581,6 @@ class PatientListFragment() : BaseFragment(), PatientSelectionListener, CallRegi
 //        }
     }
 
-    private fun createPatientVisit(
-        initialReview: Boolean,
-        id: Long?,
-        age: Int?,
-    ) {
-        id?.let { patientTrackId ->
-            fragmentVm.createPatientVisit(
-                requireContext(),
-                MedicalReviewBaseRequest(patientTrackId, SecuredPreference.getTenantId()),
-                initialReview,
-                patientTrackId,
-                age,
-            )
-        }
-    }
-
     private fun startNewReviewActivity(details: PatientDetails) {
         when (fragmentVm.origin) {
             UIConstants.MY_PATIENTS_UNIQUE_ID -> {
@@ -597,7 +589,12 @@ class PatientListFragment() : BaseFragment(), PatientSelectionListener, CallRegi
                     NurseMedicalReviewActivity::class.java,
                 )
                 intent.putExtra(IntentConstants.INTENT_PATIENT_ID, details.patientID)
+                intent.putExtra(IntentConstants.INTENT_PATIENT_ID_STRING, details.patientIdString)
                 intent.putExtra(IntentConstants.INTENT_VISIT_ID, details.visitID)
+                intent.putExtra(IntentConstants.INTENT_ENCOUNTER_REFERENCE, details.encounterReference)
+                intent.putExtra(IntentConstants.INTENT_MEMBER_REFERENCE, details.memberReference)
+                intent.putExtra(IntentConstants.INTENT_PATIENT_REFERENCE, details.patientReference)
+                intent.putExtra(IntentConstants.INTENT_INITIAL_REVIEW, details.initialReview)
                 intent.putExtra(IntentConstants.SHOW_CONTINUOUS_MEDICAL_REVIEW, false)
                 intent.putExtra(DefinedParams.ORIGIN, fragmentVm.origin)
                 refreshPatientList.launch(intent)
@@ -607,6 +604,15 @@ class PatientListFragment() : BaseFragment(), PatientSelectionListener, CallRegi
                 val intent = Intent(requireContext(), PrescriptionRefillActivity::class.java)
                 intent.putExtra(IntentConstants.INTENT_PATIENT_ID, details.patientID)
                 intent.putExtra(IntentConstants.INTENT_VISIT_ID, details.visitID)
+                startActivity(intent)
+            }
+
+            UIConstants.DISPENSE -> {
+                val intent = Intent(requireContext(), NCDPharmacistActivity::class.java)
+                intent.putExtra(NCDMRUtil.EncounterReference, details.encounterReference)
+                intent.putExtra(CommonDefinedParams.FhirId, details.patientID.toString())
+                intent.putExtra(CommonDefinedParams.PatientId, details.patientIdString)
+                intent.putExtra(CommonDefinedParams.ORIGIN, fragmentVm.origin)
                 startActivity(intent)
             }
 

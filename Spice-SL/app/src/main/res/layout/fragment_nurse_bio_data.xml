@@ -203,6 +203,47 @@
                 tools:text="1234479849" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clPatientId"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_12sdp"
+            android:layout_marginTop="@dimen/_16sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/clNationalId">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPatientIdLabel"
+                style="@style/bioDataTextStyleLabel"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/patient_id"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.4" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSeparator9"
+                style="@style/bioDataTextStyleLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/separator_colon"
+                app:layout_constraintStart_toEndOf="@+id/tvPatientIdLabel"
+                app:layout_constraintTop_toTopOf="@+id/tvPatientIdLabel" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvPatientId"
+                style="@style/bioDataTextStyle"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/_8sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/tvSeparator9"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="1234479849" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/clMobileNumber"
@@ -212,7 +253,7 @@
             android:layout_marginTop="@dimen/_16sdp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/clNationalId">
+            app:layout_constraintTop_toBottomOf="@+id/clPatientId">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvMobileNumberLabel"

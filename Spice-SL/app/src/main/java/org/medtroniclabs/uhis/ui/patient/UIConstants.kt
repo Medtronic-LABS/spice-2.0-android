@@ -7,6 +7,7 @@ object UIConstants {
     const val MEDICAL_REVIEW_UNIQUE_ID = "medical review"
     const val PRESCRIPTION_UNIQUE_ID = "prescription"
     const val MY_PATIENTS_UNIQUE_ID = "my patients"
+    const val DISPENSE = "dispense"
     const val INVESTIGATION = "investigation"
     const val LIFESTYLE = "lifestyle"
     const val PSYCHOLOGICAL = "psychological"

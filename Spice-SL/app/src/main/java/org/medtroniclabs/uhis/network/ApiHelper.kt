@@ -60,6 +60,8 @@ import org.medtroniclabs.uhis.data.history.BirthDetails
 import org.medtroniclabs.uhis.data.history.HistoryEntity
 import org.medtroniclabs.uhis.data.history.MedicalReviewHistory
 import org.medtroniclabs.uhis.data.history.NCDMedicalReviewHistory
+import org.medtroniclabs.uhis.data.medicalreview.ReqBPBGLogList
+import org.medtroniclabs.uhis.data.medicalreview.ResLabTestRecommendations
 import org.medtroniclabs.uhis.data.model.AboveFiveYearsSubmitRequest
 import org.medtroniclabs.uhis.data.model.BpAndWeightRequestModel
 import org.medtroniclabs.uhis.data.model.BpAndWeightResponse
@@ -118,7 +120,6 @@ import org.medtroniclabs.uhis.data.registration.LabTestSearchResponse
 import org.medtroniclabs.uhis.data.registration.Lifestyle
 import org.medtroniclabs.uhis.data.registration.MedicationSearchReqModel
 import org.medtroniclabs.uhis.data.registration.NurseCreateResponse
-import org.medtroniclabs.uhis.data.registration.NurseLabTest
 import org.medtroniclabs.uhis.data.registration.NurseMrRequestModel
 import org.medtroniclabs.uhis.data.registration.PatientCreateResponse
 import org.medtroniclabs.uhis.data.registration.PatientDetailsModel
@@ -630,11 +631,11 @@ interface ApiHelper {
 
     suspend fun validateSession(): Response<ResponseBody>
 
-    suspend fun getPatientDetails(request: PatientDetailsModel): Response<APIResponse<PatientDetailsModel>>
+    suspend fun getPatientDetails(request: PatientDetailRequest): Response<APIResponse<PatientDetailsModel>>
 
-    suspend fun getPatientBPLogList(request: AssessmentListRequest): Response<APIResponse<BPLogListResponse>>
+    suspend fun getPatientBPLogList(request: ReqBPBGLogList): Response<APIResponse<BPLogListResponse>>
 
-    suspend fun getPatientBloodGlucoseList(request: AssessmentListRequest): Response<APIResponse<BloodGlucoseListResponse>>
+    suspend fun getPatientBloodGlucoseList(request: ReqBPBGLogList): Response<APIResponse<BloodGlucoseListResponse>>
 
     suspend fun getSessionGraph(request: AssessmentListRequest): Response<APIResponse<SessionGraphModel>>
 
@@ -713,7 +714,7 @@ interface ApiHelper {
 
     suspend fun getPatientSessionHistoryList(request: MedicalReviewBaseRequest): Response<APIResponse<SessionHistoryResponse>>
 
-    suspend fun getPatientLabTestRecommendation(request: InvestigationReq): Response<APIResponse<List<NurseLabTest>>>
+    suspend fun getPatientLabTestRecommendation(request: InvestigationReq): Response<APIResponse<List<ResLabTestRecommendations>>>
 
     suspend fun getPatientLabTests(request: HashMap<String, Any?>): Response<APIResponse<org.medtroniclabs.uhis.data.registration.LabTestListResponse>>
 

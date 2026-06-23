@@ -1,6 +1,7 @@
 package org.medtroniclabs.uhis.data.registration
 
 import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 import java.util.Calendar
 
@@ -17,6 +18,7 @@ data class PrescriptionModel(
     var prescriptionRemainingDays: Int? = null,
     var prescribedSince: String? = null,
     var endDate: String? = null,
+    @SerializedName("name")
     var medicationName: String? = null,
     var dosageName: String? = null,
     var classification: String? = null,

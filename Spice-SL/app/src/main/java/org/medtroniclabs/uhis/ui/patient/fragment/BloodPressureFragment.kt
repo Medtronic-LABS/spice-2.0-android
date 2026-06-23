@@ -13,7 +13,7 @@ import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_ddMMMyyyy
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMdd
 import org.medtroniclabs.uhis.common.SecuredPreference
-import org.medtroniclabs.uhis.data.registration.AssessmentListRequest
+import org.medtroniclabs.uhis.data.medicalreview.ReqBPBGLogList
 import org.medtroniclabs.uhis.data.registration.BPResponse
 import org.medtroniclabs.uhis.data.registration.BpLog
 import org.medtroniclabs.uhis.data.registration.BpLogDetails
@@ -24,10 +24,10 @@ import org.medtroniclabs.uhis.formgeneration.extension.markMandatory
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseFragment
+import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.UpperLimitDiastolic
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.UpperLimitSystolic
 import org.medtroniclabs.uhis.ui.common.GeneralInfoDialog
-import org.medtroniclabs.uhis.ui.patient.UIConstants
 import org.medtroniclabs.uhis.ui.patient.viewmodel.MedicalReviewBaseViewModel
 import org.medtroniclabs.uhis.ui.patient.viewmodel.NurseMedicalReviewViewModel
 import org.medtroniclabs.uhis.ui.patient.viewmodel.PatientDetailViewModel
@@ -68,7 +68,7 @@ class BloodPressureFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun initView() {
-        medicalReviewBaseViewModel.fetchWorkFlow(UIConstants.SCREENING_UNIQUE_ID)
+        medicalReviewBaseViewModel.fetchWorkFlow(MenuConstants.NCD_MENU_ID)
         binding.instructionsLayout.safeClickListener(this)
         binding.tvViewLess.safeClickListener(this)
         binding.tvViewMore.safeClickListener(this)
@@ -137,15 +137,9 @@ class BloodPressureFragment : BaseFragment(), View.OnClickListener {
         nurseMedicalReviewViewModel.patientDetailsResponse.observe(viewLifecycleOwner) { resourceState ->
             when (resourceState.state) {
                 ResourceState.SUCCESS -> {
-                    resourceState.data?.let { data ->
-                        data.let { patientDetails ->
-                            val request = AssessmentListRequest(
-                                patientDetails._id,
-                                false,
-                                sortField = DefinedParams.BP_TAKEN_ON,
-                            )
-                            viewModel.getPatientBPLogList(requireContext(), request)
-                        }
+                    resourceState.data?.memberId?.let { id ->
+                        val request = ReqBPBGLogList(memberId = id)
+                        viewModel.getPatientBPLogList(requireContext(), request)
                     }
                 }
 

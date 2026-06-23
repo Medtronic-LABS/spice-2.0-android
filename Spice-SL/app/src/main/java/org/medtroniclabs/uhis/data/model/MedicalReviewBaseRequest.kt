@@ -16,4 +16,13 @@ data class MedicalReviewBaseRequest(
     val sessionId: Int? = null,
 )
 
-class PatientDetails(val visitID: Long, val initialReview: Boolean, val patientID: Long, val age: Int? = null)
+class PatientDetails(
+    val visitID: Long,
+    val initialReview: Boolean,
+    val patientID: Long,
+    val patientIdString: String,
+    val age: Int? = null,
+    val encounterReference: String? = null,
+    val memberReference: String? = null,
+    val patientReference: String? = null,
+)

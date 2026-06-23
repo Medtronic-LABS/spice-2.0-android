@@ -62,6 +62,8 @@ import org.medtroniclabs.uhis.data.history.BirthDetails
 import org.medtroniclabs.uhis.data.history.HistoryEntity
 import org.medtroniclabs.uhis.data.history.MedicalReviewHistory
 import org.medtroniclabs.uhis.data.history.NCDMedicalReviewHistory
+import org.medtroniclabs.uhis.data.medicalreview.ReqBPBGLogList
+import org.medtroniclabs.uhis.data.medicalreview.ResLabTestRecommendations
 import org.medtroniclabs.uhis.data.model.AboveFiveYearsSubmitRequest
 import org.medtroniclabs.uhis.data.model.BpAndWeightRequestModel
 import org.medtroniclabs.uhis.data.model.BpAndWeightResponse
@@ -120,7 +122,6 @@ import org.medtroniclabs.uhis.data.registration.LabTestSearchResponse
 import org.medtroniclabs.uhis.data.registration.Lifestyle
 import org.medtroniclabs.uhis.data.registration.MedicationSearchReqModel
 import org.medtroniclabs.uhis.data.registration.NurseCreateResponse
-import org.medtroniclabs.uhis.data.registration.NurseLabTest
 import org.medtroniclabs.uhis.data.registration.NurseMrRequestModel
 import org.medtroniclabs.uhis.data.registration.PatientCreateResponse
 import org.medtroniclabs.uhis.data.registration.PatientDetailsModel
@@ -753,11 +754,11 @@ class ApiHelperImpl @Inject constructor(
 
     override suspend fun validateSession(): Response<ResponseBody> = apiService.validateSession()
 
-    override suspend fun getPatientDetails(request: PatientDetailsModel): Response<APIResponse<PatientDetailsModel>> = apiService.getPatientDetails(request)
+    override suspend fun getPatientDetails(request: PatientDetailRequest): Response<APIResponse<PatientDetailsModel>> = apiService.getPatientDetails(request)
 
-    override suspend fun getPatientBPLogList(request: AssessmentListRequest): Response<APIResponse<BPLogListResponse>> = apiService.getPatientBPLogList(request)
+    override suspend fun getPatientBPLogList(request: ReqBPBGLogList): Response<APIResponse<BPLogListResponse>> = apiService.getPatientBPLogList(request)
 
-    override suspend fun getPatientBloodGlucoseList(request: AssessmentListRequest): Response<APIResponse<BloodGlucoseListResponse>> =
+    override suspend fun getPatientBloodGlucoseList(request: ReqBPBGLogList): Response<APIResponse<BloodGlucoseListResponse>> =
         apiService.getPatientBloodGlucoseList(request)
 
     override suspend fun getSessionGraph(request: AssessmentListRequest): Response<APIResponse<SessionGraphModel>> = apiService.getSessionGraph(request)
@@ -855,7 +856,7 @@ class ApiHelperImpl @Inject constructor(
     override suspend fun getPatientSessionHistoryList(request: MedicalReviewBaseRequest): Response<APIResponse<SessionHistoryResponse>> =
         apiService.getPatientSessionHistoryList(request)
 
-    override suspend fun getPatientLabTestRecommendation(request: InvestigationReq): Response<APIResponse<List<NurseLabTest>>> =
+    override suspend fun getPatientLabTestRecommendation(request: InvestigationReq): Response<APIResponse<List<ResLabTestRecommendations>>> =
         apiService.getPatientLabTestRecommendation(request)
 
     override suspend fun getPatientLabTests(

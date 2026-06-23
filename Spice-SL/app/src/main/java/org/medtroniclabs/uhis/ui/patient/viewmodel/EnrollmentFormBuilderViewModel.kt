@@ -250,14 +250,16 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
 
                         DefinedParams.VILLAGE -> {
                             unionCacheResponse.postLoading()
-                            val response = onBoardingRepo.getAllVillages()
-                            if (response.isNotEmpty()) {
-                                unionCacheResponse.postValue(
-                                    Resource(
-                                        ResourceState.SUCCESS,
-                                        LocalSpinnerResponse(tag, response),
-                                    ),
-                                )
+                            selectedParent?.let {
+                                val response = onBoardingRepo.getVillageList(it)
+                                if (response.isNotEmpty()) {
+                                    unionCacheResponse.postValue(
+                                        Resource(
+                                            ResourceState.SUCCESS,
+                                            LocalSpinnerResponse(tag, response),
+                                        ),
+                                    )
+                                }
                             }
                         }
 

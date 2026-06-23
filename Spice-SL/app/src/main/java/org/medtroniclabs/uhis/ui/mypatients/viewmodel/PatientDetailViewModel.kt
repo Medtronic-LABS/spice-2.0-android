@@ -66,11 +66,12 @@ class PatientDetailViewModel @Inject constructor(
         id: String,
         assessmentType: String? = null,
         origin: String? = null,
+        patientId: String? = null,
     ) {
         viewModelScope.launch(dispatcherIO) {
             patientDetailsLiveData.postLoading()
             patientDetailsLiveData.postValue(
-                patientRepository.getPatients(PatientDetailRequest(patientId = id, assessmentType = assessmentType, id = id, type = origin)),
+                patientRepository.getPatients(PatientDetailRequest(patientId = patientId ?: id, assessmentType = assessmentType, id = id, type = origin)),
             )
         }
     }

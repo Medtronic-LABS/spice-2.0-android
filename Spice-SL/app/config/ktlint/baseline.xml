@@ -1015,6 +1015,20 @@
     <file name="src/main/java/org/medtroniclabs/uhis/ui/mypatients/viewmodel/ReferralTicketViewModel.kt">
         <error line="1" column="1" source="standard:no-empty-file" />
     </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/patient/NurseMedicalReviewActivity.kt">
+        <error line="204" column="49" source="standard:chain-method-continuation" />
+        <error line="217" column="17" source="standard:chain-method-continuation" />
+        <error line="231" column="17" source="standard:chain-method-continuation" />
+        <error line="235" column="43" source="standard:chain-method-continuation" />
+        <error line="244" column="17" source="standard:chain-method-continuation" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/patient/fragment/PatientListFragment.kt">
+        <error line="3" column="1" source="standard:import-ordering" />
+    </file>
+    <file name="src/main/java/org/medtroniclabs/uhis/ui/patient/viewmodel/NurseFhirMapper.kt">
+        <error line="3" column="1" source="standard:import-ordering" />
+        <error line="25" column="1" source="standard:no-empty-first-line-in-class-body" />
+    </file>
     <file name="src/main/java/org/medtroniclabs/uhis/ui/peersupervisor/PerformanceMonitoringViewModel.kt">
         <error line="64" column="17" source="standard:backing-property-naming" />
     </file>

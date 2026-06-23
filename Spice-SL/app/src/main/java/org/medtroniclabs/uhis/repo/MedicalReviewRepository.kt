@@ -3,6 +3,9 @@ package org.medtroniclabs.uhis.repo
 import okhttp3.RequestBody
 import org.medtroniclabs.uhis.data.APIResponse
 import org.medtroniclabs.uhis.data.PatientPrescriptionModel
+import org.medtroniclabs.uhis.data.PrescriptionListRequest
+import org.medtroniclabs.uhis.data.medicalreview.ReqBPBGLogList
+import org.medtroniclabs.uhis.data.medicalreview.ResLabTestRecommendations
 import org.medtroniclabs.uhis.data.model.MedicalReviewBaseRequest
 import org.medtroniclabs.uhis.data.registration.AssessmentListRequest
 import org.medtroniclabs.uhis.data.registration.BadgeModel
@@ -13,8 +16,6 @@ import org.medtroniclabs.uhis.data.registration.InvestigationReq
 import org.medtroniclabs.uhis.data.registration.Lifestyle
 import org.medtroniclabs.uhis.data.registration.MedicationSearchReqModel
 import org.medtroniclabs.uhis.data.registration.NurseMrRequestModel
-import org.medtroniclabs.uhis.data.registration.PatientDetailsModel
-import org.medtroniclabs.uhis.data.registration.PatientHistoryRequest
 import org.medtroniclabs.uhis.data.registration.PatientPregnancyModel
 import org.medtroniclabs.uhis.data.registration.PatientRemoveRequest
 import org.medtroniclabs.uhis.data.registration.PregnancyCreateRequest
@@ -30,6 +31,10 @@ import org.medtroniclabs.uhis.data.registration.TerminateSessionModel
 import org.medtroniclabs.uhis.data.registration.TransferCreateRequest
 import org.medtroniclabs.uhis.db.entity.SiteEntity
 import org.medtroniclabs.uhis.db.local.RoomHelper
+import org.medtroniclabs.uhis.model.LabTestListRequest
+import org.medtroniclabs.uhis.model.PatientDetailRequest
+import org.medtroniclabs.uhis.model.ReferralDetailRequest
+import org.medtroniclabs.uhis.ncd.data.PatientVisitRequest
 import org.medtroniclabs.uhis.network.ApiHelper
 import retrofit2.Response
 import javax.inject.Inject
@@ -38,11 +43,11 @@ class MedicalReviewRepository @Inject constructor(
     private var apiHelper: ApiHelper,
     private var roomHelper: RoomHelper,
 ) {
-    suspend fun getPatientDetails(request: PatientDetailsModel) = apiHelper.getPatientDetails(request)
+    suspend fun getPatientDetails(request: PatientDetailRequest) = apiHelper.getPatientDetails(request)
 
-    suspend fun getPatientBPLogList(request: AssessmentListRequest) = apiHelper.getPatientBPLogList(request)
+    suspend fun getPatientBPLogList(request: ReqBPBGLogList) = apiHelper.getPatientBPLogList(request)
 
-    suspend fun getPatientBloodGlucoseList(request: AssessmentListRequest) = apiHelper.getPatientBloodGlucoseList(request)
+    suspend fun getPatientBloodGlucoseList(request: ReqBPBGLogList) = apiHelper.getPatientBloodGlucoseList(request)
 
     suspend fun getSessionGraph(request: AssessmentListRequest) = apiHelper.getSessionGraph(request)
 
@@ -138,7 +143,7 @@ class MedicalReviewRepository @Inject constructor(
 
     suspend fun getOperatingUnitSites(): List<SiteEntity> = roomHelper.getOperatingUnitSites()
 
-    suspend fun getPrescriptionList(request: PatientPrescriptionModel) = apiHelper.getNursePrescriptionList(request)
+    suspend fun getPrescriptionList(request: PrescriptionListRequest) = apiHelper.getPrescriptionList(request)
 
     suspend fun removePrescription(request: PatientPrescriptionModel) = apiHelper.removePrescription(request)
 
@@ -146,22 +151,25 @@ class MedicalReviewRepository @Inject constructor(
 
     suspend fun getFrequency() = roomHelper.getFrequencyList()
 
-    suspend fun getPatientPrescriptionHistoryList(request: PatientHistoryRequest) = apiHelper.getPatientPrescriptionHistoryList(request)
+    suspend fun getDosageFrequencyList() = roomHelper.getDosageFrequencyList()
+
+    suspend fun getPatientPrescriptionHistoryList(request: ReferralDetailRequest) = apiHelper.getPrescription(request)
 
     suspend fun getUnitList(type: String) = roomHelper.getUnitList(type)
 
     suspend fun getPrescriptionPrediction(map: HashMap<String, Any>): Response<APIResponse<PrescriptionPredictionResponse>> =
         apiHelper.getPrescriptionPrediction(map)
 
-    suspend fun getPatientLabTestHistory(request: PatientHistoryRequest) = apiHelper.getPatientLabTestHistory(request)
+    suspend fun getPatientLabTestHistory(request: ReferralDetailRequest) = apiHelper.getInvestigation(request)
 
     suspend fun getPatientMedicalReviewHistoryList(request: MedicalReviewBaseRequest) = apiHelper.getPatientMedicalReviewHistoryList(request)
 
     suspend fun getPatientSessionHistoryList(request: MedicalReviewBaseRequest) = apiHelper.getPatientSessionHistoryList(request)
 
-    suspend fun getPatientLabTestRecommendation(request: InvestigationReq) = apiHelper.getPatientLabTestRecommendation(request)
+    suspend fun getPatientLabTestRecommendation(request: InvestigationReq): Response<APIResponse<List<ResLabTestRecommendations>>> =
+        apiHelper.getPatientLabTestRecommendation(request)
 
-    suspend fun getPatientLabTests(request: HashMap<String, Any?>) = apiHelper.getPatientLabTests(request)
+    suspend fun getPatientLabTests(request: LabTestListRequest) = apiHelper.getLabTestList(request)
 
     suspend fun searchLabTest(request: SearchModel) = apiHelper.searchLabTest(request)
 
@@ -188,5 +196,5 @@ class MedicalReviewRepository @Inject constructor(
     suspend fun getPrescriptionRefillHistory(request: org.medtroniclabs.uhis.data.registration.PatientPrescriptionModel) =
         apiHelper.getPrescriptionRefillHistory(request)
 
-    suspend fun createPatientVisit(request: MedicalReviewBaseRequest) = apiHelper.createPatientVisit(request)
+    suspend fun createPatientVisit(request: PatientVisitRequest) = apiHelper.createPatientVisit(request)
 }

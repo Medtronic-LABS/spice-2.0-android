@@ -88,7 +88,7 @@ class NCDPharmacistActivity : BaseActivity(), View.OnClickListener {
                     loadPatientInfo(resourceState.data)
                     withNetworkAvailability(online = {
                         viewModel.getPrescriptionDispenseList(
-                            DispenseUpdateRequest(patientReference = patientDetailViewModel.getPatientId()),
+                            DispenseUpdateRequest(patientReference = patientDetailViewModel.getPatientFHIRId()),
                         )
                     })
                     viewModel.patientReference = patientDetailViewModel.getPatientId()
@@ -220,6 +220,7 @@ class NCDPharmacistActivity : BaseActivity(), View.OnClickListener {
                 patientDetailViewModel.getPatients(
                     id,
                     origin = patientDetailViewModel.origin?.lowercase(),
+                    patientId = it.getStringExtra(DefinedParams.PatientId),
                 )
             }
         }

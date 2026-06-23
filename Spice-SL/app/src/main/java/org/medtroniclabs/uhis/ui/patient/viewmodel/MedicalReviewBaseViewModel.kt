@@ -15,6 +15,7 @@ import org.medtroniclabs.uhis.appextensions.setError
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.StringConverter
 import org.medtroniclabs.uhis.data.APIResponse
+import org.medtroniclabs.uhis.data.medicalreview.ResLabTestRecommendations
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.data.model.MedicalReviewBaseRequest
 import org.medtroniclabs.uhis.data.model.SiteRoleResponse
@@ -26,7 +27,6 @@ import org.medtroniclabs.uhis.data.registration.InitialComorbidities
 import org.medtroniclabs.uhis.data.registration.InitialEncounterRequest
 import org.medtroniclabs.uhis.data.registration.InitialEncounterResponse
 import org.medtroniclabs.uhis.data.registration.MedicalReviewEditModel
-import org.medtroniclabs.uhis.data.registration.NurseLabTest
 import org.medtroniclabs.uhis.data.registration.PatientDetailsModel
 import org.medtroniclabs.uhis.data.registration.PrescriptionModel
 import org.medtroniclabs.uhis.data.registration.RegionSiteModel
@@ -101,7 +101,7 @@ class MedicalReviewBaseViewModel @Inject constructor(
     var instructionsList = arrayListOf<String>()
     var initialReview: Boolean = false
     var selectedChipLabTestMedication = ArrayList<ChipViewItemModel>()
-    var selectedLabTestMedication: NurseLabTest? = null
+    var selectedLabTestMedication: ResLabTestRecommendations? = null
     var confirmDiagnosis: ArrayList<String>? = null
     var list: List<DiagnosisEntity>? = null
 

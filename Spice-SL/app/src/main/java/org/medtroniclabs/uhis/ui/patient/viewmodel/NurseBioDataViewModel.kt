@@ -14,6 +14,7 @@ import org.medtroniclabs.uhis.appextensions.postSuccess
 import org.medtroniclabs.uhis.appextensions.setError
 import org.medtroniclabs.uhis.data.registration.PatientDetailsModel
 import org.medtroniclabs.uhis.di.IoDispatcher
+import org.medtroniclabs.uhis.model.PatientDetailRequest
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.utils.ConnectivityManager
 import org.medtroniclabs.uhis.repo.MedicalReviewRepository
@@ -39,7 +40,7 @@ class NurseBioDataViewModel @Inject constructor(
                 viewModelScope.launch(dispatcherIO) {
                     patientDetailsResponse.postLoading()
                     try {
-                        val response = medicalReviewRepo.getPatientDetails(request)
+                        val response = medicalReviewRepo.getPatientDetails(PatientDetailRequest(patientId = null))
                         if (response.isSuccessful) {
                             val res = response.body()
                             if (res?.status == true) {

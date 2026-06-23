@@ -13,7 +13,6 @@ import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.StringConverter
 import org.medtroniclabs.uhis.data.registration.NurseCreateResponse
-import org.medtroniclabs.uhis.data.registration.PatientDetailsModel
 import org.medtroniclabs.uhis.data.registration.SymptomModels
 import org.medtroniclabs.uhis.databinding.ActivityNurseMedicalReviewSummaryBinding
 import org.medtroniclabs.uhis.databinding.SummaryLayoutBinding
@@ -65,16 +64,13 @@ class NurseMedicalReviewSummaryActivity : BaseActivity(), View.OnClickListener {
     private fun initView() {
         binding.btnSubmit.safeClickListener(this)
         intent.extras?.let { bundle ->
+            nurseViewModel.patientIdString = bundle.getString(IntentConstants.INTENT_PATIENT_ID_STRING)
             nurseViewModel.patientId = bundle.getLong(IntentConstants.INTENT_PATIENT_ID, -1L)
             nurseViewModel.patientVisitId = bundle.getLong(IntentConstants.INTENT_VISIT_ID, -1L)
         }
 
-        nurseViewModel.patientId?.let {
-            val request = PatientDetailsModel(
-                it,
-                isAssessmentDataRequired = false,
-            )
-            nurseViewModel.getPatientDetails(this, request)
+        nurseViewModel.patientIdString?.let {
+            nurseViewModel.getPatientDetails(this, it)
         }
     }
 

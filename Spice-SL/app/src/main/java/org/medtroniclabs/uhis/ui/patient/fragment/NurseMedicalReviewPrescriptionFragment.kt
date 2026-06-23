@@ -27,7 +27,6 @@ import androidx.recyclerview.widget.RecyclerView
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.SecuredPreference
-import org.medtroniclabs.uhis.data.ActivityModel
 import org.medtroniclabs.uhis.data.UpdateMedicationModel
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.data.registration.MedicationSearchReqModel
@@ -102,6 +101,10 @@ class NurseMedicalReviewPrescriptionFragment :
         searchView()
         prescriptionViewModel.patientTrackId = nurseViewModel.patientTrackId
         prescriptionViewModel.tenantId = SecuredPreference.getTenantId()
+        // prescription-request/list & investigation/list expect the patient FHIR id
+        // (patientTrackId = the server "id"), not the human-readable patientIdString.
+        prescriptionViewModel.patientReference = nurseViewModel.patientTrackId?.toString()
+        medicalReviewPatientHistoryViewModel.patientReference = nurseViewModel.patientTrackId?.toString()
     }
 
     private fun initView() {
@@ -131,8 +134,10 @@ class NurseMedicalReviewPrescriptionFragment :
         search: String? = null,
     ) {
         if (!binding.searchView.isPopupShowing) {
+            val countryId = SecuredPreference.getCountryId()
             val request = MedicationSearchReqModel(
                 searchTerm = search?.trim(),
+                countryId = countryId,
             )
             if (isDefault) {
                 patientViewModel.getRecommendation(requireContext(), request)
@@ -741,8 +746,8 @@ class NurseMedicalReviewPrescriptionFragment :
     }
 
     private fun setPrescribeMedicationView() {
-        val selectedItem = activityTagListCustomView.getSelectedTags() as ArrayList<ActivityModel>
-        val containsOther = selectedItem.any { it.key == "Other" }
+        val selectedItem = activityTagListCustomView.getSelectedTags() as ArrayList<ChipViewItemModel>
+        val containsOther = selectedItem.any { it.name == "Other" }
         if (containsOther) {
             binding.clSearch.visibility =
                 View.VISIBLE

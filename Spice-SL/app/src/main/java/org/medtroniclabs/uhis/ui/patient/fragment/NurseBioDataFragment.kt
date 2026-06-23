@@ -13,6 +13,8 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import org.medtroniclabs.uhis.R
+import org.medtroniclabs.uhis.appextensions.gone
+import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.StringConverter
@@ -125,7 +127,7 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
 
     private fun attachObserver() {
         nurseViewModel.patientDetailsValue?.let { data ->
-            nurseViewModel.newPatientId = data.patientId
+            // nurseViewModel.newPatientId = data.patientId
             showBioData(data)
         }
         nurseViewModel.latestConfirmDiagnosesList.observe(viewLifecycleOwner) { resourceState ->
@@ -212,18 +214,37 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
+    private fun getIdentityLabel(identityType: String?): String? =
+        when {
+            identityType.isNullOrEmpty() || identityType == DefinedParams.NA -> null
+            identityType == DefinedParams.IDENTITY_TYPE_BRN -> requireContext().getString(R.string.brn)
+            else -> requireContext().getString(R.string.national_id)
+        }
+
     private fun showBioData(data: PatientDetailsModel) {
         with(binding) {
-            medicalReviewBaseViewModel.confirmDiagnosis = data.confirmDiagnosis
+            // patient/patientDetails returns the confirmed diagnoses under
+            // patientConfirmDiagnosis; confirmDiagnosis can be null in that payload.
+            val diagnosesToShow = data.patientConfirmDiagnosis ?: data.confirmDiagnosis
+            medicalReviewBaseViewModel.confirmDiagnosis = diagnosesToShow
 
-            tvNationalId.text = data.nationalId ?: getString(R.string.hyphen_symbol)
+            clNationalId.gone()
+            getIdentityLabel(data.identityType)?.let {
+                clNationalId.visible()
+                tvNationalIdLabel.text = it
+                tvNationalId.text = data.identityValue ?: requireContext().getString(R.string.hyphen_symbol)
+            }
+
+            tvPatientId.text = data.patientId ?: getString(
+                R.string.hyphen_symbol,
+            )
             tvMobileNumber.text = data.phoneNumber ?: getString(
                 R.string.hyphen_symbol,
             )
             tvDateOfRegistration.text = data.enrollmentAt?.let {
                 DateUtils.convertDateTimeToDate(
                     it,
-                    DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
+                    DateUtils.DATE_FORMAT_yyyyMMddHHmmss,
                     DateUtils.DATE_DD_MMM_YYYY,
                 )
             } ?: getString(R.string.hyphen_symbol)
@@ -233,7 +254,7 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
             tvPatientStatus.text =
                 data.ncdStatus?.let { getPatientType(it) } ?: getString(R.string.hyphen_symbol)
 
-            confirmedDiagnosis(data.confirmDiagnosis)
+            confirmedDiagnosis(diagnosesToShow)
 
             nextFollowupDate.text = data.nextMedicalReviewDate?.let {
                 DateUtils.convertDateTimeToDate(
@@ -266,7 +287,7 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
             }
 
             val bmi = CommonUtils.getBMIInformation(requireContext(), data.bmi)
-            bmi?.second?.let { tvBmi.setTextColor(it) }
+            bmi?.second?.let { tvBmi.setTextColor(requireContext().getColor(it)) }
             tvBmi.text = bmi?.first ?: getString(R.string.hyphen_symbol)
 
             tvHealthHistory.text = data.patientHealthHistory?.let { generateConditionString(it) }

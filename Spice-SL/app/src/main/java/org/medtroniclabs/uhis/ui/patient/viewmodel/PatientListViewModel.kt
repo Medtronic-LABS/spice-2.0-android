@@ -24,7 +24,6 @@ import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.FilterEnum
 import org.medtroniclabs.uhis.data.model.FilterModel
 import org.medtroniclabs.uhis.data.model.FollowUpPatientDetailsResponse
-import org.medtroniclabs.uhis.data.model.MedicalReviewBaseRequest
 import org.medtroniclabs.uhis.data.model.PatientDataModel
 import org.medtroniclabs.uhis.data.model.PatientDetails
 import org.medtroniclabs.uhis.data.model.PatientListResModel
@@ -33,11 +32,13 @@ import org.medtroniclabs.uhis.data.model.ResponseDivisionDistrictUpazilas
 import org.medtroniclabs.uhis.data.model.SiteRoleResponse
 import org.medtroniclabs.uhis.data.model.SortModel
 import org.medtroniclabs.uhis.data.model.UpdatePatientCallRegister
+import org.medtroniclabs.uhis.data.offlinesync.model.ProvanceDto
 import org.medtroniclabs.uhis.data.servicerecipient.PatientHistoryData
 import org.medtroniclabs.uhis.db.entity.SubVillageEntity
 import org.medtroniclabs.uhis.db.entity.VillageEntity
 import org.medtroniclabs.uhis.di.IoDispatcher
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
+import org.medtroniclabs.uhis.ncd.data.PatientVisitRequest
 import org.medtroniclabs.uhis.network.ApiHelper
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.resource.ResourceState
@@ -368,25 +369,33 @@ class PatientListViewModel @Inject constructor(
 
     fun createPatientVisit(
         context: Context,
-        request: MedicalReviewBaseRequest,
-        initialReview: Boolean,
-        patientID: Long,
-        age: Int?,
+        patientRef: Long,
+        memberRef: String,
+        patientId: String,
     ) {
         if (connectivityManager.isNetworkAvailable()) {
             patientVisitResponse.postLoading()
             viewModelScope.launch(dispatcherIO) {
                 try {
+                    val request = PatientVisitRequest(
+                        patientReference = patientRef.toString(),
+                        memberReference = memberRef,
+                        provenance = ProvanceDto(),
+                    )
+
                     val response = medicalReviewRepo.createPatientVisit(request)
                     if (response.isSuccessful) {
                         val res = response.body()
                         if (res?.status == true && res.entity != null) {
                             patientVisitResponse.postSuccess(
                                 PatientDetails(
-                                    res.entity.id,
-                                    initialReview,
-                                    patientID,
-                                    age,
+                                    visitID = res.entity.encounterReference?.toLongOrNull() ?: 0L,
+                                    initialReview = res.entity.initialReviewed ?: false,
+                                    patientID = patientRef,
+                                    patientIdString = patientId,
+                                    encounterReference = res.entity.encounterReference,
+                                    memberReference = request.memberReference,
+                                    patientReference = request.patientReference,
                                 ),
                             )
                         }

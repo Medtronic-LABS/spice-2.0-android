@@ -14,17 +14,18 @@ import org.medtroniclabs.uhis.appextensions.postError
 import org.medtroniclabs.uhis.appextensions.postLoading
 import org.medtroniclabs.uhis.appextensions.postSuccess
 import org.medtroniclabs.uhis.data.APIResponse
+import org.medtroniclabs.uhis.data.DosageFrequency
 import org.medtroniclabs.uhis.data.PatientPrescriptionModel
+import org.medtroniclabs.uhis.data.PrescriptionListRequest
 import org.medtroniclabs.uhis.data.ResponseDataModel
 import org.medtroniclabs.uhis.data.UnitMetricEntity
 import org.medtroniclabs.uhis.data.UpdateMedicationModel
-import org.medtroniclabs.uhis.data.registration.PatientHistoryRequest
 import org.medtroniclabs.uhis.data.registration.PatientPrescriptionHistoryResponse
 import org.medtroniclabs.uhis.data.registration.PrescriptionModel
 import org.medtroniclabs.uhis.data.registration.PrescriptionPredictionResponse
-import org.medtroniclabs.uhis.db.entity.FrequencyEntity
 import org.medtroniclabs.uhis.di.IoDispatcher
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
+import org.medtroniclabs.uhis.model.ReferralDetailRequest
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.utils.ConnectivityManager
 import org.medtroniclabs.uhis.repo.MedicalReviewRepository
@@ -42,11 +43,12 @@ class PrescriptionCopyViewModel @Inject constructor(
     var patientTrackId: Long? = null
     var patientVisitId: Long? = null
     var tenantId: Long? = null
+    var patientReference: String? = null
     var prescriptionUIModel: ArrayList<PrescriptionModel>? = null
     val removePrescriptionLiveDate = MutableLiveData<Resource<ResponseDataModel>>()
     var savePrescriptionList: ArrayList<UpdateMedicationModel>? = null
     val updatePrescriptionLiveDate = MutableLiveData<Resource<ResponseDataModel>>()
-    val frequencyList = MutableLiveData<List<FrequencyEntity>>()
+    val frequencyList = MutableLiveData<List<DosageFrequency>>()
     val medicationHistoryLiveData = MutableLiveData<Resource<PatientPrescriptionHistoryResponse>>()
     val reloadInstruction = MutableLiveData<Boolean>()
     val unitList = MutableLiveData<List<UnitMetricEntity>>()
@@ -61,19 +63,15 @@ class PrescriptionCopyViewModel @Inject constructor(
         viewModelScope.launch(dispatcherIO) {
             try {
                 val response = medicalReviewRepo.getPrescriptionList(
-                    PatientPrescriptionModel(
-                        patientTrackId = patientTrackId,
-                        tenantId = tenantId,
-                        isDeleted = isDiscontinuedMedicationList,
+                    PrescriptionListRequest(
+                        patientReference = patientReference,
+                        isActive = !isDiscontinuedMedicationList,
                     ),
                 )
-                if (response.isSuccessful) {
-                    val res = response.body()
-                    if (res?.status == true) {
-                        prescriptionListLiveDate.postSuccess(res.entityList ?: ArrayList())
-                    } else {
-                        prescriptionListLiveDate.postError()
-                    }
+                if (response.isSuccessful && response.body()?.status == true) {
+                    prescriptionListLiveDate.postSuccess(
+                        NurseFhirMapper.mapPrescriptionList(response.body()?.entity),
+                    )
                 } else {
                     prescriptionListLiveDate.postError()
                 }
@@ -88,21 +86,15 @@ class PrescriptionCopyViewModel @Inject constructor(
         viewModelScope.launch(dispatcherIO) {
             try {
                 val response = medicalReviewRepo.getPrescriptionList(
-                    PatientPrescriptionModel(
-                        patientTrackId = patientTrackId,
-                        tenantId = tenantId,
-                        isDeleted = isDiscontinuedMedicationList,
+                    PrescriptionListRequest(
+                        patientReference = patientReference,
+                        isActive = !isDiscontinuedMedicationList,
                     ),
                 )
-                if (response.isSuccessful) {
-                    val res = response.body()
-                    if (res?.status == true) {
-                        disContinuedPrescriptionListLiveDate.postSuccess(
-                            res.entityList ?: ArrayList(),
-                        )
-                    } else {
-                        disContinuedPrescriptionListLiveDate.postError()
-                    }
+                if (response.isSuccessful && response.body()?.status == true) {
+                    disContinuedPrescriptionListLiveDate.postSuccess(
+                        NurseFhirMapper.mapPrescriptionList(response.body()?.entity),
+                    )
                 } else {
                     disContinuedPrescriptionListLiveDate.postError()
                 }
@@ -192,7 +184,7 @@ class PrescriptionCopyViewModel @Inject constructor(
 
     fun getFrequencyList() {
         viewModelScope.launch(dispatcherIO) {
-            frequencyList.postValue(medicalReviewRepo.getFrequency())
+            frequencyList.postValue(medicalReviewRepo.getDosageFrequencyList())
         }
     }
 
@@ -201,21 +193,12 @@ class PrescriptionCopyViewModel @Inject constructor(
         viewModelScope.launch(dispatcherIO) {
             try {
                 val response = medicalReviewRepo.getPatientPrescriptionHistoryList(
-                    PatientHistoryRequest(
-                        isLatestRequired = false,
-                        patientVisitId = null,
-                        patientTrackId = patientTrackId ?: -1,
-                        prescriptionId = prescriptionId,
-                        tenantId = tenantId ?: -1,
-                    ),
+                    ReferralDetailRequest(patientReference = patientReference),
                 )
-                if (response.isSuccessful) {
-                    val res = response.body()
-                    if (res?.status == true) {
-                        medicationHistoryLiveData.postSuccess(res.entity)
-                    } else {
-                        medicationHistoryLiveData.postError()
-                    }
+                if (response.isSuccessful && response.body()?.status == true) {
+                    medicationHistoryLiveData.postSuccess(
+                        NurseFhirMapper.mapPrescriptionHistory(response.body()?.entity),
+                    )
                 } else {
                     medicationHistoryLiveData.postError()
                 }

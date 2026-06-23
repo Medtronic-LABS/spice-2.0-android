@@ -11,11 +11,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.SecuredPreference
+import org.medtroniclabs.uhis.data.medicalreview.ResLabTestRecommendations
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.data.registration.LabTest
 import org.medtroniclabs.uhis.data.registration.LabTestListResponse
 import org.medtroniclabs.uhis.data.registration.LabTestModel
-import org.medtroniclabs.uhis.data.registration.NurseLabTest
 import org.medtroniclabs.uhis.data.registration.PatientDetailsModel
 import org.medtroniclabs.uhis.data.registration.PatientHistoryRequest
 import org.medtroniclabs.uhis.databinding.FragmentInvestigationNurseBinding
@@ -88,11 +88,9 @@ class InvestigationNurseFragment :
             LinearLayoutManager(binding.investigationCard.rvTestList.context ?: requireContext())
         binding.addInvestigationCard.rvTestList.adapter = addLabTestCreateAdapter
         // Chip List api call
-        SecuredPreference
-            .getUserDetails()
-            ?.country
-            ?.id
-            ?.let { medicalReviewPatientHistoryViewModel.getPatientLabTestRecommendation(it) }
+        SecuredPreference.getCountryId()?.let {
+            medicalReviewPatientHistoryViewModel.getPatientLabTestRecommendation(it)
+        }
         nurseViewModel.nurseMrRequestModel.labTest = arrayListOf()
         binding.ivRefresh.visibility = View.GONE
     }
@@ -262,22 +260,20 @@ class InvestigationNurseFragment :
                 ResourceState.SUCCESS -> {
                     hideLoading()
                     resourceState.data?.let {
-                        it
-                            .sortedBy { item -> item.displayOrder } // Sorting based on displayOrder
-                            .forEach { item ->
-                                item.name
-                                    .let { medicationName ->
-                                        ChipViewItemModel(
-                                            name = medicationName,
-                                            value = medicationName,
-                                            type = medicationName,
-                                        )
-                                    }.let { data ->
-                                        if (!medicalReviewPatientHistoryViewModel.chipListLT.contains(data)) {
-                                            medicalReviewPatientHistoryViewModel.chipListLT.add(data)
-                                        }
+                        it.forEach { item ->
+                            item.testName
+                                ?.let { medicationName ->
+                                    ChipViewItemModel(
+                                        name = medicationName,
+                                        value = medicationName,
+                                        type = medicationName,
+                                    )
+                                }?.let { data ->
+                                    if (!medicalReviewPatientHistoryViewModel.chipListLT.contains(data)) {
+                                        medicalReviewPatientHistoryViewModel.chipListLT.add(data)
                                     }
-                            }
+                                }
+                        }
                     } ?: kotlin.run {
                         medicalReviewPatientHistoryViewModel.investigationUIModel = null
                     }
@@ -315,19 +311,19 @@ class InvestigationNurseFragment :
                 medicalReviewPatientHistoryViewModel.patientLabTestRecommendation.value
                     ?.data
                     ?.filter { item ->
-                        name.contains(item.name)
+                        name.contains(item.testName)
                     }?.toList() ?: emptyList()
             filteredItem.forEach { remove(it) }
         }
     }
 
-    fun remove(model: NurseLabTest) {
+    fun remove(model: ResLabTestRecommendations) {
         val iterator =
             medicalReviewPatientHistoryViewModel.investigationUIModel?.iterator()
         if (iterator != null) {
             while (iterator.hasNext()) {
                 val item = iterator.next()
-                if (item.name == model.name) {
+                if (item.testName == model.testName) {
                     iterator.remove()
                 }
             }
@@ -336,7 +332,7 @@ class InvestigationNurseFragment :
         if (iteratorList != null) {
             while (iteratorList.hasNext()) {
                 val item = iteratorList.next()
-                if (item.labTestName == model.name && item._id == null) {
+                if (item.labTestName == model.testName && item._id == null) {
                     iteratorList.remove()
                 }
             }
@@ -346,7 +342,7 @@ class InvestigationNurseFragment :
             val iterator = list.iterator()
             while (iterator.hasNext()) {
                 val item = iterator.next()
-                if (item.value == model.name) {
+                if (item.value == model.testName) {
                     iterator.remove()
                 }
             }
@@ -362,7 +358,7 @@ class InvestigationNurseFragment :
         val fieldName = updatedMedicationList.map { it.value }.filter { it != "Other" }
         medicalReviewPatientHistoryViewModel.patientLabTestRecommendation.value?.data?.let { data ->
             for (item in data) {
-                if (item.name != null && fieldName.contains(item.name)) {
+                if (item.testName != null && fieldName.contains(item.testName)) {
                     medicalReviewBaseViewModel.selectedLabTestMedication = item
                     addLabTest()
                     return
@@ -397,9 +393,9 @@ class InvestigationNurseFragment :
                 labTestListResponse.add(
                     LabTestModel(
                         _id = null,
-                        labTestId = it.id,
-                        labTestName = it.name,
-                        patientVisitId = it.patientVisitId?.toLong(),
+                        labTestId = it.id?.toLong(),
+                        labTestName = it.testName,
+                        patientVisitId = 0L,
                         referredDate = DateUtils.getTodayDateDDMMYYYY(),
                         referredBy = null,
                     ),
@@ -448,6 +444,9 @@ class InvestigationNurseFragment :
     private fun getMedicalReview(data: PatientDetailsModel?) {
         data?.let { patient ->
             medicalReviewPatientHistoryViewModel.patientTrackId = patient._id
+            // investigation/list expects the patient FHIR id (_id = the server "id"),
+            // not the human-readable patientId.
+            medicalReviewPatientHistoryViewModel.patientReference = patient._id.toString()
             // for Current history
             medicalReviewPatientHistoryViewModel.getLabTestList()
             medicalReviewPatientHistoryViewModel.getLabTestContinousList()

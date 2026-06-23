@@ -21,6 +21,7 @@ import org.medtroniclabs.uhis.data.registration.UnselectedDiagnosis
 import org.medtroniclabs.uhis.db.entity.SiteEntity
 import org.medtroniclabs.uhis.db.entity.SymptomEntity
 import org.medtroniclabs.uhis.di.IoDispatcher
+import org.medtroniclabs.uhis.model.PatientDetailRequest
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.network.utils.ConnectivityManager
@@ -40,6 +41,7 @@ class NurseMedicalReviewViewModel @Inject constructor(
     val latestConfirmDiagnosesList = MutableLiveData<Resource<PatientDetailsModel>>()
     var patientId: Long? = null
     var patientVisitId: Long? = null
+    var patientIdString: String? = null
     var patientDetailsValue: PatientDetailsModel? = null
     val worseningSymptomsSelections = HashMap<String, Any>()
     var selectedSymptomsAndAdherence: String? = null
@@ -65,13 +67,13 @@ class NurseMedicalReviewViewModel @Inject constructor(
 
     fun getPatientDetails(
         context: Context,
-        request: PatientDetailsModel,
+        patientId: String,
     ) {
         if (connectivityManager.isNetworkAvailable()) {
             viewModelScope.launch(dispatcherIO) {
                 patientDetailsResponse.postLoading()
                 try {
-                    val response = medicalReviewRepo.getPatientDetails(request)
+                    val response = medicalReviewRepo.getPatientDetails(PatientDetailRequest(patientId = patientId))
                     if (response.isSuccessful) {
                         val res = response.body()
                         if (res?.status == true) {
@@ -100,7 +102,7 @@ class NurseMedicalReviewViewModel @Inject constructor(
             viewModelScope.launch(dispatcherIO) {
                 latestConfirmDiagnosesList.postLoading()
                 try {
-                    val response = medicalReviewRepo.getPatientDetails(request)
+                    val response = medicalReviewRepo.getPatientDetails(PatientDetailRequest(patientId = null))
                     if (response.isSuccessful) {
                         val res = response.body()
                         if (res?.status == true) {
@@ -188,7 +190,7 @@ class NurseMedicalReviewViewModel @Inject constructor(
             viewModelScope.launch(dispatcherIO) {
                 patientDetailsDiagnosisResponse.postLoading()
                 try {
-                    val response = medicalReviewRepo.getPatientDetails(request)
+                    val response = medicalReviewRepo.getPatientDetails(PatientDetailRequest(patientId = null))
                     if (response.isSuccessful) {
                         val res = response.body()
                         if (res?.status == true) {

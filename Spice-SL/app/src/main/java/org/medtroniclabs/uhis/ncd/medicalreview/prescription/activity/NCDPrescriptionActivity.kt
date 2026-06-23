@@ -83,7 +83,9 @@ class NCDPrescriptionActivity :
     }
 
     fun getPatients() {
-        prescriptionViewModel.patientReference = intent.getStringExtra(DefinedParams.PatientId)
+        // patientReference must be the patient FHIR id (passed in via DefinedParams.ID =
+        // getPatientFHIRId()), not the human-readable patientId.
+        prescriptionViewModel.patientReference = intent.getStringExtra(DefinedParams.ID)
         prescriptionViewModel.memberReference = intent.getStringExtra(DefinedParams.ID)
         prescriptionViewModel.patient_visit_id = intent.getStringExtra(DefinedParams.PATIENT_VISIT_ID)
         prescriptionViewModel.enrollmentType = intent.getStringExtra(DefinedParams.EnrollmentType)

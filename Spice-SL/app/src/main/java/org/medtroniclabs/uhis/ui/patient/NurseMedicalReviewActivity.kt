@@ -11,8 +11,12 @@ import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.CommonUtils
+import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.StringConverter
-import org.medtroniclabs.uhis.data.registration.PatientDetailsModel
+import org.medtroniclabs.uhis.data.registration.InvestigationModels
+import org.medtroniclabs.uhis.data.registration.NurseCreateResponse
+import org.medtroniclabs.uhis.data.registration.PrescriptionModels
+import org.medtroniclabs.uhis.data.registration.SymptomModels
 import org.medtroniclabs.uhis.databinding.ActivityNurseMedicalReviewBinding
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
@@ -53,6 +57,7 @@ class NurseMedicalReviewActivity : BaseActivity(), View.OnClickListener {
                 onHomeIconClicked()
             },
         )
+        showLoading()
         initView()
         attachObserver()
         swipeRefresh()
@@ -93,10 +98,14 @@ class NurseMedicalReviewActivity : BaseActivity(), View.OnClickListener {
         nurseViewModel.patientDetailsResponse.observe(this) { resourceState ->
             when (resourceState.state) {
                 ResourceState.SUCCESS -> {
-                    showLoading()
                     resourceState.data?.let { data ->
-                        viewModel.initialReview = data.initialReview
-                        nurseViewModel.initialReview = data.initialReview
+                        // patientvisit/create is the source of truth for whether this is the
+                        // initial review; patient/details may not carry it (defaults to false).
+                        val initialReviewFromVisit =
+                            intent.getBooleanExtra(IntentConstants.INTENT_INITIAL_REVIEW, false)
+                        val resolvedInitialReview = data.initialReview || initialReviewFromVisit
+                        viewModel.initialReview = resolvedInitialReview
+                        nurseViewModel.initialReview = resolvedInitialReview
 
                         nurseViewModel.unselectedDiagnosis = data.unselectedDiagnosis
 
@@ -107,9 +116,16 @@ class NurseMedicalReviewActivity : BaseActivity(), View.OnClickListener {
                         nurseViewModel.nurseMrRequestModel.patientVisitId =
                             intent.getLongExtra(IntentConstants.INTENT_VISIT_ID, -1L)
                         nurseViewModel.nurseMrRequestModel.tenantId = data.tenantId
-                        data.firstName?.let { firstName ->
-                            val text =
-                                StringConverter.appendTexts(firstText = firstName, data.lastName)
+                        nurseViewModel.nurseMrRequestModel.assessmentOrganizationId =
+                            SecuredPreference.getOrganizationFhirId()
+                        nurseViewModel.nurseMrRequestModel.encounterReference =
+                            intent.getStringExtra(IntentConstants.INTENT_ENCOUNTER_REFERENCE)
+                        nurseViewModel.nurseMrRequestModel.memberReference =
+                            intent.getStringExtra(IntentConstants.INTENT_MEMBER_REFERENCE)
+                        nurseViewModel.nurseMrRequestModel.patientReference =
+                            intent.getStringExtra(IntentConstants.INTENT_PATIENT_REFERENCE)
+                        data.name?.let { name ->
+                            val text = name
                             setTitle(
                                 StringConverter.appendTexts(
                                     firstText = CommonUtils.capitalize(text),
@@ -120,6 +136,7 @@ class NurseMedicalReviewActivity : BaseActivity(), View.OnClickListener {
                             )
                         }
                     }
+                    showLoading()
                 }
 
                 ResourceState.LOADING -> {
@@ -142,17 +159,22 @@ class NurseMedicalReviewActivity : BaseActivity(), View.OnClickListener {
             when (resourceState.state) {
                 ResourceState.SUCCESS -> {
                     hideLoading()
-                    resourceState.data?.let { data ->
+                    resourceState.data?.let {
                         finish()
                         val intent = Intent(this, NurseMedicalReviewSummaryActivity::class.java)
                         val bundle = Bundle()
                         nurseViewModel.patientId?.let { patientId ->
                             bundle.putLong(IntentConstants.INTENT_PATIENT_ID, patientId)
                         }
+                        nurseViewModel.patientIdString?.let { patientIdString ->
+                            bundle.putString(IntentConstants.INTENT_PATIENT_ID_STRING, patientIdString)
+                        }
                         nurseViewModel.patientVisitId?.let { patientVisitId ->
                             bundle.putLong(IntentConstants.INTENT_VISIT_ID, patientVisitId)
                         }
-                        bundle.putSerializable(NURSE_RESPONE, data)
+                        // The UHIS medical-review/create response is references-only, so build the
+                        // summary result from the data the user just submitted.
+                        bundle.putSerializable(NURSE_RESPONE, buildResultFromRequest())
                         intent.putExtras(bundle)
                         startActivity(intent)
                     }
@@ -176,6 +198,57 @@ class NurseMedicalReviewActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
+    private fun buildResultFromRequest(): NurseCreateResponse {
+        val request = nurseViewModel.nurseMrRequestModel
+        return NurseCreateResponse(
+            prescriptions = request.prescription?.prescriptionList
+                ?.map { item ->
+                    PrescriptionModels(
+                        id = item.id?.toInt(),
+                        medicationName = item.medicationName,
+                        dosageUnitValue = item.dosageUnitValue,
+                        dosageUnitName = item.dosageUnitName,
+                        dosageFrequencyName = item.dosageFrequencyName,
+                        prescribedDays = item.prescribedDays,
+                        instructionNote = item.instructionNote,
+                        dosageFormName = item.dosageFormName,
+                    )
+                }
+                ?.let { ArrayList(it) },
+            investigations = request.labTest
+                ?.map { test ->
+                    InvestigationModels(
+                        id = test.id?.toInt(),
+                        labTestId = test.labTestId?.toInt(),
+                        labTestName = test.labTestName,
+                        resultDate = test.resultDate,
+                        referredBy = test.referredBy?.toInt(),
+                        isReviewed = test.isReviewed,
+                        isAbnormal = test.isAbnormal,
+                        comment = test.comment,
+                    )
+                }
+                ?.let { ArrayList(it) },
+            avgSystolic = request.bpLog?.avgSystolic?.toInt(),
+            avgDiastolic = request.bpLog?.avgDiastolic?.toInt(),
+            glucoseLog = request.glucoseLog,
+            symptoms = request.symptomsLog?.symptoms
+                ?.map { symptom ->
+                    SymptomModels(
+                        id = symptom.id?.toInt(),
+                        name = symptom.name.orEmpty(),
+                        type = symptom.type,
+                        newWorseningSymptoms = symptom.newWorseningSymptoms,
+                    )
+                }
+                ?.let { ArrayList(it) },
+            compliance = request.symptomsLog?.compliance,
+            nextMedicalReviewDate = request.nextMedicalReviewDate,
+            patientTrackId = request.patientTrackId,
+            tenantId = request.tenantId,
+        )
+    }
+
     private fun initView() {
         binding.btnSubmit.safeClickListener(this)
         viewModel.showContinuousMedicalReview =
@@ -185,6 +258,8 @@ class NurseMedicalReviewActivity : BaseActivity(), View.OnClickListener {
         nurseViewModel.patientId = patientId
         val visitId = intent.getLongExtra(IntentConstants.INTENT_VISIT_ID, -1L)
         nurseViewModel.patientVisitId = visitId
+        val patientIdString = intent.getStringExtra(IntentConstants.INTENT_PATIENT_ID_STRING)
+        nurseViewModel.patientIdString = patientIdString
     }
 
     private fun loadFragment() {
@@ -319,15 +394,10 @@ class NurseMedicalReviewActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun swipeRefresh() {
-        val request = nurseViewModel.patientId?.let {
-            PatientDetailsModel(
-                it,
-                isAssessmentDataRequired = false,
-            )
+        nurseViewModel.patientIdString?.let {
+            nurseViewModel.getPatientDetails(this, it)
         }
-        if (request != null) {
-            nurseViewModel.getPatientDetails(this, request)
-        }
+
         val symptomsAdherenceFragment =
             supportFragmentManager.findFragmentById(R.id.symptomsAdherenceFragment) as? SymptomsAdherenceFragment
         symptomsAdherenceFragment?.resetSelection()

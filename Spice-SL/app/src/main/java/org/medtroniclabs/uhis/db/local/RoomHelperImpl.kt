@@ -1548,7 +1548,7 @@ class RoomHelperImpl @Inject constructor(
         formTypeTwo: String,
     ): List<FormEntity> = metaDataDAO.getFormBasedOnType(formTypeOne, formTypeTwo)
 
-    override suspend fun getVillageList(selectedParent: Long): List<VillageEntity> = metaDataDAO.getVillageList()
+    override suspend fun getVillageList(selectedParent: Long): List<VillageEntity> = metaDataDAO.getVillagesByChiefDom(selectedParent)
 
     override suspend fun getOtherVillage(): VillageEntity = metaDataDAO.getOtherVillage()
 

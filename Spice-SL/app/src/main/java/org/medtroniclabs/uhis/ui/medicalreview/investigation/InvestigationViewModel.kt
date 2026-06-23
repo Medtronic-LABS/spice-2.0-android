@@ -286,7 +286,9 @@ class InvestigationViewModel @Inject constructor(
 
     fun getLabTestList(data: PatientListRespModel) {
         viewModelScope.launch(dispatcherIO) {
-            val patientId = if (CommonUtils.isNonCommunity()) data.patientId else data.id
+            // investigation/list expects the patient FHIR id (data.id), not the
+            // human-readable patientId.
+            val patientId = data.id
             patientId?.let { id ->
                 labTestListLiveData.postLoading()
                 val response = investigationRepository.getLabTestList(LabTestListRequest(id))

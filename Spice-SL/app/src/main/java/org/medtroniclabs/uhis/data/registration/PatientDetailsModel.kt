@@ -9,6 +9,8 @@ data class PatientDetailsModel(
     var tenantId: Long? = null,
     val firstName: String? = null,
     val middleName: String? = null,
+    val name: String? = null,
+    val memberId: String? = null,
     val lastName: String? = null,
     val age: Double? = null,
     val gender: String? = null,
@@ -30,6 +32,7 @@ data class PatientDetailsModel(
     val provisionalDiagnosis: ArrayList<String>? = null,
     val isRegularSmoker: Boolean? = null,
     val confirmDiagnosis: ArrayList<String>? = null,
+    val patientConfirmDiagnosis: ArrayList<String>? = null,
     val isConfirmDiagnosis: Boolean = false,
     val height: Double? = null,
     val weight: Double? = null,
@@ -64,7 +67,7 @@ data class PatientDetailsModel(
     var patientCounselorAssessment: ArrayList<LifestyleModel>? = null,
     var screeningLogId: Long? = null,
     var screeningId: Long? = null,
-    var patientId: Long? = null,
+    var patientId: String? = null,
     val isDiabetesDiagnosis: Boolean = false,
     val isHtnDiagnosis: Boolean = false,
     var lastMenstrualPeriodDate: String? = null,
@@ -100,6 +103,8 @@ data class PatientDetailsModel(
     val initialReview: Boolean = false,
     val unselectedDiagnosis: ArrayList<UnselectedDiagnosis>? = null,
     var eyeCare: EyeCare? = null,
+    val identityType: String? = null,
+    val identityValue: String? = null,
 ) : java.io.Serializable
 
 data class PregnancyDetails(

@@ -59,6 +59,8 @@ import org.medtroniclabs.uhis.data.history.BirthDetails
 import org.medtroniclabs.uhis.data.history.HistoryEntity
 import org.medtroniclabs.uhis.data.history.MedicalReviewHistory
 import org.medtroniclabs.uhis.data.history.NCDMedicalReviewHistory
+import org.medtroniclabs.uhis.data.medicalreview.ReqBPBGLogList
+import org.medtroniclabs.uhis.data.medicalreview.ResLabTestRecommendations
 import org.medtroniclabs.uhis.data.model.AboveFiveYearsSubmitRequest
 import org.medtroniclabs.uhis.data.model.BpAndWeightRequestModel
 import org.medtroniclabs.uhis.data.model.BpAndWeightResponse
@@ -117,7 +119,6 @@ import org.medtroniclabs.uhis.data.registration.LabTestSearchResponse
 import org.medtroniclabs.uhis.data.registration.Lifestyle
 import org.medtroniclabs.uhis.data.registration.MedicationSearchReqModel
 import org.medtroniclabs.uhis.data.registration.NurseCreateResponse
-import org.medtroniclabs.uhis.data.registration.NurseLabTest
 import org.medtroniclabs.uhis.data.registration.NurseMrRequestModel
 import org.medtroniclabs.uhis.data.registration.PatientCreateResponse
 import org.medtroniclabs.uhis.data.registration.PatientDetailsModel
@@ -1153,19 +1154,19 @@ interface ApiService {
     @GET("/user-service/user/validate")
     suspend fun validateSession(): Response<ResponseBody>
 
-    @POST("/spice-service/patient/details")
+    @POST("/spice-service/patient/patientDetails")
     suspend fun getPatientDetails(
-        @Body request: PatientDetailsModel,
+        @Body request: PatientDetailRequest,
     ): Response<APIResponse<PatientDetailsModel>>
 
     @POST("/spice-service/bplog/list")
     suspend fun getPatientBPLogList(
-        @Body request: AssessmentListRequest,
+        @Body request: ReqBPBGLogList,
     ): Response<APIResponse<BPLogListResponse>>
 
     @POST("/spice-service/glucoselog/list")
     suspend fun getPatientBloodGlucoseList(
-        @Body request: AssessmentListRequest,
+        @Body request: ReqBPBGLogList,
     ): Response<APIResponse<BloodGlucoseListResponse>>
 
     @POST("/spice-service/para-counselling/graph-details")
@@ -1352,10 +1353,10 @@ interface ApiService {
         @Body request: MedicalReviewBaseRequest,
     ): Response<APIResponse<SessionHistoryResponse>>
 
-    @POST("/admin-service/labtest/recommendation")
+    @POST("/admin-service/lab-test-customization/recommendation")
     suspend fun getPatientLabTestRecommendation(
         @Body countryId: InvestigationReq,
-    ): Response<APIResponse<List<NurseLabTest>>>
+    ): Response<APIResponse<List<ResLabTestRecommendations>>>
 
     @POST("/spice-service/patient-labtest/list")
     suspend fun getPatientLabTests(

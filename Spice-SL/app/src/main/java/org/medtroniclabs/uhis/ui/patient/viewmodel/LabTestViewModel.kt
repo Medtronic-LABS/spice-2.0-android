@@ -22,6 +22,7 @@ import org.medtroniclabs.uhis.data.registration.SearchModel
 import org.medtroniclabs.uhis.db.entity.DiagnosisEntity
 import org.medtroniclabs.uhis.di.IoDispatcher
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
+import org.medtroniclabs.uhis.model.LabTestListRequest
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.utils.ConnectivityManager
 import org.medtroniclabs.uhis.repo.MedicalReviewRepository
@@ -45,6 +46,7 @@ class LabTestViewModel @Inject constructor(
     var selectedLabTest: LabTestSearchResponse? = null
     var patientTrackId: Long = -1L
     var patientVisitId: Long = -1L
+    var patientReference: String? = null
     val isToRefer = MutableLiveData(false)
     var labTestLists = ArrayList<LabTestModel>()
     var labTestAddLists = ArrayList<LabTestModel>()
@@ -130,20 +132,16 @@ class LabTestViewModel @Inject constructor(
     }
 
     fun getLabTestList(isFromTechnicianLogin: Boolean = false) {
-        val request = HashMap<String, Any?>()
-        request[DefinedParams.PATIENT_TRACK_ID] = patientTrackId
-        request[DefinedParams.TENANT_ID] = SecuredPreference.getTenantId()
         viewModelScope.launch(dispatcherIO) {
             labTestListResponse.postLoading()
             try {
-                val response = medicalReviewRepo.getPatientLabTests(request)
-                if (response.isSuccessful) {
-                    val res = response.body()
-                    if (res?.status == true) {
-                        labTestListResponse.postSuccess(res.entity)
-                    } else {
-                        labTestListResponse.postError()
-                    }
+                val response = medicalReviewRepo.getPatientLabTests(
+                    LabTestListRequest(patientReference = patientReference ?: ""),
+                )
+                if (response.isSuccessful && response.body()?.status == true) {
+                    labTestListResponse.postSuccess(
+                        NurseFhirMapper.mapLabTestList(response.body()?.entityList, resultUpdated = true),
+                    )
                 } else {
                     labTestListResponse.postError()
                 }

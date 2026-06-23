@@ -15,7 +15,7 @@ import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_ddMMMyyyy
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMdd
 import org.medtroniclabs.uhis.common.DateUtils.convertToIsoFormat
-import org.medtroniclabs.uhis.data.registration.AssessmentListRequest
+import org.medtroniclabs.uhis.data.medicalreview.ReqBPBGLogList
 import org.medtroniclabs.uhis.data.registration.BloodGlucose
 import org.medtroniclabs.uhis.data.registration.GlucoseLog
 import org.medtroniclabs.uhis.databinding.AddBgReadingBinding
@@ -109,18 +109,12 @@ class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
         nurseViewModel.patientDetailsResponse.observe(viewLifecycleOwner) { resourceState ->
             when (resourceState.state) {
                 ResourceState.SUCCESS -> {
-                    resourceState.data?.let { data ->
-                        data.let { patientDetails ->
-                            val request = AssessmentListRequest(
-                                patientDetails._id,
-                                false,
-                                sortField = DefinedParams.BG_TAKEN_ON,
-                            )
-                            patientDetailViewModel.getPatientBloodGlucoseList(
-                                requireContext(),
-                                request,
-                            )
-                        }
+                    resourceState.data?.memberId?.let { id ->
+                        val request = ReqBPBGLogList(memberId = id)
+                        patientDetailViewModel.getPatientBloodGlucoseList(
+                            requireContext(),
+                            request,
+                        )
                     }
                 }
 

@@ -11,6 +11,7 @@ data class PatientListResModel(
     val enrollmentAt: String? = null,
     val birthDate: String? = null,
     val patientId: String? = null,
+    val memberReference: String? = null,
     val initialReview: Boolean,
     val redRiskPatient: Boolean? = null,
     val screeningLogId: Long? = null,
@@ -29,7 +30,6 @@ data class PatientListResModel(
     val callRegisterId: Long? = null,
     val identityType: String? = null,
     val identityValue: String? = null,
-    val memberReference: String? = null,
     val qrCode: String? = null,
 ) {
     fun resolvedNationalId(): String? =
