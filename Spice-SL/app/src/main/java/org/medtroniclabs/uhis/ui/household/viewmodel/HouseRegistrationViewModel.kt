@@ -16,7 +16,6 @@ import org.medtroniclabs.uhis.db.entity.HouseholdEntity
 import org.medtroniclabs.uhis.db.entity.VillageEntity
 import org.medtroniclabs.uhis.di.IoDispatcher
 import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration
-import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.VILLAGE_ID
 import org.medtroniclabs.uhis.mappingkey.MemberRegistration.ID_GUARDIAN
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.repo.HouseHoldRepository
@@ -26,7 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HouseRegistrationViewModel @Inject constructor(
-    @IoDispatcher override var dispatcherIO: CoroutineDispatcher,
+    @param:IoDispatcher override var dispatcherIO: CoroutineDispatcher,
     private val houseHoldRepository: HouseHoldRepository,
     private val houseHoldRepositoryMember: HouseholdMemberRepository,
 ) : BaseViewModel(dispatcherIO) {
@@ -109,10 +108,7 @@ class HouseRegistrationViewModel @Inject constructor(
         }
     }
 
-    fun loadShasthyaShebikaDataCacheByType(
-        type: String,
-        tag: String,
-    ) {
+    fun loadShasthyaShebikaDataCacheByType() {
         viewModelScope.launch(dispatcherIO) {
             val userId = SecuredPreference.getUserId()
             shasthyaShebikaListResponse.postLoading()
@@ -136,11 +132,7 @@ class HouseRegistrationViewModel @Inject constructor(
 
     suspend fun getVillageEntity(villageId: Long): VillageEntity? = houseHoldRepository.getVillageByID(villageId).data
 
-    fun loadSubVillageDataCacheByType(
-        type: String,
-        tag: String,
-        shasthyaShebikaId: Long,
-    ) {
+    fun loadSubVillageDataCacheByType(shasthyaShebikaId: Long) {
         viewModelScope.launch(dispatcherIO) {
             subVillageListResponse.postLoading()
             subVillageListResponse.postValue(houseHoldRepository.getSubVillagesByShasthyaShebikaId(shasthyaShebikaId))
@@ -153,7 +145,7 @@ class HouseRegistrationViewModel @Inject constructor(
                 houseHoldRegistrationLiveData.postLoading()
                 householdEntityDetail = houseHoldRepository.createOrUpdateHouseHoldEntity(map)
                 houseHoldRegistrationLiveData.postSuccess()
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 houseHoldRegistrationLiveData.postError()
             }
         }
@@ -176,7 +168,7 @@ class HouseRegistrationViewModel @Inject constructor(
                     householdEntityDetail = before
                 }
                 houseHoldUpdateLiveData.postSuccess()
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 houseHoldUpdateLiveData.postError()
             }
         }
@@ -189,7 +181,7 @@ class HouseRegistrationViewModel @Inject constructor(
                 householdEntityDetail = houseHoldRepository.getHouseHoldDetailsById(houseHoldId)
                 houseHoldDetailLiveData.postSuccess(householdEntityDetail)
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             houseHoldDetailLiveData.postError()
         }
     }

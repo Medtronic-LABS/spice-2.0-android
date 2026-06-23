@@ -35,6 +35,8 @@ data class HouseholdEntity(
     var householdType: String? = null,
     @ColumnInfo(name = "monthly_income")
     var monthlyIncome: Double? = null,
+    @ColumnInfo(name = HH_COLUMN_MONTHLY_INCOME_RANGE)
+    var monthlyIncomeRange: String? = null,
     @ColumnInfo("latitude")
     var latitude: Double = 0.0,
     @ColumnInfo("longitude")
@@ -48,3 +50,5 @@ data class HouseholdEntity(
     @ColumnInfo("other_occupation")
     var otherOccupation: String? = null,
 ) : BaseEntity()
+
+const val HH_COLUMN_MONTHLY_INCOME_RANGE = "monthly_income_range"

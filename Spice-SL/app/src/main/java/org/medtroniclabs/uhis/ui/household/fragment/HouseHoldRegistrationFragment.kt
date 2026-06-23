@@ -156,8 +156,6 @@ class HouseHoldRegistrationFragment : BaseFragment(), View.OnClickListener, Form
                                         .getLongOrNull(id) ?: 0L
                                     if (shasthyaShebikaIdLong != 0L) {
                                         householdRegistrationViewModel.loadSubVillageDataCacheByType(
-                                            HouseHoldRegistration.SUB_VILLAGE_ID,
-                                            "",
                                             shasthyaShebikaIdLong,
                                         )
                                     }
@@ -201,7 +199,7 @@ class HouseHoldRegistrationFragment : BaseFragment(), View.OnClickListener, Form
                         // Set pending sub village ID if available (for edit mode)
                         pendingSubVillageId?.let { subVillageId ->
                             if (subVillageId != 0L) {
-                                formGenerator.getViewByTag(HouseHoldRegistration.SUB_VILLAGE_ID)?.let { view ->
+                                formGenerator.getViewByTag(SUB_VILLAGE_ID)?.let { view ->
                                     formGenerator.setValueForView(subVillageId, view)
                                     // Disable Village field in edit mode
                                     view.isEnabled = false
@@ -265,10 +263,14 @@ class HouseHoldRegistrationFragment : BaseFragment(), View.OnClickListener, Form
                 formGenerator.setValueForView(type, view)
             }
         }
-        formGenerator.getViewByTag(HouseHoldRegistration.MONTHLY_INCOME)?.let { view ->
-            details.monthlyIncome?.let { income ->
-                // Convert Double to String for EditText
-                formGenerator.setValueForView(income.toString(), view)
+        formGenerator.getViewByTag(HouseHoldRegistration.MONTHLY_INCOME_RANGE)?.let { view ->
+            val range = if (details.monthlyIncomeRange.isNullOrBlank()) {
+                details.monthlyIncome?.let { HouseHoldRegistration.rangeFromExactValue(it) }
+            } else {
+                details.monthlyIncomeRange
+            }
+            range?.let { incomeRange ->
+                formGenerator.setValueForView(incomeRange, view)
             }
         }
         formGenerator.getViewByTag(HouseHoldRegistration.HOUSEHOLD_NUMBER)?.let { view ->
@@ -385,7 +387,7 @@ class HouseHoldRegistrationFragment : BaseFragment(), View.OnClickListener, Form
                     householdRegistrationViewModel.loadDataCacheByType(id, localDataCache)
                 }
                 HouseHoldRegistration.SHASTHYA_SHEBIKA_ID -> {
-                    householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType(id, localDataCache)
+                    householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType()
                 }
                 HouseHoldRegistration.SUB_VILLAGE_ID -> {
                     // This will be triggered when shasthya shebika is selected (via dependentID)
@@ -396,7 +398,7 @@ class HouseHoldRegistrationFragment : BaseFragment(), View.OnClickListener, Form
                         formGenerator.getViewByTag(HouseHoldRegistration.SUB_VILLAGE_ID)?.let { view ->
                             formGenerator.setValueForView("", view)
                         }
-                        householdRegistrationViewModel.loadSubVillageDataCacheByType(id, localDataCache, shasthyaShebikaIdLong)
+                        householdRegistrationViewModel.loadSubVillageDataCacheByType(shasthyaShebikaIdLong)
                     }
                 }
                 else -> {
@@ -447,10 +449,7 @@ class HouseHoldRegistrationFragment : BaseFragment(), View.OnClickListener, Form
 
     override fun onRenderingComplete() {
         // SS list is tied to logged-in Kormi user, not Union — same as [ExternalMemberRegistrationFragment]
-        householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType(
-            HouseHoldRegistration.SHASTHYA_SHEBIKA_ID,
-            "",
-        )
+        householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType()
     }
 
     override fun onUpdateInstruction(

@@ -1,6 +1,5 @@
 package org.medtroniclabs.uhis.ui.patient.viewmodel
 
-import org.medtroniclabs.uhis.data.Prescription as FhirPrescription
 import org.medtroniclabs.uhis.data.history.HistoryEntity
 import org.medtroniclabs.uhis.data.registration.LabTestHistory
 import org.medtroniclabs.uhis.data.registration.LabTestListResponse
@@ -10,6 +9,7 @@ import org.medtroniclabs.uhis.data.registration.PatientPrescription
 import org.medtroniclabs.uhis.data.registration.PatientPrescriptionHistoryResponse
 import org.medtroniclabs.uhis.data.registration.PrescriptionModel
 import org.medtroniclabs.uhis.data.registration.VisitDateModel
+import org.medtroniclabs.uhis.data.Prescription as FhirPrescription
 import org.medtroniclabs.uhis.model.LabTestListResponse as FhirLabTestListResponse
 
 /**
@@ -22,7 +22,6 @@ import org.medtroniclabs.uhis.model.LabTestListResponse as FhirLabTestListRespon
  * round-trip those ids are handled in a follow-up.
  */
 object NurseFhirMapper {
-
     fun mapPrescriptionList(source: List<FhirPrescription>?): ArrayList<PrescriptionModel> {
         val result = ArrayList<PrescriptionModel>()
         source?.forEach { item ->

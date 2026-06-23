@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "fa41af1e1af2d7ec12eca9609b603036",
+    "identityHash": "fe8b968ebb21f9039d6a8face08f8e9d",
     "entities": [
       {
         "tableName": "Household",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `household_no` TEXT, `name` TEXT NOT NULL, `village_id` INTEGER NOT NULL, `no_of_people` INTEGER NOT NULL, `shasthya_shebika_id` INTEGER, `sub_village_id` INTEGER, `household_type` TEXT, `monthly_income` REAL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `version` TEXT, `lastUpdated` TEXT, `disability_persons_count` INTEGER, `household_head_occupation` TEXT, `other_occupation` TEXT, `fhir_id` TEXT, `sync_status` TEXT NOT NULL, `created_by` INTEGER NOT NULL, `updated_at` INTEGER NOT NULL, `created_at` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `household_no` TEXT, `name` TEXT NOT NULL, `village_id` INTEGER NOT NULL, `no_of_people` INTEGER NOT NULL, `shasthya_shebika_id` INTEGER, `sub_village_id` INTEGER, `household_type` TEXT, `monthly_income` REAL, `monthly_income_range` TEXT, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `version` TEXT, `lastUpdated` TEXT, `disability_persons_count` INTEGER, `household_head_occupation` TEXT, `other_occupation` TEXT, `fhir_id` TEXT, `sync_status` TEXT NOT NULL, `created_by` INTEGER NOT NULL, `updated_at` INTEGER NOT NULL, `created_at` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -56,6 +56,11 @@
             "fieldPath": "monthlyIncome",
             "columnName": "monthly_income",
             "affinity": "REAL"
+          },
+          {
+            "fieldPath": "monthlyIncomeRange",
+            "columnName": "monthly_income_range",
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "latitude",
@@ -4187,7 +4192,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fa41af1e1af2d7ec12eca9609b603036')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fe8b968ebb21f9039d6a8face08f8e9d')"
     ]
   }
 }

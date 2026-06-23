@@ -201,7 +201,8 @@ class NurseMedicalReviewActivity : BaseActivity(), View.OnClickListener {
     private fun buildResultFromRequest(): NurseCreateResponse {
         val request = nurseViewModel.nurseMrRequestModel
         return NurseCreateResponse(
-            prescriptions = request.prescription?.prescriptionList
+            prescriptions = request.prescription
+                ?.prescriptionList
                 ?.map { item ->
                     PrescriptionModels(
                         id = item.id?.toInt(),
@@ -213,8 +214,7 @@ class NurseMedicalReviewActivity : BaseActivity(), View.OnClickListener {
                         instructionNote = item.instructionNote,
                         dosageFormName = item.dosageFormName,
                     )
-                }
-                ?.let { ArrayList(it) },
+                }?.let { ArrayList(it) },
             investigations = request.labTest
                 ?.map { test ->
                     InvestigationModels(
@@ -227,12 +227,12 @@ class NurseMedicalReviewActivity : BaseActivity(), View.OnClickListener {
                         isAbnormal = test.isAbnormal,
                         comment = test.comment,
                     )
-                }
-                ?.let { ArrayList(it) },
+                }?.let { ArrayList(it) },
             avgSystolic = request.bpLog?.avgSystolic?.toInt(),
             avgDiastolic = request.bpLog?.avgDiastolic?.toInt(),
             glucoseLog = request.glucoseLog,
-            symptoms = request.symptomsLog?.symptoms
+            symptoms = request.symptomsLog
+                ?.symptoms
                 ?.map { symptom ->
                     SymptomModels(
                         id = symptom.id?.toInt(),
@@ -240,8 +240,7 @@ class NurseMedicalReviewActivity : BaseActivity(), View.OnClickListener {
                         type = symptom.type,
                         newWorseningSymptoms = symptom.newWorseningSymptoms,
                     )
-                }
-                ?.let { ArrayList(it) },
+                }?.let { ArrayList(it) },
             compliance = request.symptomsLog?.compliance,
             nextMedicalReviewDate = request.nextMedicalReviewDate,
             patientTrackId = request.patientTrackId,

@@ -44,7 +44,6 @@ import org.medtroniclabs.uhis.data.model.PatientListResModel
 import org.medtroniclabs.uhis.data.model.SortModel
 import org.medtroniclabs.uhis.databinding.FragmentPatientListBinding
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams as CommonDefinedParams
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.ncd.medicalreview.NCDMRUtil
 import org.medtroniclabs.uhis.network.resource.ResourceState
@@ -62,6 +61,7 @@ import org.medtroniclabs.uhis.ui.patient.TermsAndConditionActivity
 import org.medtroniclabs.uhis.ui.patient.UIConstants
 import org.medtroniclabs.uhis.ui.patient.adapter.PatientsListAdapter
 import org.medtroniclabs.uhis.ui.patient.viewmodel.PatientListViewModel
+import org.medtroniclabs.uhis.common.DefinedParams as CommonDefinedParams
 
 @AndroidEntryPoint
 class PatientListFragment() : BaseFragment(), PatientSelectionListener, CallRegisterInterface, FilterSortInterface {

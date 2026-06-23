@@ -133,8 +133,8 @@ class HouseHoldRepository @Inject constructor(
         val householdType = map[HouseHoldRegistration.HOUSEHOLD_TYPE]
         householdEntity.householdType = CommonUtils.getStringOrEmptyString(householdType).takeIf { it.isNotEmpty() }
 
-        val monthlyIncome = map[HouseHoldRegistration.MONTHLY_INCOME]
-        householdEntity.monthlyIncome = CommonUtils.getDoubleOrNull(monthlyIncome)
+        val monthlyIncomeRange = map[HouseHoldRegistration.MONTHLY_INCOME_RANGE]
+        householdEntity.monthlyIncomeRange = CommonUtils.getStringOrEmptyString(monthlyIncomeRange).takeIf { it.isNotBlank() }
 
         val occupation = map[HouseHoldRegistration.HOUSEHOLD_HEAD_OCCUPATION]
         householdEntity.householdHeadOccupation = CommonUtils.getStringOrEmptyString(occupation).takeIf { it.isNotEmpty() }
@@ -300,7 +300,7 @@ class HouseHoldRepository @Inject constructor(
         if (before.shasthyaShebikaId != after.shasthyaShebikaId) return true
         if (before.subVillageId != after.subVillageId) return true
         if (before.householdType != after.householdType) return true
-        if (before.monthlyIncome != after.monthlyIncome) return true
+        if (before.monthlyIncomeRange != after.monthlyIncomeRange) return true
         if (before.householdHeadOccupation != after.householdHeadOccupation) return true
         if (before.otherOccupation != after.otherOccupation) return true
         if (before.noOfPeople != after.noOfPeople) return true

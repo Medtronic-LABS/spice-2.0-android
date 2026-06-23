@@ -598,10 +598,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
         )
         if (!CommonUtils.isFoOrPo()) {
             // SS list is scoped to logged-in Kormi user, not to Union selection
-            householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType(
-                SHASTHYA_SHEBIKA_ID,
-                "",
-            )
+            householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType()
         }
         // FO/PO: SK list is loaded via [loadLocalCache] when the SK spinner is built; SS loads after SK selection.
     }
@@ -624,8 +621,6 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                 val shasthyaShebikaIdLong = CommonUtils.getLongOrNull(selectedId) ?: 0L
                 if (shasthyaShebikaIdLong != 0L) {
                     householdRegistrationViewModel.loadSubVillageDataCacheByType(
-                        SUB_VILLAGE_ID,
-                        "",
                         shasthyaShebikaIdLong,
                     )
                     // During edit prefill, preserve pending sub-village and avoid clearing.
@@ -663,13 +658,13 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                             householdRegistrationViewModel.loadShasthyaShebikaForKormiId(selectedParent)
                         }
                         !CommonUtils.isFoOrPo() -> {
-                            householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType(id, localDataCache)
+                            householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType()
                         }
                     }
                 }
                 SUB_VILLAGE_ID -> {
                     selectedParent?.let {
-                        householdRegistrationViewModel.loadSubVillageDataCacheByType(id, localDataCache, it)
+                        householdRegistrationViewModel.loadSubVillageDataCacheByType(it)
                     }
                 }
             }

@@ -5,10 +5,12 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.db.entity.EntitiesName.FOLLOW_UP
 import org.medtroniclabs.uhis.db.entity.EntitiesName.FOLLOW_UP_CALL
+import org.medtroniclabs.uhis.db.entity.EntitiesName.HOUSEHOLD
 import org.medtroniclabs.uhis.db.entity.EntitiesName.HOUSEHOLD_MEMBER
 import org.medtroniclabs.uhis.db.entity.EntitiesName.MEMBER_ASSESSMENT_HISTORY_ENTITY
 import org.medtroniclabs.uhis.db.entity.EntitiesName.PREGNANCY_DETAIL
 import org.medtroniclabs.uhis.db.entity.FU_COLUMN_REFERRAL_FACILITY_TYPE
+import org.medtroniclabs.uhis.db.entity.HH_COLUMN_MONTHLY_INCOME_RANGE
 import org.medtroniclabs.uhis.db.entity.INDEX_MAH_MEMBER_SERVICE_VISIT
 import org.medtroniclabs.uhis.db.entity.INDEX_MAH_MEMBER_VISIT
 import org.medtroniclabs.uhis.db.entity.INDEX_MAH_PRACTITIONER_ID
@@ -70,6 +72,8 @@ object SpiceDatabaseMigration {
             db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN $MAH_COLUMN_REFERRAL_FACILITY_TYPE TEXT;")
 
             db.execSQL("CREATE INDEX IF NOT EXISTS $INDEX_MAH_MEMBER_SERVICE_VISIT ON $MEMBER_ASSESSMENT_HISTORY_ENTITY(memberId, serviceProvided, visitDate)")
+
+            db.execSQL("ALTER TABLE $HOUSEHOLD ADD COLUMN $HH_COLUMN_MONTHLY_INCOME_RANGE TEXT;")
         }
     }
 }
