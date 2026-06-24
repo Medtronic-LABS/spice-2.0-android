@@ -61,6 +61,7 @@ import org.medtroniclabs.uhis.common.DefinedParams.REFRESH_FRAGMENT
 import org.medtroniclabs.uhis.common.GeneralErrorDialog
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.TransferStatusEnum
+import org.medtroniclabs.uhis.common.resolveCoachingPersona
 import org.medtroniclabs.uhis.databinding.ActivityLandingBinding
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.ncd.data.NCDPatientTransferNotificationCountRequest
@@ -211,6 +212,7 @@ class LandingActivity :
             .language(SpiceBaseApplication.spiceLanguageToSdkLanguage(SecuredPreference.getCultureName()))
             .backendUrl(BuildConfig.COACHING_BACKEND_URL)
             .authToken(token)
+            .persona(resolveCoachingPersona())
             .enableTelemetry(BuildConfig.ENABLE_COACHING_TELEMETRY)
             .enableChat(true)
             .enableLearnModule(true)

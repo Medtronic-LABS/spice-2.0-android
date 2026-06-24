@@ -249,7 +249,7 @@ dependencies {
     implementation(project(":analytics"))
 
     // MicroCoaching SDK (sourced from mavenLocal — see ../micro-coaching-android-sdk)
-    implementation("com.medtroniclabs.microcoaching:sdk-android:0.5.0-SNAPSHOT")
+    implementation("com.medtroniclabs.microcoaching:sdk-android:0.5.1-SNAPSHOT")
     // Optional offline-Bengali STT engine. Bundles sherpa-onnx (~30 MB)
     // and provides SherpaOnnxStt.factory which the Builder consumes below.
     implementation("com.medtroniclabs.microcoaching:sdk-android-sherpa:0.4.0-SNAPSHOT")

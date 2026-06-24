@@ -30,6 +30,7 @@ import org.medtroniclabs.uhis.appextensions.isDebug
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.SPICE
 import org.medtroniclabs.uhis.common.SecuredPreference
+import org.medtroniclabs.uhis.common.resolveCoachingPersona
 import org.medtroniclabs.uhis.log.CrashReportingTree
 import timber.log.Timber
 import java.util.UUID
@@ -89,6 +90,7 @@ class SpiceBaseApplication : Application(), Configuration.Provider {
             .language(spiceLanguageToSdkLanguage(SecuredPreference.getCultureName()))
             .backendUrl(BuildConfig.COACHING_BACKEND_URL)
             .authToken(authToken)
+            .persona(resolveCoachingPersona())
             .enableTelemetry(BuildConfig.ENABLE_COACHING_TELEMETRY)
             .enableChat(true)
             .enableLearnModule(true)
