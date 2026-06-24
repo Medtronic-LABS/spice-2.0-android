@@ -172,6 +172,9 @@ class NurseMedicalReviewActivity : BaseActivity(), View.OnClickListener {
                         nurseViewModel.patientVisitId?.let { patientVisitId ->
                             bundle.putLong(IntentConstants.INTENT_VISIT_ID, patientVisitId)
                         }
+                        // patient/details (re-fetched on the summary) may not carry the initial-review
+                        // flag, so forward the resolved value used during the review.
+                        bundle.putBoolean(IntentConstants.INTENT_INITIAL_REVIEW, nurseViewModel.initialReview)
                         // The UHIS medical-review/create response is references-only, so build the
                         // summary result from the data the user just submitted.
                         bundle.putSerializable(NURSE_RESPONE, buildResultFromRequest())

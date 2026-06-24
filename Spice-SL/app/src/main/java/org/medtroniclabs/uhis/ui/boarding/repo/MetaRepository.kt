@@ -346,6 +346,11 @@ class MetaRepository @Inject constructor(
                             }
                         }
                         onProgress?.invoke(ResourceLoadingSyncProgress.TB_SEGMENT_COMPLETE)
+                        // Ensure the CVD risk classification table is always requested even when
+                        // the menu config doesn't list it, otherwise the backend skips it.
+                        if (!meta.contains(DefinedParams.META_RISK_ALGORITHM)) {
+                            meta.add(DefinedParams.META_RISK_ALGORITHM)
+                        }
                         if (meta.isNotEmpty()) {
                             val metadataResponse =
                                 async { apiHelper.getFormMetadata(FormMetaRequest(meta)) }.await()

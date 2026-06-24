@@ -47,6 +47,8 @@ class MedicalReviewRepository @Inject constructor(
 
     suspend fun getPatientBPLogList(request: ReqBPBGLogList) = apiHelper.getPatientBPLogList(request)
 
+    suspend fun riskFactorListing() = roomHelper.getAllRiskFactorEntityList()
+
     suspend fun getPatientBloodGlucoseList(request: ReqBPBGLogList) = apiHelper.getPatientBloodGlucoseList(request)
 
     suspend fun getSessionGraph(request: AssessmentListRequest) = apiHelper.getSessionGraph(request)

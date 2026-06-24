@@ -23,7 +23,7 @@ import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.StringConverter
 import org.medtroniclabs.uhis.data.ErrorResponse
 import org.medtroniclabs.uhis.data.LocalSpinnerResponse
-import org.medtroniclabs.uhis.data.model.MedicalReviewBaseRequest
+import org.medtroniclabs.uhis.data.model.PatientDetails
 import org.medtroniclabs.uhis.data.registration.PatientCreateResponse
 import org.medtroniclabs.uhis.data.registration.PatientModel
 import org.medtroniclabs.uhis.data.registration.QRCodeRequest
@@ -34,6 +34,7 @@ import org.medtroniclabs.uhis.formgeneration.FormGenerator
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
 import org.medtroniclabs.uhis.formgeneration.model.FormLayout
 import org.medtroniclabs.uhis.mappingkey.Screening
+import org.medtroniclabs.uhis.ncd.data.PatientVisitRequest
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.network.utils.ConnectivityManager
@@ -69,7 +70,7 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
         var isFromDirectEnrollment = false
         var screeningId: Long? = null
         var qrCodeValidationResult = MutableLiveData<Resource<QRCodeResponse>>()
-        val patientVisitIDResponse = MutableLiveData<Resource<Long>>()
+        val patientVisitIDResponse = MutableLiveData<Resource<PatientDetails>>()
         var isNationalIdGenerated: Boolean = false
         var nationalId: String = "-1"
 
@@ -382,7 +383,9 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
 
         fun createPatientVisit(
             context: Context,
-            request: MedicalReviewBaseRequest,
+            request: PatientVisitRequest,
+            patientId: Long,
+            patientIdString: String,
         ) {
             if (connectivityManager.isNetworkAvailable()) {
                 patientVisitIDResponse.postLoading()
@@ -392,7 +395,22 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
                         if (response.isSuccessful) {
                             val res = response.body()
                             if (res?.status == true && res.entity != null) {
-                                patientVisitIDResponse.postSuccess(res.entity.id)
+                                // The visit-create response only carries references; build the
+                                // navigation payload from the response + the request references,
+                                // mirroring the medical-review (my-patients) flow.
+                                patientVisitIDResponse.postSuccess(
+                                    PatientDetails(
+                                        visitID = res.entity.encounterReference?.toLongOrNull() ?: 0L,
+                                        initialReview = res.entity.initialReviewed ?: false,
+                                        patientID = patientId,
+                                        patientIdString = patientIdString,
+                                        encounterReference = res.entity.encounterReference,
+                                        memberReference = request.memberReference,
+                                        patientReference = request.patientReference,
+                                    ),
+                                )
+                            } else {
+                                patientVisitIDResponse.postError()
                             }
                         } else {
                             patientVisitIDResponse.postError()

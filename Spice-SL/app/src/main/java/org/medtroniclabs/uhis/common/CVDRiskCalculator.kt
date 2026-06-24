@@ -12,6 +12,35 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.IS_REGULAR_S
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.WEIGHT
 
 object CVDRiskCalculator {
+    data class CVDRiskResult(
+        val score: Int,
+        val level: String,
+        val display: String,
+    )
+
+    /**
+     * Computes the CVD risk directly from already-resolved patient values (age, gender, bmi,
+     * averaged systolic BP and smoker status) instead of a form map. Used by flows such as the
+     * nurse medical-review bio-data, where the backend may not return a pre-computed score.
+     */
+    fun calculateCVDRiskScore(
+        list: ArrayList<RiskClassificationModel>,
+        age: Double?,
+        gender: String?,
+        bmiValue: Double?,
+        avgSystolic: Int?,
+        isSmoker: Boolean,
+    ): CVDRiskResult? {
+        if (list.isEmpty() || age == null) return null
+        val result =
+            calculateRiskFactor(list, age, gender, bmiValue, avgSystolic, isSmoker) ?: return null
+        return CVDRiskResult(
+            score = result[DefinedParams.CVD_RISK_SCORE] as Int,
+            level = result[DefinedParams.CVD_RISK_LEVEL] as String,
+            display = result[DefinedParams.CVD_RISK_SCORE_DISPLAY] as String,
+        )
+    }
+
     fun calculateCVDRiskFactor(
         map: HashMap<String, Any>,
         list: ArrayList<RiskClassificationModel>,

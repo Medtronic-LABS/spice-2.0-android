@@ -115,8 +115,13 @@ class NurseMedicalReviewSummaryActivity : BaseActivity(), View.OnClickListener {
                 ResourceState.SUCCESS -> {
                     hideLoading()
                     resourceState.data?.let { data ->
-                        viewModel.initialReview = data.initialReview
-                        nurseViewModel.initialReview = data.initialReview
+                        // patient/details may not carry the initial-review flag (defaults to false),
+                        // so fall back to the value forwarded from the medical review screen.
+                        val resolvedInitialReview =
+                            data.initialReview ||
+                                intent.getBooleanExtra(IntentConstants.INTENT_INITIAL_REVIEW, false)
+                        viewModel.initialReview = resolvedInitialReview
+                        nurseViewModel.initialReview = resolvedInitialReview
                         nurseViewModel.unselectedDiagnosis = data.unselectedDiagnosis
                         nurseViewModel.patientDetailsValue = data
                         loadFragment()

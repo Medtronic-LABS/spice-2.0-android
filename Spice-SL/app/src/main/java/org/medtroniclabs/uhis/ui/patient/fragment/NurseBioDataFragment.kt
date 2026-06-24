@@ -17,6 +17,7 @@ import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
+import org.medtroniclabs.uhis.common.PatientStatusEvaluator
 import org.medtroniclabs.uhis.common.StringConverter
 import org.medtroniclabs.uhis.data.registration.PatientDetailsModel
 import org.medtroniclabs.uhis.data.registration.PatientHistoryModel
@@ -161,6 +162,26 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
             }
         }
 
+        nurseBioDataViewModel.cvdRiskResult.observe(viewLifecycleOwner) { result ->
+            binding.tvCvdRisk.text = result.display
+            binding.tvCvdRisk.setTextColor(
+                CommonUtils.cvdRiskColorCode(result.score.toDouble(), requireContext()),
+            )
+        }
+
+        nurseBioDataViewModel.patientStatusResult.observe(viewLifecycleOwner) { status ->
+            val (textRes, colorRes) =
+                when (status) {
+                    PatientStatusEvaluator.ControlStatus.UNCONTROLLED ->
+                        R.string.un_controlled to R.color.attention_color
+
+                    PatientStatusEvaluator.ControlStatus.CONTROLLED ->
+                        R.string.controlled to R.color.secondary_green_color
+                }
+            binding.tvPatientStatus.text = getString(textRes)
+            binding.tvPatientStatus.setTextColor(requireContext().getColor(colorRes))
+        }
+
         nurseBioDataViewModel.patientDetailsResponse.observe(viewLifecycleOwner) { resourceState ->
             when (resourceState.state) {
                 ResourceState.LOADING -> showLoading()
@@ -272,6 +293,22 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
                 )
             } ?: getString(R.string.hyphen_symbol)
 
+            // Backend may not return a pre-computed CVD score; derive it on-device from the
+            // averaged systolic BP and the patient's bio data when missing.
+            nurseBioDataViewModel.computeCvdRiskIfNeeded(data)
+
+            // Derive the Controlled / Uncontrolled status from the latest BP, last two glucose
+            // readings, comorbidities/complications and the medication-adherence answer captured
+            // during the review. Falls back to the backend ncdStatus shown above when undetermined.
+            nurseBioDataViewModel.computePatientStatusIfNeeded(
+                memberId = data.memberId,
+                hasComorbidities = !data.comorbidities.isNullOrEmpty(),
+                hasComplications = !nurseViewModel.nurseMrRequestModel.complications.isNullOrEmpty(),
+                takingMedication = parseMedicationAdherence(
+                    nurseViewModel.nurseMrRequestModel.symptomsLog?.compliance,
+                ),
+            )
+
             tvDateOfLastVisit.text = data.lastReviewDate?.let {
                 DateUtils.convertDateTimeToDate(
                     it,
@@ -288,7 +325,10 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
 
             val bmi = CommonUtils.getBMIInformation(requireContext(), data.bmi)
             bmi?.second?.let { tvBmi.setTextColor(requireContext().getColor(it)) }
-            tvBmi.text = bmi?.first ?: getString(R.string.hyphen_symbol)
+            tvBmi.text = data.bmi?.let { bmiValue ->
+                val formattedBmi = CommonUtils.getDecimalFormatted(bmiValue)
+                bmi?.first?.let { category -> "$formattedBmi ($category)" } ?: formattedBmi
+            } ?: getString(R.string.hyphen_symbol)
 
             tvHealthHistory.text = data.patientHealthHistory?.let { generateConditionString(it) }
                 ?: getString(R.string.hyphen_symbol)
@@ -330,6 +370,15 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
             binding.tvDiagnosesText.movementMethod = LinkMovementMethod.getInstance()
         }
     }
+
+    // The medication spinner stores the answer as "Yes" / "No"; null means the question wasn't
+    // answered yet (e.g. opening bio-data before completing the review).
+    private fun parseMedicationAdherence(compliance: String?): Boolean? =
+        when {
+            compliance.equals(DefinedParams.YES, ignoreCase = true) -> true
+            compliance.equals(DefinedParams.NO, ignoreCase = true) -> false
+            else -> null
+        }
 
     private fun getPatientType(it: String?): String =
         when (it) {

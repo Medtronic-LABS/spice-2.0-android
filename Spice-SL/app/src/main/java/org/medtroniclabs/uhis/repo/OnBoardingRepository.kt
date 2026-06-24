@@ -3,7 +3,6 @@ package org.medtroniclabs.uhis.repo
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
-import org.medtroniclabs.uhis.data.model.MedicalReviewBaseRequest
 import org.medtroniclabs.uhis.data.registration.QRCodeRequest
 import org.medtroniclabs.uhis.data.registration.UserDashboardRequest
 import org.medtroniclabs.uhis.db.entity.SubVillageEntity
@@ -11,6 +10,7 @@ import org.medtroniclabs.uhis.db.entity.SymptomEntity
 import org.medtroniclabs.uhis.db.entity.VillageEntity
 import org.medtroniclabs.uhis.db.local.RoomHelper
 import org.medtroniclabs.uhis.formgeneration.model.FormResponse
+import org.medtroniclabs.uhis.ncd.data.PatientVisitRequest
 import org.medtroniclabs.uhis.network.ApiHelper
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.resource.ResourceState
@@ -74,7 +74,7 @@ class OnBoardingRepository @Inject constructor(
         newSequenceCode: Long,
     ) = roomHelper.updateSequenceCode(villageId, newSequenceCode)
 
-    suspend fun createPatientVisit(request: MedicalReviewBaseRequest) = apiHelper.createPatientVisit(request)
+    suspend fun createPatientVisit(request: PatientVisitRequest) = apiHelper.createPatientVisit(request)
 
     suspend fun createScreeningLog(createPatientRequest: JsonObject) = apiHelper.createScreeningLog(createPatientRequest)
 

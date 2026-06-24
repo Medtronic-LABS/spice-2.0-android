@@ -13,7 +13,7 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.SecuredPreference
-import org.medtroniclabs.uhis.data.model.MedicalReviewBaseRequest
+import org.medtroniclabs.uhis.data.offlinesync.model.ProvanceDto
 import org.medtroniclabs.uhis.data.registration.InitialDiagnosis
 import org.medtroniclabs.uhis.data.registration.PatientCreateResponse
 import org.medtroniclabs.uhis.databinding.CardLayoutBinding
@@ -21,6 +21,7 @@ import org.medtroniclabs.uhis.databinding.FragmentEnrollmentSummaryBinding
 import org.medtroniclabs.uhis.databinding.SummaryLayoutBinding
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
+import org.medtroniclabs.uhis.ncd.data.PatientVisitRequest
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
 import org.medtroniclabs.uhis.ui.BaseFragment
@@ -109,19 +110,15 @@ class EnrollmentSummaryFragment : BaseFragment(), View.OnClickListener {
 
                 ResourceState.SUCCESS -> {
                     hideLoading()
-                    resourceState.data?.let { patientVisitId ->
+                    resourceState.data?.let { details ->
                         val intent = Intent(requireContext(), NurseMedicalReviewActivity::class.java)
-                        val patientId =
-                            viewModel.enrollPatientLiveData.value
-                                ?.data
-                                ?.patientId
-                        val patientTrackId =
-                            viewModel.enrollPatientLiveData.value
-                                ?.data
-                                ?.memberId
-
-                        intent.putExtra(IntentConstants.INTENT_VISIT_ID, patientVisitId)
-                        intent.putExtra(IntentConstants.INTENT_PATIENT_ID, patientTrackId)
+                        intent.putExtra(IntentConstants.INTENT_PATIENT_ID, details.patientID)
+                        intent.putExtra(IntentConstants.INTENT_PATIENT_ID_STRING, details.patientIdString)
+                        intent.putExtra(IntentConstants.INTENT_VISIT_ID, details.visitID)
+                        intent.putExtra(IntentConstants.INTENT_ENCOUNTER_REFERENCE, details.encounterReference)
+                        intent.putExtra(IntentConstants.INTENT_MEMBER_REFERENCE, details.memberReference)
+                        intent.putExtra(IntentConstants.INTENT_PATIENT_REFERENCE, details.patientReference)
+                        intent.putExtra(IntentConstants.INTENT_INITIAL_REVIEW, details.initialReview)
                         intent.putExtra(DefinedParams.ORIGIN, "medical review")
                         intent.putExtra(IntentConstants.SHOW_CONTINUOUS_MEDICAL_REVIEW, false)
 
@@ -289,16 +286,17 @@ class EnrollmentSummaryFragment : BaseFragment(), View.OnClickListener {
                         ),
                     )
                 }
-                bmi?.let {
-                    CommonUtils.getBMIInformation(requireContext(), it.toDouble())?.let { value ->
-                        layout.addView(
-                            inflateChildView(
-                                getString(R.string.bmi),
-                                value.first,
-                                textColor = value.second,
-                            ),
-                        )
-                    }
+                bmi?.let { bmiValue ->
+                    val bmiInfo = CommonUtils.getBMIInformation(requireContext(), bmiValue.toDouble())
+                    val formattedBmi = CommonUtils.getDecimalFormatted(bmiValue)
+                    val bmiText = bmiInfo?.first?.let { category -> "$formattedBmi ($category)" } ?: formattedBmi
+                    layout.addView(
+                        inflateChildView(
+                            getString(R.string.bmi),
+                            bmiText,
+                            textColor = bmiInfo?.second,
+                        ),
+                    )
                 }
 
                 facilityName?.let {
@@ -363,23 +361,35 @@ class EnrollmentSummaryFragment : BaseFragment(), View.OnClickListener {
             }
 
             binding.btnFollowUp -> {
-                showLoading()
-                val patientTrackId =
-                    viewModel.enrollPatientLiveData.value
-                        ?.data
-                        ?.memberId
-                patientTrackId
-                    ?.let {
-                        MedicalReviewBaseRequest(
-                            patientTrackId = it.toLong(),
-                            tenantId = SecuredPreference.getTenantId(),
-                        )
-                    }?.let {
-                        viewModel.createPatientVisit(
-                            requireContext(),
-                            it,
-                        )
-                    }
+                val data = viewModel.enrollPatientLiveData.value?.data
+                // Mirror the medical-review (my-patients) visit-create request: patientReference is
+                // the numeric patient track id (`id`), memberReference is the member, and the patient
+                // details screen is later loaded with `patientId`.
+                val patientReference = data?.id
+                val memberReference = data?.memberReference ?: data?.memberId
+                val patientIdString = data?.patientId
+                val patientTrackId = patientReference?.toLongOrNull()
+                if (patientReference != null && memberReference != null &&
+                    patientIdString != null && patientTrackId != null
+                ) {
+                    showLoading()
+                    viewModel.createPatientVisit(
+                        requireContext(),
+                        PatientVisitRequest(
+                            patientReference = patientReference,
+                            memberReference = memberReference,
+                            provenance = ProvanceDto(),
+                        ),
+                        patientId = patientTrackId,
+                        patientIdString = patientIdString,
+                    )
+                } else {
+                    (activity as BaseActivity).showErrorDialogue(
+                        getString(R.string.error),
+                        getString(R.string.something_went_wrong),
+                        isNegativeButtonNeed = false,
+                    ) {}
+                }
             }
         }
     }

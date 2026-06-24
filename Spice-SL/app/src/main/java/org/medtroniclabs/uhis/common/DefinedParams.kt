@@ -5,6 +5,9 @@ import android.provider.ContactsContract
 object DefinedParams {
     const val ZERO = "0"
 
+    // Backend meta key (Constants.META_RISK_ALGORITHM) that returns the CVD risk classification table.
+    const val META_RISK_ALGORITHM = "RiskAlgorithm"
+
     const val ID = "id"
     const val GENDER_MALE = "male"
     const val GENDER_FEMALE = "female"
