@@ -135,6 +135,7 @@ class HouseholdMemberRepository @Inject constructor(
         if (before.guardianId != after.guardianId) return true
         if (before.maritalStatus != after.maritalStatus) return true
         if (before.disability != after.disability) return true
+        if (before.qrCode != after.qrCode)return true
         return false
     }
 
