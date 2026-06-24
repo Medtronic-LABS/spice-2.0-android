@@ -829,18 +829,11 @@ class LandingActivity :
 
     private val languagePreferenceListener = object : OnDialogDismissListener {
         override fun onDialogDismissListener(isFinish: Boolean) {
-            showErrorDialogue(
-                message = getString(R.string.language_change_alert),
-                isNegativeButtonNeed = true,
-                cancelBtnName = getString(R.string.no),
-                positiveButtonName = getString(R.string.yes),
-            ) { isPositiveResult ->
-                if (isPositiveResult && SecuredPreference.logout()) {
-                    cancelAllWorker()
-                    startActivity(Intent(this@LandingActivity, LoginActivity::class.java))
-                    finish()
-                    UserDetail.referenceId = UUID.randomUUID().toString()
-                }
+            if (isFinish && SecuredPreference.logout()) {
+                cancelAllWorker()
+                startActivity(Intent(this@LandingActivity, LoginActivity::class.java))
+                finish()
+                UserDetail.referenceId = UUID.randomUUID().toString()
             }
         }
     }

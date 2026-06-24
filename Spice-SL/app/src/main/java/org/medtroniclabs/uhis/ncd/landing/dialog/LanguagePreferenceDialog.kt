@@ -154,9 +154,18 @@ class LanguagePreferenceDialog(private val listener: OnDialogDismissListener) :
             }
 
             R.id.btnConfirm -> {
-                (activity as? BaseActivity)?.withNetworkAvailability(online = {
-                    updateUserLocale()
-                })
+                (activity as? BaseActivity)?.showErrorDialogue(
+                    message = getString(R.string.language_change_alert),
+                    isNegativeButtonNeed = true,
+                    cancelBtnName = getString(R.string.no),
+                    positiveButtonName = getString(R.string.yes),
+                ) { isPositive ->
+                    if (isPositive) {
+                        (activity as? BaseActivity)?.withNetworkAvailability(online = {
+                            updateUserLocale()
+                        })
+                    }
+                }
             }
         }
     }
