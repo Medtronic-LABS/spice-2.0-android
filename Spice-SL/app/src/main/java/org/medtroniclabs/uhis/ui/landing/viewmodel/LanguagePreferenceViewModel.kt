@@ -26,6 +26,12 @@ class LanguagePreferenceViewModel @Inject constructor(
     val cultureList = MutableLiveData<Resource<List<CulturesEntity>>>()
     val cultureUpdateResponse = MutableLiveData<Resource<HashMap<String, Any>>>()
 
+    val selectedCultureForConfirmation = MutableLiveData<CulturesEntity?>()
+
+    fun setSelectedCultureForConfirmation(culture: CulturesEntity?) {
+        selectedCultureForConfirmation.value = culture
+    }
+
     fun getCultures() {
         viewModelScope.launch(dispatcherIO) {
             cultureList.postValue(metaRepository.getCultures())

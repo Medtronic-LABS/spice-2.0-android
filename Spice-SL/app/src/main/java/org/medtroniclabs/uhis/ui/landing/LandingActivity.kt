@@ -68,6 +68,7 @@ import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.TransferStatusEnum
 import org.medtroniclabs.uhis.databinding.ActivityLandingBinding
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
+import org.medtroniclabs.uhis.model.CultureLocaleModel
 import org.medtroniclabs.uhis.ncd.data.NCDPatientTransferNotificationCountRequest
 import org.medtroniclabs.uhis.ncd.data.NCDPatientTransferUpdateRequest
 import org.medtroniclabs.uhis.ncd.data.NCDSupportRequest
@@ -490,6 +491,60 @@ class LandingActivity :
                 }
             }
         }
+
+        languageViewModel.selectedCultureForConfirmation.observe(this) { culture ->
+            culture ?: return@observe
+
+            languageViewModel.setSelectedCultureForConfirmation(null)
+
+            showErrorDialogue(
+                message = getString(R.string.language_change_alert),
+                isNegativeButtonNeed = true,
+                cancelBtnName = getString(R.string.no),
+                positiveButtonName = getString(R.string.yes),
+            ) { isPositive ->
+                if (isPositive) {
+                    languageViewModel.cultureLocaleUpdate(
+                        CultureLocaleModel(
+                            SecuredPreference.getUserId(),
+                            culture,
+                        ),
+                    )
+                }
+            }
+        }
+
+        languageViewModel.cultureUpdateResponse.observe(this) { resourceState ->
+            when (resourceState.state) {
+                ResourceState.LOADING -> showLoading()
+
+                ResourceState.SUCCESS -> {
+                    hideLoading()
+
+                    languageViewModel.selectedCultureForConfirmation.value?.let { culture ->
+                        SecuredPreference.setUserPreferenceSync(
+                            culture.id,
+                            culture.name,
+                            CommonUtils.checkIfTranslationEnabled(culture.name),
+                        )
+                    }
+
+                    languageViewModel.setSelectedCultureForConfirmation(null)
+
+                    if (SecuredPreference.logout()) {
+                        cancelAllWorker()
+                        startActivity(Intent(this@LandingActivity, LoginActivity::class.java))
+                        finish()
+                        UserDetail.referenceId = UUID.randomUUID().toString()
+                    }
+                }
+
+                ResourceState.ERROR -> {
+                    hideLoading()
+                    languageViewModel.setSelectedCultureForConfirmation(null)
+                }
+            }
+        }
     }
 
     private fun setTransferCount(transferCount: Long): Int {
@@ -789,12 +844,11 @@ class LandingActivity :
 
             R.id.switch_language -> {
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
-                val languagePreferenceDialog =
-                    LanguagePreferenceDialog.newInstance(languagePreferenceListener)
-                languagePreferenceDialog.show(
-                    supportFragmentManager,
-                    LanguagePreferenceDialog.TAG,
-                )
+
+                LanguagePreferenceDialog
+                    .newInstance()
+                    .show(supportFragmentManager, LanguagePreferenceDialog.TAG)
+
                 return true
             }
 
@@ -825,17 +879,6 @@ class LandingActivity :
             supportFragmentManager,
             NCDSupportDialogFragment.TAG,
         )
-    }
-
-    private val languagePreferenceListener = object : OnDialogDismissListener {
-        override fun onDialogDismissListener(isFinish: Boolean) {
-            if (isFinish && SecuredPreference.logout()) {
-                cancelAllWorker()
-                startActivity(Intent(this@LandingActivity, LoginActivity::class.java))
-                finish()
-                UserDetail.referenceId = UUID.randomUUID().toString()
-            }
-        }
     }
 
     private fun goToOfflineSyncPage() {
