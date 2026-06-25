@@ -492,6 +492,11 @@ class LandingActivity :
             }
         }
 
+        /**
+         * Observes the language selected from LanguagePreferenceDialog.
+         * Displays the re-login confirmation dialog before initiating
+         * the locale update request.
+         */
         languageViewModel.selectedCultureForConfirmation.observe(this) { culture ->
             culture ?: return@observe
 
@@ -514,6 +519,11 @@ class LandingActivity :
             }
         }
 
+        /**
+         * Updates the local language preference only after the
+         * locale update API succeeds, then logs out the user so
+         * the new language is applied on the next login.
+         */
         languageViewModel.cultureUpdateResponse.observe(this) { resourceState ->
             when (resourceState.state) {
                 ResourceState.LOADING -> showLoading()
@@ -842,6 +852,10 @@ class LandingActivity :
                 return true
             }
 
+            /**
+             * Opens the language selection dialog.
+             * Language update is handled after user confirmation.
+             */
             R.id.switch_language -> {
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
 

@@ -29,8 +29,16 @@ class LanguagePreferenceDialog :
     DialogFragment(),
     View.OnClickListener {
     private lateinit var binding: DialogLanguagePreferenceBinding
+
+    /**
+     * Shared ViewModel used to exchange the selected language
+     * with LandingActivity.
+     */
     private val viewModel: LanguagePreferenceViewModel by activityViewModels()
 
+    /**
+     * Creates a new instance of the language preference dialog
+     */
     companion object {
         const val TAG = "LanguagePreferenceDialog"
 
@@ -121,6 +129,8 @@ class LanguagePreferenceDialog :
                 dismiss()
             }
 
+            // Pass the selected culture to the shared ViewModel.
+            // Actual locale update is handled in LandingActivity after user confirmation.
             R.id.btnConfirm -> {
                 val selectedRadioButton =
                     binding.radioGroup.findViewById<RadioButton>(binding.radioGroup.checkedRadioButtonId)
@@ -132,6 +142,11 @@ class LanguagePreferenceDialog :
                         ?.firstOrNull { it.id == cultureId }
 
                 culture?.let {
+                    /**
+                     * Store the selected culture in the shared ViewModel.
+                     * LandingActivity observes this value and proceeds with
+                     * language update only after user confirmation.
+                     */
                     viewModel.setSelectedCultureForConfirmation(it)
                     dismiss()
                 }

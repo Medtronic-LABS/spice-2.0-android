@@ -26,8 +26,15 @@ class LanguagePreferenceViewModel @Inject constructor(
     val cultureList = MutableLiveData<Resource<List<CulturesEntity>>>()
     val cultureUpdateResponse = MutableLiveData<Resource<HashMap<String, Any>>>()
 
+    /**
+     * Holds the selected language until the user confirms
+     * the language change from LandingActivity.
+     */
     val selectedCultureForConfirmation = MutableLiveData<CulturesEntity?>()
 
+    /**
+     * Updates the selected language for the confirmation flow.
+     */
     fun setSelectedCultureForConfirmation(culture: CulturesEntity?) {
         selectedCultureForConfirmation.value = culture
     }
