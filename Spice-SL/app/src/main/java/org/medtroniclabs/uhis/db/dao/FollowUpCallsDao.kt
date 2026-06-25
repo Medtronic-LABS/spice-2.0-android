@@ -2,12 +2,13 @@ package org.medtroniclabs.uhis.db.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import org.medtroniclabs.uhis.db.entity.FollowUpCall
 
 @Dao
 interface FollowUpCallsDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFollowUpCall(followUpCall: FollowUpCall)
 
     @Query("SELECT * FROM FollowUpCall WHERE followUpId = :followUpId AND isSynced = 0")

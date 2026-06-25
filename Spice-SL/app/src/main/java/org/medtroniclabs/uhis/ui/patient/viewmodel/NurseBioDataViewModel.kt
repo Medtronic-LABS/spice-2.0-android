@@ -97,14 +97,15 @@ class NurseBioDataViewModel @Inject constructor(
                         cvdRiskComputed = false
                         return@launch
                     }
-                    CVDRiskCalculator.calculateCVDRiskScore(
-                        list = riskList,
-                        age = details.age,
-                        gender = details.gender,
-                        bmiValue = details.bmi,
-                        avgSystolic = avgSystolic,
-                        isSmoker = details.isRegularSmoker == true,
-                    )?.let { cvdRiskResult.postValue(it) }
+                    CVDRiskCalculator
+                        .calculateCVDRiskScore(
+                            list = riskList,
+                            age = details.age,
+                            gender = details.gender,
+                            bmiValue = details.bmi,
+                            avgSystolic = avgSystolic,
+                            isSmoker = details.isRegularSmoker == true,
+                        )?.let { cvdRiskResult.postValue(it) }
                 } catch (e: Exception) {
                     cvdRiskComputed = false
                 }

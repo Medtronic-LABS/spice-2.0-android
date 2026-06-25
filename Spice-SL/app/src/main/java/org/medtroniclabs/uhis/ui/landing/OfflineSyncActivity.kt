@@ -106,11 +106,6 @@ class OfflineSyncActivity : BaseActivity() {
     }
 
     private fun initObserver() {
-        viewModel.unAssignedMembers.observe(this) {
-            val ids = it.map { item -> item.memberId }
-            // viewModel.insertDummyCallHistory(ids)
-        }
-
         viewModel.unSyncedCountLiveData.observe(this) {
             unSyncedCountAdapter.updateList(it)
         }
@@ -155,7 +150,7 @@ class OfflineSyncActivity : BaseActivity() {
 
         viewModel.progressLiveData.observe(this) {
             binding.progressBar.progress = it
-            binding.tvOfflineSyncProgress.text = "$it%"
+            binding.tvOfflineSyncProgress.text = getString(R.string.sync_progress_percent, it)
         }
 
         viewModel.statusLiveData.observe(this) {

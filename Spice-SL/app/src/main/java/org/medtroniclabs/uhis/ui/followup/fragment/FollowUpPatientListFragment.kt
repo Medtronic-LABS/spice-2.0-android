@@ -100,8 +100,9 @@ class FollowUpPatientListFragment : BaseFragment() {
                         intent.putExtra(DefinedParams.DOB, data.dateOfBirth)
                         startActivity(intent)
                     } else {
+                        val showCallButton = data.isValidNumber()
                         data.toPatientHistoryData(requireContext()).takeIf { it.isNotEmpty() }?.let { historyData ->
-                            val dialog = PatientDetailHistoryDialogFragment.newInstance(historyData, true)
+                            val dialog = PatientDetailHistoryDialogFragment.newInstance(historyData, showCallButton)
                             dialog.show(childFragmentManager, PatientDetailHistoryDialogFragment::class.simpleName)
                         }
                     }

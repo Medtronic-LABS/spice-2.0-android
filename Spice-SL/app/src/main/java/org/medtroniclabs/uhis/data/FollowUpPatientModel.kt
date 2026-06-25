@@ -89,12 +89,14 @@ data class FollowUpPatientModel(
                         }
                         val assessment = memberAssessmentHistory.firstOrNull()
                         assessment?.let { safeAssessment ->
-                            PatientHistoryDataItem(
-                                R.string.screened_by,
-                                AssessmentUtil.formatServiceProviderDisplay(
-                                    context,
-                                    safeAssessment.serviceProvidedByName,
-                                    safeAssessment.serviceProvidedByRole,
+                            add(
+                                PatientHistoryDataItem(
+                                    R.string.screened_by,
+                                    AssessmentUtil.formatServiceProviderDisplay(
+                                        context,
+                                        safeAssessment.serviceProvidedByName,
+                                        safeAssessment.serviceProvidedByRole,
+                                    ),
                                 ),
                             )
                         }
@@ -129,9 +131,11 @@ data class FollowUpPatientModel(
             ),
         )
         if (followUpCalls.isNotEmpty()) {
-            val callInformationItems = followUpCalls.map { it.toPatientHistoryDataItem() }
+            val callInformationItems = followUpCalls.sortedByDescending { DateUtils.convertDateToLong(it.callDate) ?: 0L }.map { it.toPatientHistoryDataItem() }
             historyData.add(PatientHistoryData(R.string.call_information, callInformationItems))
         }
         return historyData
     }
+
+    fun isValidNumber() = !isWrongNumber && !phoneNumber.isNullOrBlank() && phoneNumber != "0"
 }

@@ -369,8 +369,10 @@ class EnrollmentSummaryFragment : BaseFragment(), View.OnClickListener {
                 val memberReference = data?.memberReference ?: data?.memberId
                 val patientIdString = data?.patientId
                 val patientTrackId = patientReference?.toLongOrNull()
-                if (patientReference != null && memberReference != null &&
-                    patientIdString != null && patientTrackId != null
+                if (patientReference != null &&
+                    memberReference != null &&
+                    patientIdString != null &&
+                    patientTrackId != null
                 ) {
                     showLoading()
                     viewModel.createPatientVisit(

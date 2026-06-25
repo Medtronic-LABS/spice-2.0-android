@@ -513,9 +513,9 @@ class OfflineSyncRepository @Inject constructor(
         callDetails.forEach { callDetail ->
             val existingCall = roomHelper.getFollowupCall(callDetail.followUpId, callDetail.callDate, callDetail.calledByUserId)
             val updatedCall = if (existingCall != null) {
-                callDetail.copy(id = existingCall.id, followUpId = existingCall.followUpId)
+                callDetail.copy(id = existingCall.id, followUpId = existingCall.followUpId, isSynced = true)
             } else {
-                callDetail.copy(followUpId = callDetail.callRegisterId)
+                callDetail.copy(followUpId = callDetail.callRegisterId, isSynced = true)
             }
             roomHelper.insertFollowUpCall(updatedCall)
         }

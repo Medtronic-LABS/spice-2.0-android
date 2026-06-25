@@ -1,7 +1,7 @@
 package org.medtroniclabs.uhis.repo
 
 import androidx.lifecycle.LiveData
-import org.medtroniclabs.uhis.appextensions.convertToUtcDateTime
+import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMdd
 import org.medtroniclabs.uhis.common.DateUtils.DATE_ddMMyyyy
 import org.medtroniclabs.uhis.common.SecuredPreference
@@ -162,7 +162,7 @@ class FollowUpRepository @Inject constructor(
 
         val callDetail = FollowUpCall(
             followUpId = followUpId,
-            callDate = System.currentTimeMillis().convertToUtcDateTime(),
+            callDate = DateUtils.formatDate(System.currentTimeMillis()) ?: "",
             duration = totalTimeTaken,
             attempts = followUp.attempts,
             status = status,
