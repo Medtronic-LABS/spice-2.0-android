@@ -530,17 +530,6 @@ class LandingActivity :
 
                 ResourceState.SUCCESS -> {
                     hideLoading()
-
-                    languageViewModel.selectedCultureForConfirmation.value?.let { culture ->
-                        SecuredPreference.setUserPreferenceSync(
-                            culture.id,
-                            culture.name,
-                            CommonUtils.checkIfTranslationEnabled(culture.name),
-                        )
-                    }
-
-                    languageViewModel.setSelectedCultureForConfirmation(null)
-
                     if (SecuredPreference.logout()) {
                         cancelAllWorker()
                         startActivity(Intent(this@LandingActivity, LoginActivity::class.java))
@@ -551,7 +540,6 @@ class LandingActivity :
 
                 ResourceState.ERROR -> {
                     hideLoading()
-                    languageViewModel.setSelectedCultureForConfirmation(null)
                 }
             }
         }
