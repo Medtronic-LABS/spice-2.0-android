@@ -25,6 +25,7 @@ data class PatientCreateResponse(
     val levelOfEducation: String?,
     val memberId: String?,
     val patientId: String?,
+    val patientUniqueId: String?,
     val treatmentPlanResponse: Any?,
     val patientDiagnosisStatus: PatientDiagnosisStatus?,
     val patientHealthHistory: PatientHealthHistory?,

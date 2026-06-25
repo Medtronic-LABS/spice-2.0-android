@@ -30,4 +30,5 @@ data class DashboardCountsRow(
     val glassesSoldCustomStatusCount: Int?,
     val ncdServicesInCataractCampCount: Int?,
     val patientsReferredForOperationCount: Int?,
+    val linkedToCareCount: Int? = 0,
 )

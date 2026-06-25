@@ -171,7 +171,51 @@ interface MemberAssessmentHistoryDao {
                     THEN 1
                     ELSE 0
                 END
-            ) AS patientsReferredForOperationCount
+            ) AS patientsReferredForOperationCount,
+            (
+                SELECT COUNT(DISTINCT e.memberId)
+                FROM memberassessmenthistory AS e
+                LEFT JOIN householdmember AS ehm ON ehm.id = e.memberId
+                LEFT JOIN household AS ehh ON ehh.id = ehm.household_id
+                WHERE LOWER(e.serviceProvided) = 'enrollment'
+                  AND (:startDate IS NULL OR date(datetime(e.visitDate, 'localtime')) >= :startDate)
+                  AND (:endDate IS NULL OR date(datetime(e.visitDate, 'localtime')) <= :endDate)
+                  AND (
+                      CASE
+                          WHEN :subVillageIdsSize > 0
+                          THEN COALESCE(ehm.sub_village_id, ehh.sub_village_id) IN (:subVillageIds)
+
+                          WHEN :ssIdsSize > 0
+                          THEN COALESCE(ehm.sub_village_id, ehh.sub_village_id) IN (
+                              SELECT DISTINCT sslv.subVillageId
+                              FROM ShasthyaShebikaLinkedVillageEntity AS sslv
+                              WHERE sslv.shasthyaShebikaId IN (:ssIds)
+                          )
+
+                          ELSE 1
+                      END
+                  )
+                  AND EXISTS (
+                      SELECT 1 FROM memberassessmenthistory AS n
+                      WHERE n.memberId = e.memberId
+                        AND LOWER(n.serviceProvided) = 'ncd'
+                        AND date(datetime(n.visitDate, 'localtime')) <= date(datetime(e.visitDate, 'localtime'))
+                        AND n.practitionerId IS :userId
+                        AND NOT EXISTS (
+                            SELECT 1 FROM memberassessmenthistory AS n2
+                            WHERE n2.memberId = e.memberId
+                              AND LOWER(n2.serviceProvided) = 'ncd'
+                              AND date(datetime(n2.visitDate, 'localtime')) <= date(datetime(e.visitDate, 'localtime'))
+                              AND (
+                                  date(datetime(n2.visitDate, 'localtime')) > date(datetime(n.visitDate, 'localtime'))
+                                  OR (
+                                      date(datetime(n2.visitDate, 'localtime')) = date(datetime(n.visitDate, 'localtime'))
+                                      AND n2.id > n.id
+                                  )
+                              )
+                        )
+                  )
+            ) AS linkedToCareCount
         FROM memberassessmenthistory AS h
         LEFT JOIN householdmember AS hm ON hm.id = h.memberId
         LEFT JOIN household AS hh ON hh.id = hm.household_id

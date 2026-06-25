@@ -44,6 +44,7 @@ class DashboardLocalRepository @Inject constructor(
             glassesSoldCustomStatusCount = row.glassesSoldCustomStatusCount ?: 0,
             ncdServicesInCataractCampCount = row.ncdServicesInCataractCampCount ?: 0,
             patientsReferredForOperationCount = row.patientsReferredForOperationCount ?: 0,
+            linkedToCareCount = row.linkedToCareCount ?: 0,
         )
     }
 

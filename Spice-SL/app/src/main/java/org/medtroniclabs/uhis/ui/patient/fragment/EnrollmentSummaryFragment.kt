@@ -362,28 +362,26 @@ class EnrollmentSummaryFragment : BaseFragment(), View.OnClickListener {
 
             binding.btnFollowUp -> {
                 val data = viewModel.enrollPatientLiveData.value?.data
-                // Mirror the medical-review (my-patients) visit-create request: patientReference is
-                // the numeric patient track id (`id`), memberReference is the member, and the patient
-                // details screen is later loaded with `patientId`.
-                val patientReference = data?.id
-                val memberReference = data?.memberReference ?: data?.memberId
-                val patientIdString = data?.patientId
-                val patientTrackId = patientReference?.toLongOrNull()
-                if (patientReference != null &&
-                    memberReference != null &&
-                    patientIdString != null &&
-                    patientTrackId != null
+                // patientReference / track id (for patientvisit/create) come from the numeric
+                // patient id, but the medical-review screen looks the patient up by
+                // patientUniqueId (returned by the register API), not the FHIR id.
+                val patientTrackIdString = data?.id ?: data?.patientId
+                val memberReference = data?.memberId
+                val patientTrackId = patientTrackIdString?.toLongOrNull()
+                val patientUniqueId = data?.patientUniqueId
+                if (patientTrackIdString != null && memberReference != null &&
+                    patientTrackId != null && patientUniqueId != null
                 ) {
                     showLoading()
                     viewModel.createPatientVisit(
                         requireContext(),
                         PatientVisitRequest(
-                            patientReference = patientReference,
+                            patientReference = patientTrackIdString,
                             memberReference = memberReference,
                             provenance = ProvanceDto(),
                         ),
                         patientId = patientTrackId,
-                        patientIdString = patientIdString,
+                        patientIdString = patientUniqueId,
                     )
                 } else {
                     (activity as BaseActivity).showErrorDialogue(
