@@ -999,6 +999,15 @@ object DateUtils {
             zonedDateTime.toInstant().toEpochMilli()
         }
 
+    fun convertToTimestamp(
+        dateString: String?,
+        defaultValue: Long,
+    ): Long =
+        dateString?.let {
+            val zonedDateTime = ZonedDateTime.parse(it, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+            zonedDateTime.toInstant().toEpochMilli()
+        } ?: defaultValue
+
     fun convertToTimestampWithoutZone(
         dateString: String?,
         isStartOfDay: Boolean,

@@ -18,6 +18,7 @@ import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_DD_MMMM_YYYY
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
 import org.medtroniclabs.uhis.common.DateUtils.calculateGestationalAge
+import org.medtroniclabs.uhis.common.DateUtils.convertToTimestamp
 import org.medtroniclabs.uhis.common.DateUtils.formatGestationalAge
 import org.medtroniclabs.uhis.common.DateUtils.getLastMenstrualDate
 import org.medtroniclabs.uhis.common.DefinedParams
@@ -26,6 +27,7 @@ import org.medtroniclabs.uhis.databinding.SummaryListItemBinding
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
 import org.medtroniclabs.uhis.db.entity.PregnancyDetail
 import org.medtroniclabs.uhis.ui.MenuConstants
+import org.medtroniclabs.uhis.ui.assessment.rmnch.PregnancyCohortRules
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 import org.medtroniclabs.uhis.ui.externalmember.ExternalMemberRegistrationActivity
 import org.medtroniclabs.uhis.ui.externalmember.ExternalMemberRegistrationFragment
@@ -116,24 +118,28 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
             } else {
                 binding.tvEdit.gone()
             }
-            val recentHistory = memberDetails.history.firstOrNull() ?: return@observe
-            val recentService = recentHistory.serviceProvided?.lowercase().orEmpty()
+            val recentPregnancy = memberDetails.memberPregnancyDetails?.firstOrNull()
+            val latestFpVisit = memberDetails.history.firstOrNull {
+                MenuConstants.FP_MENU_ID.equals(it.serviceProvided.orEmpty(), true)
+            }
             var showRecentStatus = true
-            when (recentService) {
-                MenuConstants.PREGNANT_WOMEN_PROFILE.lowercase(),
-                MenuConstants.ANC.lowercase(),
-                -> {
-                    showRecentStatus = !addPregnancySummaryViews(memberDetails.memberPregnancyDetails?.firstOrNull())
+            when {
+                recentPregnancy != null && PregnancyCohortRules.isActivePregnancy(recentPregnancy) -> {
+                    showRecentStatus = !addPregnancySummaryViews(recentPregnancy)
                 }
 
-                MenuConstants.PREGNANCY_OUTCOME.lowercase(),
-                MenuConstants.PNC_MOTHER.lowercase(),
-                -> {
-                    showRecentStatus = !addDeliveryOutcomeSummaryViews(memberDetails.history, memberDetails.memberPregnancyDetails?.firstOrNull())
+                recentPregnancy != null && PregnancyCohortRules.isPostnatal(recentPregnancy) -> {
+                    showRecentStatus = !addDeliveryOutcomeSummaryViews(memberDetails.history, recentPregnancy)
                 }
 
-                MenuConstants.FP_MENU_ID.lowercase() -> {
-                    showRecentStatus = !addFPSummaryView(recentHistory)
+                recentPregnancy != null &&
+                    !recentPregnancy.typeOfAbortion.isNullOrBlank() &&
+                    !hasVisitAfterAbortion(memberDetails.history, recentPregnancy) -> {
+                    showRecentStatus = !addDeliveryOutcomeSummaryViews(memberDetails.history, recentPregnancy)
+                }
+
+                latestFpVisit != null -> {
+                    showRecentStatus = !addFPSummaryView(latestFpVisit)
                 }
             }
             if (showRecentStatus) {
@@ -144,6 +150,22 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
                     } ?: getString(R.string.separator_double_hyphen),
                 )
             }
+        }
+    }
+
+    private fun hasVisitAfterAbortion(
+        history: List<MemberAssessmentHistoryEntity>,
+        pregnancyDetail: PregnancyDetail,
+    ): Boolean {
+        val outcomeVisit = history.firstOrNull {
+            it.observations?.pregnancyEpisodeId == pregnancyDetail.pregnancyEpisodeId &&
+                MenuConstants.PREGNANCY_OUTCOME.equals(it.serviceProvided.orEmpty(), true)
+        }
+        val abortionAnchorDate = outcomeVisit?.visitDate ?: return false
+        val anchorMillis = convertToTimestamp(abortionAnchorDate, 0)
+        return history.any { visit ->
+            val visitMillis = convertToTimestamp(visit.visitDate.orEmpty(), 0)
+            visitMillis > anchorMillis
         }
     }
 
