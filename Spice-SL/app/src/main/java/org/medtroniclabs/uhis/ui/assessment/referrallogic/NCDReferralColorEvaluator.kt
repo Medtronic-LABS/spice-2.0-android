@@ -55,7 +55,7 @@ object NCDReferralColorEvaluator {
         const val DIABETES_RED_MMOL = 27.8
         const val DIABETES_ORANGE_LOW_MMOL = 16.7
         const val DIABETES_YELLOW_HIGH_MMOL = 13.9
-        const val FBS_GREEN_HIGH_MMOL = 7.2
+        const val FBS_YELLOW_LOW_MMOL = 7.0
         const val RBS_GREEN_HIGH_MMOL = 9.9
         const val LOW_GLUCOSE_BAND_HIGH_MMOL = 4.5
 
@@ -172,10 +172,10 @@ object NCDReferralColorEvaluator {
     ): Boolean {
         val lowBand = bg >= Thresholds.HYPOGLYCEMIA_MMOL && bg < Thresholds.LOW_GLUCOSE_BAND_HIGH_MMOL
         return when (type) {
-            "fbs" -> (bg > Thresholds.FBS_GREEN_HIGH_MMOL && bg < Thresholds.DIABETES_YELLOW_HIGH_MMOL) || lowBand
+            "fbs" -> (bg >= Thresholds.FBS_YELLOW_LOW_MMOL && bg < Thresholds.DIABETES_YELLOW_HIGH_MMOL) || lowBand
             "rbs" -> (bg > Thresholds.RBS_GREEN_HIGH_MMOL && bg < Thresholds.DIABETES_YELLOW_HIGH_MMOL) || lowBand
             else ->
-                (bg > Thresholds.FBS_GREEN_HIGH_MMOL && bg < Thresholds.DIABETES_YELLOW_HIGH_MMOL) ||
+                (bg >= Thresholds.FBS_YELLOW_LOW_MMOL && bg < Thresholds.DIABETES_YELLOW_HIGH_MMOL) ||
                     (bg > Thresholds.RBS_GREEN_HIGH_MMOL && bg < Thresholds.DIABETES_YELLOW_HIGH_MMOL) ||
                     lowBand
         }
@@ -186,10 +186,11 @@ object NCDReferralColorEvaluator {
         type: String?,
     ): Boolean =
         when (type) {
-            "fbs" -> bg in Thresholds.LOW_GLUCOSE_BAND_HIGH_MMOL..Thresholds.FBS_GREEN_HIGH_MMOL
+            "fbs" -> bg >= Thresholds.LOW_GLUCOSE_BAND_HIGH_MMOL && bg < Thresholds.FBS_YELLOW_LOW_MMOL
             "rbs" -> bg in Thresholds.LOW_GLUCOSE_BAND_HIGH_MMOL..Thresholds.RBS_GREEN_HIGH_MMOL
             else ->
-                bg in Thresholds.LOW_GLUCOSE_BAND_HIGH_MMOL..Thresholds.FBS_GREEN_HIGH_MMOL ||
+                bg >= Thresholds.LOW_GLUCOSE_BAND_HIGH_MMOL &&
+                    bg < Thresholds.FBS_YELLOW_LOW_MMOL ||
                     bg in Thresholds.LOW_GLUCOSE_BAND_HIGH_MMOL..Thresholds.RBS_GREEN_HIGH_MMOL
         }
 
