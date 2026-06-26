@@ -413,6 +413,9 @@ class AssessmentRMNCHFragment :
     private fun showHideOptionsForChildHealth() {
         viewModel.memberDetailsLiveData.value?.data?.dateOfBirth?.let {
             calculateAgeInMonths(it)?.let { pair ->
+                if (viewModel.workflowName == RMNCH.ChildHoodVisit) {
+                    updateChildWeightValidationRanges(pair.first)
+                }
                 if (pair.first > 18) {
                     formGenerator.getViewByTag(AssessmentDefinedParams.WHAT_FED_LAST_24_HRS + rootSuffix)?.visibility = View.GONE
                     formGenerator.getViewByTag(AssessmentDefinedParams.BREAST_FEEDING + rootSuffix)?.visibility = View.VISIBLE
@@ -872,6 +875,12 @@ class AssessmentRMNCHFragment :
 
                 RMNCH.ChildHoodVisit -> {
                     manageChildFormBasedOnPregnancyDetail(viewModel.pregnancyDetailLiveData.value)
+                    // Apply age-specific child weight validation for Childhood Visit.
+                    viewModel.memberDetailsLiveData.value?.data?.dateOfBirth?.let { dateOfBirth ->
+                        calculateAgeInMonths(dateOfBirth)?.let { pair ->
+                            updateChildWeightValidationRanges(pair.first)
+                        }
+                    }
                 }
             }
         }
@@ -2208,4 +2217,19 @@ class AssessmentRMNCHFragment :
                 DateUtils.getDaysDifference(date.getLongTime())
             }
         }
+
+    /**
+     * Updates the child weight validation range based on the child's age in months.
+     *
+     * The minimum and maximum allowed weight values are retrieved from the
+     * predefined RMNCH age-specific validation ranges and applied to the
+     * weight input field.
+     */
+    private fun updateChildWeightValidationRanges(ageInMonths: Int) {
+        val (minWeight, maxWeight) = RMNCH.getChildWeightValidationRange(ageInMonths) ?: return
+        formGenerator.getFormLayout(AssessmentDefinedParams.WEIGHT)?.apply {
+            minValue = minWeight
+            maxValue = maxWeight
+        }
+    }
 }

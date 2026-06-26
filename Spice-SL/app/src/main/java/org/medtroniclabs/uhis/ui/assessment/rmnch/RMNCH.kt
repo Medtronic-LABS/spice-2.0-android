@@ -310,6 +310,19 @@ object RMNCH {
         return triple.third
     }
 
+    /**
+     * Valid weight (kg) range for childhood visit, keyed by age in whole months.
+     */
+    fun getChildWeightValidationRange(ageInMonths: Int): Pair<Double, Double>? =
+        when (ageInMonths) {
+            in 0..3 -> 1.1 to 9.0
+            in 4..6 -> 3.0 to 12.0
+            in 7..11 -> 4.0 to 15.0
+            in 12..18 -> 5.0 to 20.0
+            in 19..Int.MAX_VALUE -> 6.0 to 25.0
+            else -> null
+        }
+
     private fun getWeekPeriod(
         gestationWeek: Double,
         context: Context,
