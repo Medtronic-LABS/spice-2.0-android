@@ -126,12 +126,11 @@ object DateUtils {
             today.minusYears(years.toLong()).minusMonths(months.toLong()),
         )
         val daysTotal = daysInRemainder.toInt()
-        if (years >= 5) {
+        if (years >= 1) {
             return AgeOrDobDisplay(years, AgeOrDobDisplay.AgeOrDobUnit.YEAR)
         }
-        val totalMonths = (years * 12) + months
-        if (totalMonths > 0) {
-            return AgeOrDobDisplay(totalMonths, AgeOrDobDisplay.AgeOrDobUnit.MONTH)
+        if (months > 0) {
+            return AgeOrDobDisplay(months, AgeOrDobDisplay.AgeOrDobUnit.MONTH)
         }
         return AgeOrDobDisplay(daysTotal, AgeOrDobDisplay.AgeOrDobUnit.DAY)
     }

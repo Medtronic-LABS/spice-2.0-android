@@ -2630,16 +2630,8 @@ class FormGenerator(
                 etAge.setText(display.value.toString())
                 applyAgeOrDobUnitToView(tvAgeUnit, display)
             } else {
-                var age = CommonUtils.getAgeInYearsByDOB(dobFormatted)
-                if (age < 1) {
-                    age = 1
-                }
-                etAge.setText(age.toString())
-                tvAgeUnit.text = if (age == 1) {
-                    context.getString(R.string.year)
-                } else {
-                    context.getString(R.string.years)
-                }
+                etAge.setText("")
+                tvAgeUnit.text = context.getString(R.string.years)
             }
             etAge.alpha = 0.6f
             tvAgeUnit.alpha = 0.6f
