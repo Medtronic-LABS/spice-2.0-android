@@ -3,10 +3,15 @@ package org.medtroniclabs.uhis.repo
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import com.google.gson.TypeAdapter
 import com.google.gson.reflect.TypeToken
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
+import com.google.gson.stream.JsonWriter
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -279,6 +284,42 @@ class OfflineSyncRepository @Inject constructor(
         }
     }
 
+    /**
+     * Reads a JSON number/string into a [Long], tolerating fractional values the backend
+     * sometimes sends for Long-typed fields. Fractional values are rounded; null and
+     * unparseable values become null so Gson can keep the entity's default.
+     */
+    private val lenientLongAdapter = object : TypeAdapter<Long?>() {
+        override fun write(
+            out: JsonWriter,
+            value: Long?,
+        ) {
+            if (value == null) out.nullValue() else out.value(value)
+        }
+
+        override fun read(reader: JsonReader): Long? =
+            when (reader.peek()) {
+                JsonToken.NULL -> {
+                    reader.nextNull()
+                    null
+                }
+                JsonToken.NUMBER -> Math.round(reader.nextDouble())
+                JsonToken.STRING -> {
+                    val raw = reader.nextString()
+                    raw.toLongOrNull() ?: raw.toDoubleOrNull()?.let { Math.round(it) }
+                }
+                else -> {
+                    reader.skipValue()
+                    null
+                }
+            }
+    }
+
+    private val lenientLongGson: Gson = GsonBuilder()
+        .registerTypeAdapter(java.lang.Long::class.java, lenientLongAdapter)
+        .registerTypeAdapter(java.lang.Long.TYPE, lenientLongAdapter)
+        .create()
+
     suspend fun fetchSyncedData(
         villageIds: List<Long> = listOf(),
         serverLastSyncedAt: String? = null,
@@ -299,7 +340,13 @@ class OfflineSyncRepository @Inject constructor(
         val response = syncedResponse.body()?.string()
         response?.let {
             try {
-                val gson = Gson()
+                // The backend can send fractional values (e.g. 0.110033…) for fields the
+                // entities declare as Long (e.g. FollowUpCall.duration). Default Gson throws
+                // NumberFormatException on that, aborting the whole initial download and
+                // leaving the user stuck on the 0% "Downloading data" screen. Coerce such
+                // values to Long here so the download completes without changing the Room
+                // schema (this is the host app, not the SDK).
+                val gson = lenientLongGson
                 val type: Type = object : TypeToken<ResponseInitialDownload>() {}.type
                 val responseInitialDownload: ResponseInitialDownload? = gson.fromJson(it, type)
                 if (responseInitialDownload == null) {
