@@ -78,6 +78,12 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
     companion object {
         const val TAG = "HomeScreenFragment"
 
+        /**
+         * How long the pull-to-refresh spinner lingers after [MicroCoachingSDK.refreshRefreshers]
+         * (which is fire-and-forget; the MorningCard updates reactively). Purely cosmetic feedback.
+         */
+        private const val COACHING_REFRESH_SPINNER_MS = 1200L
+
         fun newInstance(): HomeScreenFragment = HomeScreenFragment()
     }
 
@@ -116,6 +122,17 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
 
         sdk.onHomeScreenShown(chwId)
         pushTodaysVisits(sdk)
+
+        // Pull-to-refresh on the home coaching surface → re-fetch the morning
+        // refreshers (backend re-runs its gap algorithm + on-device re-evaluation).
+        // refreshRefreshers() is fire-and-forget on the SDK scope and the MorningCard
+        // updates reactively, so stop the spinner after a short delay for feedback.
+        // Capture the view (not `binding`) so the delayed stop is safe across teardown.
+        binding.coachingSwipeRefresh.setOnRefreshListener {
+            sdk.refreshRefreshers()
+            val swipeRefresh = binding.coachingSwipeRefresh
+            swipeRefresh.postDelayed({ swipeRefresh.isRefreshing = false }, COACHING_REFRESH_SPINNER_MS)
+        }
         // The Coaching grid tile + its skipped-refresher badge are rendered by the
         // SDK's CoachingGridTile (see DashboardMenuItemsAdapter) — no host badge
         // wiring needed; the tile observes the count internally.
