@@ -4755,6 +4755,7 @@ class FormGenerator(
                 VIEW_TYPE_FORM_DATEPICKER -> createDatePicker(formLayout)
                 VIEW_TYPE_FORM_BP -> createBPView(formLayout)
                 VIEW_TYPE_TIME -> createTimeView(formLayout)
+                VIEW_TYPE_FORM_QR -> addScannerView(formLayout)
             }
         }
     }
@@ -5206,6 +5207,23 @@ class FormGenerator(
             }
         }
 
+        getViewByTag(tag + errorSuffix)?.visibility = View.GONE
+    }
+
+    /**
+     * Edit flow: a community patient already has a QR linked at enrollment, but the patient-details
+     * API does not return the QR value. This shows the "linked successfully" state (with the
+     * "Scan New QR Code?" option still available) WITHOUT writing a value into [resultHashMap], so
+     * submitting preserves the existing link unless the user explicitly re-scans a new code.
+     */
+    fun markQrAlreadyLinked(tag: String) {
+        getViewByTag(tag + titleSuffix)?.let {
+            if (it is TextView) {
+                it.text = getString(R.string.qr_code_scanned)
+            }
+        }
+        getViewByTag(tag + scanDoneButtonSuffix)?.visibility = View.VISIBLE
+        getViewByTag(tag + innerRootSuffix)?.visibility = View.VISIBLE
         getViewByTag(tag + errorSuffix)?.visibility = View.GONE
     }
 

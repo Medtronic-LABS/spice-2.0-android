@@ -34,6 +34,7 @@ import org.medtroniclabs.uhis.db.local.RoomHelper
 import org.medtroniclabs.uhis.model.LabTestListRequest
 import org.medtroniclabs.uhis.model.PatientDetailRequest
 import org.medtroniclabs.uhis.model.ReferralDetailRequest
+import org.medtroniclabs.uhis.ncd.data.NCDDiagnosisRequestResponse
 import org.medtroniclabs.uhis.ncd.data.PatientVisitRequest
 import org.medtroniclabs.uhis.network.ApiHelper
 import retrofit2.Response
@@ -62,6 +63,8 @@ class MedicalReviewRepository @Inject constructor(
     suspend fun getPatientPregnancyDetails(request: PatientPregnancyModel) = apiHelper.getPatientPregnancyDetails(request)
 
     suspend fun confirmDiagnosis(request: ConfirmDiagnosesRequest) = apiHelper.confirmDiagnosis(request)
+
+    suspend fun updateConfirmDiagnosis(request: NCDDiagnosisRequestResponse) = apiHelper.createConfirmDiagonsis(request)
 
     suspend fun getMentalHealthDetails(request: HashMap<String, Any>) = apiHelper.getMentalHealthDetails(request)
 

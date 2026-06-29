@@ -14,18 +14,23 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.internal.LinkedTreeMap
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.postError
 import org.medtroniclabs.uhis.appextensions.setError
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.SecuredPreference
+import org.medtroniclabs.uhis.data.CodeDetailsObject
+import org.medtroniclabs.uhis.data.EncounterDetails
+import org.medtroniclabs.uhis.data.offlinesync.model.ProvanceDto
 import org.medtroniclabs.uhis.data.registration.LabTestModel
 import org.medtroniclabs.uhis.data.registration.LabTestResult
 import org.medtroniclabs.uhis.databinding.AddLabTestResultBinding
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
 import org.medtroniclabs.uhis.formgeneration.extension.markMandatory
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
+import org.medtroniclabs.uhis.model.LabTestCreateRequest
+import org.medtroniclabs.uhis.model.LabTestDetails
+import org.medtroniclabs.uhis.model.LabTestResultObject
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
 import org.medtroniclabs.uhis.ui.patient.adapter.LabTestResultsAdapter
@@ -191,89 +196,60 @@ class AddLabTestResultDialog(
     }
 
     private fun createRequest() {
-        val request = HashMap<String, Any>()
         val labResults = resultsAdapter.getResultsList()
-        var isEmptyRanges = true
-        labResults.forEach { resultMap ->
-            // Entered Value
-            val result = resultMap[DefinedParams.RESULT_VALUE]
-            var enteredValue: Double? = null
-            if (result is String) {
-                enteredValue = result.toDoubleOrNull()
-            }
-
-            // Comparing the selected unit test range with the entered value
-            val selectedUnit = resultMap[DefinedParams.UNIT]
-            val rangesList = resultMap[DefinedParams.LAB_RESULT_RANGE]
-            if (rangesList is ArrayList<*>) {
-                isEmptyRanges = rangesList.isEmpty()
-                handleRangeList(resultMap, rangesList, selectedUnit, enteredValue)
-            }
-            request[DefinedParams.IS_EMPTY_RANGES] = isEmptyRanges
-
-            // Removing the Lab Result Ranges list(As we have calculated the value for the is_abnormal key)
-            resultMap.remove(DefinedParams.LAB_RESULT_RANGE)
-        }
-        request[DefinedParams.PATIENT_LABTEST_RESULTS] = labResults
-        request[DefinedParams.REFFERED_DATE] = labTestModel.referredDate ?: ""
-        request[DefinedParams.PATIENT_LABTEST_ID] = labTestModel._id ?: -1
-        request[DefinedParams.TENANT_ID] = SecuredPreference.getTenantId()
-        request[DefinedParams.TESTED_ON] = DateUtils.convertDateTimeToDate(
+        val testedOn = DateUtils.convertDateTimeToDate(
             binding.tvTestedOn.text.toString(),
             DateUtils.DATE_FORMAT_ddMMMyyyy,
             DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
             inUserTimeZone = true,
         )
-        request[DefinedParams.COMMENT] = binding.etComment.text?.toString() ?: ""
-        val userRole = SecuredPreference.getUserDetails()?.roles?.joinToString { it.name } ?: ""
-        request[DefinedParams.ROLE_NAME] = userRole
-        request[DefinedParams.IS_REVIEWED] = false
-        viewModel.createLabTestResult(requireContext(), request)
+        val performedBy = SecuredPreference.getUserFhirId()
+        val resultObjects = ArrayList<LabTestResultObject>()
+        labResults.forEach { row ->
+            val fieldId = (row[LabTestViewModel.FHIR_FIELD_ID] as? String)
+                ?: (row[DefinedParams.NAME] as? String).orEmpty()
+            val code = row[LabTestViewModel.FHIR_CODE] as? String
+            val url = row[LabTestViewModel.FHIR_URL] as? String
+            resultObjects.add(
+                LabTestResultObject(
+                    name = fieldId,
+                    value = row[DefinedParams.RESULT_VALUE],
+                    performedBy = performedBy,
+                    codeDetails = if (code != null && url != null) CodeDetailsObject(code, url) else null,
+                    testedOn = testedOn,
+                    resource = row[LabTestViewModel.FHIR_RESOURCE] as? String,
+                    unit = row[DefinedParams.UNIT] as? String,
+                ),
+            )
+        }
+        viewModel.createLabTestResultFhir(buildLabTestCreateRequest(resultObjects))
     }
 
-    private fun handleRangeList(
-        resultMap: HashMap<String, Any>,
-        rangesList: ArrayList<*>,
-        selectedUnit: Any?,
-        enteredValue: Double?,
-    ) {
-        rangesList.forEach range@{ range ->
-            if (range is LinkedTreeMap<*, *>) {
-                val unit = range[DefinedParams.UNIT]
-                if (unit is String && selectedUnit is String && unit == selectedUnit) {
-                    validateRanges(resultMap, range, enteredValue)
-                    return@range
-                }
-            }
-        }
-    }
-
-    private fun validateRanges(
-        resultMap: HashMap<String, Any>,
-        range: LinkedTreeMap<*, *>,
-        enteredValue: Double?,
-    ) {
-        val min = range[DefinedParams.MINIMUM_VALUE] ?: 0.0
-        val max = range[DefinedParams.MAXIMUM_VALUE]
-        max?.let { maximumRange ->
-            if (min is Double && maximumRange is Double) {
-                enteredValue?.let { value ->
-                    val isNormal = value >= min && value <= maximumRange
-                    resultMap[DefinedParams.IS_ABNORMAL] = !isNormal
-                    resultMap[DefinedParams.RESULT_STATUS] =
-                        if (isNormal) DefinedParams.RESULT_NEGATIVE else DefinedParams.RESULT_POSITIVE
-                }
-            }
-        }
-        if (!resultMap.containsKey(DefinedParams.IS_ABNORMAL)) {
-            resultMap[DefinedParams.IS_ABNORMAL] = false
-            resultMap[DefinedParams.RESULT_STATUS] =
-                DefinedParams.RESULT_NEGATIVE
-        }
-        val displayName = range[DefinedParams.DISPLAY_NAME]
-        if (displayName is String) {
-            resultMap[DefinedParams.DISPLAY_NAME] = displayName
-        }
+    private fun buildLabTestCreateRequest(resultObjects: ArrayList<LabTestResultObject>): LabTestCreateRequest {
+        val nurseMr = nurseViewModel.nurseMrRequestModel
+        val patient = nurseViewModel.patientDetailsValue
+        val detail = LabTestDetails(
+            testName = labTestModel.labTestName.orEmpty(),
+            labTestId = labTestModel.labTestId,
+            recommendedBy = labTestModel.recommendedById ?: SecuredPreference.getUserFhirId(),
+            recommendedName = labTestModel.referredByDisplay,
+            recommendedOn = labTestModel.referredDate.orEmpty(),
+            labTestResults = resultObjects,
+            id = labTestModel.fhirId ?: labTestModel._id?.toString(),
+        )
+        val encounter = EncounterDetails(
+            id = nurseMr.encounterReference,
+            patientReference = nurseMr.patientReference,
+            patientId = patient?.patientId,
+            memberId = nurseMr.memberReference,
+            provenance = ProvanceDto(),
+            visitId = nurseMr.patientVisitId?.takeIf { it > 0L }?.toString(),
+        )
+        return LabTestCreateRequest(
+            encounter = encounter,
+            labTests = arrayListOf(detail),
+            identityValue = patient?.identityValue,
+        )
     }
 
     private fun showDatePickerDialog() {

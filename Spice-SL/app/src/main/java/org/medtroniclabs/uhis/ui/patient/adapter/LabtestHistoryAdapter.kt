@@ -71,15 +71,22 @@ class LabtestHistoryAdapter(var itemRemove: Boolean, var type: Int? = null) :
 
             binding.tvValue.setTextColor(getTextColor(context, item.resultUpdateBy))
 
-            binding.ivDelete.visibility = View.GONE
+            // Edit (enter result) is only for a persisted/server-saved referred test that has no
+            // result entered yet. Newly added but unsaved items have no _id, so they show no edit.
+            val isReferredWithoutResult =
+                item._id != null && item.referredDate != null && item.resultDate.isNullOrEmpty()
+
             binding.ivDropDown.visibility =
                 if (item.resultDate.isNullOrBlank()) View.GONE else View.VISIBLE
 
-            binding.ivEdit.visibility =
-                if (item.referredDate != null && item.resultDate.isNullOrEmpty()) View.VISIBLE else View.GONE
+            binding.ivEdit.visibility = if (isReferredWithoutResult) View.VISIBLE else View.GONE
+            // The separate delete icon is never shown; removal is done via the cross (ivRemove).
+            binding.ivDelete.visibility = View.GONE
 
+            // The cross/remove shows for any referred test that has no result yet - both saved
+            // records (server delete) and unsaved local additions (discard).
             binding.ivRemove.visibility =
-                if (item.isReviewed == true || item.resultDate != null) View.GONE else View.VISIBLE
+                if (item.resultDate.isNullOrEmpty()) View.VISIBLE else View.GONE
             if (itemRemove) {
                 binding.ivRemove.visibility = View.GONE
                 binding.ivDelete.visibility = View.GONE
@@ -88,14 +95,11 @@ class LabtestHistoryAdapter(var itemRemove: Boolean, var type: Int? = null) :
             }
             if (type == 2) {
 //                binding.ivRemove.visibility = View.GONE
-                binding.ivDelete.visibility = View.GONE
                 binding.tvValue.visibility = View.GONE
                 binding.tvTestedOn.visibility = View.GONE
             }
-            if (item._id == null) {
-                binding.ivEdit.visibility = View.GONE
-            }
             binding.ivEdit.safeClickListener(this)
+            binding.ivDelete.safeClickListener(this)
             binding.ivDropDown.safeClickListener(this)
             binding.tvTestName.safeClickListener(this)
             binding.ivRemove.safeClickListener(this)
@@ -136,7 +140,7 @@ class LabtestHistoryAdapter(var itemRemove: Boolean, var type: Int? = null) :
 
         override fun onClick(mView: View?) {
             when (mView?.id) {
-                binding.ivRemove.id -> {
+                binding.ivRemove.id, binding.ivDelete.id -> {
                     handleRemove(context, layoutPosition)
                 }
 

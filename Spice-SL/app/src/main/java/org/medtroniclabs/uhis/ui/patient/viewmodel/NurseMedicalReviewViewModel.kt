@@ -102,7 +102,7 @@ class NurseMedicalReviewViewModel @Inject constructor(
             viewModelScope.launch(dispatcherIO) {
                 latestConfirmDiagnosesList.postLoading()
                 try {
-                    val response = medicalReviewRepo.getPatientDetails(PatientDetailRequest(patientId = null))
+                    val response = medicalReviewRepo.getPatientDetails(PatientDetailRequest(patientId = patientIdString))
                     if (response.isSuccessful) {
                         val res = response.body()
                         if (res?.status == true) {
@@ -190,7 +190,7 @@ class NurseMedicalReviewViewModel @Inject constructor(
             viewModelScope.launch(dispatcherIO) {
                 patientDetailsDiagnosisResponse.postLoading()
                 try {
-                    val response = medicalReviewRepo.getPatientDetails(PatientDetailRequest(patientId = null))
+                    val response = medicalReviewRepo.getPatientDetails(PatientDetailRequest(patientId = patientIdString))
                     if (response.isSuccessful) {
                         val res = response.body()
                         if (res?.status == true) {

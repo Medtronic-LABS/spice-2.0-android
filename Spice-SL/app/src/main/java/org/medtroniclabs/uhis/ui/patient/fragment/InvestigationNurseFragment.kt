@@ -541,7 +541,12 @@ class InvestigationNurseFragment :
     }
 
     private fun fetchResults(model: LabTestModel) {
-        viewModel.getResultDetails(model._id ?: -1L)
+        // Result values are delivered inline by investigation/list (mapped into labResultDetails);
+        // the relational result/details endpoint no longer exists on the FHIR backend.
+        labTestCreateAdapter.showResultDetails(
+            model.labResultDetails ?: emptyList(),
+            model.resultComments,
+        )
     }
 
     override fun onClick(mView: View?) {
@@ -560,7 +565,9 @@ class InvestigationNurseFragment :
         if (model?._id != null) {
             viewModel.editModel = model
             nurseViewModel.labTestId = model._id
-            viewModel.getLabTestResults(requireContext(), model.labTestId!!, model.labTestName)
+            // Result fields come from the lab test's inline form definition (formInput); the old
+            // relational result/list endpoint no longer exists on the FHIR backend.
+            viewModel.buildLabTestResultFields(model.labTestName)
         }
     }
 
@@ -580,10 +587,7 @@ class InvestigationNurseFragment :
 
     private fun removeLabTest(model: LabTestModel) {
         if (model._id != null) {
-            val request = HashMap<String, Any>()
-            request[DefinedParams.ID] = model._id
-            request[DefinedParams.TENANT_ID] = SecuredPreference.getTenantId()
-            viewModel.removeLabTest(requireContext(), request, model)
+            viewModel.removeLabTestFhir(model)
         } else {
             model.labTestName?.let {
                 activityTagListCustomView.deselectChipByID(

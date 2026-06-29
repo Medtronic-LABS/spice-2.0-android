@@ -1,5 +1,6 @@
 package org.medtroniclabs.uhis.ui.patient.viewmodel
 
+import com.google.gson.Gson
 import org.medtroniclabs.uhis.data.history.HistoryEntity
 import org.medtroniclabs.uhis.data.registration.LabTestHistory
 import org.medtroniclabs.uhis.data.registration.LabTestListResponse
@@ -9,6 +10,10 @@ import org.medtroniclabs.uhis.data.registration.PatientPrescription
 import org.medtroniclabs.uhis.data.registration.PatientPrescriptionHistoryResponse
 import org.medtroniclabs.uhis.data.registration.PrescriptionModel
 import org.medtroniclabs.uhis.data.registration.VisitDateModel
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
+import org.medtroniclabs.uhis.formgeneration.model.FormLayout
+import org.medtroniclabs.uhis.formgeneration.model.FormResponse
+import org.medtroniclabs.uhis.model.LabTestResultObject
 import org.medtroniclabs.uhis.data.Prescription as FhirPrescription
 import org.medtroniclabs.uhis.model.LabTestListResponse as FhirLabTestListResponse
 
@@ -81,6 +86,11 @@ object NurseFhirMapper {
         source?.filter { (it.testedOn != null) == resultUpdated }?.forEach { item ->
             list.add(
                 LabTestModel(
+                    _id = item.id.toLongOrNull(),
+                    fhirId = item.id,
+                    labTestId = item.labTestCustomization.id,
+                    recommendedById = item.recommendedBy,
+                    formInput = item.labTestCustomization.formInput,
                     testName = item.testName,
                     labTestName = item.testName,
                     referredBy = item.recommendedName,
@@ -89,10 +99,55 @@ object NurseFhirMapper {
                     resultDate = item.testedOn,
                     isReviewed = item.isReview ?: false,
                     comment = item.comments,
+                    resultComments = item.comments,
+                    labResultDetails = mapResultDetails(
+                        item.labTestResults,
+                        item.labTestCustomization.formInput,
+                    ),
                 ),
             )
         }
         return LabTestListResponse(patientLabTest = list, patientLabtestDates = ArrayList())
+    }
+
+    /**
+     * Converts the inline FHIR result objects into the map shape the result-detail grid
+     * ([org.medtroniclabs.uhis.ui.patient.adapter.ResultsAdapter]) reads. This replaces the
+     * removed relational patient-labtest/result/details endpoint.
+     */
+    private fun mapResultDetails(
+        results: List<LabTestResultObject>?,
+        formInput: String?,
+    ): ArrayList<Map<String, Any>> {
+        val list = ArrayList<Map<String, Any>>()
+        // The saved result's name is the form field id; resolve its human-readable title (and a
+        // unit fallback) from the lab test's inline form definition.
+        val fieldsById = parseFormFields(formInput)
+        results?.forEach { result ->
+            val map = HashMap<String, Any>()
+            val field = fieldsById[result.name]
+            val displayName = field?.title?.takeIf { it.isNotBlank() } ?: result.name
+            map[DefinedParams.RESULT_NAME] = displayName
+            result.value?.let { map[DefinedParams.RESULT_VALUE] = it.toString() }
+            val unit = result.unit?.takeIf { it.isNotBlank() }
+                ?: (field?.unitList?.firstOrNull()?.get(DefinedParams.NAME) as? String)
+            unit?.let { map[DefinedParams.UNIT] = it }
+            list.add(map)
+        }
+        return list
+    }
+
+    private fun parseFormFields(formInput: String?): Map<String, FormLayout> {
+        if (formInput.isNullOrBlank()) return emptyMap()
+        return try {
+            Gson()
+                .fromJson(formInput, FormResponse::class.java)
+                ?.formLayout
+                ?.associateBy { it.id }
+                ?: emptyMap()
+        } catch (e: Exception) {
+            emptyMap()
+        }
     }
 
     fun mapLabTestHistory(entity: HistoryEntity?): PatientLabTestHistoryResponse {

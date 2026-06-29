@@ -1,6 +1,7 @@
 package org.medtroniclabs.uhis.ui.patient.fragment
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
@@ -24,14 +25,18 @@ import org.medtroniclabs.uhis.data.registration.PatientHistoryModel
 import org.medtroniclabs.uhis.databinding.FragmentNurseBioDataBinding
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
+import org.medtroniclabs.uhis.ncd.medicalreview.NCDMRUtil
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseFragment
+import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.patient.util.CommonDialogInterface
 import org.medtroniclabs.uhis.ui.patient.viewmodel.MedicalReviewBaseViewModel
 import org.medtroniclabs.uhis.ui.patient.viewmodel.NurseBioDataViewModel
 import org.medtroniclabs.uhis.ui.patient.viewmodel.NurseMedicalReviewViewModel
+import org.medtroniclabs.uhis.ui.patientEdit.NCDPatientEditActivity
 import java.util.ArrayList
 import kotlin.getValue
+import org.medtroniclabs.uhis.common.DefinedParams as CommonDefinedParams
 
 class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
     private lateinit var binding: FragmentNurseBioDataBinding
@@ -117,12 +122,26 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
     override fun onClick(view: View?) {
         when (view?.id) {
             R.id.tvEdit, R.id.ivEdit -> {
-//                val intent = Intent(requireContext(), PatientEditActivity::class.java)
-//                intent.putExtra(DefinedParams.PATIENT_ID, nurseViewModel.newPatientId)
-//                intent.putExtra(DefinedParams.PatientTrackId, nurseViewModel.patientTrackId)
-//                intent.putExtra(DefinedParams.fromMedicalReview, true)
-//                patientEditLauncher.launch(intent)
+                openPatientEdit()
             }
+        }
+    }
+
+    /**
+     * Right-side bio-data edit navigates to the patient enrollment/edit page.
+     * (The "Edit diagnosis" link continues to open the confirm-diagnosis dialog.)
+     */
+    private fun openPatientEdit() {
+        // NCDPatientEditActivity looks up the patient via the MEMBER_REFERENCE extra
+        // (passed to /patient/patientDetails). For the nurse flow the value that resolves
+        // is patientIdString (the same id used by getPatientDetails), not memberReference.
+        val patientIdString = nurseViewModel.patientIdString
+        if (!patientIdString.isNullOrEmpty()) {
+            val intent = Intent(requireContext(), NCDPatientEditActivity::class.java)
+            intent.putExtra(NCDMRUtil.PATIENT_REFERENCE, nurseViewModel.nurseMrRequestModel.patientReference)
+            intent.putExtra(NCDMRUtil.MEMBER_REFERENCE, patientIdString)
+            intent.putExtra(CommonDefinedParams.ORIGIN, MenuConstants.MY_PATIENTS_MENU_ID)
+            patientEditLauncher.launch(intent)
         }
     }
 
@@ -209,6 +228,19 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
                     hideLoading()
                 }
             }
+        }
+    }
+
+    private fun openConfirmDiagnosis() {
+        nurseViewModel.isConfirmDiagnosis = true
+        val request = nurseViewModel.patientId?.let {
+            PatientDetailsModel(
+                it,
+                isAssessmentDataRequired = false,
+            )
+        }
+        if (request != null) {
+            context?.let { nurseViewModel.getPatientDetailsDiagnosis(it, request) }
         }
     }
 
@@ -345,17 +377,7 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
         } else {
             val clickableSpan = object : ClickableSpan() {
                 override fun onClick(mView: View) {
-                    nurseViewModel.isConfirmDiagnosis = true
-
-                    val request = nurseViewModel.patientId?.let {
-                        PatientDetailsModel(
-                            it,
-                            isAssessmentDataRequired = false,
-                        )
-                    }
-                    if (request != null) {
-                        context?.let { nurseViewModel.getPatientDetailsDiagnosis(it, request) }
-                    }
+                    openConfirmDiagnosis()
                 }
             }
             val subText = " ${getString(R.string.edit_diagnosis)}"
@@ -416,11 +438,8 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
     private val patientEditLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                nurseViewModel.patientId?.let {
-                    nurseBioDataViewModel.getPatientDetails(
-                        requireContext(),
-                        PatientDetailsModel(it, isAssessmentDataRequired = false),
-                    )
+                nurseViewModel.patientIdString?.let {
+                    nurseBioDataViewModel.getPatientDetails(requireContext(), it)
                 }
             }
         }

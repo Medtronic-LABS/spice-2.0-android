@@ -94,6 +94,14 @@ data class PatientListRespModel(
     val entryPoint: String? = null,
     val isEmtctFlow: Boolean? = null,
     val otherEntryPoint: String? = null,
+    val patientHealthHistory: PatientHealthHistory? = null,
+) : Serializable
+
+data class PatientHealthHistory(
+    val heartAttack: String? = null,
+    val stroke: String? = null,
+    val kidneyDisease: String? = null,
+    val copd: String? = null,
 ) : Serializable
 
 data class PregnancyDetails(

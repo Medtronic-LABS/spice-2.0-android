@@ -50,6 +50,7 @@ import org.medtroniclabs.uhis.di.IoDispatcher
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
 import org.medtroniclabs.uhis.formgeneration.model.FormLayout
 import org.medtroniclabs.uhis.model.PatientDetailRequest
+import org.medtroniclabs.uhis.ncd.data.NCDDiagnosisRequestResponse
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.utils.ConnectivityManager
 import org.medtroniclabs.uhis.repo.MedicalReviewRepository
@@ -482,6 +483,43 @@ class PatientDetailViewModel @Inject constructor(
             }
         } else {
             patientPregnancyDetailResponse.setError(context.getString(R.string.no_internet_error))
+        }
+    }
+
+    /**
+     * Confirm-diagnosis update for the nurse flow. Routes to the existing
+     * /medical-review/confirm-diagnosis/update endpoint (via [NCDDiagnosisRequestResponse]) and
+     * reuses [confirmDiagnosisRequest] so the dialog's success/error handling stays unchanged.
+     */
+    fun updateConfirmDiagnosis(
+        context: Context,
+        request: NCDDiagnosisRequestResponse,
+    ) {
+        try {
+            viewModelScope.launch(dispatcherIO) {
+                try {
+                    if (connectivityManager.isNetworkAvailable()) {
+                        confirmDiagnosisRequest.postLoading()
+                        val response = medicalReviewRepo.updateConfirmDiagnosis(request)
+                        if (response.isSuccessful) {
+                            val res = response.body()
+                            if (res?.status == true) {
+                                confirmDiagnosisRequest.postSuccess(res.entity)
+                            } else {
+                                confirmDiagnosisRequest.postError()
+                            }
+                        } else {
+                            confirmDiagnosisRequest.postError()
+                        }
+                    } else {
+                        confirmDiagnosisRequest.postError(context.getString(R.string.no_internet_error))
+                    }
+                } catch (e: Exception) {
+                    confirmDiagnosisRequest.postError()
+                }
+            }
+        } catch (e: Exception) {
+            confirmDiagnosisRequest.postError()
         }
     }
 

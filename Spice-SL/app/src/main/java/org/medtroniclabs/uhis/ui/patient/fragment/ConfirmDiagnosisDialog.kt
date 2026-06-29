@@ -16,6 +16,7 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.postError
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
+import org.medtroniclabs.uhis.data.offlinesync.model.ProvanceDto
 import org.medtroniclabs.uhis.data.registration.Diagnosis
 import org.medtroniclabs.uhis.data.registration.PatientDetailsModel
 import org.medtroniclabs.uhis.databinding.FragmentConfirmDiagnosisBinding
@@ -23,6 +24,9 @@ import org.medtroniclabs.uhis.db.entity.DiagnosisEntity
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.HYPERTENSION
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
+import org.medtroniclabs.uhis.ncd.data.NCDDiagnosisItem
+import org.medtroniclabs.uhis.ncd.data.NCDDiagnosisRequestResponse
+import org.medtroniclabs.uhis.ncd.medicalreview.NCDMRUtil
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
@@ -191,17 +195,36 @@ class ConfirmDiagnosisDialog(val commonDialogInterface: CommonDialogInterface? =
 
         medicalReviewBaseViewModel.diagnosisListResponse.observe(this) { responseList ->
             val list = validateResponseList(responseList)
-            var removeItem: List<DiagnosisEntity> = validateEntityList(list)
+            val removeItem: List<DiagnosisEntity> = validateEntityList(list)
             (list as? ArrayList?)?.removeAll(removeItem)
-            val diagnosisMap: HashMap<String, MutableList<String>>? = diagnosisGrouping(list)
-            val selectedDiagnosis = ArrayList<String>()
-            if (patientDetails?.confirmDiagnosis?.isNotEmpty() == true) {
-                selectedDiagnosis.addAll(patientDetails?.confirmDiagnosis!!)
+
+            val chipItems = list.map { entity ->
+                ChipViewItemModel(
+                    id = entity._id,
+                    name = entity.diagnosis,
+                    cultureValue = entity.cultureValue,
+                    type = entity.type,
+                    value = entity.value,
+                )
             }
+            val diagnosisMap: HashMap<String, MutableList<ChipViewItemModel>> =
+                chipItems.groupByTo(HashMap(), { it.type.toString() }, { it })
+
+            // patient/patientDetails returns confirmed diagnoses under patientConfirmDiagnosis
+            // (confirmDiagnosis can be null in that payload), and the list may contain null entries.
+            val selectedDiagnosis = ArrayList<String>()
+            (patientDetails?.patientConfirmDiagnosis ?: patientDetails?.confirmDiagnosis)
+                ?.filterNotNull()
+                ?.let { selectedDiagnosis.addAll(it) }
             autoPopulateDialogue(selectedDiagnosis)?.let {
                 selectedDiagnosis.addAll(it)
             }
-            // tagListCustomView.addChipItemList(list, selectedDiagnosis, diagnosisMap)
+
+            val selectedChips = chipItems.filter { chip ->
+                selectedDiagnosis.any { it.equals(chip.name, ignoreCase = true) }
+            }
+
+            tagListCustomView.addChipItemList(chipItems, selectedChips, diagnosisMap)
             enableConfirm()
         }
 
@@ -313,17 +336,28 @@ class ConfirmDiagnosisDialog(val commonDialogInterface: CommonDialogInterface? =
         }
     }
 
-    private fun diagnosisGrouping(list: List<DiagnosisEntity>?): HashMap<String, MutableList<String>>? {
-        var diagnosisTypeAndValues = HashMap<String, MutableList<String>>()
-        return list?.groupByTo(diagnosisTypeAndValues, { it.type.toString() }, { it.diagnosis })
-    }
-
     private fun saveDiagnosis() {
         if (validateInputs()) {
-            patientDetails?.let { patientDetails ->
-                viewModel.confirmDiagnosisRequestData.patientTrackId = patientDetails._id
-                viewModel.confirmDiagnosisRequestData.tenantId = patientDetails.tenantId
-                viewModel.confirmDiagnosis(requireContext(), viewModel.confirmDiagnosisRequestData)
+            patientDetails?.let {
+                val selectedDiagnoses = tagListCustomView
+                    .getSelectedTags()
+                    .filterIsInstance<ChipViewItemModel>()
+                    .map { chip ->
+                        NCDDiagnosisItem(
+                            type = chip.type,
+                            value = chip.value ?: chip.name,
+                            name = chip.name,
+                        )
+                    }
+                val request = NCDDiagnosisRequestResponse(
+                    provenanceDTO = ProvanceDto(),
+                    confirmDiagnosis = selectedDiagnoses,
+                    diagnosisNotes = viewModel.confirmDiagnosisRequestData.diagnosisComments,
+                    patientReference = nurseViewModel.nurseMrRequestModel.patientReference,
+                    memberReference = nurseViewModel.nurseMrRequestModel.memberReference,
+                    type = NCDMRUtil.NCD,
+                )
+                viewModel.updateConfirmDiagnosis(requireContext(), request)
             }
         }
     }

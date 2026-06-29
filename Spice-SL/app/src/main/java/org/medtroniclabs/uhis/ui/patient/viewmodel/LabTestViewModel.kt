@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -22,9 +24,15 @@ import org.medtroniclabs.uhis.data.registration.SearchModel
 import org.medtroniclabs.uhis.db.entity.DiagnosisEntity
 import org.medtroniclabs.uhis.di.IoDispatcher
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
+import org.medtroniclabs.uhis.formgeneration.config.ViewType
+import org.medtroniclabs.uhis.formgeneration.model.FormResponse
+import org.medtroniclabs.uhis.model.LabTestCreateRequest
 import org.medtroniclabs.uhis.model.LabTestListRequest
+import org.medtroniclabs.uhis.model.RemoveLabTestRequest
 import org.medtroniclabs.uhis.network.resource.Resource
+import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.network.utils.ConnectivityManager
+import org.medtroniclabs.uhis.repo.InvestigationRepository
 import org.medtroniclabs.uhis.repo.MedicalReviewRepository
 import javax.inject.Inject
 import kotlin.text.set
@@ -32,6 +40,7 @@ import kotlin.text.set
 @HiltViewModel
 class LabTestViewModel @Inject constructor(
     private val medicalReviewRepo: MedicalReviewRepository,
+    private val investigationRepo: InvestigationRepository,
     @IoDispatcher private val dispatcherIO: CoroutineDispatcher,
 ) : ViewModel() {
     var editModel: LabTestModel? = null
@@ -128,6 +137,135 @@ class LabTestViewModel @Inject constructor(
             list.sortBy { if (it.containsKey(DefinedParams.DISPLAY_ORDER)) (it[DefinedParams.DISPLAY_ORDER] as Number).toInt() else null }
             editModel?.patientLabtestResults = list
             labTestResultResponse.postSuccess(list)
+        }
+    }
+
+    /**
+     * Builds the result-entry rows from the lab test's inline form definition
+     * (labTestCustomization.formInput) instead of the removed relational
+     * patient-labtest/result/list endpoint. Rows are normalized through Gson so the nested
+     * maps/lists match the runtime types [LabTestResultsAdapter] expects (LinkedTreeMap/Double).
+     */
+    fun buildLabTestResultFields(labTestName: String?) {
+        val model = editModel
+        if (model == null) {
+            labTestResultResponse.postError()
+            return
+        }
+        labTestResultResponse.postLoading()
+        try {
+            val gson = Gson()
+            val rows = ArrayList<HashMap<String, Any>>()
+            val formInput = model.formInput
+            if (!formInput.isNullOrBlank()) {
+                val formResponse = gson.fromJson(formInput, FormResponse::class.java)
+                formResponse
+                    ?.formLayout
+                    ?.filter { it.viewType != ViewType.VIEW_TYPE_FORM_CARD_FAMILY && it.id != TESTED_ON_FIELD }
+                    ?.forEachIndexed { index, field ->
+                        val row = HashMap<String, Any>()
+                        row[DefinedParams.NAME] = field.title.ifBlank { labTestName ?: "" }
+                        row[DefinedParams.DISPLAY_ORDER] = field.orderId ?: (index + 1)
+                        row[FHIR_FIELD_ID] = field.id
+                        field.resource?.let { row[FHIR_RESOURCE] = it }
+                        field.code?.let { row[FHIR_CODE] = it }
+                        field.url?.let { row[FHIR_URL] = it }
+                        val ranges = field.ranges
+                        if (!ranges.isNullOrEmpty()) {
+                            val rangeList = ArrayList<HashMap<String, Any>>()
+                            ranges.distinctBy { it.unitType }.forEachIndexed { rIndex, range ->
+                                val rangeMap = HashMap<String, Any>()
+                                rangeMap[DefinedParams.ID] = (rIndex + 1).toDouble()
+                                rangeMap[DefinedParams.UNIT] = range.unitType
+                                rangeMap[DefinedParams.MINIMUM_VALUE] = range.minRange
+                                rangeMap[DefinedParams.MAXIMUM_VALUE] = range.maxRange
+                                rangeMap[DefinedParams.DISPLAY_NAME] = range.displayRange
+                                rangeList.add(rangeMap)
+                            }
+                            row[DefinedParams.LAB_RESULT_RANGE] = rangeList
+                        } else {
+                            // No ranges defined: fall back to the field's unitList so the unit
+                            // dropdown still populates (the adapter reads units from this list).
+                            val rangeList = ArrayList<HashMap<String, Any>>()
+                            field.unitList?.forEachIndexed { uIndex, unit ->
+                                val unitName = (unit[DefinedParams.NAME] as? String)
+                                    ?: (unit[DefinedParams.ID] as? String)
+                                if (!unitName.isNullOrBlank()) {
+                                    val rangeMap = HashMap<String, Any>()
+                                    rangeMap[DefinedParams.ID] = (uIndex + 1).toDouble()
+                                    rangeMap[DefinedParams.UNIT] = unitName
+                                    rangeList.add(rangeMap)
+                                }
+                            }
+                            if (rangeList.isNotEmpty()) {
+                                row[DefinedParams.LAB_RESULT_RANGE] = rangeList
+                            }
+                        }
+                        rows.add(row)
+                    }
+            }
+            if (rows.isEmpty()) {
+                val row = HashMap<String, Any>()
+                row[DefinedParams.NAME] = labTestName ?: ""
+                row[DefinedParams.DISPLAY_ORDER] = 1
+                rows.add(row)
+            }
+            val normalizedType = object : TypeToken<ArrayList<HashMap<String, Any>>>() {}.type
+            val normalized: ArrayList<HashMap<String, Any>> =
+                gson.fromJson(gson.toJson(rows), normalizedType)
+            model.patientLabtestResults = normalized
+            labTestResultResponse.postSuccess(normalized)
+        } catch (e: Exception) {
+            labTestResultResponse.postError()
+        }
+    }
+
+    /** Saves an entered lab test result through the FHIR investigation/create endpoint. */
+    fun createLabTestResultFhir(request: LabTestCreateRequest) {
+        viewModelScope.launch(dispatcherIO) {
+            if (!connectivityManager.isNetworkAvailable()) {
+                createResultResponse.postError()
+                return@launch
+            }
+            createResultResponse.postLoading()
+            try {
+                val resource = investigationRepo.createLabTest(request)
+                if (resource.state == ResourceState.SUCCESS) {
+                    createResultResponse.postSuccess(HashMap(resource.data ?: emptyMap()))
+                } else {
+                    createResultResponse.postError(resource.message)
+                }
+            } catch (e: Exception) {
+                createResultResponse.postError()
+            }
+        }
+    }
+
+    /** Removes a referred lab test through the FHIR investigation/remove endpoint. */
+    fun removeLabTestFhir(model: LabTestModel) {
+        viewModelScope.launch(dispatcherIO) {
+            if (!connectivityManager.isNetworkAvailable()) {
+                removeLabTestResponse.postError()
+                return@launch
+            }
+            removeLabTestResponse.postLoading()
+            try {
+                val id = model.fhirId ?: model._id?.toString()
+                if (id.isNullOrBlank()) {
+                    removeLabTestResponse.postError()
+                    return@launch
+                }
+                val resource = investigationRepo.removeLabTest(RemoveLabTestRequest(id))
+                if (resource.state == ResourceState.SUCCESS) {
+                    val entity = HashMap<String, Any>(resource.data ?: emptyMap())
+                    entity[DefinedParams.OTHER] = model
+                    removeLabTestResponse.postSuccess(entity)
+                } else {
+                    removeLabTestResponse.postError()
+                }
+            } catch (e: Exception) {
+                removeLabTestResponse.postError()
+            }
         }
     }
 
@@ -344,5 +482,18 @@ class LabTestViewModel @Inject constructor(
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    companion object {
+        // The "Tested On" date field is captured separately by the dialog, so it is excluded
+        // from the generated result-entry rows.
+        private const val TESTED_ON_FIELD = "TestedOn"
+
+        // Keys used to stash FHIR field metadata on each result row so the save request can
+        // rebuild the observation (name/resource/codeDetails) from the entered values.
+        const val FHIR_FIELD_ID = "fhirFieldId"
+        const val FHIR_RESOURCE = "fhirResource"
+        const val FHIR_CODE = "fhirCode"
+        const val FHIR_URL = "fhirUrl"
     }
 }

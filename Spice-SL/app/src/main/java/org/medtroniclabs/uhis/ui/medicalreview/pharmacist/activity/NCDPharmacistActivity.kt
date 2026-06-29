@@ -151,14 +151,15 @@ class NCDPharmacistActivity : BaseActivity(), View.OnClickListener {
     private fun loadPatientInfo(data: PatientListRespModel?) {
         data?.let {
             binding.tvProgramId.text = it.programId.textOrHyphen()
-            binding.tvNationalId.text = it.identityValue.textOrHyphen()
-            data.firstName?.let {
-                val text = StringConverter.appendTexts(firstText = it, data.lastName)
+            binding.tvNationalId.text = (it.identityValue ?: it.nationalID?.toString()).textOrHyphen()
+            val displayName = it.name?.takeIf { name -> name.isNotBlank() }
+                ?: StringConverter.appendTexts(firstText = it.firstName.orEmpty(), it.lastName)
+            if (displayName.isNotBlank()) {
                 setTitle(
                     StringConverter.appendTexts(
-                        firstText = text,
-                        data.age.toString(),
-                        data.gender?.capitalizeFirstChar(),
+                        firstText = displayName.capitalizeFirstChar(),
+                        it.age?.toString(),
+                        it.gender?.capitalizeFirstChar(),
                         separator = "-",
                     ),
                 )

@@ -49,13 +49,13 @@ class NurseBioDataViewModel @Inject constructor(
 
         fun getPatientDetails(
             context: Context,
-            request: PatientDetailsModel,
+            patientId: String,
         ) {
             if (connectivityManager.isNetworkAvailable()) {
                 viewModelScope.launch(dispatcherIO) {
                     patientDetailsResponse.postLoading()
                     try {
-                        val response = medicalReviewRepo.getPatientDetails(PatientDetailRequest(patientId = null))
+                        val response = medicalReviewRepo.getPatientDetails(PatientDetailRequest(patientId = patientId))
                         if (response.isSuccessful) {
                             val res = response.body()
                             if (res?.status == true) {

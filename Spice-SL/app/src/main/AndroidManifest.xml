@@ -89,7 +89,6 @@
             android:name=".ui.patientEdit.NCDPatientEditActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="false"
-            android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.medicalreview.labTechnician.NCDLabTestListActivity"

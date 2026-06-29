@@ -22,4 +22,12 @@ data class LabTestModel(
     var resultDetails: ArrayList<Map<String, Any>>? = null,
     var referDateDisplay: String? = null,
     var isAbnormal: Boolean? = false,
+    // FHIR-port fields: the investigation/* endpoints identify records with String ids and need
+    // the lab test's form definition (result fields) which is delivered inline in the list response.
+    var fhirId: String? = null,
+    var recommendedById: String? = null,
+    var formInput: String? = null,
+    // Result values delivered inline by investigation/list; kept separately from the transient
+    // [resultDetails] (which the adapter clears on collapse) so the dropdown can re-render them.
+    var labResultDetails: ArrayList<Map<String, Any>>? = null,
 ) : Serializable

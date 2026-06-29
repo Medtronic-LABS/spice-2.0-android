@@ -18,4 +18,5 @@ data class DiagnosisEntity(
     val cultureValue: String? = null,
     @ColumnInfo(name = "display_order")
     var displayOrder: Int? = null,
+    val value: String? = null,
 )
