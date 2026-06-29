@@ -39,6 +39,26 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
     private val snackBarDuration = 10000
     private var isDifferentUseLogin = false
 
+    companion object {
+        /**
+         * Dev/testing override for the locked username field.
+         *
+         * In COMMUNITY builds the username is normally pinned to the last logged-in user
+         * (see [initView]): the device caches a single user's offline credentials and a
+         * single user's offline dataset, and the "different user" login/migration path is
+         * disabled (commented out in [validateLoginInputs]). Locking the field prevents
+         * one CHW's cached data from being mixed with another's.
+         *
+         * Set to `true` to temporarily unlock the field so a different account can be
+         * entered without clearing app data, then set it back to `false`.
+         *
+         * WARNING: this only unlocks the input. It does NOT wipe the previous user's
+         * local data or reset SERVER_LAST_SYNCED, so a real account switch while this is
+         * on can show stale data. For clean testing, still clear app data when switching.
+         */
+        const val ALLOW_USERNAME_CHANGE = true
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
@@ -182,7 +202,8 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
             SecuredPreference.getString(SecuredPreference.EnvironmentKey.USERNAME.name)
         if (!oldUserName.isNullOrEmpty() && CommonUtils.isCommunity()) {
             binding.userName.setText(oldUserName)
-            binding.userName.isEnabled = false
+            // Locked to the previous user unless the dev override is on.
+            binding.userName.isEnabled = ALLOW_USERNAME_CHANGE
         }
     }
 
