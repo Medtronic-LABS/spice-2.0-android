@@ -325,9 +325,13 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
             map[DefinedParams.BioData] = resultMap as HashMap<String, Any>
         }
         map[DefinedParams.HealthFacilityFhirId] = SecuredPreference.getOrganizationFhirId()
-        map[AssessmentDefinedParams.memberReference] =
-            patientViewModel.getPatientFHIRId().toString()
-        map[AssessmentDefinedParams.patientReference] = patientViewModel.getPatientId().toString()
+        // memberReference = member FHIR id (data.id), patientReference = patient FHIR id
+        // (data.patientId). Prefer the loaded patient details (authoritative, matches the NCD
+        // medical-review flow); fall back to the intent extras only if the details are missing.
+        val memberReference = patientViewModel.getPatientMemberId()
+        val patientReference = patientViewModel.getPatientFHIRId()
+        memberReference?.let { map[AssessmentDefinedParams.memberReference] = it }
+        patientReference?.let { map[AssessmentDefinedParams.patientReference] = it }
         map[DefinedParams.Provenance] = ProvanceDto()
         if (connectivityManager.isNetworkAvailable()) {
             viewModel.ncdUpdatePatientDetail(map)

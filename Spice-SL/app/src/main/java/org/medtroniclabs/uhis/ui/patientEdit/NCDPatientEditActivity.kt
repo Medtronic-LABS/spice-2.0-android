@@ -46,7 +46,10 @@ class NCDPatientEditActivity : BaseActivity() {
     private fun getPatientDetails() {
         intent?.let {
             patientDetailViewModel.origin = it.getStringExtra(DefinedParams.ORIGIN)
-            intent.putExtra(NCDMRUtil.PATIENT_REFERENCE, patientDetailViewModel.getPatientId())
+            // PATIENT_REFERENCE (patient FHIR id) and MEMBER_REFERENCE (member FHIR id) are passed
+            // in by the launching flow. Do NOT overwrite PATIENT_REFERENCE here: getPatientId() is
+            // still null at this point (details are loaded asynchronously below), so overwriting it
+            // would drop the patient FHIR id from the /patient/update payload.
             it.getStringExtra(NCDMRUtil.MEMBER_REFERENCE)?.let { id ->
                 patientDetailViewModel.getPatients(
                     id,

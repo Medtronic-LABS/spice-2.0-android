@@ -149,7 +149,7 @@
       "id": "identityValue",
       "inputType": 96,
       "isEditable": true,
-      "isEnabled": true,
+      "isEnabled": false,
       "isMandatory": true,
       "isNeededDefault": true,
       "orderId": 5,
@@ -200,13 +200,14 @@
           "id": "Others"
         }
       ],
-      "isEnabled": true,
+      "isEnabled": false,
       "viewType": "SingleSelectionView",
       "id": "gender",
       "family": "bioMetrics",
       "orderId": 0,
       "isMandatory": true,
-      "cultureErrorMessage": "অনুগ্রহ করে লিঙ্গ নির্বাচন করুন"
+      "cultureErrorMessage": "অনুগ্রহ করে লিঙ্গ নির্বাচন করুন",
+      "enableSingleSelection": false
     },
     {
       "orientation": 0.0,
@@ -231,7 +232,7 @@
           "id": "false"
         }
       ],
-      "isEnabled": true,
+      "isEnabled": false,
       "viewType": "SingleSelectionView",
       "id": "isPregnant",
       "family": "bioMetrics",
@@ -245,7 +246,7 @@
       "fieldName": "Age",
       "id": "dateOfBirth",
       "isEditable": true,
-      "isEnabled": true,
+      "isEnabled": false,
       "maxAge": 130,
       "isMandatory": true,
       "isNeededDefault": true,

@@ -14,7 +14,6 @@ import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
 import org.medtroniclabs.uhis.common.DateUtils.DATE_ddMMyyyy
 import org.medtroniclabs.uhis.common.RoleConstant
 import org.medtroniclabs.uhis.common.SecuredPreference
-import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.data.model.FilterModel
 import org.medtroniclabs.uhis.data.model.SortModel
 import org.medtroniclabs.uhis.data.registration.CustomDateModel
@@ -24,7 +23,6 @@ import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
 import org.medtroniclabs.uhis.ui.TagListCustomView
-import org.medtroniclabs.uhis.ui.patient.ActivityEnum
 import org.medtroniclabs.uhis.ui.patient.FilterSortInterface
 import org.medtroniclabs.uhis.ui.patient.util.ViewUtil
 import org.medtroniclabs.uhis.ui.patient.viewmodel.NurseDashboardViewModel
@@ -83,14 +81,18 @@ class NurseDashboardFragment : Fragment(), View.OnClickListener, FilterSortInter
         binding.apply {
             when (role) {
                 RoleConstant.NURSE -> {
+                    // Nurse dashboard shows only Follow up and Registered KPIs.
+                    cardFollowUp.visibility = View.VISIBLE
                     cardEnrolled.visibility = View.VISIBLE
-                    cardScreening.visibility = View.VISIBLE
-                    cardReferred.visibility = View.VISIBLE
+                    // Other KPIs are intentionally hidden for the nurse dashboard.
+                    cardScreening.visibility = View.GONE
+                    cardReferred.visibility = View.GONE
+                    cardAssessed.visibility = View.GONE
                     cardLinkedToCare.visibility = View.GONE
-                    cardAssessed.visibility = View.VISIBLE
                 }
 
                 else -> {
+                    cardFollowUp.visibility = View.GONE
                     cardScreening.visibility = View.GONE
                     cardReferred.visibility = View.GONE
                     cardEnrolled.visibility = View.GONE
@@ -121,10 +123,12 @@ class NurseDashboardFragment : Fragment(), View.OnClickListener, FilterSortInter
                     binding.tvScreening.text = getString(R.string.screened)
                     resourceState.data?.let {
                         binding.apply {
-                            tvScreeningValue.text = "${it.screened}"
-                            tvReferredValue.text = "${it.referred}"
+                            tvFollowUpValue.text = "${it.medicalReview ?: 0}"
                             tvEnrolledValue.text = "${it.registered}"
-                            tvAssessedValue.text = "${it.assessed}"
+                            // Other KPIs hidden for the nurse dashboard.
+                            // tvScreeningValue.text = "${it.screened}"
+                            // tvReferredValue.text = "${it.referred}"
+                            // tvAssessedValue.text = "${it.assessed}"
                         }
                     }
                 }
@@ -149,6 +153,9 @@ class NurseDashboardFragment : Fragment(), View.OnClickListener, FilterSortInter
     }
 
     private fun loadActivityList() {
+        // Activity filter chips (Today, Yesterday, This week, Month, Customize) are intentionally
+        // commented out. The nurse dashboard now always uses the From/To date range only.
+        /*
         activityTagListCustomView = TagListCustomView(
             requireContext(),
             binding.cgActivity,
@@ -172,58 +179,41 @@ class NurseDashboardFragment : Fragment(), View.OnClickListener, FilterSortInter
         selectedList.add(ChipViewItemModel(name = getString(R.string.customize), value = ActivityEnum.CUSTOMISE.title, type = ActivityEnum.CUSTOMISE.fieldName))
 
         activityTagListCustomView.addChipItemList(chipList, selectedList)
+         */
+        binding.cgActivity.visibility = View.GONE
+        resetCount()
+        showDatePickers()
+        binding.etFrom.text = getDashboardFromDate()
+        binding.etTo.text = getDashboardToDate()
+        if (!binding.etFrom.text.isNullOrEmpty() && !binding.etTo.text.isNullOrEmpty()) {
+            getDashboardList(true)
+        }
     }
 
     private fun getDashboardList(fetchDates: Boolean? = false) {
-        if (fetchDates == false) {
-            val selectedItem = activityTagListCustomView.getSelectedTags()
-            if (selectedItem.isNotEmpty()) {
-                selectedItem[0].let {
-                    if (it.value == ActivityEnum.CUSTOMISE.title) {
-                        resetCount()
-                        showDatePickers()
-                        binding.etFrom.text = getDashboardFromDate()
-                        binding.etTo.text = getDashboardToDate()
-                        binding.etFrom.text?.takeIf { it.isNotEmpty() }?.let { fromDate ->
-                            binding.etTo.text?.takeIf { it.isNotEmpty() }?.let { toDate ->
-                                getDashboardList(true)
-                            }
-                        }
-                    } else {
-                        hideDatePicker()
-                        val request = UserDashboardRequest(
-                            sortField = it.type,
-                            tenantId = SecuredPreference.getTenantId(),
-                            userId = SecuredPreference.getUserFhirId(),
-                            shasthyaShebikaId = viewModel.filter?.shasthyaShebikaId,
-                        )
-                        constructRequest(request)
-                    }
-                }
-            }
-        } else {
-            val endDate = changeStringToDate(binding.etTo.text.toString(), DATE_FORMAT_ddMMMyyyy)
-            val request = UserDashboardRequest(
-                sortField = null,
-                tenantId = SecuredPreference.getTenantId(),
-                customDate = CustomDateModel(
-                    startDate = convertDateTimeToDate(
-                        binding.etFrom.text.toString(),
-                        DATE_FORMAT_ddMMMyyyy,
-                        DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
-                        inUTC = true,
-                    ),
-                    endDate = getEndDate(
-                        endDate,
-                        DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
-                        inUTC = true,
-                    ),
+        // Activity chips are removed; the dashboard always loads using the From/To date range.
+        if (binding.etFrom.text.isNullOrEmpty() || binding.etTo.text.isNullOrEmpty()) return
+        val endDate = changeStringToDate(binding.etTo.text.toString(), DATE_FORMAT_ddMMMyyyy)
+        val request = UserDashboardRequest(
+            sortField = null,
+            tenantId = SecuredPreference.getTenantId(),
+            customDate = CustomDateModel(
+                startDate = convertDateTimeToDate(
+                    binding.etFrom.text.toString(),
+                    DATE_FORMAT_ddMMMyyyy,
+                    DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
+                    inUTC = true,
                 ),
-                userId = SecuredPreference.getUserFhirId(),
-                shasthyaShebikaId = viewModel.filter?.shasthyaShebikaId,
-            )
-            constructRequest(request)
-        }
+                endDate = getEndDate(
+                    endDate,
+                    DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
+                    inUTC = true,
+                ),
+            ),
+            userId = SecuredPreference.getUserFhirId(),
+            shasthyaShebikaId = viewModel.filter?.shasthyaShebikaId,
+        )
+        constructRequest(request)
     }
 
     private fun constructRequest(request: UserDashboardRequest) {
@@ -232,9 +222,10 @@ class NurseDashboardFragment : Fragment(), View.OnClickListener, FilterSortInter
 
     private fun resetCount() {
         binding.apply {
+            tvFollowUpValue.text = "0"
+            tvEnrolledValue.text = "0"
             tvScreeningValue.text = "0"
             tvReferredValue.text = "0"
-            tvEnrolledValue.text = "0"
             tvAssessedValue.text = "0"
 
             tvLinkedToCareValue.text = "0"

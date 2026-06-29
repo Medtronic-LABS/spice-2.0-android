@@ -121,13 +121,62 @@
                 app:constraint_referenced_ids="tvFrom,tvTo,etFrom,etTo" />
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardScreening"
+                android:id="@+id/cardFollowUp"
                 style="@style/CardView_Style"
                 android:layout_marginHorizontal="@dimen/_5sdp"
                 android:layout_marginTop="@dimen/_20sdp"
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/etFrom">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvFollowUp"
+                        style="@style/Form_Label_Style_16"
+                        android:layout_width="@dimen/_0dp"
+                        android:paddingHorizontal="@dimen/_10sdp"
+                        android:text="@string/follow_up"
+                        android:textColor="@color/secondary_black"
+                        android:textSize="@dimen/_18ssp"
+                        app:layout_constraintBaseline_toBaselineOf="@id/tvFollowUpValue"
+                        app:layout_constraintEnd_toStartOf="@id/tvFollowUpValue"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <View
+                        android:id="@+id/viewFollowUp"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:background="@drawable/dashboard_card_drawable"
+                        app:layout_constraintBottom_toBottomOf="@id/tvFollowUpValue"
+                        app:layout_constraintEnd_toEndOf="@id/tvFollowUpValue"
+                        app:layout_constraintStart_toStartOf="@id/tvFollowUpValue"
+                        app:layout_constraintTop_toTopOf="@id/tvFollowUpValue" />
+
+                    <TextView
+                        android:id="@+id/tvFollowUpValue"
+                        style="@style/Dashboard_Value_Style"
+                        android:layout_width="wrap_content"
+                        android:text=""
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardScreening"
+                style="@style/CardView_Style"
+                android:layout_marginHorizontal="@dimen/_5sdp"
+                android:layout_marginTop="@dimen/_20sdp"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cardFollowUp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"

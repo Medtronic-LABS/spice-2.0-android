@@ -9,4 +9,5 @@ data class UserDashboardResponse(
     val investigated: Int? = null,
     val nutritionistLifestyleCount: Int? = null,
     val psychologicalNotesCount: Int? = null,
+    val medicalReview: Int? = null,
 )
