@@ -242,11 +242,10 @@ object PNCAssessmentEvaluator {
 
             // IFA and Calcium
             val daysSinceDelivery = CommonUtils.getInteger(resultMap[RMNCH.ID_DAYS_SINCE_DELIVERY])
-            val expectedTablets = daysSinceDelivery + 1
 
             // IFA (Non-optional integer)
             val ifaConsumed = CommonUtils.getInteger(maternalAssessment[RMNCH.ID_IFA_TABLETS_CONSUMED])
-            if (ifaConsumed < expectedTablets) {
+            if (ifaConsumed < daysSinceDelivery) {
                 hasSupplementationGaps = true
                 supplementationGaps.add(PNCSupplementation.IFA.value)
                 cultureSupplementationGaps.add(PNCSupplementation.IFA.cultureValue)
@@ -254,7 +253,7 @@ object PNCAssessmentEvaluator {
 
             // Calcium (Non-optional integer)
             val calciumConsumed = CommonUtils.getInteger(maternalAssessment[RMNCH.ID_CALCIUM_TABLETS_CONSUMED])
-            if (calciumConsumed < expectedTablets) {
+            if (calciumConsumed < daysSinceDelivery) {
                 hasSupplementationGaps = true
                 supplementationGaps.add(PNCSupplementation.CALCIUM.value)
                 cultureSupplementationGaps.add(PNCSupplementation.CALCIUM.cultureValue)
