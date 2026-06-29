@@ -23,9 +23,10 @@ import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.StringConverter
 import org.medtroniclabs.uhis.data.ErrorResponse
 import org.medtroniclabs.uhis.data.LocalSpinnerResponse
+import org.medtroniclabs.uhis.data.model.MedicalReviewBaseRequest
 import org.medtroniclabs.uhis.data.model.PatientDetails
+import org.medtroniclabs.uhis.data.offlinesync.model.ProvanceDto
 import org.medtroniclabs.uhis.data.registration.PatientCreateResponse
-import org.medtroniclabs.uhis.data.registration.PatientModel
 import org.medtroniclabs.uhis.data.registration.QRCodeRequest
 import org.medtroniclabs.uhis.data.registration.QRCodeResponse
 import org.medtroniclabs.uhis.data.registration.RiskClassificationModel
@@ -39,6 +40,7 @@ import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.network.utils.ConnectivityManager
 import org.medtroniclabs.uhis.network.utils.DoesNetworkHaveInternet
+import org.medtroniclabs.uhis.repo.MedicalReviewRepository
 import org.medtroniclabs.uhis.repo.OnBoardingRepository
 import java.lang.reflect.Type
 import javax.inject.Inject
@@ -46,6 +48,7 @@ import javax.inject.Inject
 @HiltViewModel
 class EnrollmentFormBuilderViewModel @Inject constructor(
     private val onBoardingRepo: OnBoardingRepository,
+    private val medicalReviewRepo: MedicalReviewRepository,
     @IoDispatcher private val dispatcherIO: CoroutineDispatcher,
 ) :
     ViewModel() {
@@ -53,17 +56,18 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
         lateinit var connectivityManager: ConnectivityManager
         var formResponseLiveData = MutableLiveData<Resource<List<FormLayout>>>()
         var formResponseListLiveData = MutableLiveData<Resource<ArrayList<Pair<String, String>>>>()
-        var duplicationNudgeResponse = MutableLiveData<Resource<Pair<String, PatientModel?>>>()
+        var duplicationNudgeResponse = MutableLiveData<Resource<Pair<HashMap<String, Any>, List<FormLayout>?>>>()
         var enrollPatientLiveData = MutableLiveData<Resource<PatientCreateResponse>>()
         var groupedEnrollmentHashMap = HashMap<String, Any>()
         var patientTrackId: Long? = null
 
-        var assessmentRequired: Boolean = true
+        var isFromProceedEnrollment: Boolean = false
         var list = ArrayList<RiskClassificationModel>()
 
         var unionCacheResponse = MutableLiveData<Resource<LocalSpinnerResponse>>()
         var villageCacheResponse = MutableLiveData<Resource<LocalSpinnerResponse>>()
         var mentalHealthQuestions = MutableLiveData<Resource<HashMap<String, LocalSpinnerResponse>>>()
+        val patientVisitResponse = MutableLiveData<Resource<PatientDetails>>()
         var programListResponse = MutableLiveData<Resource<LocalSpinnerResponse>>()
         var patientInitial: String = ""
         var isConfirmDiagnosis: Boolean = false
@@ -159,6 +163,33 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
                                     villageId,
                                     enrollmentReq,
                                 )
+                            } else if (isFromProceedEnrollment) {
+                                isFromProceedEnrollment = false
+
+                                duplicationNudgeResponse.value?.data?.first?.let { map ->
+                                    val id = map[DefinedParams.ID] as String
+                                    val patientId = map[DefinedParams.PATIENT_REFERENCE] as String
+
+                                    var enrollmentReq = it
+                                    StringConverter.convertStringToMap(request)?.let { map ->
+                                        val reqMap = HashMap(map)
+                                        reqMap[DefinedParams.ID] = id
+                                        reqMap[DefinedParams.PATIENT_ID] = patientId
+                                        reqMap[DefinedParams.IS_DUPLICATE_NUDGE] = true
+                                        StringConverter
+                                            .convertGivenMapToString(reqMap)
+                                            ?.let { reqStr ->
+                                                enrollmentReq =
+                                                    StringConverter.getJsonObject(reqStr)
+                                            }
+                                    }
+                                    proceedToCreatePatient(
+                                        context,
+                                        maxSequence,
+                                        villageId,
+                                        enrollmentReq,
+                                    )
+                                }
                             } else {
                                 val validateResponse = onBoardingRepo.validatePatient(it)
                                 if (validateResponse.isSuccessful) {
@@ -173,12 +204,18 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
                                         enrollPatientLiveData.postError()
                                     }
                                 } else if (validateResponse.code() == AppConstants.CONFLICT_ERROR_CODE) {
-                                    val entity = StringConverter.getFormattedData(
-                                        context,
-                                        validateResponse.errorBody(),
-                                        true,
-                                    )
-                                    duplicationNudgeResponse.postSuccess(entity)
+                                    val duplicateEntity = StringConverter.getDuplicatePatientMap(validateResponse.errorBody())
+
+                                    val errorResp = if (duplicateEntity.isNullOrEmpty()) {
+                                        Resource(state = ResourceState.ERROR)
+                                    } else {
+                                        Resource(
+                                            state = ResourceState.ERROR,
+                                            data = Pair(duplicateEntity, null),
+                                        )
+                                    }
+
+                                    duplicationNudgeResponse.postValue(errorResp)
                                 } else {
                                     enrollPatientLiveData.postError(
                                         StringConverter.getErrorMessage(
@@ -214,12 +251,23 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
                     enrollPatientLiveData.postError()
                 }
             } else if (response.code() == AppConstants.CONFLICT_ERROR_CODE) {
-                val entity = StringConverter.getFormattedData(
-                    context,
-                    response.errorBody(),
-                    true,
+               /* val duplicateEntity = StringConverter.getDuplicatePatientMap(response.errorBody())
+
+                val errorResp = if (duplicateEntity.isNullOrEmpty()) {
+                    Resource(state = ResourceState.ERROR)
+                } else {
+                    Resource(
+                        state = ResourceState.ERROR,
+                        data = Pair(duplicateEntity, null),
+                    )
+                }
+
+                duplicationNudgeResponse.postValue(errorResp)*/
+                enrollPatientLiveData.postError(
+                    StringConverter.getErrorMessage(
+                        response.errorBody(),
+                    ),
                 )
-                duplicationNudgeResponse.postSuccess(entity)
             } else {
                 enrollPatientLiveData.postError(
                     StringConverter.getErrorMessage(
@@ -334,7 +382,7 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
                         val response = onBoardingRepo.validateQRCodeValidation(QRCodeRequest(qrCodeValue))
                         if (response.isSuccessful) {
                             response.body()?.let { qrCodeResponse ->
-                                if (qrCodeResponse.status) {
+                                if (!qrCodeResponse.entity) {
                                     qrCodeResponse.qrCode = qrCodeValue
                                     qrCodeValidationResult.postSuccess(qrCodeResponse)
                                 } else {
@@ -378,6 +426,47 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
+            }
+        }
+
+        fun createPatientVisit(
+            context: Context,
+            patientRef: Long,
+            memberRef: String,
+            patientId: String,
+        ) {
+            if (connectivityManager.isNetworkAvailable()) {
+                patientVisitResponse.postLoading()
+                viewModelScope.launch(dispatcherIO) {
+                    try {
+                        val request = PatientVisitRequest(
+                            patientReference = patientRef.toString(),
+                            memberReference = memberRef,
+                            provenance = ProvanceDto(),
+                        )
+
+                        val response = medicalReviewRepo.createPatientVisit(request)
+                        if (response.isSuccessful) {
+                            val res = response.body()
+                            if (res?.status == true && res.entity != null) {
+                                patientVisitResponse.postSuccess(
+                                    PatientDetails(
+                                        visitID = 0L,
+                                        initialReview = res.entity.initialReviewed ?: false,
+                                        patientID = patientRef,
+                                        patientIdString = patientId,
+                                    ),
+                                )
+                            }
+                        } else {
+                            patientVisitResponse.postError()
+                        }
+                    } catch (e: Exception) {
+                        patientVisitResponse.postError()
+                    }
+                }
+            } else {
+                patientVisitResponse.postError(context.getString(R.string.no_internet_error))
             }
         }
 

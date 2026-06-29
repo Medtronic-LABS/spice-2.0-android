@@ -437,6 +437,9 @@ interface MemberDAO {
     @Query("SELECT * FROM HouseHoldMember AS hhm LEFT JOIN memberassessmenthistory AS mah ON hhm.id = mah.memberId WHERE hhm.id = :memberId ORDER BY mah.visitDate DESC")
     fun getMemberWithAssessmentHistory(memberId: Long): LiveData<Map<HouseholdMemberEntity, List<MemberAssessmentHistoryEntity>>?>
 
-    @Query("SELECT * FROM HouseHoldMember WHERE qr_code = :qrCode")
-    suspend fun getMemberByQRCode(qrCode: String): List<HouseholdMemberEntity>
+    @Query("SELECT * FROM HouseHoldMember WHERE qr_code = :qrCode AND (:memberId IS NULL OR id != :memberId)")
+    suspend fun getMemberByQRCode(
+        qrCode: String,
+        memberId: Long?,
+    ): List<HouseholdMemberEntity>
 }

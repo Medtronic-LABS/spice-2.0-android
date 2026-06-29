@@ -14,6 +14,7 @@ import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.offlinesync.model.ProvanceDto
+import org.medtroniclabs.uhis.data.model.PatientDetails
 import org.medtroniclabs.uhis.data.registration.InitialDiagnosis
 import org.medtroniclabs.uhis.data.registration.PatientCreateResponse
 import org.medtroniclabs.uhis.databinding.CardLayoutBinding
@@ -29,6 +30,7 @@ import org.medtroniclabs.uhis.ui.landing.LandingActivity
 import org.medtroniclabs.uhis.ui.patient.EnrollmentFormBuilderActivity
 import org.medtroniclabs.uhis.ui.patient.IntentConstants
 import org.medtroniclabs.uhis.ui.patient.NurseMedicalReviewActivity
+import org.medtroniclabs.uhis.ui.patient.UIConstants
 import org.medtroniclabs.uhis.ui.patient.viewmodel.EnrollmentFormBuilderViewModel
 import kotlin.getValue
 import kotlin.toString
@@ -91,7 +93,7 @@ class EnrollmentSummaryFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun setObserver() {
-        viewModel.patientVisitIDResponse.observe(viewLifecycleOwner) { resourceState ->
+        viewModel.patientVisitResponse.observe(viewLifecycleOwner) { resourceState ->
             when (resourceState.state) {
                 ResourceState.LOADING -> {
                     showLoading()
@@ -110,25 +112,27 @@ class EnrollmentSummaryFragment : BaseFragment(), View.OnClickListener {
 
                 ResourceState.SUCCESS -> {
                     hideLoading()
-                    resourceState.data?.let { details ->
-                        val intent = Intent(requireContext(), NurseMedicalReviewActivity::class.java)
-                        intent.putExtra(IntentConstants.INTENT_PATIENT_ID, details.patientID)
-                        intent.putExtra(IntentConstants.INTENT_PATIENT_ID_STRING, details.patientIdString)
-                        intent.putExtra(IntentConstants.INTENT_VISIT_ID, details.visitID)
-                        intent.putExtra(IntentConstants.INTENT_ENCOUNTER_REFERENCE, details.encounterReference)
-                        intent.putExtra(IntentConstants.INTENT_MEMBER_REFERENCE, details.memberReference)
-                        intent.putExtra(IntentConstants.INTENT_PATIENT_REFERENCE, details.patientReference)
-                        intent.putExtra(IntentConstants.INTENT_INITIAL_REVIEW, details.initialReview)
-                        intent.putExtra(DefinedParams.ORIGIN, "medical review")
-                        intent.putExtra(IntentConstants.SHOW_CONTINUOUS_MEDICAL_REVIEW, false)
-
-                        (activity as BaseActivity).startAsNewActivity(
-                            intent,
-                        )
+                    hideLoading()
+                    resourceState.data?.let { patientDetails ->
+                        startNewReviewActivity(patientDetails)
                     }
                 }
             }
         }
+    }
+
+    private fun startNewReviewActivity(details: PatientDetails) {
+        val intent = Intent(
+            requireContext(),
+            NurseMedicalReviewActivity::class.java,
+        )
+        intent.putExtra(IntentConstants.INTENT_PATIENT_ID, details.patientID)
+        intent.putExtra(IntentConstants.INTENT_PATIENT_ID_STRING, details.patientIdString)
+        intent.putExtra(IntentConstants.INTENT_VISIT_ID, details.visitID)
+        intent.putExtra(IntentConstants.SHOW_CONTINUOUS_MEDICAL_REVIEW, false)
+        intent.putExtra(DefinedParams.ORIGIN, UIConstants.MY_PATIENTS_UNIQUE_ID)
+        requireActivity().finish()
+        startActivity(intent)
     }
 
     private fun addCardView(
@@ -260,7 +264,9 @@ class EnrollmentSummaryFragment : BaseFragment(), View.OnClickListener {
                     ),
                 )
 
-                layout.addView(inflateChildView(getString(R.string.national_id), nationalId ?: getString(R.string.hyphen_symbol)))
+                getIdentityLabel(identityType)?.let {
+                    layout.addView(inflateChildView(it, identityValue ?: getString(R.string.hyphen_symbol)))
+                }
 
                 layout.addView(inflateChildView(getString(R.string.name), name ?: getString(R.string.hyphen_symbol)))
 
@@ -309,6 +315,13 @@ class EnrollmentSummaryFragment : BaseFragment(), View.OnClickListener {
             }
         }
     }
+
+    private fun getIdentityLabel(identityType: String?): String? =
+        when {
+            identityType.isNullOrEmpty() || identityType == DefinedParams.NA -> null
+            identityType == DefinedParams.IDENTITY_TYPE_BRN -> requireContext().getString(R.string.brn)
+            else -> requireContext().getString(R.string.national_id)
+        }
 
     private fun inflateChildView(
         labelKey: String,
@@ -361,36 +374,15 @@ class EnrollmentSummaryFragment : BaseFragment(), View.OnClickListener {
             }
 
             binding.btnFollowUp -> {
-                val data = viewModel.enrollPatientLiveData.value?.data
-                // patientReference / track id (for patientvisit/create) come from the numeric
-                // patient id, but the medical-review screen looks the patient up by
-                // patientUniqueId (returned by the register API), not the FHIR id.
-                val patientTrackIdString = data?.id ?: data?.patientId
-                val memberReference = data?.memberId
-                val patientTrackId = patientTrackIdString?.toLongOrNull()
-                val patientUniqueId = data?.patientUniqueId
-                if (patientTrackIdString != null &&
-                    memberReference != null &&
-                    patientTrackId != null &&
-                    patientUniqueId != null
-                ) {
-                    showLoading()
-                    viewModel.createPatientVisit(
-                        requireContext(),
-                        PatientVisitRequest(
-                            patientReference = patientTrackIdString,
-                            memberReference = memberReference,
-                            provenance = ProvanceDto(),
-                        ),
-                        patientId = patientTrackId,
-                        patientIdString = patientUniqueId,
-                    )
-                } else {
-                    (activity as BaseActivity).showErrorDialogue(
-                        getString(R.string.error),
-                        getString(R.string.something_went_wrong),
-                        isNegativeButtonNeed = false,
-                    ) {}
+                viewModel.enrollPatientLiveData.value?.data?.let { item ->
+                    item.id?.let { patientRef ->
+                        item.memberReference?.let { memberRef ->
+                            item.patientId?.let { patientId ->
+                                showLoading()
+                                viewModel.createPatientVisit(requireContext(), patientRef.toLong(), memberRef, patientId)
+                            }
+                        }
+                    }
                 }
             }
         }

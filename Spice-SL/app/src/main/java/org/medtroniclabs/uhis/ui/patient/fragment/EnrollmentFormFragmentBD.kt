@@ -25,6 +25,7 @@ import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
 import org.medtroniclabs.uhis.common.DateUtils.DATE_ddMMyyyy
 import org.medtroniclabs.uhis.common.EntityMapper
 import org.medtroniclabs.uhis.common.SecuredPreference
+import org.medtroniclabs.uhis.common.StringConverter
 import org.medtroniclabs.uhis.common.qrscanner.QRScanContract
 import org.medtroniclabs.uhis.common.qrscanner.QRScanResult
 import org.medtroniclabs.uhis.common.qrscanner.QRScannerActivity
@@ -49,6 +50,7 @@ import org.medtroniclabs.uhis.formgeneration.ui.FormResultComposer
 import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
 import org.medtroniclabs.uhis.mappingkey.MemberRegistration
 import org.medtroniclabs.uhis.mappingkey.Screening
+import org.medtroniclabs.uhis.ncd.screening.ui.DuplicationNudgeDialog
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
@@ -219,16 +221,45 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
                         if (data.status && data.qrCode != null) {
                             formGenerator.showQRScannedText(data.qrCode!!, DefinedParams.QR_CODE)
                         } else {
-                            formGenerator.showErrorQRScanned(DefinedParams.QR_CODE, data.message)
+                            formGenerator.showErrorQRScanned(DefinedParams.QR_CODE)
                         }
                     }
                 }
                 else -> {
                     resourceState.message?.let { message ->
-                        formGenerator.showErrorQRScanned(DefinedParams.QR_CODE, message)
+                        formGenerator.showErrorQRScanned(DefinedParams.QR_CODE, getString(R.string.invalid_qr_message))
                     } ?: kotlin.run {
                         formGenerator.showErrorQRScanned(DefinedParams.QR_CODE)
                     }
+                }
+            }
+        }
+
+        viewModel.duplicationNudgeResponse.observe(viewLifecycleOwner) { resources ->
+            if (resources.state == ResourceState.ERROR) {
+                binding.btnSubmit.isEnabled = true
+                hideLoading()
+                if (resources.data is Pair<*, *>) {
+                    resources.data.first.let { responseMap ->
+                        val dialog =
+                            DuplicationNudgeDialog.newInstance(
+                                StringConverter.convertGivenMapToString(
+                                    responseMap,
+                                ),
+                                isFromEnrollment = true,
+                            ) { doAssessment ->
+                                viewModel.isFromProceedEnrollment = true
+                                formGenerator.formSubmitAction(binding.btnSubmit)
+                            }
+                        dialog.show(childFragmentManager, DuplicationNudgeDialog.TAG)
+                    }
+                } else {
+                    (activity as? BaseActivity?)?.showErrorDialogue(
+                        title = getString(R.string.error),
+                        message = resources.message
+                            ?: getString(R.string.something_went_wrong_try_later),
+                        positiveButtonName = getString(R.string.ok),
+                    ) {}
                 }
             }
         }

@@ -203,8 +203,16 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
 
             MenuConstants.DASHBOARD -> {
                 if (CommonUtils.isNURSE()) {
-                    val intent = Intent(requireContext(), NurseDashboardActivity::class.java)
-                    startActivity(intent)
+                    if (connectivityManager.isNetworkAvailable()) {
+                        val intent = Intent(requireContext(), NurseDashboardActivity::class.java)
+                        startActivity(intent)
+                    } else {
+                        (activity as BaseActivity?)?.showErrorDialogue(
+                            getString(R.string.title_no_network),
+                            getString(R.string.message_no_network),
+                            isNegativeButtonNeed = false,
+                        ) { _ -> }
+                    }
                 } else {
                     val intent = Intent(requireContext(), NCDDashboardViewActivity::class.java)
                     startActivity(intent)

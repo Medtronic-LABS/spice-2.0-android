@@ -515,6 +515,10 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
             details.chiefdomId?.let { formGenerator.getResultMap()[CHIEFDOM_ID] = it }
         }
 
+        details.qrCode?.let {
+            formGenerator.showQRScannedText(it, FormDefinedParams.QR_CODE)
+        }
+
         // Lock location selections for external-member edit mode.
         disableLocationFieldsInEditMode()
     }
@@ -745,7 +749,10 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
     private val qrScanLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(QRScanContract()) { result ->
             if (result.resultString != null) {
-                memberRegistrationViewModel.validateQRCodeLocally(result.resultString)
+                val memberId = memberRegistrationViewModel.memberDetailsLiveData.value
+                    ?.data
+                    ?.id
+                memberRegistrationViewModel.validateQRCodeLocally(result.resultString, memberId)
             }
         }
 

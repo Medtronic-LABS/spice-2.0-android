@@ -10,6 +10,7 @@ object DefinedParams {
     const val HEIGHT = "height"
     const val WEIGHT = "weight"
     const val ID = "id"
+    const val PATIENT_REFERENCE = "patientReference"
     const val VALUE = "value"
     const val DISPLAY_VALUE = "displayValue"
     const val DEFAULT_ID_LABEL = "--Select--"
@@ -74,6 +75,7 @@ object DefinedParams {
 
     const val NATIONAL_ID = "nationalId"
     const val PATIENT_ID = "patientId"
+    const val IS_DUPLICATE_NUDGE = "isDuplicateNudge"
 
     const val SCREENING_ID = "screening_id"
     const val PATIENT_DIAGNOSIS = "patientDiagnosis"

@@ -553,5 +553,8 @@ class HouseholdMemberRepository @Inject constructor(
 
     suspend fun getPregnancyDetails(id: Long) = roomHelper.getPregnancyDetailByPatientId(id)
 
-    suspend fun getMemberByQRCode(qrCode: String): List<HouseholdMemberEntity> = roomHelper.getMemberByQRCode(qrCode)
+    suspend fun getMemberByQRCode(
+        qrCode: String,
+        memberId: Long?,
+    ): List<HouseholdMemberEntity> = roomHelper.getMemberByQRCode(qrCode, memberId)
 }

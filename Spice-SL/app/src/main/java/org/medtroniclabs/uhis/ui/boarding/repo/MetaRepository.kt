@@ -161,14 +161,16 @@ class MetaRepository @Inject constructor(
 
                             chiefdoms?.let { chiefdomList ->
                                 roomHelper.deleteChiefDoms()
-                                roomHelper.saveChiefDoms(filterChiefdomsForNurse(chiefdomList))
+                                // roomHelper.saveChiefDoms(filterChiefdomsForNurse(chiefdomList))
+                                roomHelper.saveChiefDoms(chiefdomList)
                             }
 
                             deleteAllVillages()
                             saveVillage(modifiedVillages(nurseVillages, userProfile.villages))
                             if (CommonUtils.isNurse()) {
                                 // Save SubVillages which are linked to Nurse
-                                saveSubVillages(filterSubVillagesForNurse(subVillages, nurseVillageIds))
+                                // saveSubVillages(filterSubVillagesForNurse(subVillages, nurseVillageIds))
+                                saveSubVillages(subVillages)
                             } else {
                                 // Save SubVillages which are linked to shasthya shebikas
                                 saveSubVillages(shasthyaShebikas?.flatMap { it.subVillages ?: emptyList() })
@@ -1464,8 +1466,9 @@ class MetaRepository @Inject constructor(
     }
 
     private fun filterVillagesForNurse(villages: List<VillageEntity>?): List<VillageEntity>? {
-        if (!CommonUtils.isNurse()) return villages
-        return villages?.filter { it.isDistrictVillage != true }
+//        if (!CommonUtils.isNurse()) return villages
+//        return villages?.filter { it.isDistrictVillage != true }
+        return villages
     }
 
     private fun filterSubVillagesForNurse(

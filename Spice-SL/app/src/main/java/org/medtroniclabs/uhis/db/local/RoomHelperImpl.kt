@@ -1689,7 +1689,10 @@ class RoomHelperImpl @Inject constructor(
 
     override suspend fun getSubVillage(villageId: Long): List<SubVillageEntity> = metaDataDAO.getSubVillage(villageId)
 
-    override suspend fun getMemberByQRCode(qrCode: String): List<HouseholdMemberEntity> = memberDAO.getMemberByQRCode(qrCode)
+    override suspend fun getMemberByQRCode(
+        qrCode: String,
+        memberId: Long?,
+    ): List<HouseholdMemberEntity> = memberDAO.getMemberByQRCode(qrCode, memberId)
 
     override suspend fun getLatestMemberServiceBAfterServiceA(
         memberId: Long,

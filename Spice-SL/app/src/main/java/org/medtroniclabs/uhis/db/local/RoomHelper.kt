@@ -1112,7 +1112,10 @@ interface RoomHelper {
 
     suspend fun getSubVillage(villageId: Long): List<SubVillageEntity>
 
-    suspend fun getMemberByQRCode(qrCode: String): List<HouseholdMemberEntity>
+    suspend fun getMemberByQRCode(
+        qrCode: String,
+        memberId: Long?,
+    ): List<HouseholdMemberEntity>
 
     suspend fun getLatestMemberServiceBAfterServiceA(
         memberId: Long,

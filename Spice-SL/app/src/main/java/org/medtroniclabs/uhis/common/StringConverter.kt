@@ -11,7 +11,6 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.data.ErrorResponse
 import org.medtroniclabs.uhis.data.registration.DuplicationNudgeModel
 import org.medtroniclabs.uhis.data.registration.PatientModel
-import org.medtroniclabs.uhis.mappingkey.Screening
 import java.lang.reflect.Type
 
 object StringConverter {
@@ -149,23 +148,22 @@ object StringConverter {
 
     fun getDuplicatePatientMap(errorBody: ResponseBody?): HashMap<String, Any>? =
         try {
-            var returnMap: HashMap<String, Any>? = null
-            errorBody?.let { err ->
-                val errorResponse = Gson().fromJson(err.string(), Map::class.java)
-                if (errorResponse.containsKey(Screening.Entity)) {
-                    errorResponse[Screening.Entity]?.let { entity ->
-                        if (entity is Map<*, *> && entity.contains(Screening.PATIENT_DETAILS)) {
-                            entity[Screening.PATIENT_DETAILS]?.let { details ->
-                                (details as? Map<String, Any>)?.let { map ->
-                                    returnMap = HashMap(map.toMutableMap())
-                                }
-                            }
-                        }
-                    }
+            val json = errorBody?.string()
+            val type = object : TypeToken<Map<String, Any>>() {}.type
+
+            val responseMap: Map<String, Any> = Gson().fromJson(json, type)
+
+            val entityMap = responseMap["entity"] as? Map<*, *>
+
+            entityMap
+                ?.entries
+                ?.associate {
+                    it.key.toString() to (it.value ?: "")
+                }?.let {
+                    HashMap(it)
                 }
-            }
-            returnMap
         } catch (e: Exception) {
+            e.printStackTrace()
             null
         }
 

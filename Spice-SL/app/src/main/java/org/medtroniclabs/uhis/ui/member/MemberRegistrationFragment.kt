@@ -511,6 +511,10 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
                 formGenerator.setValueForView(guardianId, it)
             }
         }
+
+        details.qrCode?.let {
+            formGenerator.showQRScannedText(it, FormDefinedParams.QR_CODE)
+        }
     }
 
     private fun singleSelectValueOption(
@@ -856,7 +860,10 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
     private val qrScanLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(QRScanContract()) { result ->
             if (result.resultString != null) {
-                memberRegistrationViewModel.validateQRCodeLocally(result.resultString)
+                val memberId = memberRegistrationViewModel.memberDetailsLiveData.value
+                    ?.data
+                    ?.id
+                memberRegistrationViewModel.validateQRCodeLocally(result.resultString, memberId)
             }
         }
 
