@@ -129,11 +129,28 @@ internal object ServiceMemberQueryBuilder {
         // WHERE areaMatch. A reassigned household keeps its original SS stamp, which may not exist in
         // this device's ShasthyaShebikaEntity — an INNER join here wrongly hides those members, so the
         // newly-assigned village's members never appear (UHIS-1173). Use LEFT so these never filter.
+        // Display new ss name based on village where the old ss is not there in the DB.
         val ssJoin =
             if (useOptionalHouseholdJoins) {
-                "LEFT JOIN ShasthyaShebikaEntity AS ss ON hhm.shasthya_shebika_id = ss.id"
+                """
+                LEFT JOIN ShasthyaShebikaEntity AS ss
+                    ON ss.id = hhm.shasthya_shebika_id
+
+                LEFT JOIN ShasthyaShebikaLinkedVillageEntity AS sslv
+                    ON sslv.subVillageId = hhm.sub_village_id
+                LEFT JOIN ShasthyaShebikaEntity AS ss_fallback
+                    ON ss_fallback.id = sslv.shasthyaShebikaId
+                """.trimIndent()
             } else {
-                "LEFT JOIN ShasthyaShebikaEntity AS ss ON ss.id = hh.shasthya_shebika_id"
+                """
+                LEFT JOIN ShasthyaShebikaEntity AS ss
+                    ON ss.id = hh.shasthya_shebika_id
+
+                LEFT JOIN ShasthyaShebikaLinkedVillageEntity AS sslv
+                    ON sslv.subVillageId = hh.sub_village_id
+                LEFT JOIN ShasthyaShebikaEntity AS ss_fallback
+                    ON ss_fallback.id = sslv.shasthyaShebikaId
+                """.trimIndent()
             }
 
         val svJoin =
@@ -161,8 +178,8 @@ internal object ServiceMemberQueryBuilder {
             SELECT
                 hhm.*, td.diagnoses,
                 ${ServiceFilterConditions.RECENT_SERVICE_DATE_EXPR} AS recent_service_date,
-                COALESCE(ss.name, '') AS shasthya_shebika_name,
-                COALESCE(ss.ssId, '') AS shasthya_shebika_ssId,
+                COALESCE(ss.name, ss_fallback.name, '') AS shasthya_shebika_name,
+                COALESCE(ss.ssId, ss_fallback.ssId, '') AS shasthya_shebika_ssId,
                 COALESCE(sv.name, '') AS sub_village_name
             FROM householdmember AS hhm
 

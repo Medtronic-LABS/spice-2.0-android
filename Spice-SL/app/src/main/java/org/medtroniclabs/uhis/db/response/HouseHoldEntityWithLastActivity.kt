@@ -13,6 +13,8 @@ data class HouseHoldEntityWithLastActivity(
     val villageName: String,
     @ColumnInfo("sub_village_name")
     val subVillageName: String,
+    @ColumnInfo("shasthya_shebika_ssId")
+    val shasthyaShebikaNameSsId: String,
     @ColumnInfo("shasthya_shebika_name")
     val shasthyaShebikaName: String,
     /** Epoch-ms of the most recent member registration or assessment, whichever is later. */
