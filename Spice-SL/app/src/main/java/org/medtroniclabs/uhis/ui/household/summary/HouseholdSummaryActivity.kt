@@ -224,6 +224,7 @@ class HouseholdSummaryActivity : BaseActivity(), MemberSelectionListener, View.O
         dateOfBirth: String?,
         isContactTrace: Boolean,
         houseHoldId: Long?,
+        fhirId: String?,
     ) {
         if (isContactTrace) {
             val intent = Intent(this, AssessmentActivity::class.java)

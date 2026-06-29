@@ -149,6 +149,7 @@ class MemberSearchAdapter(
                     false,
                     item.dateOfBirth,
                     houseHoldId = item.householdId,
+                    fhirId = item.fhirId,
                 )
             }
         }

@@ -7,5 +7,6 @@ interface MemberSelectionListener {
         dateOfBirth: String?,
         isContactTrace: Boolean = false,
         houseHoldId: Long? = null,
+        fhirId: String? = null,
     )
 }
