@@ -68,7 +68,20 @@ class HouseholdListAdapter(
         holder.binding.tvHouseholdNo.text = item.householdNo ?: holder.context.getString(R.string.separator_double_hyphen)
         holder.binding.tvLabelVillage.setText(R.string.village)
         holder.binding.tvVillageName.text = item.subVillageName
-        holder.binding.tvSSName.text = item.shasthyaShebikaName
+        val shasthyaShebika = when {
+            item.shasthyaShebikaNameSsId.isNotBlank() && item.shasthyaShebikaName.isNotBlank() -> {
+                "${item.shasthyaShebikaNameSsId} - ${item.shasthyaShebikaName}"
+            }
+
+            item.shasthyaShebikaName.isNotBlank() -> {
+                item.shasthyaShebikaName
+            }
+
+            else -> {
+                context.getString(R.string.separator_double_hyphen)
+            }
+        }
+        holder.binding.tvSSName.text = shasthyaShebika
         holder.binding.tvLastVisitDate.text = DateUtils.formatDateToDisplayFormat(item.lastActivityAt)
 
         val services = item.assessmentHistory.filterNot { it.serviceProvided.isNullOrBlank() }

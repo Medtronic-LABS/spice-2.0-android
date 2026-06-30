@@ -51,8 +51,8 @@
                 },
                 {
                     "id": "liveBirth",
-                    "name": "Live Birth",
-                    "cultureValue": "জীবিত জন্ম"
+                    "name": "Delivery outcome",
+                    "cultureValue": "প্রসবের ফলাফল"
                 },
                 {
                     "id": "abortion",
