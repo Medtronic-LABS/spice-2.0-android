@@ -8,11 +8,11 @@
             "familyOrder": 0,
             "titleCulture": "সাধারণ তথ্য",
             "visibility": "gone"
-          },
-          {
+        },
+        {
             "id": "camp_type",
             "title": "Camp Type",
-        "family": "generalInformation",
+            "family": "generalInformation",
             "orderId": 0,
             "viewType": "SingleSelectionView",
             "condition": [],
@@ -23,23 +23,23 @@
             "visibility": "gone",
             "isMandatory": true,
             "optionsList": [
-              {
-                "id": "Combined",
-                "name": "Combined",
-                "cultureValue": "কম্বাইন্ড"
-              },
-              {
-                "id": "Single",
-                "name": "Single",
-                "cultureValue": "সিঙ্গেল"
-              }
+                {
+                    "id": "combined",
+                    "name": "Combined",
+                    "cultureValue": "কম্বাইন্ড"
+                },
+                {
+                    "id": "single",
+                    "name": "Single",
+                    "cultureValue": "সিঙ্গেল"
+                }
             ],
             "orientation": 0,
             "errorMessage": "Please select camp type",
             "titleCulture": "ক্যাম্পের ধরণ",
             "isNeededDefault": true,
             "cultureErrorMessage": "অনুগ্রহ করে ক্যাম্পের ধরণ নির্বাচন করুন"
-          },
+        },
         {
             "familyOrder": 1,
             "id": "symptomsLog",
@@ -619,13 +619,12 @@
             "condition":
             [
                 {
-                    "eqList":
-                    [
-                        "+1.00",
-                        "+1.50",
-                        "+2.00",
-                        "+2.50",
-                        "+3.00"
+                    "eqList": [
+                        "1.0",
+                        "1.5",
+                        "2.0",
+                        "2.5",
+                        "3.0"
                     ],
                     "targetId": "haveTheGlassesBeenSold",
                     "visibility": "visible"
@@ -638,26 +637,25 @@
             "isEnabled": true,
             "isMandatory": true,
             "isSummary": true,
-            "optionsList":
-            [
+            "optionsList": [
                 {
-                    "id": "+1.00",
+                    "id": "1.0",
                     "name": "+1.00"
                 },
                 {
-                    "id": "+1.50",
+                    "id": "1.5",
                     "name": "+1.50"
                 },
                 {
-                    "id": "+2.00",
+                    "id": "2.0",
                     "name": "+2.00"
                 },
                 {
-                    "id": "+2.50",
+                    "id": "2.5",
                     "name": "+2.50"
                 },
                 {
-                    "id": "+3.00",
+                    "id": "3.0",
                     "name": "+3.00"
                 }
             ],
@@ -671,7 +669,7 @@
             "condition":
             [
                 {
-                    "eq": "Yes",
+                    "eq": "yes",
                     "targetId": "typeOfGlass",
                     "visibility": "visible"
                 }
@@ -687,12 +685,12 @@
             [
                 {
                     "cultureValue": "হ্যাঁ",
-                    "id": "Yes",
+                    "id": "yes",
                     "name": "Yes"
                 },
                 {
                     "cultureValue": "না",
-                    "id": "No",
+                    "id": "no",
                     "name": "No"
                 }
             ],
@@ -706,10 +704,9 @@
             "condition":
             [
                 {
-                    "eqList":
-                    [
-                        "biFocal",
-                        "singleVision"
+                    "eqList": [
+                        "bf",
+                        "sv"
                     ],
                     "targetId": "typeOfFrame",
                     "visibility": "visible"
@@ -726,12 +723,12 @@
             [
                 {
                     "cultureValue": "বাই-ফোকাল",
-                    "id": "biFocal",
+                    "id": "bf",
                     "name": "Bi Focal"
                 },
                 {
                     "cultureValue": "সিঙ্গেল ভিশন",
-                    "id": "singleVision",
+                    "id": "sv",
                     "name": "Single Vision"
                 }
             ],
@@ -747,8 +744,8 @@
                 {
                     "eqList":
                     [
-                        "Metal",
-                        "Plastic"
+                        "metal",
+                        "plastic"
                     ],
                     "targetId": "firstTimeUser",
                     "visibility": "visible"
@@ -765,12 +762,12 @@
             [
                 {
                     "cultureValue": "মেটাল",
-                    "id": "Metal",
+                    "id": "metal",
                     "name": "Metal"
                 },
                 {
                     "cultureValue": "প্লাস্টিক",
-                    "id": "Plastic",
+                    "id": "plastic",
                     "name": "Plastic"
                 }
             ],
@@ -794,12 +791,12 @@
             [
                 {
                     "cultureValue": "হ্যাঁ",
-                    "id": "Yes",
+                    "id": "yes",
                     "name": "Yes"
                 },
                 {
                     "cultureValue": "না",
-                    "id": "No",
+                    "id": "no",
                     "name": "No"
                 }
             ],
@@ -822,29 +819,29 @@
             "optionsList":
             [
                 {
-                    "cultureValue": "ভিশন সেন্টার",
-                    "id": "Vision Center",
-                    "name": "Vision Center"
+                    "id": "visionCenter",
+                    "name": "Vision Center",
+                    "cultureValue": "ভিশন সেন্টার"
                 },
                 {
-                    "cultureValue": "পিএসপি ক্যাম্প",
-                    "id": "PSP Camp",
-                    "name": "PSP Camp"
+                    "id": "pspCamp",
+                    "name": "PSP Camp",
+                    "cultureValue": "পিএসপি ক্যাম্প"
                 },
                 {
-                    "cultureValue": "মেডিকেল কলেজ হাসপাতাল",
-                    "id": "Medical College Hospital",
-                    "name": "Medical College Hospital"
+                    "id": "medicalCollegeHospital",
+                    "name": "Medical College Hospital",
+                    "cultureValue": "মেডিকেল কলেজ হাসপাতাল"
                 },
                 {
-                    "cultureValue": "সরকারি/বেসরকারি বিশেষায়িত হাসপাতাল",
-                    "id": "Govt/Private Specialized Hospital",
-                    "name": "Govt/Private Specialized Hospital"
+                    "id": "govtPrivateHospital",
+                    "name": "Govt/Private Specialized Hospital",
+                    "cultureValue": "সরকারি/বেসরকারি বিশেষায়িত হাসপাতাল"
                 },
                 {
-                    "cultureValue": "অন্যান্য",
-                    "id": "Others",
-                    "name": "Others"
+                    "id": "others",
+                    "name": "Others",
+                    "cultureValue": "অন্যান্য"
                 }
             ],
             "orderId": 7,

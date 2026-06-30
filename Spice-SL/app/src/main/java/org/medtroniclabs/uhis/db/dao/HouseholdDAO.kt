@@ -274,19 +274,25 @@ interface HouseholdDAO {
                     hh.household_no,
                     hh.updated_at,
                     COALESCE(ve.name, '') AS village_name,
-                    COALESCE(ss.name, '') AS shasthya_shebika_name,
+                    COALESCE(ss.name, ss_fallback.name, '') AS shasthya_shebika_name,
+                    COALESCE(ss.ssId, ss_fallback.ssId, '') AS shasthya_shebika_ssId,
                     COALESCE(sv.name, '') AS sub_village_name
                 FROM Household AS hh
                 -- ve/ss/sv supply display names only; scope is enforced by the WHERE clause. A
                 -- reassigned household keeps its original SS (and possibly village) which may not be
                 -- in this device's tables — INNER joins here wrongly hide those households, so a
                 -- newly-assigned village's households never appear (UHIS-1173). Use LEFT joins.
+                -- Display new ss name based on village where the old ss is not there in the DB.
                 LEFT JOIN VillageEntity AS ve
                     ON ve.id = hh.village_id
                 LEFT JOIN ShasthyaShebikaEntity AS ss
                     ON ss.id = hh.shasthya_shebika_id
                 LEFT JOIN SubVillageEntity AS sv
                     ON sv.id = hh.sub_village_id
+                LEFT JOIN ShasthyaShebikaLinkedVillageEntity AS sslv
+                    ON sslv.subVillageId = hh.sub_village_id
+                LEFT JOIN ShasthyaShebikaEntity AS ss_fallback
+                    ON ss_fallback.id = sslv.shasthyaShebikaId
                 $whereClause
             )
             SELECT
@@ -295,6 +301,7 @@ interface HouseholdDAO {
                 fh.household_no,
                 fh.village_name,
                 fh.shasthya_shebika_name,
+                fh.shasthya_shebika_ssId,
                 fh.sub_village_name,
                 memberAgg.last_member_registered_at,
                 MAX(

@@ -390,6 +390,7 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
         dateOfBirth: String?,
         isContactTrace: Boolean,
         houseHoldId: Long?,
+        fhirId: String?,
     ) {
         val intent = Intent(this, MemberSummaryActivity::class.java)
         intent.putExtra(CommonDefinedParams.HOUSEHOLD_ID, houseHoldId)

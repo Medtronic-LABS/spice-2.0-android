@@ -400,7 +400,9 @@ class OfflineSyncRepository @Inject constructor(
 
     private suspend fun saveAssessmentHistory(assessmentHistory: List<MemberAssessmentHistoryEntity>) {
         if (assessmentHistory.isEmpty()) return
-        assessmentHistory.forEach { history ->
+        // Resolve each row against existing local data, then persist in a single batch insert.
+        // A per-row insert here turns a full first-time sync into N separate Room transactions (UHIS-1387).
+        val updatedHistoryList = assessmentHistory.map { history ->
             val memberId = roomHelper.getHouseholdMemberIdByFhirId(history.memberFhirId)
             val existingHistory = roomHelper.getMemberAssessmentHistory(
                 history.memberFhirId,
@@ -408,13 +410,13 @@ class OfflineSyncRepository @Inject constructor(
                 history.visitDate,
                 history.serviceProvided?.uppercase(Locale.ENGLISH),
             )
-            val updatedHistory = if (existingHistory != null) {
+            if (existingHistory != null) {
                 history.copy(id = existingHistory.id, memberId = memberId)
             } else {
                 history.copy(memberId = memberId)
             }
-            roomHelper.insertMemberAssessmentHistory(updatedHistory)
         }
+        roomHelper.insertMemberAssessmentHistory(updatedHistoryList)
     }
 
     private suspend fun saveRequestInitialDownload(

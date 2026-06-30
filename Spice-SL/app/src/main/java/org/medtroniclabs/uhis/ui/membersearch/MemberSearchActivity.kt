@@ -30,6 +30,7 @@ import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.qrscanner.QRScanContract
 import org.medtroniclabs.uhis.common.qrscanner.QRScanResult
 import org.medtroniclabs.uhis.common.qrscanner.QRScannerActivity
+import org.medtroniclabs.uhis.data.model.PatientListResModel
 import org.medtroniclabs.uhis.data.offlinesync.model.SavedMemberDetails
 import org.medtroniclabs.uhis.databinding.ActivityMemberSearchBinding
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
@@ -354,14 +355,33 @@ class MemberSearchActivity : BaseActivity(), View.OnClickListener, MemberSelecti
         dateOfBirth: String?,
         isContactTrace: Boolean,
         houseHoldId: Long?,
+        fhirId: String?,
     ) {
-        navigateToMemberSummary(
-            SavedMemberDetails(
-                localMemberId = item,
-                dateOfBirth = dateOfBirth,
-            ),
-            houseHoldId = houseHoldId,
-        )
+        if (fhirId.isNullOrBlank()) {
+            navigateToMemberSummary(
+                SavedMemberDetails(
+                    localMemberId = item,
+                    dateOfBirth = dateOfBirth,
+                ),
+                houseHoldId = houseHoldId,
+            )
+        } else {
+            withNetworkAvailability(
+                online = {
+                    viewModel.fetchRemoteMemberDetails(PatientListResModel(memberReference = fhirId, initialReview = false))
+                },
+                offline = {
+                    navigateToMemberSummary(
+                        SavedMemberDetails(
+                            localMemberId = item,
+                            dateOfBirth = dateOfBirth,
+                        ),
+                        houseHoldId = houseHoldId,
+                    )
+                },
+                isErrorShow = false,
+            )
+        }
     }
 
     private fun navigateToMemberSummary(
