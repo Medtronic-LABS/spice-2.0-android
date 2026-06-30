@@ -620,11 +620,11 @@
             [
                 {
                     "eqList": [
-                        "1",
+                        "1.0",
                         "1.5",
-                        "2",
+                        "2.0",
                         "2.5",
-                        "3"
+                        "3.0"
                     ],
                     "targetId": "haveTheGlassesBeenSold",
                     "visibility": "visible"
@@ -637,10 +637,9 @@
             "isEnabled": true,
             "isMandatory": true,
             "isSummary": true,
-            "optionsList":
-            [
+            "optionsList": [
                 {
-                    "id": "1",
+                    "id": "1.0",
                     "name": "+1.00"
                 },
                 {
@@ -648,7 +647,7 @@
                     "name": "+1.50"
                 },
                 {
-                    "id": "2",
+                    "id": "2.0",
                     "name": "+2.00"
                 },
                 {
@@ -656,7 +655,7 @@
                     "name": "+2.50"
                 },
                 {
-                    "id": "3",
+                    "id": "3.0",
                     "name": "+3.00"
                 }
             ],
