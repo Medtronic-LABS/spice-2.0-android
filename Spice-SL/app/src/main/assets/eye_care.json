@@ -1,353 +1,346 @@
 {
     "time": 1678841138701,
     "formLayout": [
-      {
-        "id": "generalInformation",
-        "title": "General Information",
-        "viewType": "CardView",
-        "familyOrder": 0,
-        "titleCulture": "সাধারণ তথ্য",
-        "visibility": "gone"
-      },
-      {
-        "id": "camp_type",
-        "title": "Camp Type",
-        "family": "generalInformation",
-        "orderId": 0,
-        "viewType": "SingleSelectionView",
-        "condition": [],
-        "fieldName": "Camp Type",
-        "isEnabled": true,
-        "isSummary": true,
-        "optionType": "string",
-        "visibility": "gone",
-        "isMandatory": true,
-        "optionsList": [
-          {
-            "id": "Combined",
-            "name": "Combined",
-            "cultureValue": "কম্বাইন্ড"
-          },
-          {
-            "id": "Single",
-            "name": "Single",
-            "cultureValue": "সিঙ্গেল"
-          }
-        ],
-        "orientation": 0,
-        "errorMessage": "Please select camp type",
-        "titleCulture": "ক্যাম্পের ধরণ",
-        "isNeededDefault": true,
-        "cultureErrorMessage": "অনুগ্রহ করে ক্যাম্পের ধরণ নির্বাচন করুন"
-      },
-      {
-        "id": "eyeCare",
-        "title": "Eye Care",
-        "viewType": "CardView",
-        "familyOrder": 8,
-        "titleCulture": "চোখ পরীক্ষা",
-        "isDefaultVisible": true
-      },
-      {
-        "id": "eyeTestOutcome",
-        "title": "Eye Test Outcome",
-        "family": "eyeCare",
-        "orderId": 1,
-        "viewType": "Spinner",
-        "condition": [
-          {
-            "eqList": [
-              "cataracts",
-              "myopia",
-              "otherProblem"
+        {
+            "id": "generalInformation",
+            "title": "General Information",
+            "viewType": "CardView",
+            "familyOrder": 0,
+            "titleCulture": "সাধারণ তথ্য",
+            "visibility": "gone"
+        },
+        {
+            "id": "camp_type",
+            "title": "Camp Type",
+            "family": "generalInformation",
+            "orderId": 0,
+            "viewType": "SingleSelectionView",
+            "condition": [],
+            "fieldName": "Camp Type",
+            "isEnabled": true,
+            "isSummary": true,
+            "optionType": "string",
+            "visibility": "gone",
+            "isMandatory": true,
+            "optionsList": [
+                {
+                    "id": "combined",
+                    "name": "Combined",
+                    "cultureValue": "কম্বাইন্ড"
+                },
+                {
+                    "id": "single",
+                    "name": "Single",
+                    "cultureValue": "সিঙ্গেল"
+                }
             ],
-            "targetId": "referPlace",
-            "visibility": "visible"
-          },
-          {
-            "eq": "presbyopia",
-            "targetId": "glassPower",
-            "visibility": "visible"
-          }
-        ],
-        "fieldName": "Eye Test Outcome",
-        "isEnabled": true,
-        "isSummary": true,
-        "visibility": "visible",
-        "isMandatory": true,
-        "optionsList": [
-          {
-            "id": "cataracts",
-            "name": "Cataracts",
-            "cultureValue": "ছানি"
-          },
-          {
-            "id": "myopia",
-            "name": "Myopia",
-            "cultureValue": "দূরদৃষ্টি সমস্যা"
-          },
-          {
-            "id": "presbyopia",
-            "name": "Presbyopia",
-            "cultureValue": "প্রেসবায়োপিয়া বা নিকট দৃষ্টি সমস্যা"
-          },
-          {
-            "id": "otherProblem",
-            "name": "Other Problem",
-            "cultureValue": "অন্যান্য সমস্যা"
-          },
-          {
-            "id": "noProblem",
-            "name": "No Problem",
-            "cultureValue": "সমস্যা নেই"
-          }
-        ],
-        "errorMessage": "Please select a valid option",
-        "titleCulture": "চোখ পরীক্ষার ফলাফল",
-        "isNeededDefault": true,
-        "isDefaultVisible": true,
-        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
-      },
-      {
-        "id": "glassPower",
-        "title": "Glass Power",
-        "family": "eyeCare",
-        "orderId": 2,
-        "viewType": "Spinner",
-        "condition": [
-          {
-            "eqList": [
-              "+1.00",
-              "+1.50",
-              "+2.00",
-              "+2.50",
-              "+3.00"
+            "orientation": 0,
+            "errorMessage": "Please select camp type",
+            "titleCulture": "ক্যাম্পের ধরণ",
+            "isNeededDefault": true,
+            "cultureErrorMessage": "অনুগ্রহ করে ক্যাম্পের ধরণ নির্বাচন করুন"
+        },
+        {
+            "id": "eyeCare",
+            "title": "Eye Care",
+            "viewType": "CardView",
+            "familyOrder": 8,
+            "titleCulture": "চোখ পরীক্ষা",
+            "isDefaultVisible": true
+        },
+        {
+            "id": "eyeTestOutcome",
+            "title": "Eye Test Outcome",
+            "family": "eyeCare",
+            "orderId": 1,
+            "viewType": "Spinner",
+            "condition": [
+                {
+                    "eqList": [
+                        "cataracts",
+                        "myopia",
+                        "otherProblem"
+                    ],
+                    "targetId": "referPlace",
+                    "visibility": "visible"
+                },
+                {
+                    "eq": "presbyopia",
+                    "targetId": "glassPower",
+                    "visibility": "visible"
+                }
             ],
-            "targetId": "haveTheGlassesBeenSold",
-            "visibility": "visible"
-          }
-        ],
-        "fieldName": "Glass Power",
-        "isEnabled": true,
-        "isSummary": true,
-        "visibility": "gone",
-        "isMandatory": true,
-        "optionsList": [
-          {
-            "id": "+1.00",
-            "name": "+1.00"
-          },
-          {
-            "id": "+1.50",
-            "name": "+1.50"
-          },
-          {
-            "id": "+2.00",
-            "name": "+2.00"
-          },
-          {
-            "id": "+2.50",
-            "name": "+2.50"
-          },
-          {
-            "id": "+3.00",
-            "name": "+3.00"
-          }
-        ],
-        "errorMessage": "Please select a valid option",
-        "titleCulture": "পাওয়ার",
-        "isNeededDefault": true,
-        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
-      },
-      {
-        "id": "haveTheGlassesBeenSold",
-        "title": "Have the glasses been sold?",
-        "family": "eyeCare",
-        "orderId": 3,
-        "viewType": "Spinner",
-        "condition": [
-          {
-            "eq": "Yes",
-            "targetId": "typeOfGlass",
-            "visibility": "visible"
-          }
-        ],
-        "fieldName": "Have the glasses been sold?",
-        "isEnabled": true,
-        "isSummary": true,
-        "visibility": "gone",
-        "isMandatory": true,
-        "optionsList": [
-          {
-            "id": "Yes",
-            "name": "Yes",
-            "cultureValue": "হ্যাঁ"
-          },
-          {
-            "id": "No",
-            "name": "No",
-            "cultureValue": "না"
-          }
-        ],
-        "errorMessage": "Please select a valid option",
-        "titleCulture": "চশমা দেয়া হয়েছে কি",
-        "isNeededDefault": true,
-        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
-      },
-      {
-        "id": "typeOfGlass",
-        "title": "Type of Glass",
-        "family": "eyeCare",
-        "orderId": 4,
-        "viewType": "Spinner",
-        "condition": [
-          {
-            "eqList": [
-              "biFocal",
-              "singleVision"
+            "fieldName": "Eye Test Outcome",
+            "isEnabled": true,
+            "isSummary": true,
+            "visibility": "visible",
+            "isMandatory": true,
+            "optionsList": [
+                {
+                    "id": "cataracts",
+                    "name": "Cataracts",
+                    "cultureValue": "ছানি"
+                },
+                {
+                    "id": "myopia",
+                    "name": "Myopia",
+                    "cultureValue": "দূরদৃষ্টি সমস্যা"
+                },
+                {
+                    "id": "presbyopia",
+                    "name": "Presbyopia",
+                    "cultureValue": "প্রেসবায়োপিয়া বা নিকট দৃষ্টি সমস্যা"
+                },
+                {
+                    "id": "otherProblem",
+                    "name": "Other Problem",
+                    "cultureValue": "অন্যান্য সমস্যা"
+                },
+                {
+                    "id": "noProblem",
+                    "name": "No Problem",
+                    "cultureValue": "সমস্যা নেই"
+                }
             ],
-            "targetId": "typeOfFrame",
-            "visibility": "visible"
-          }
-        ],
-        "fieldName": "Type of Glass",
-        "isEnabled": true,
-        "isSummary": true,
-        "visibility": "gone",
-        "isMandatory": true,
-        "optionsList": [
-          {
-            "id": "biFocal",
-            "name": "Bi Focal",
-            "cultureValue": "বাই-ফোকাল"
-          },
-          {
-            "id": "singleVision",
-            "name": "Single Vision",
-            "cultureValue": "সিঙ্গেল ভিশন"
-          }
-        ],
-        "errorMessage": "Please select a valid option",
-        "titleCulture": "চশমার ধরণ",
-        "isNeededDefault": true,
-        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
-      },
-      {
-        "id": "typeOfFrame",
-        "title": "Type of Frame",
-        "family": "eyeCare",
-        "orderId": 5,
-        "viewType": "Spinner",
-        "condition": [
-          {
-            "eqList": [
-              "Metal",
-              "Plastic"
+            "errorMessage": "Please select a valid option",
+            "titleCulture": "চোখ পরীক্ষার ফলাফল",
+            "isNeededDefault": true,
+            "isDefaultVisible": true,
+            "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+        },
+        {
+            "id": "glassPower",
+            "title": "Glass Power",
+            "family": "eyeCare",
+            "orderId": 2,
+            "viewType": "Spinner",
+            "condition": [
+                {
+                    "eqList": [
+                        "1",
+                        "1.5",
+                        "2",
+                        "2.5",
+                        "3"
+                    ],
+                    "targetId": "haveTheGlassesBeenSold",
+                    "visibility": "visible"
+                }
             ],
-            "targetId": "firstTimeUser",
-            "visibility": "visible"
-          }
-        ],
-        "fieldName": "Type of Frame",
-        "isEnabled": true,
-        "isSummary": true,
-        "visibility": "gone",
-        "isMandatory": true,
-        "optionsList": [
-          {
-            "id": "Metal",
-            "name": "Metal",
-            "cultureValue": "মেটাল"
-          },
-          {
-            "id": "Plastic",
-            "name": "Plastic",
-            "cultureValue": "প্লাস্টিক"
-          }
-        ],
-        "errorMessage": "Please select a valid option",
-        "titleCulture": "ফ্রেমের ধরণ",
-        "isNeededDefault": true,
-        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
-      },
-      {
-        "id": "firstTimeUser",
-        "title": "First time user?",
-        "family": "eyeCare",
-        "orderId": 6,
-        "viewType": "Spinner",
-        "condition": [
-          {
-            "eq": "Other Problem",
-            "targetId": "otherEyeTestOutcome",
-            "visibility": "visible"
-          }
-        ],
-        "fieldName": "First time user?",
-        "isEnabled": true,
-        "isSummary": true,
-        "visibility": "gone",
-        "isMandatory": true,
-        "optionsList": [
-          {
-            "id": "Yes",
-            "name": "Yes",
-            "cultureValue": "হ্যাঁ"
-          },
-          {
-            "id": "No",
-            "name": "No",
-            "cultureValue": "না"
-          }
-        ],
-        "errorMessage": "Please select a valid option",
-        "titleCulture": "প্রথম চশমা ব্যবহারকারী কিনা",
-        "isNeededDefault": true,
-        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
-      },
-      {
-        "id": "referPlace",
-        "title": "Refer Place",
-        "family": "eyeCare",
-        "orderId": 7,
-        "viewType": "Spinner",
-        "condition": [],
-        "fieldName": "Refer Place",
-        "isEnabled": true,
-        "isSummary": true,
-        "visibility": "gone",
-        "isMandatory": true,
-        "optionsList": [
-          {
-            "id": "Vision Center",
-            "name": "Vision Center",
-            "cultureValue": "ভিশন সেন্টার"
-          },
-          {
-            "id": "PSP Camp",
-            "name": "PSP Camp",
-            "cultureValue": "পিএসপি ক্যাম্প"
-          },
-          {
-            "id": "Medical College Hospital",
-            "name": "Medical College Hospital",
-            "cultureValue": "মেডিকেল কলেজ হাসপাতাল"
-          },
-          {
-            "id": "Govt/Private Specialized Hospital",
-            "name": "Govt/Private Specialized Hospital",
-            "cultureValue": "সরকারি/বেসরকারি বিশেষায়িত হাসপাতাল"
-          },
-          {
-            "id": "Others",
-            "name": "Others",
-            "cultureValue": "অন্যান্য"
-          }
-        ],
-        "errorMessage": "Please select a valid option",
-        "titleCulture": "রেফারের স্থান",
-        "isNeededDefault": true,
-        "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
-      }
+            "fieldName": "Glass Power",
+            "isEnabled": true,
+            "isSummary": true,
+            "visibility": "gone",
+            "isMandatory": true,
+            "optionsList": [
+                {
+                    "id": "1",
+                    "name": "+1.00"
+                },
+                {
+                    "id": "1.5",
+                    "name": "+1.50"
+                },
+                {
+                    "id": "2",
+                    "name": "+2.00"
+                },
+                {
+                    "id": "2.5",
+                    "name": "+2.50"
+                },
+                {
+                    "id": "3",
+                    "name": "+3.00"
+                }
+            ],
+            "errorMessage": "Please select a valid option",
+            "titleCulture": "পাওয়ার",
+            "isNeededDefault": true,
+            "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+        },
+        {
+            "id": "haveTheGlassesBeenSold",
+            "title": "Have the glasses been sold?",
+            "family": "eyeCare",
+            "orderId": 3,
+            "viewType": "Spinner",
+            "condition": [
+                {
+                    "eq": "yes",
+                    "targetId": "typeOfGlass",
+                    "visibility": "visible"
+                }
+            ],
+            "fieldName": "Have the glasses been sold?",
+            "isEnabled": true,
+            "isSummary": true,
+            "visibility": "gone",
+            "isMandatory": true,
+            "optionsList": [
+                {
+                    "id": "yes",
+                    "name": "Yes",
+                    "cultureValue": "হ্যাঁ"
+                },
+                {
+                    "id": "no",
+                    "name": "No",
+                    "cultureValue": "না"
+                }
+            ],
+            "errorMessage": "Please select a valid option",
+            "titleCulture": "চশমা দেয়া হয়েছে কি",
+            "isNeededDefault": true,
+            "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+        },
+        {
+            "id": "typeOfGlass",
+            "title": "Type of Glass",
+            "family": "eyeCare",
+            "orderId": 4,
+            "viewType": "Spinner",
+            "condition": [
+                {
+                    "eqList": [
+                        "bf",
+                        "sv"
+                    ],
+                    "targetId": "typeOfFrame",
+                    "visibility": "visible"
+                }
+            ],
+            "fieldName": "Type of Glass",
+            "isEnabled": true,
+            "isSummary": true,
+            "visibility": "gone",
+            "isMandatory": true,
+            "optionsList": [
+                {
+                    "id": "bf",
+                    "name": "Bi Focal",
+                    "cultureValue": "বাই-ফোকাল"
+                },
+                {
+                    "id": "sv",
+                    "name": "Single Vision",
+                    "cultureValue": "সিঙ্গেল ভিশন"
+                }
+            ],
+            "errorMessage": "Please select a valid option",
+            "titleCulture": "চশমার ধরণ",
+            "isNeededDefault": true,
+            "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+        },
+        {
+            "id": "typeOfFrame",
+            "title": "Type of Frame",
+            "family": "eyeCare",
+            "orderId": 5,
+            "viewType": "Spinner",
+            "condition": [
+                {
+                    "eqList": [
+                        "metal",
+                        "plastic"
+                    ],
+                    "targetId": "firstTimeUser",
+                    "visibility": "visible"
+                }
+            ],
+            "fieldName": "Type of Frame",
+            "isEnabled": true,
+            "isSummary": true,
+            "visibility": "gone",
+            "isMandatory": true,
+            "optionsList": [
+                {
+                    "id": "metal",
+                    "name": "Metal",
+                    "cultureValue": "মেটাল"
+                },
+                {
+                    "id": "plastic",
+                    "name": "Plastic",
+                    "cultureValue": "প্লাস্টিক"
+                }
+            ],
+            "errorMessage": "Please select a valid option",
+            "titleCulture": "ফ্রেমের ধরণ",
+            "isNeededDefault": true,
+            "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+        },
+        {
+            "id": "firstTimeUser",
+            "title": "First time user?",
+            "family": "eyeCare",
+            "orderId": 6,
+            "viewType": "Spinner",
+            "fieldName": "First time user?",
+            "isEnabled": true,
+            "isSummary": true,
+            "visibility": "gone",
+            "isMandatory": true,
+            "optionsList": [
+                {
+                    "id": "yes",
+                    "name": "Yes",
+                    "cultureValue": "হ্যাঁ"
+                },
+                {
+                    "id": "no",
+                    "name": "No",
+                    "cultureValue": "না"
+                }
+            ],
+            "errorMessage": "Please select a valid option",
+            "titleCulture": "প্রথম চশমা ব্যবহারকারী কিনা",
+            "isNeededDefault": true,
+            "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+        },
+        {
+            "id": "referPlace",
+            "title": "Refer Place",
+            "family": "eyeCare",
+            "orderId": 7,
+            "viewType": "Spinner",
+            "condition": [],
+            "fieldName": "Refer Place",
+            "isEnabled": true,
+            "isSummary": true,
+            "visibility": "gone",
+            "isMandatory": true,
+            "optionsList": [
+                {
+                    "id": "visionCenter",
+                    "name": "Vision Center",
+                    "cultureValue": "ভিশন সেন্টার"
+                },
+                {
+                    "id": "pspCamp",
+                    "name": "PSP Camp",
+                    "cultureValue": "পিএসপি ক্যাম্প"
+                },
+                {
+                    "id": "medicalCollegeHospital",
+                    "name": "Medical College Hospital",
+                    "cultureValue": "মেডিকেল কলেজ হাসপাতাল"
+                },
+                {
+                    "id": "govtPrivateHospital",
+                    "name": "Govt/Private Specialized Hospital",
+                    "cultureValue": "সরকারি/বেসরকারি বিশেষায়িত হাসপাতাল"
+                },
+                {
+                    "id": "others",
+                    "name": "Others",
+                    "cultureValue": "অন্যান্য"
+                }
+            ],
+            "errorMessage": "Please select a valid option",
+            "titleCulture": "রেফারের স্থান",
+            "isNeededDefault": true,
+            "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ অপশন নির্বাচন করুন"
+        }
     ]
-  }
+}
