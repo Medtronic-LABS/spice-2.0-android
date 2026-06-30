@@ -82,6 +82,8 @@ object SecuredPreference {
          * Flag to store whether duplicate assessment history are deleted
          */
         DELETED_DUPLICATE_ASSESSMENT_HISTORY,
+
+        DEFAULT_CHIEFDOM_ID_FOR_NURSE,
     }
 
     private const val DEFAULT_SUFFIX = "_preferences"

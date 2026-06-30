@@ -44,6 +44,7 @@
     <string name="household_name_no">খানার নাম / নম্বর</string>
     <string name="diagnoses">রোগনির্ণয়</string>
     <string name="confirm_diagnoses">রোগনির্ণয় নিশ্চিত করুন</string>
+    <string name="confirm_diagnosis">রোগ নিশ্চিতকরণ (নিবন্ধিত রোগী)</string>
     <string name="edit_diagnosis">রোগনির্ণয় এডিট করুন</string>
     <string name="patient_status">রোগীর অবস্থা</string>
     <string name="child_status">শিশুর অবস্থা</string>
@@ -1806,6 +1807,7 @@
     <string name="union">ইউনিয়ন/ওয়ার্ড</string>
 
     <string name="both">উভয়</string>
+    <string name="upazila">উপজেলা</string>
     <string name="upazilla_health_complex">উপজেলা স্বাস্থ্য কমপ্লেক্স</string>
     <string name="unsuccessful">ব্যার্থ</string>
     <string name="willing_to_visit_uhc">উপজেলা স্বাস্থ্য কমপ্লেক্সে যেতে রাজি কিনা?</string>

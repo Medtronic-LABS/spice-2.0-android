@@ -37,7 +37,7 @@ class EnrollmentFormBuilderActivity : BaseActivity() {
         setMainContentView(
             binding.root,
             true,
-            title = getString(R.string.confirm_diagnoses),
+            title = getString(R.string.confirm_diagnosis),
             homeAndBackVisibility = Pair(true, true),
             callbackHome = {
                 showOnBackPressedAlert()

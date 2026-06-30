@@ -44,6 +44,7 @@
     <string name="household_name_no">Household Name / No</string>
     <string name="diagnoses">Diagnoses</string>
     <string name="confirm_diagnoses">Confirm Diagnoses</string>
+    <string name="confirm_diagnosis">Confirm Diagnosis</string>
     <string name="edit_diagnosis">Edit Diagnoses</string>
     <string name="patient_status">Patient Status</string>
     <string name="child_status">Child Status</string>
@@ -1882,6 +1883,7 @@
     <string name="union_village">Union</string>
     <string name="linked_to_care">Linked to Care</string>
     <string name="both">Both</string>
+    <string name="upazila">Upazila</string>
     <string name="upazilla_health_complex">Upazila Health Complex</string>
     <string name="unsuccessful">Unsuccessful</string>
     <string name="willing_to_visit_uhc">Willing to visit UHC?</string>

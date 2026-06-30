@@ -164,6 +164,10 @@ class MetaRepository @Inject constructor(
                             )
 
                             chiefdoms?.let { chiefdomList ->
+                                chiefdomList.first { it.isDistrictChiefdom == false }.let {
+                                    SecuredPreference.putLong(SecuredPreference.EnvironmentKey.DEFAULT_CHIEFDOM_ID_FOR_NURSE.name, it.id)
+                                }
+
                                 roomHelper.deleteChiefDoms()
                                 // roomHelper.saveChiefDoms(filterChiefdomsForNurse(chiefdomList))
                                 roomHelper.saveChiefDoms(chiefdomList)

@@ -588,6 +588,6 @@ interface MetaDataDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSiteDetails(siteEntity: List<SiteEntity>)
 
-    @Query("SELECT * FROM SubVillageEntity WHERE villageId =:villageId")
+    @Query("SELECT * FROM SubVillageEntity WHERE villageId =:villageId ORDER BY name ASC")
     suspend fun getSubVillage(villageId: Long): List<SubVillageEntity>
 }

@@ -22,6 +22,7 @@ import org.medtroniclabs.uhis.appextensions.postLoading
 import org.medtroniclabs.uhis.appextensions.postSuccess
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.FilterEnum
+import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.model.FilterModel
 import org.medtroniclabs.uhis.data.model.FollowUpPatientDetailsResponse
 import org.medtroniclabs.uhis.data.model.PatientDataModel
@@ -413,7 +414,8 @@ class PatientListViewModel @Inject constructor(
 
     fun getAllUnionList() {
         viewModelScope.launch(dispatcherIO) {
-            val response = onBoardingRepo.getAllVillages()
+            val cheifDomId = SecuredPreference.getLong(SecuredPreference.EnvironmentKey.DEFAULT_CHIEFDOM_ID_FOR_NURSE.name)
+            val response = onBoardingRepo.getVillageList(cheifDomId)
             unionListResponse.postValue(
                 Resource(
                     ResourceState.SUCCESS,
