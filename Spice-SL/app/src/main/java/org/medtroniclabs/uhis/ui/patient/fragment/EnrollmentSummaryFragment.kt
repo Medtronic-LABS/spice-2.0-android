@@ -22,6 +22,7 @@ import org.medtroniclabs.uhis.databinding.FragmentEnrollmentSummaryBinding
 import org.medtroniclabs.uhis.databinding.SummaryLayoutBinding
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
+import org.medtroniclabs.uhis.ncd.data.PatientVisitRequest
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
 import org.medtroniclabs.uhis.ui.BaseFragment
