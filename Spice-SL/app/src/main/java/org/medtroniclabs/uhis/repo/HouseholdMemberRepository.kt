@@ -301,7 +301,7 @@ class HouseholdMemberRepository @Inject constructor(
     }
 
     private suspend fun shouldApplyLoggedInUserAsKormi(): Boolean {
-        if (CommonUtils.isFoOrPo()) return false
+        if (CommonUtils.isFoPoOrChcp()) return false
         val userId = SecuredPreference.getUserId()
         if (!isValidShasthyaKormiId(userId)) return false
         // SS users share the CHW role; their login id matches ShasthyaShebikaEntity.id.

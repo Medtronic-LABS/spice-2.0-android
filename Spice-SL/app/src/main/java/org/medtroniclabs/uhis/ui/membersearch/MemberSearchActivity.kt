@@ -208,6 +208,12 @@ class MemberSearchActivity : BaseActivity(), View.OnClickListener, MemberSelecti
 
         binding.bottomNavigationView.visible()
         binding.btnAddMember.safeClickListener(this)
+
+        // CHCP doesn't use the member-type category dropdown; the list defaults to ALL_MEMBERS.
+        if (CommonUtils.isCHCP()) {
+            binding.tvMemberTypes.gone()
+            binding.viewMemberTypes.gone()
+        }
     }
 
     private fun setListeners() {

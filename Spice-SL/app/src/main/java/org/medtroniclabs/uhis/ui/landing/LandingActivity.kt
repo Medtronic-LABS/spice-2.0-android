@@ -692,7 +692,7 @@ class LandingActivity :
     }
 
     private fun startSyncWorker() {
-        if (CommonUtils.isChw() || (CommonUtils.isNonCommunity() && CommonUtils.isChp())) {
+        if (CommonUtils.isChw() || CommonUtils.isCHCP() || (CommonUtils.isNonCommunity() && CommonUtils.isChp())) {
             startBackgroundOfflineSync()
             checkBGSyncStatus()
         }
@@ -702,7 +702,7 @@ class LandingActivity :
         val menu: Menu = binding.navView.menu
         val offlineSyncMenuItem: MenuItem? = menu.findItem(R.id.offline_sync)
         val changeFacilityMenuItem: MenuItem? = menu.findItem(R.id.changeFacility)
-        if (CommonUtils.isCommunity() && !CommonUtils.isChw() && offlineSyncMenuItem != null) {
+        if (CommonUtils.isCommunity() && !CommonUtils.isChw() && !CommonUtils.isCHCP() && offlineSyncMenuItem != null) {
             menu.removeItem(offlineSyncMenuItem.itemId)
         }
         if (CommonUtils.isCommunity() && !CommonUtils.isProvider() && changeFacilityMenuItem != null) {
@@ -722,7 +722,7 @@ class LandingActivity :
             }
         }
 
-        if (CommonUtils.isFoOrPo() || CommonUtils.isHealthEducator()) {
+        if (CommonUtils.isFoPoOrChcp() || CommonUtils.isHealthEducator()) {
             menu.findItem(R.id.external_member)?.let { menu.removeItem(it.itemId) }
         }
 

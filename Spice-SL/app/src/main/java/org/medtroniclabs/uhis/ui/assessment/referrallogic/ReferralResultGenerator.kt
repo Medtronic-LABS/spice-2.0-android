@@ -713,7 +713,7 @@ class ReferralResultGenerator {
         bgResult: Triple<String?, String?, Double?>,
         isFollowUpVisit: Boolean,
     ): String {
-        if (isFollowUpVisit || CommonUtils.isFoOrPo()) {
+        if (isFollowUpVisit || CommonUtils.isFoPoOrChcp()) {
             return FACILITY_TYPE_UPAZILA
         }
         val hasBpOrBgReason = ReferredReason.bloodPressure in referredReasonList ||

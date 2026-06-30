@@ -196,7 +196,7 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
                 val referralTypeSite = findValueByKey(json, REFERRAL_FACILITY_TYPE) as String
                 viewModel.otherAssessmentDetails[REFERRAL_FACILITY_TYPE] = referralTypeSite
 
-                if (CommonUtils.isFoOrPo() || referralTypeSite == FACILITY_TYPE_UPAZILA) {
+                if (CommonUtils.isFoPoOrChcp() || referralTypeSite == FACILITY_TYPE_UPAZILA) {
                     binding.labelPhuReferred.gone()
                     binding.etPhuChange.gone()
                 } else {

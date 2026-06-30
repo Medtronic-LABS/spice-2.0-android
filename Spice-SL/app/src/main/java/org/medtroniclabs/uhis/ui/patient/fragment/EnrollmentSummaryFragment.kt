@@ -13,8 +13,8 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.SecuredPreference
-import org.medtroniclabs.uhis.data.offlinesync.model.ProvanceDto
 import org.medtroniclabs.uhis.data.model.PatientDetails
+import org.medtroniclabs.uhis.data.offlinesync.model.ProvanceDto
 import org.medtroniclabs.uhis.data.registration.InitialDiagnosis
 import org.medtroniclabs.uhis.data.registration.PatientCreateResponse
 import org.medtroniclabs.uhis.databinding.CardLayoutBinding
@@ -374,15 +374,36 @@ class EnrollmentSummaryFragment : BaseFragment(), View.OnClickListener {
             }
 
             binding.btnFollowUp -> {
-                viewModel.enrollPatientLiveData.value?.data?.let { item ->
-                    item.id?.let { patientRef ->
-                        item.memberReference?.let { memberRef ->
-                            item.patientId?.let { patientId ->
-                                showLoading()
-                                viewModel.createPatientVisit(requireContext(), patientRef.toLong(), memberRef, patientId)
-                            }
-                        }
-                    }
+                val data = viewModel.enrollPatientLiveData.value?.data
+                // patientReference / track id (for patientvisit/create) come from the numeric
+                // patient id, but the medical-review screen looks the patient up by
+                // patientUniqueId (returned by the register API), not the FHIR id.
+                val patientTrackIdString = data?.id ?: data?.patientId
+                val memberReference = data?.memberId
+                val patientTrackId = patientTrackIdString?.toLongOrNull()
+                val patientUniqueId = data?.patientUniqueId
+                if (patientTrackIdString != null &&
+                    memberReference != null &&
+                    patientTrackId != null &&
+                    patientUniqueId != null
+                ) {
+                    showLoading()
+                    viewModel.createPatientVisit(
+                        requireContext(),
+                        PatientVisitRequest(
+                            patientReference = patientTrackIdString,
+                            memberReference = memberReference,
+                            provenance = ProvanceDto(),
+                        ),
+                        patientId = patientTrackId,
+                        patientIdString = patientUniqueId,
+                    )
+                } else {
+                    (activity as BaseActivity).showErrorDialogue(
+                        getString(R.string.error),
+                        getString(R.string.something_went_wrong),
+                        isNegativeButtonNeed = false,
+                    ) {}
                 }
             }
         }

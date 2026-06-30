@@ -19,6 +19,7 @@ import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams.HOUSEHOLDFILTER
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
+import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.databinding.FragmentFilterBottomSheetDialogBinding
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
@@ -41,6 +42,11 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
     private val viewModel: MemberSearchViewModel by activityViewModels()
 
     private var spinnerDataSet = false
+
+    /** CHCP-only: Union (village) selector and the sub-villages loaded for the selected Union. */
+    private val isChcp: Boolean by lazy { CommonUtils.isCHCP() }
+    private lateinit var unionListTagView: TagListCustomView
+    private var lastChcpSubVillages: List<ChipViewItemModel> = emptyList()
 
     companion object {
         const val TAG = "MemberSearchFilterBottomSheetDialogFragment"
@@ -73,7 +79,11 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
         initView()
         initializeListeners()
         attachObservers()
-        viewModel.getFilterUiData()
+        if (isChcp) {
+            viewModel.loadChcpUnions()
+        } else {
+            viewModel.getFilterUiData()
+        }
     }
 
     private fun hasValidSkSelected(): Boolean {
@@ -85,6 +95,12 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
     }
 
     private fun enableConfirm() {
+        if (isChcp) {
+            val unionSelected = unionListTagView.getSelectedTags().isNotEmpty()
+            val subVillageSelected = subVillageListTagView.getSelectedTags().isNotEmpty()
+            binding.btnApply.isEnabled = unionSelected || subVillageSelected
+            return
+        }
         val isSsValid = ssListTagView.getSelectedTags().isNotEmpty()
         val isSubVillageValid = subVillageListTagView.getSelectedTags().isNotEmpty()
         val skOnlyValid = hasValidSkSelected()
@@ -98,6 +114,10 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
     }
 
     private fun attachObservers() {
+        if (isChcp) {
+            attachChcpObservers()
+            return
+        }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
@@ -149,6 +169,41 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
         }
     }
 
+    /**
+     * CHCP filter observers: Union (village) list and the sub-villages for the selected Union.
+     */
+    private fun attachChcpObservers() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.unions.collect { unions ->
+                        unionListTagView.addChipItemList(unions)
+                        enableConfirm()
+                    }
+                }
+                launch {
+                    viewModel.subVillages.collect { villages ->
+                        lastChcpSubVillages = villages
+                        binding.subVillageChipGroup.clearCheck()
+                        if (villages.isEmpty()) {
+                            hideVillage()
+                        } else {
+                            binding.tvSubVillage.post {
+                                binding.tvSubVillage.visible()
+                                binding.subVillageChipGroup.visible()
+                            }
+                        }
+                        subVillageListTagView.addChipItemList(
+                            villages,
+                            viewModel.searchParams.value.filterBySubVillages,
+                        )
+                        enableConfirm()
+                    }
+                }
+            }
+        }
+    }
+
     private fun initView() {
         viewModel.setUserJourney(HOUSEHOLDFILTER)
 
@@ -156,6 +211,49 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
         binding.registrationStatusChipGroup.gone()
         hideVillage()
 
+        if (isChcp) {
+            initChcpLocationViews()
+        } else {
+            initFoPoLocationViews()
+        }
+
+        binding.etFromDate.safeClickListener(this)
+        binding.etToDate.safeClickListener(this)
+    }
+
+    /**
+     * CHCP filter: Union (village) → Village (sub-village). No Shasthya Kormi/Shebika.
+     */
+    private fun initChcpLocationViews() {
+        binding.tvVillageTitle.visible()
+        binding.tvVillageTitle.setText(R.string.union_village)
+        binding.spShasthyaKormi.gone()
+        binding.villageChipGroup.visible()
+        hideSS()
+        binding.tvSubVillage.setText(R.string.village)
+
+        unionListTagView =
+            TagListCustomView(binding.root.context, binding.villageChipGroup, true) { _, _, _ ->
+                val selectedUnion = unionListTagView.getSelectedTags().firstOrNull()
+                val unionId = selectedUnion?.id
+                if (unionId == null) {
+                    viewModel.clearChcpSubVillages()
+                    hideVillage()
+                } else {
+                    viewModel.onUnionSelected(unionId)
+                }
+                enableConfirm()
+            }
+        subVillageListTagView =
+            TagListCustomView(binding.root.context, binding.subVillageChipGroup) { _, _, _ ->
+                enableConfirm()
+            }
+    }
+
+    /**
+     * FO/PO filter: Shasthya Kormi → SS → sub-village.
+     */
+    private fun initFoPoLocationViews() {
         binding.tvVillageTitle.visible()
         binding.tvVillageTitle.setText(R.string.shasthya_kormi_sk)
         binding.villageChipGroup.gone()
@@ -203,9 +301,6 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
         subVillageListTagView = TagListCustomView(binding.root.context, binding.subVillageChipGroup) { _, _, _ ->
             enableConfirm()
         }
-
-        binding.etFromDate.safeClickListener(this)
-        binding.etToDate.safeClickListener(this)
     }
 
     private fun hideVillage() {
@@ -287,26 +382,46 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
             R.id.btnApply -> applyFilter()
             R.id.btnCancel -> {
                 viewModel.setUserJourney(AnalyticsDefinedParams.HOUSEHOLDFILTERCANCELTRIGGERED)
-                viewModel.updateFilter(
-                    ssFilter = listOf(),
-                    subVillagesFilter = listOf(),
-                    filterSk = -1,
-                )
-                ssListTagView.clearSelection()
-                subVillageListTagView.clearSelection()
-                hideVillage()
-                suppressSkSpinnerSelection = true
-                binding.spShasthyaKormi.setSelection(0, false)
-                binding.spShasthyaKormi.post {
-                    suppressSkSpinnerSelection = false
+                if (isChcp) {
+                    clearChcpFilter()
+                } else {
+                    viewModel.updateFilter(
+                        ssFilter = listOf(),
+                        subVillagesFilter = listOf(),
+                        filterSk = -1,
+                    )
+                    ssListTagView.clearSelection()
+                    subVillageListTagView.clearSelection()
+                    hideVillage()
+                    suppressSkSpinnerSelection = true
+                    binding.spShasthyaKormi.setSelection(0, false)
+                    binding.spShasthyaKormi.post {
+                        suppressSkSpinnerSelection = false
+                    }
                 }
                 dismiss()
             }
         }
     }
 
+    private fun clearChcpFilter() {
+        viewModel.updateFilter(
+            ssFilter = listOf(),
+            subVillagesFilter = listOf(),
+            filterSk = -1,
+        )
+        unionListTagView.clearSelection()
+        subVillageListTagView.clearSelection()
+        viewModel.clearChcpSubVillages()
+        hideVillage()
+    }
+
     private fun applyFilter() {
         viewModel.setUserJourney(AnalyticsDefinedParams.HOUSEHOLDFILTERAPPLYTRIGGERED)
+        if (isChcp) {
+            applyChcpFilter()
+            return
+        }
         val ssSelection = ssListTagView.getSelectedTags()
         val subSelection = subVillageListTagView.getSelectedTags()
         val filterSk = if (hasValidSkSelected()) {
@@ -319,6 +434,21 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClic
             ssFilter = ssSelection,
             subVillagesFilter = subSelection,
             filterSk = filterSk,
+        )
+        dismiss()
+    }
+
+    /**
+     * CHCP: filter by the chosen sub-villages, or by every sub-village in the selected Union
+     * when no specific sub-village is picked.
+     */
+    private fun applyChcpFilter() {
+        val subSelection = subVillageListTagView.getSelectedTags()
+        val effectiveSubVillages = subSelection.ifEmpty { lastChcpSubVillages }
+        viewModel.updateFilter(
+            ssFilter = listOf(),
+            subVillagesFilter = effectiveSubVillages,
+            filterSk = -1,
         )
         dismiss()
     }

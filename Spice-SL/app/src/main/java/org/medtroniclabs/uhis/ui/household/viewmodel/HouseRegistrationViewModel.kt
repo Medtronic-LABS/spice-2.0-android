@@ -139,6 +139,17 @@ class HouseRegistrationViewModel @Inject constructor(
         }
     }
 
+    /**
+     * CHCP registration loads sub-villages directly from the selected Union ([villageId])
+     * instead of via a Shasthya Shebika.
+     */
+    fun loadSubVillageByVillageId(villageId: Long) {
+        viewModelScope.launch(dispatcherIO) {
+            subVillageListResponse.postLoading()
+            subVillageListResponse.postValue(houseHoldRepository.getSubVillagesByVillageId(villageId))
+        }
+    }
+
     fun registerHousehold(map: HashMap<String, Any>) {
         viewModelScope.launch(dispatcherIO) {
             try {

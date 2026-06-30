@@ -237,7 +237,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                             applyPendingSelectionIfReady(SHASTHYA_KORMI_ID, pendingShasthyaKormiId) {
                                 pendingShasthyaKormiId = null
                             }
-                            if (CommonUtils.isFoOrPo() &&
+                            if (CommonUtils.isFoPoOrChcp() &&
                                 data.response is List<*> &&
                                 data.response.size == 1 &&
                                 data.response[0] is ShasthyaKormiEntity
@@ -365,10 +365,18 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                             jsonString,
                             object : TypeToken<FormResponse>() {}.type,
                         )
-                        val formLayouts = if (CommonUtils.isFoOrPo()) {
+                        val formLayouts = if (CommonUtils.isFoPoOrChcp()) {
+                            val isChcp = CommonUtils.isCHCP()
                             formResponse.formLayout.forEach { field ->
-                                if (field.id == SHASTHYA_KORMI_ID) {
-                                    field.visibility = "visible"
+                                when (field.id) {
+                                    // CHCP picks the Union directly, so hide SK/SS and surface Union;
+                                    // FO/PO keep the Kormi-driven cascade with the Union hidden.
+                                    SHASTHYA_KORMI_ID ->
+                                        field.visibility = if (isChcp) FormDefinedParams.GONE else FormDefinedParams.VISIBLE
+                                    SHASTHYA_SHEBIKA_ID ->
+                                        if (isChcp) field.visibility = FormDefinedParams.GONE
+                                    VILLAGE_ID ->
+                                        if (isChcp) field.visibility = FormDefinedParams.VISIBLE
                                 }
                             }
                             formResponse.formLayout.filterNot { it.id == MemberRegistration.ID_MARITAL_STATUS }
@@ -511,7 +519,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
             pendingSubVillageId = null
         }
 
-        if (CommonUtils.isFoOrPo()) {
+        if (CommonUtils.isFoPoOrChcp()) {
             details.chiefdomId?.let { formGenerator.getResultMap()[CHIEFDOM_ID] = it }
         }
 
@@ -534,6 +542,29 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
     }
 
     /**
+     * CHCP picks the Union directly: load its sub-villages, derive the Chiefdom from the Union,
+     * and clear any stale sub-village selection (except while prefilling an edit).
+     */
+    private fun onChcpUnionSelected(selectedId: Any?) {
+        val villageId = CommonUtils.getLongOrNull(selectedId) ?: return
+        if (villageId == 0L) return
+        householdRegistrationViewModel.loadSubVillageByVillageId(villageId)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val village = householdRegistrationViewModel.getVillageEntity(villageId) ?: return@launch
+            withContext(Dispatchers.Main) {
+                village.chiefdomId?.let { chiefdom ->
+                    formGenerator.getResultMap()[CHIEFDOM_ID] = chiefdom
+                }
+            }
+        }
+        if (pendingSubVillageId == null) {
+            formGenerator.getViewByTag(SUB_VILLAGE_ID)?.let { view ->
+                formGenerator.setValueForView(null, view)
+            }
+        }
+    }
+
+    /**
      * Keeps Union ([VILLAGE_ID]) hidden; after user picks sub-village, set parent village id on the hidden Union spinner.
      */
     private fun applyVillageIdFromSubVillageSelection(selectedId: Any?) {
@@ -543,7 +574,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
         formGenerator.getViewByTag(VILLAGE_ID)?.let { view ->
             formGenerator.setValueForView(parentVillageId, view)
         }
-        if (!CommonUtils.isFoOrPo()) return
+        if (!CommonUtils.isFoPoOrChcp()) return
         viewLifecycleOwner.lifecycleScope.launch {
             val village = householdRegistrationViewModel.getVillageEntity(parentVillageId) ?: return@launch
             withContext(Dispatchers.Main) {
@@ -587,7 +618,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
     private fun disableLocationFieldsInEditMode() {
         if (editMemberId == -1L) return
         formGenerator.getViewByTag(VILLAGE_ID)?.isEnabled = false
-        if (CommonUtils.isFoOrPo()) {
+        if (CommonUtils.isFoPoOrChcp()) {
             formGenerator.getViewByTag(SHASTHYA_KORMI_ID)?.isEnabled = false
         }
         formGenerator.getViewByTag(SHASTHYA_SHEBIKA_ID)?.isEnabled = false
@@ -600,7 +631,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
             VILLAGE_ID,
             "",
         )
-        if (!CommonUtils.isFoOrPo()) {
+        if (!CommonUtils.isFoPoOrChcp()) {
             // SS list is scoped to logged-in Kormi user, not to Union selection
             householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType()
         }
@@ -612,13 +643,18 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
         selectedId: Any?,
     ) {
         when (id) {
+            VILLAGE_ID -> {
+                if (CommonUtils.isCHCP()) {
+                    onChcpUnionSelected(selectedId)
+                }
+            }
             SHASTHYA_KORMI_ID -> {
-                if (CommonUtils.isFoOrPo()) {
+                if (CommonUtils.isFoPoOrChcp()) {
                     formGenerator.getResultMap().remove(CHIEFDOM_ID)
                 }
             }
             SHASTHYA_SHEBIKA_ID -> {
-                if (CommonUtils.isFoOrPo()) {
+                if (CommonUtils.isFoPoOrChcp()) {
                     formGenerator.getResultMap().remove(CHIEFDOM_ID)
                 }
                 // SS selected - load Village list
@@ -636,7 +672,10 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                 }
             }
             SUB_VILLAGE_ID -> {
-                applyVillageIdFromSubVillageSelection(selectedId)
+                // CHCP selects the Union directly, so the Union/Chiefdom is already resolved.
+                if (!CommonUtils.isCHCP()) {
+                    applyVillageIdFromSubVillageSelection(selectedId)
+                }
             }
         }
     }
@@ -652,6 +691,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                     householdRegistrationViewModel.loadDataCacheByType(id, localDataCache)
                 }
                 SHASTHYA_KORMI_ID -> {
+                    // CHCP hides the Kormi cascade entirely.
                     if (CommonUtils.isFoOrPo()) {
                         householdRegistrationViewModel.loadAllShasthyaKormis()
                     }
@@ -661,14 +701,18 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                         CommonUtils.isFoOrPo() && selectedParent != null -> {
                             householdRegistrationViewModel.loadShasthyaShebikaForKormiId(selectedParent)
                         }
-                        !CommonUtils.isFoOrPo() -> {
+                        !CommonUtils.isFoPoOrChcp() -> {
                             householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType()
                         }
                     }
                 }
                 SUB_VILLAGE_ID -> {
                     selectedParent?.let {
-                        householdRegistrationViewModel.loadSubVillageDataCacheByType(it)
+                        if (CommonUtils.isCHCP()) {
+                            householdRegistrationViewModel.loadSubVillageByVillageId(it)
+                        } else {
+                            householdRegistrationViewModel.loadSubVillageDataCacheByType(it)
+                        }
                     }
                 }
             }

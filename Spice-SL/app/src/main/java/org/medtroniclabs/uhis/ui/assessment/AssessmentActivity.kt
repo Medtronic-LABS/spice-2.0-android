@@ -83,7 +83,7 @@ class AssessmentActivity : BaseActivity() {
             },
         )
         getIntentValue()
-        if (isCataractAccessDenied()) {
+        if (isCataractAccessDenied() || isEyeCareAccessDenied()) {
             finish()
             return
         }
@@ -94,6 +94,10 @@ class AssessmentActivity : BaseActivity() {
     private fun isCataractAccessDenied(): Boolean =
         CommonUtils.isCataractMenuId(viewModel.menuId) &&
             !CommonUtils.isCataractWorkflowEnabledForUser()
+
+    private fun isEyeCareAccessDenied(): Boolean =
+        CommonUtils.isEyeCareMenuId(viewModel.menuId) &&
+            !CommonUtils.isEyeCareWorkflowEnabledForUser()
 
     private fun getCurrentLocation() {
         val locationManager = SpiceLocationManager(this)

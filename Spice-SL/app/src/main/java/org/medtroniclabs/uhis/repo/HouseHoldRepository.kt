@@ -196,6 +196,18 @@ class HouseHoldRepository @Inject constructor(
             Resource(state = ResourceState.ERROR)
         }
 
+    /**
+     * CHCP registration drives the Union -> Sub-village cascade directly (no Shasthya
+     * Kormi/Shebika), so sub-villages are resolved by their parent Union [villageId].
+     */
+    suspend fun getSubVillagesByVillageId(villageId: Long): Resource<LocalSpinnerResponse> =
+        try {
+            val response = roomHelper.getSubVillage(villageId)
+            Resource(state = ResourceState.SUCCESS, LocalSpinnerResponse("sub_village_id", response))
+        } catch (_: Exception) {
+            Resource(state = ResourceState.ERROR)
+        }
+
     suspend fun updateHouseHoldEntity(householdEntity: HouseholdEntity) {
         roomHelper.updateHousehold(householdEntity)
     }

@@ -91,7 +91,7 @@ class ResourceLoadingScreen : BaseActivity() {
                 }
 
                 ResourceState.SUCCESS -> {
-                    if (CommonUtils.isChw() && CommonUtils.isCommunity()) {
+                    if ((CommonUtils.isChw() || CommonUtils.isCHCP()) && CommonUtils.isCommunity()) {
                         viewModel.downloadInitialDetails()
                     } else if (CommonUtils.isNonCommunity() && CommonUtils.isChp()) {
                         viewModel.downloadTheFollowUpData()

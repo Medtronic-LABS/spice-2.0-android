@@ -281,7 +281,7 @@ object CommonUtils {
 
     fun isChw(): Boolean = SecuredPreference.getUserDetails()?.roles?.any { it.name in CHWs } == true
 
-    fun offlineUsers(): Boolean = isNonCommunity() || (isCommunity() && isChw())
+    fun offlineUsers(): Boolean = isNonCommunity() || (isCommunity() && (isChw() || isCHCP()))
 
     fun isSk() = SecuredPreference.getUserDetails()?.roles?.any { it.name == SHASTIYA_KORMI } == true
 
@@ -2203,10 +2203,21 @@ object CommonUtils {
 
     fun isFoOrPo(): Boolean = isFo() || isPo()
 
+    /**
+     * CHCP shares the FO/PO offline "My Patients" flow (member search, add member, NCD
+     * assessment/referral) while behaving like a nurse elsewhere.
+     */
+    fun isFoPoOrChcp(): Boolean = isFoOrPo() || isCHCP()
+
     /** Cataract camp workflow is available only to FO/PO, regardless of facility assignment. */
     fun isCataractWorkflowEnabledForUser(): Boolean = isFoOrPo()
 
     fun isCataractMenuId(menuId: String?): Boolean = menuId.equals(MenuConstants.CATARACT_MENU_ID, ignoreCase = true)
+
+    /** CHCP only handles NCD assessments, so the eye care workflow is hidden for them. */
+    fun isEyeCareWorkflowEnabledForUser(): Boolean = !isCHCP()
+
+    fun isEyeCareMenuId(menuId: String?): Boolean = menuId.equals(MenuConstants.EYE_CARE_MENU_ID, ignoreCase = true)
 
     fun gestationalWeekLimitCheck(date: String?): Boolean {
         date?.let {

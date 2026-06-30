@@ -135,9 +135,9 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
             }
 
             MenuConstants.MY_PATIENTS_MENU_ID -> {
-                if (CommonUtils.isFoOrPo()) {
+                if (CommonUtils.isFoOrPo() || CommonUtils.isCHCP()) {
                     startActivity(Intent(requireContext(), MemberSearchActivity::class.java))
-                } else if (CommonUtils.isNurse() || CommonUtils.isCHCP()) {
+                } else if (CommonUtils.isNurse()) {
                     val bundle = Bundle().apply {
                         putString(DefinedParams.ORIGIN, MenuConstants.MY_PATIENTS_MENU_ID.lowercase())
                     }

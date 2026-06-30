@@ -18,6 +18,8 @@ import org.medtroniclabs.uhis.common.DefinedParams.LIST_LIMIT
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.data.model.PatientListResModel
 import org.medtroniclabs.uhis.data.offlinesync.model.SavedMemberDetails
+import org.medtroniclabs.uhis.db.entity.SubVillageEntity
+import org.medtroniclabs.uhis.db.entity.VillageEntity
 import org.medtroniclabs.uhis.di.IoDispatcher
 import org.medtroniclabs.uhis.model.household.HouseHoldFilterUiData
 import org.medtroniclabs.uhis.model.services.ServiceStaticFilter
@@ -62,8 +64,13 @@ class MemberSearchViewModel @Inject constructor(
 
     private val _subVillages = MutableStateFlow<List<ChipViewItemModel>>(emptyList())
 
-    /** Sub-villages for the currently selected SS chips. */
+    /** Sub-villages for the currently selected SS chips (FO/PO) or Union (CHCP). */
     val subVillages: StateFlow<List<ChipViewItemModel>> = _subVillages.asStateFlow()
+
+    private val _unions = MutableStateFlow<List<ChipViewItemModel>>(emptyList())
+
+    /** Union (village) list for the CHCP filter sheet. */
+    val unions: StateFlow<List<ChipViewItemModel>> = _unions.asStateFlow()
 
     private val _remoteMemberDetailsState = MutableStateFlow(Resource<SavedMemberDetails>(ResourceState.SUCCESS))
 
@@ -216,6 +223,41 @@ class MemberSearchViewModel @Inject constructor(
                     .getSubVillagesByShasthyaShebikaIds(tags.mapNotNull { it.id })
                     .map { ChipViewItemModel(id = it.id, name = it.name) }
         }
+    }
+
+    /**
+     * CHCP filter: loads the Union (village) list scoped to the logged-in user.
+     */
+    fun loadChcpUnions() {
+        viewModelScope.launch(dispatcherIO) {
+            val response = houseHoldRepository.getUserVillages("").data?.response as? List<*>
+            _unions.value =
+                response
+                    ?.filterIsInstance<VillageEntity>()
+                    ?.map { ChipViewItemModel(id = it.id, name = it.name) }
+                    .orEmpty()
+        }
+    }
+
+    /**
+     * CHCP filter: loads sub-villages for the selected Union.
+     */
+    fun onUnionSelected(villageId: Long) {
+        viewModelScope.launch(dispatcherIO) {
+            val response = houseHoldRepository.getSubVillagesByVillageId(villageId).data?.response as? List<*>
+            _subVillages.value =
+                response
+                    ?.filterIsInstance<SubVillageEntity>()
+                    ?.map { ChipViewItemModel(id = it.id, name = it.name) }
+                    .orEmpty()
+        }
+    }
+
+    /**
+     * CHCP filter: clears sub-villages when the Union selection is removed.
+     */
+    fun clearChcpSubVillages() {
+        _subVillages.value = emptyList()
     }
 
     private suspend fun loadSkFilterData(kormiId: Long) {

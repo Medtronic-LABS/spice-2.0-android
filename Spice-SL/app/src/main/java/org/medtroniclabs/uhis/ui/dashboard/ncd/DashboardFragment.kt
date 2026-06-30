@@ -64,7 +64,9 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
 
     private fun hasNcdWorkflow(): Boolean = workflowSlugsContain(MenuConstants.NCD_MENU_ID)
 
-    private fun hasEyeCareWorkflow(): Boolean = workflowSlugsContain(MenuConstants.EYE_CARE_MENU_ID)
+    private fun hasEyeCareWorkflow(): Boolean =
+        CommonUtils.isEyeCareWorkflowEnabledForUser() &&
+            workflowSlugsContain(MenuConstants.EYE_CARE_MENU_ID)
 
     private fun hasCataractWorkflow(): Boolean =
         CommonUtils.isCataractWorkflowEnabledForUser() &&

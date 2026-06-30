@@ -235,8 +235,8 @@ class BDNCDAssessmentFragment : BaseFragment(), FormEventListener {
                 formGenerator.getViewByTag(ID_DIAGNOSED_GLUCOSE + rootSuffix)?.gone()
                 // Smoking history is captured on the first visit only; lock it from the 2nd visit onwards.
                 formGenerator.getViewByTag(IS_REGULAR_SMOKER + rootSuffix)?.gone()
-            } else if (CommonUtils.isFoOrPo()) {
-                // FO/PO users see the symptoms question only from the 2nd visit onwards,
+            } else if (CommonUtils.isFoPoOrChcp()) {
+                // FO/PO and CHCP users see the symptoms question only from the 2nd visit onwards,
                 // so hide the section on the first visit.
                 formGenerator.getViewByTag(SYMPTOMS_LOG + rootSuffix)?.gone()
                 formGenerator.getViewByTag(HAS_SYMPTOMS + rootSuffix)?.gone()
@@ -257,11 +257,12 @@ class BDNCDAssessmentFragment : BaseFragment(), FormEventListener {
     }
 
     /**
-     * Hide eye care section if the member's age is less than 35 years
+     * Hide eye care section if the member's age is less than 35 years.
+     * CHCP users never see the eye care section in NCD, regardless of age.
      */
     private fun handleDateOfBirth() {
         val age = DateUtils.calculateAge(viewModel.selectedMemberDob)
-        if (age < 35) {
+        if (age < 35 || CommonUtils.isCHCP()) {
             formGenerator.getServerData()?.let { serverData ->
                 formGenerator.getViewByTag(EYE_CARE + rootSuffix)?.gone()
                 serverData.filter { it.family == EYE_CARE }.forEach {

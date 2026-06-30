@@ -167,7 +167,7 @@ class MetaRepository @Inject constructor(
 
                             deleteAllVillages()
                             saveVillage(modifiedVillages(nurseVillages, userProfile.villages))
-                            if (CommonUtils.isNurse()) {
+                            if (CommonUtils.isNurse() || CommonUtils.isCHCP()) {
                                 // Save SubVillages which are linked to Nurse
                                 // saveSubVillages(filterSubVillagesForNurse(subVillages, nurseVillageIds))
                                 saveSubVillages(subVillages)
@@ -1227,8 +1227,14 @@ class MetaRepository @Inject constructor(
         }
 
     private fun filterCataractMenusForRole(menus: List<MenuEntity>): List<MenuEntity> {
-        if (CommonUtils.isCataractWorkflowEnabledForUser()) return menus
-        return menus.filterNot { CommonUtils.isCataractMenuId(it.menuId) }
+        val cataractFiltered =
+            if (CommonUtils.isCataractWorkflowEnabledForUser()) {
+                menus
+            } else {
+                menus.filterNot { CommonUtils.isCataractMenuId(it.menuId) }
+            }
+        if (CommonUtils.isEyeCareWorkflowEnabledForUser()) return cataractFiltered
+        return cataractFiltered.filterNot { CommonUtils.isEyeCareMenuId(it.menuId) }
     }
 
     private fun isRmnchClinicalWorkflow(clinicalWorkflow: ClinicalWorkflow): Boolean {

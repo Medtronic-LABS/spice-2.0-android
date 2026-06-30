@@ -180,6 +180,9 @@ class ToolsMenuFragment : BaseFragment(), MenuSelectionListener {
         if (CommonUtils.isCataractMenuId(menuId) && !CommonUtils.isCataractWorkflowEnabledForUser()) {
             return
         }
+        if (CommonUtils.isEyeCareMenuId(menuId) && !CommonUtils.isEyeCareWorkflowEnabledForUser()) {
+            return
+        }
         when (menuId) {
             MenuConstants.RMNCH_MENU_ID -> {
                 subModule?.let {

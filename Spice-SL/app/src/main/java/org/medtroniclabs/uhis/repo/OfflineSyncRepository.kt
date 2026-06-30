@@ -296,7 +296,7 @@ class OfflineSyncRepository @Inject constructor(
 
         val responseInitialDownload = parseSyncedDataResponse(syncedResponse.body()?.string()) ?: return false
 
-        val assessmentHistory = if (CommonUtils.isFoOrPo()) {
+        val assessmentHistory = if (CommonUtils.isFoPoOrChcp()) {
             val memberIds = extractSyncedMemberIds(responseInitialDownload.members)
             val history = mutableListOf<MemberAssessmentHistoryEntity>()
             // First fetch based on member ids

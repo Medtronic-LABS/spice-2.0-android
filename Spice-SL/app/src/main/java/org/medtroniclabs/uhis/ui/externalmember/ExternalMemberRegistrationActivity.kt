@@ -24,7 +24,7 @@ class ExternalMemberRegistrationActivity : BaseActivity(), OnDialogDismissListen
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         binding = ActivityExternalMemberRegistrationBinding.inflate(layoutInflater)
         val toolbarTitle =
-            if (CommonUtils.isFoOrPo()) {
+            if (CommonUtils.isFoPoOrChcp()) {
                 getString(R.string.member_registration)
             } else {
                 getString(R.string.external_member_registration)
