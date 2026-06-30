@@ -19,4 +19,7 @@ data class MenuEntity(
 ) {
     @Ignore
     var isDisabled: Boolean = false
+
+    @Ignore
+    var navigationBlockedMessage: String? = null
 }

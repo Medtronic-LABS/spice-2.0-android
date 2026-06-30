@@ -6,12 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
-import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
@@ -34,6 +32,7 @@ import org.medtroniclabs.uhis.ui.home.adapter.DashboardMenuItemsAdapter
 class ToolsMenuFragment : BaseFragment(), MenuSelectionListener {
     private lateinit var binding: FragmentToolsMenuBinding
     private val viewModel: ToolsViewModel by activityViewModels()
+    private var menuItems: List<MenuEntity> = emptyList()
 
     companion object {
         const val TAG = "ToolsMenuFragment"
@@ -96,7 +95,9 @@ class ToolsMenuFragment : BaseFragment(), MenuSelectionListener {
                 ResourceState.SUCCESS -> {
                     (activity as BaseActivity).hideLoading()
                     resourceState.data?.let {
-                        setAdapterViews(it)
+                        val resolvedMenus = getResolvedMenuLabels(it)
+                        menuItems = resolvedMenus
+                        setAdapterViews(resolvedMenus)
                     }
                 }
 
@@ -114,13 +115,10 @@ class ToolsMenuFragment : BaseFragment(), MenuSelectionListener {
             layoutManager.justifyContent = JustifyContent.CENTER
             binding.rvActivitiesList.layoutManager = layoutManager
         } else {
-            val layoutManager = GridLayoutManager(context, 2)
-            binding.rvActivitiesList.layoutManager = layoutManager
+            binding.rvActivitiesList.layoutManager = GridLayoutManager(context, 2)
         }
-        lifecycleScope.launch {
-            val resolvedMenus = getResolvedMenuLabels(menus)
-            binding.rvActivitiesList.adapter = DashboardMenuItemsAdapter(resolvedMenus, this@ToolsMenuFragment)
-        }
+
+        binding.rvActivitiesList.adapter = DashboardMenuItemsAdapter(menus, this@ToolsMenuFragment)
     }
 
     private fun getResolvedMenuLabels(menus: List<MenuEntity>): List<MenuEntity> =
@@ -133,31 +131,31 @@ class ToolsMenuFragment : BaseFragment(), MenuSelectionListener {
                         RMNCH.PNC -> getString(R.string.pnc)
                         else -> getString(R.string.child_health)
                     }
-                    menu.copy(name = rmnchTitle, displayValue = null)
+                    menu.copyWithResolvedLabels(name = rmnchTitle)
                 }
 
                 MenuConstants.PREGNANCY_OUTCOME.lowercase() -> {
-                    menu.copy(name = getString(R.string.pregnancy_outcome), displayValue = null)
+                    menu.copyWithResolvedLabels(name = getString(R.string.pregnancy_outcome))
                 }
 
                 MenuConstants.PREGNANT_WOMEN_PROFILE.lowercase() -> {
-                    menu.copy(name = getString(R.string.pregnant_women_profile), displayValue = null)
+                    menu.copyWithResolvedLabels(name = getString(R.string.pregnant_women_profile))
                 }
 
                 MenuConstants.FP_MENU_ID.lowercase() -> {
-                    menu.copy(name = getString(R.string.family_planning), displayValue = null)
+                    menu.copyWithResolvedLabels(name = getString(R.string.family_planning))
                 }
 
                 MenuConstants.NCD_MENU_ID.lowercase() -> {
-                    menu.copy(name = getString(R.string.ncd), displayValue = null)
+                    menu.copyWithResolvedLabels(name = getString(R.string.ncd))
                 }
 
                 MenuConstants.EYE_CARE_MENU_ID.lowercase() -> {
-                    menu.copy(name = getString(R.string.eye_care), displayValue = null)
+                    menu.copyWithResolvedLabels(name = getString(R.string.eye_care))
                 }
 
                 MenuConstants.CATARACT_MENU_ID.lowercase() -> {
-                    menu.copy(name = getString(R.string.cataract), displayValue = null)
+                    menu.copyWithResolvedLabels(name = getString(R.string.cataract))
                 }
 
                 else -> {
@@ -170,6 +168,20 @@ class ToolsMenuFragment : BaseFragment(), MenuSelectionListener {
         menuId: String,
         subModule: String?,
     ) {
+        val selectedMenu = menuItems.firstOrNull {
+            it.menuId == menuId && it.subModule == subModule
+        }
+
+        val blockedMessage = selectedMenu?.navigationBlockedMessage
+        if (!blockedMessage.isNullOrBlank()) {
+            showErrorDialogue(
+                title = getString(R.string.alert),
+                message = blockedMessage,
+                isNegativeButtonNeed = false,
+                positiveButtonName = getString(R.string.ok),
+            ) {}
+            return
+        }
         startAssessmentToolsActivity(menuId, subModule)
     }
 
@@ -266,3 +278,12 @@ class ToolsMenuFragment : BaseFragment(), MenuSelectionListener {
 
     private fun getEncounterReference(): String = requireArguments().getString(EncounterReference) ?: ""
 }
+
+private fun MenuEntity.copyWithResolvedLabels(
+    name: String,
+    displayValue: String? = null,
+): MenuEntity =
+    copy(name = name, displayValue = displayValue).apply {
+        isDisabled = this@copyWithResolvedLabels.isDisabled
+        navigationBlockedMessage = this@copyWithResolvedLabels.navigationBlockedMessage
+    }

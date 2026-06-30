@@ -1,10 +1,13 @@
 package org.medtroniclabs.uhis.ui.boarding.repo
 
+import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
+import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.ConsentFormType
 import org.medtroniclabs.uhis.common.DateUtils
@@ -82,6 +85,7 @@ import java.util.Locale
 import javax.inject.Inject
 
 class MetaRepository @Inject constructor(
+    @ApplicationContext private val context: Context,
     private var apiHelper: ApiHelper,
     private var roomHelper: RoomHelper,
 ) {
@@ -1067,9 +1071,11 @@ class MetaRepository @Inject constructor(
         menu.forEach { item ->
             when (item.menuId) {
                 MenuConstants.RMNCH_MENU_ID -> {
-                    val childVisit = isChildVisitMenuDisable(selectedHouseholdMemberID, dateOfBirth)
-                    item.isDisabled = childVisit.first
-                    item.subModule = childVisit.second
+                    isChildVisitMenuDisable(
+                        item,
+                        selectedHouseholdMemberID,
+                        dateOfBirth,
+                    )
                 }
             }
         }
@@ -1149,23 +1155,36 @@ class MetaRepository @Inject constructor(
     }
 
     private suspend fun isChildVisitMenuDisable(
+        menuItem: MenuEntity,
         selectedHouseholdMemberID: Long,
         dateOfBirth: String?,
-    ): Pair<Boolean, String> {
+    ) {
         val ageInDays = DateUtils.calculateAgeInDays(dateOfBirth)
+        menuItem.subModule = RMNCH.ChildHoodVisit
 
-        return if (ageInDays < 42) {
-            checkIfLastServiceProvidedIsAfter(
+        if (ageInDays < 42) {
+            menuItem.isDisabled = checkIfLastServiceProvidedIsAfter(
                 selectedHouseholdMemberID,
                 MenuConstants.CHILDHOOD_VISIT,
                 1,
-            ) to RMNCH.ChildHoodVisit
+            )
+            menuItem.navigationBlockedMessage = null
         } else {
-            checkIfLastServiceProvidedIsAfter(
+            val isVisitNotYetDue = checkIfLastServiceProvidedIsAfter(
                 selectedHouseholdMemberID,
                 MenuConstants.CHILDHOOD_VISIT,
                 15,
-            ) to RMNCH.ChildHoodVisit
+            )
+            menuItem.isDisabled = false
+            menuItem.navigationBlockedMessage = if (isVisitNotYetDue) {
+                context.resources.getQuantityString(
+                    R.plurals.child_health_next_visit_unavailable,
+                    CHILD_HEALTH_NEXT_VISIT_DAYS,
+                    CHILD_HEALTH_NEXT_VISIT_DAYS,
+                )
+            } else {
+                null
+            }
         }
     }
 
@@ -1248,6 +1267,8 @@ class MetaRepository @Inject constructor(
     }
 
     private companion object {
+        private const val CHILD_HEALTH_NEXT_VISIT_DAYS = 15
+
         private val RMNCH_CLINICAL_MENU_IDS =
             setOf(
                 MenuConstants.RMNCH_MENU_ID,

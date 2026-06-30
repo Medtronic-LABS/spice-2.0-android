@@ -214,6 +214,10 @@
     <string name="anc_3_plus_services">গর্ভকালীন সময়ে একই মাকে ৩ অথবা ৩+ ANC সেবা</string>
     <string name="highrisk_pregnant_women">উচ্চ ঝুঁকিপূর্ণ গর্ভবতী মা</string>
     <string name="child_visit">0–24 মাস বয়সী শিশু কাউন্সেলিং</string>
+    <plurals name="child_health_next_visit_unavailable">
+        <item quantity="one">পরবর্তী শিশু স্বাস্থ্য সেবা শেষ ভিজিটের %d দিন পর উপলব্ধ হবে।</item>
+        <item quantity="other">পরবর্তী শিশু স্বাস্থ্য সেবা শেষ ভিজিটের %d দিন পর উপলব্ধ হবে।</item>
+    </plurals>
     <string name="household_registered">খানা নিবন্ধন</string>
     <string name="pregnancy_outcome_dashboard">ডেলিভারি রেজিস্ট্রেশন</string>
     <string name="family_planning_dashboard">পরিবার পরিকল্পনা কাউন্সেলিংয়ের সংখ্যা</string>
