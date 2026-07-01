@@ -120,7 +120,7 @@
     <string name="age">বয়স</string>
     <string name="seperator_hyphen" translatable="false">-</string>
     <string name="household_empty_text">কোন খানা পাওয়া যায়নি।</string>
-    <string name="household_name_or_no">নাম / নম্বর / ফোন</string>
+    <string name="household_name_or_no">নাম / নম্বর / জাতীয় পরিচয় পত্র (NID) বা জন্ম নিবন্ধন নম্বর (BRN) / ফোন</string>
     <string name="member_deceased">মৃত্যু নিবন্ধন</string>
     <string name="male_prefix">M</string>
     <string name="female_prefix">F</string>
@@ -1688,7 +1688,7 @@
     <string name="add_external_member">বহিরাগত সদস্য যোগ করুন </string>
     <string name="child_health">শিশু ফলোআপ</string>
     <string name="gender_other_prefix" translatable="false">O</string>
-    <string name="member_name_or_phone">সদস্যের নাম / ফোন</string>
+    <string name="member_name_or_phone">সদস্যের নাম / জাতীয় পরিচয় পত্র (NID) বা জন্ম নিবন্ধন নম্বর (BRN) / ফোন</string>
     <string name="pregnant_women_profile">গর্ভবতী রেজিস্ট্রেশন</string>
     <string name="preterm_birth">সময়ের আগে প্রসব</string>
     <string name="tb_assessment">টিবি মূল্যায়ন</string>

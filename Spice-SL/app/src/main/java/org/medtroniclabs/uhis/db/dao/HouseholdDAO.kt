@@ -215,8 +215,9 @@ interface HouseholdDAO {
         val conditions = mutableListOf<String>()
 
         if (searchTerm.isNotBlank()) {
-            conditions += "(hh.name LIKE ? OR hh.household_no LIKE ? OR EXISTS (SELECT 1 FROM HouseholdMember hm WHERE hm.household_id = hh.id AND hm.phone_number LIKE ?))"
+            conditions += "(hh.name LIKE ? OR hh.household_no LIKE ? OR EXISTS (SELECT 1 FROM HouseholdMember hm WHERE hm.household_id = hh.id AND (hm.phone_number LIKE ? OR hm.national_id LIKE ?)))"
             val pattern = "%${searchTerm.trim()}%"
+            args += pattern
             args += pattern
             args += pattern
             args += pattern

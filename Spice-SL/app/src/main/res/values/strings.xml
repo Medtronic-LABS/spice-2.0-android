@@ -123,8 +123,8 @@
     <string name="age">Age</string>
     <string name="seperator_hyphen" translatable="false">-</string>
     <string name="household_empty_text">No Household found.</string>
-    <string name="household_name_or_no">Name / No / Phone</string>
-    <string name="member_name_or_phone">Member Name / Phone</string>
+    <string name="household_name_or_no">Name / No / National ID or BRN / Phone</string>
+    <string name="member_name_or_phone">Member Name / National ID or BRN / Phone</string>
     <string name="add_external_member">Add External Member</string>
     <string name="member_deceased">Member Deceased</string>
     <string name="male_prefix">M</string>

@@ -75,8 +75,9 @@ internal object ServiceMemberQueryBuilder {
         }
 
         if (!searchInput.isNullOrBlank()) {
-            conditions += "(hhm.name LIKE ? OR hhm.phone_number LIKE ?)"
+            conditions += "(hhm.name LIKE ? OR hhm.phone_number LIKE ? OR hhm.national_id LIKE ?)"
             val pattern = "%${searchInput.trim()}%"
+            args += pattern
             args += pattern
             args += pattern
         }

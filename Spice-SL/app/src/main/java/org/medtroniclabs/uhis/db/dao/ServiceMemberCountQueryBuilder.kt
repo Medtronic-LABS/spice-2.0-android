@@ -35,8 +35,9 @@ internal object ServiceMemberCountQueryBuilder {
 
         val whereConditions = mutableListOf<String>()
         if (searchInput.isNotBlank()) {
-            whereConditions += "(hhm.name LIKE ? OR hhm.phone_number LIKE ?)"
+            whereConditions += "(hhm.name LIKE ? OR hhm.phone_number LIKE ? OR hhm.national_id LIKE ?)"
             val pattern = "%${searchInput.trim()}%"
+            args += pattern
             args += pattern
             args += pattern
         }

@@ -284,7 +284,7 @@ interface MemberDAO {
      * Returns a live list of members with last-activity info.
      *
      * **Filters** (all optional):
-     * @param searchInput match against member name or phone number; blank = no filter
+     * @param searchInput match against member name, phone number, or national ID/BRN; blank = no filter
      * @param filterBySs whitelist of Shasthya Shebika IDs; empty = no filter
      * @param filterBySubVillages whitelist of sub-village IDs; empty = no filter
      * @param staticFilter selected static service bucket to apply
