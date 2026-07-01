@@ -23,7 +23,19 @@ data class HouseHoldEntityWithLastActivity(
     /** Epoch-ms of the most recently registered household member. */
     @ColumnInfo("last_member_registered_at")
     val lastMemberRegisteredAt: Long,
+    @ColumnInfo("total_registered_members")
+    val totalRegisteredMembers: Int = 0,
 ) {
     @Ignore
     var assessmentHistory: List<MemberAssessmentHistoryEntity> = emptyList()
+
+    @get:Ignore
+    val membersSeekingBracServices: Int
+        get() =
+            assessmentHistory
+                .asSequence()
+                .filter { !it.serviceProvided.isNullOrBlank() }
+                .mapNotNull { it.memberId }
+                .distinct()
+                .count()
 }

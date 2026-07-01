@@ -1861,6 +1861,7 @@
     <string name="days_due_string">দিন বাকী</string>
     <string name="anc_received">এএনসি সেবা গ্রহণ করা হয়েছে</string>
     <string name="anc_received_value">BRAC (%1$s) থেকে / মোট (%2$s)</string>
+    <string name="household_brac_service_members_value">(%1$s / %2$s)</string>
     <string name="live_birth_s">জীবিত জন্ম (%1$s)</string>
     <string name="still_birth_s">মৃত জন্ম (%1$s)</string>
     <string name="newborn_death_s">নবজাতকের মৃত্যু (%1$s)</string>

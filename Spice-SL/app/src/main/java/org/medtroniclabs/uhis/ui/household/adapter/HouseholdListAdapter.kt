@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
+import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.databinding.ListItemHouseholdBinding
 import org.medtroniclabs.uhis.db.response.HouseHoldEntityWithLastActivity
@@ -63,6 +64,21 @@ class HouseholdListAdapter(
                 setTextAppearance(R.style.TextStyle_Bold_16_NoBG)
                 setTextColor(ContextCompat.getColor(context, R.color.grey_black))
                 text = item.name
+            },
+        )
+        holder.binding.flexTitle.addView(
+            TextView(context).apply {
+                layoutParams = ViewGroup.MarginLayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                )
+                setTextAppearance(R.style.TextStyle_Bold_16_NoBG)
+                setTextColor(ContextCompat.getColor(context, R.color.base_muted_foreground))
+                text = formatBracServiceMembers(
+                    context,
+                    item.membersSeekingBracServices,
+                    item.totalRegisteredMembers,
+                )
             },
         )
         holder.binding.tvHouseholdNo.text = item.householdNo ?: holder.context.getString(R.string.separator_double_hyphen)
@@ -139,4 +155,15 @@ class HouseholdListAdapter(
         )
 
     override fun getItemCount(): Int = houseHoldList.size
+
+    private fun formatBracServiceMembers(
+        context: Context,
+        seeking: Int,
+        total: Int,
+    ): String =
+        context.getString(
+            R.string.household_brac_service_members_value,
+            CommonUtils.formatCountForCurrentLocale(seeking),
+            CommonUtils.formatCountForCurrentLocale(total),
+        )
 }

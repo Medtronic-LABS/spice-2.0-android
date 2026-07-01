@@ -305,6 +305,7 @@ interface HouseholdDAO {
                 fh.shasthya_shebika_ssId,
                 fh.sub_village_name,
                 memberAgg.last_member_registered_at,
+                memberAgg.total_registered_members,
                 MAX(
                     COALESCE(fh.updated_at, 0),
                     COALESCE(memberAgg.last_member_registered_at, 0),
@@ -314,6 +315,7 @@ interface HouseholdDAO {
             INNER JOIN (
                 SELECT
                     household_id,
+                    COUNT(id) AS total_registered_members,
                     MAX(updated_at) AS last_member_registered_at
                 FROM HouseholdMember
                 WHERE household_id IN (SELECT id FROM filtered_households)
