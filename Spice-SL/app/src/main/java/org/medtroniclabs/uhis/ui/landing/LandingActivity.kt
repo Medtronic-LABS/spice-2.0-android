@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -813,7 +814,7 @@ class LandingActivity :
             R.id.privacy_policy -> {
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
                 if (connectivityManager.isNetworkAvailable()) {
-                    binding.appBarMain.tvTitle.text = getString(R.string.privacy_policy)
+                    setToolbarTitle(getString(R.string.privacy_policy))
                     supportFragmentManager
                         .beginTransaction()
                         .replace(
@@ -910,10 +911,23 @@ class LandingActivity :
         }
     }
 
+    private fun setToolbarTitle(
+        title: String,
+        textSizeRes: Int = R.dimen._16ssp,
+    ) {
+        binding.appBarMain.tvTitle.apply {
+            text = title
+            setTextSize(
+                TypedValue.COMPLEX_UNIT_PX,
+                resources.getDimension(textSizeRes),
+            )
+        }
+    }
+
     @SuppressLint("SourceLockedOrientationActivity")
     private fun handleNavigation(isDeepLink: Boolean = false) {
         if (CommonUtils.isCommunity() && CommonUtils.isRolePresent()) {
-            binding.appBarMain.tvTitle.text = getString(R.string.search_patient)
+            setToolbarTitle(getString(R.string.search_patient))
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
             val bundle = Bundle().apply {
                 putString(DefinedParams.ORIGIN, MenuConstants.MY_PATIENTS_MENU_ID)
@@ -924,7 +938,7 @@ class LandingActivity :
                 tag = PatientSearchFragment.TAG,
             )
         } else {
-            binding.appBarMain.tvTitle.text = getString(R.string.home_title)
+            setToolbarTitle(getString(R.string.home_title), R.dimen._20ssp)
             if (CommonUtils.isChwChp()) {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             }
