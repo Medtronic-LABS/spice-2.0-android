@@ -78,6 +78,8 @@ class NCDMedicalReviewCMRActivity : BaseActivity(), View.OnClickListener, AncVis
         )
     }
 
+    override fun consumeImeInsets() = true
+
     private fun showHideVerticalIcon(visibility: Boolean) {
         showVerticalMoreIcon(visibility) {
             onMoreIconClicked(it)

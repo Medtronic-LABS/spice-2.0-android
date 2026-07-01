@@ -93,7 +93,7 @@ class EnrollmentSummaryFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun setObserver() {
-        viewModel.patientVisitResponse.observe(viewLifecycleOwner) { resourceState ->
+        viewModel.patientVisitIDResponse.observe(viewLifecycleOwner) { resourceState ->
             when (resourceState.state) {
                 ResourceState.LOADING -> {
                     showLoading()
@@ -111,7 +111,6 @@ class EnrollmentSummaryFragment : BaseFragment(), View.OnClickListener {
                 }
 
                 ResourceState.SUCCESS -> {
-                    hideLoading()
                     hideLoading()
                     resourceState.data?.let { patientDetails ->
                         startNewReviewActivity(patientDetails)

@@ -63,6 +63,8 @@ class NurseMedicalReviewActivity : BaseActivity(), View.OnClickListener {
         swipeRefresh()
     }
 
+    override fun consumeImeInsets() = true
+
     private val onBackPressedCallback: OnBackPressedCallback =
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {

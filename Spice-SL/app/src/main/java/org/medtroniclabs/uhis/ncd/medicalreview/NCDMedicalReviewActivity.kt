@@ -141,6 +141,8 @@ class NCDMedicalReviewActivity :
         }
     }
 
+    override fun consumeImeInsets() = true
+
     private fun showHideVerticalIcon(visibility: Boolean) {
         showVerticalMoreIcon(visibility) {
             onMoreIconClicked(it)

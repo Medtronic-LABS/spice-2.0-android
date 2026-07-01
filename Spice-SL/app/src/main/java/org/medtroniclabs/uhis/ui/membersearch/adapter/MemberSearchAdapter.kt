@@ -124,6 +124,13 @@ class MemberSearchAdapter(
         }
         holder.binding.tvDiagnosisStatus.text = shasthyaShebika
 
+        // CHCP users should not see the Shasthya Shebika (SS) name on My Patients.
+        if (CommonUtils.isCHCP()) {
+            holder.binding.tvDiagnosis.gone()
+            holder.binding.tvDiagnosisSeparator.gone()
+            holder.binding.tvDiagnosisStatus.gone()
+        }
+
         val memberName = if (item.isActive) {
             holder.binding.clPatientRoot.setBackgroundResource(R.drawable.default_color_bg)
             disableAllChildren(holder.binding.root, 1f, true)
@@ -175,6 +182,9 @@ class MemberSearchAdapter(
         holder.binding.tvRecentServiceDateSeparator.gone()
         holder.binding.tvRecentServiceDateValue.gone()
 
+        holder.binding.tvDiagnosis.visible()
+        holder.binding.tvDiagnosisSeparator.visible()
+        holder.binding.tvDiagnosisStatus.visible()
         holder.binding.tvDiagnosis.setText(R.string.national_id)
         holder.binding.tvDiagnosisStatus.text =
             item.resolvedNationalId() ?: context.getString(R.string.separator_double_hyphen)

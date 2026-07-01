@@ -61,6 +61,8 @@ class NurseMedicalReviewSummaryActivity : BaseActivity(), View.OnClickListener {
         assessmentViewModel.getSymptomList()
     }
 
+    override fun consumeImeInsets() = true
+
     private fun initView() {
         binding.btnSubmit.safeClickListener(this)
         intent.extras?.let { bundle ->

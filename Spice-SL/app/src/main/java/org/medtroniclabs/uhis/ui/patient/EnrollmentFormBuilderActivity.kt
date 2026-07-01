@@ -55,6 +55,8 @@ class EnrollmentFormBuilderActivity : BaseActivity() {
         getIntentValues()
     }
 
+    override fun consumeImeInsets() = true
+
     private fun getIntentValues() {
         patientDetailsViewModel.patientId = intent.getLongExtra(DefinedParams.PATIENT_ID, -1L)
         viewModel.patientTrackId = intent.getLongExtra(DefinedParams.PATIENT_ID, -1L)

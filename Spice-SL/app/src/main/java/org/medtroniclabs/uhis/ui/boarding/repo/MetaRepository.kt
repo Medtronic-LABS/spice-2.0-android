@@ -164,7 +164,7 @@ class MetaRepository @Inject constructor(
                             )
 
                             chiefdoms?.let { chiefdomList ->
-                                chiefdomList.first { it.isDistrictChiefdom == false }.let {
+                                chiefdomList.firstOrNull { it.isDistrictChiefdom != true }?.let {
                                     SecuredPreference.putLong(SecuredPreference.EnvironmentKey.DEFAULT_CHIEFDOM_ID_FOR_NURSE.name, it.id)
                                 }
 
