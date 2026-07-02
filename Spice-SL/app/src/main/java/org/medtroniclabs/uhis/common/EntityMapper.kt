@@ -57,10 +57,6 @@ object EntityMapper {
                 updateMapsIdName(map, properties.id, properties.name)
             }
 
-            is ChiefDomEntity -> {
-                updateMapsIdName(map, properties.id, properties.name)
-            }
-
             is DistrictEntity -> {
                 updateMapsIdName(map, properties.id, properties.name)
             }
@@ -68,11 +64,12 @@ object EntityMapper {
             is ProgramEntity -> {
                 updateMapsIdName(map, properties.id, properties.name)
             }
+
             is ShasthyaKormiEntity -> {
-                val displayName = if (!properties.firstName.isNullOrBlank() && !properties.lastName.isNullOrBlank()) {
+                val displayName = if (properties.firstName.isNotBlank() && properties.lastName.isNotBlank()) {
                     "${properties.firstName} ${properties.lastName}"
                 } else {
-                    ""
+                    properties.firstName
                 }
                 updateMapsIdName(map, properties.id, displayName)
             }
@@ -85,10 +82,6 @@ object EntityMapper {
                     properties.name
                 }
                 updateMapsIdName(map, properties.id, displayName)
-            }
-
-            is SubVillageEntity -> {
-                updateMapsIdName(map, properties.id, properties.name)
             }
 
             is HouseholdMemberEntity -> {
