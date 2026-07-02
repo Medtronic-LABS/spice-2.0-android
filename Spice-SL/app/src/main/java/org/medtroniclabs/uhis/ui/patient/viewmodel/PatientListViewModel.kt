@@ -27,7 +27,9 @@ import org.medtroniclabs.uhis.data.model.FilterModel
 import org.medtroniclabs.uhis.data.model.FollowUpPatientDetailsResponse
 import org.medtroniclabs.uhis.data.model.PatientDataModel
 import org.medtroniclabs.uhis.data.model.PatientDetails
+import org.medtroniclabs.uhis.data.model.PatientDetailsFollowUp
 import org.medtroniclabs.uhis.data.model.PatientListResModel
+import org.medtroniclabs.uhis.data.model.RegisterCallRequest
 import org.medtroniclabs.uhis.data.model.RegisterCallResponse
 import org.medtroniclabs.uhis.data.model.ResponseDivisionDistrictUpazilas
 import org.medtroniclabs.uhis.data.model.SiteRoleResponse
@@ -35,6 +37,7 @@ import org.medtroniclabs.uhis.data.model.SortModel
 import org.medtroniclabs.uhis.data.model.UpdatePatientCallRegister
 import org.medtroniclabs.uhis.data.offlinesync.model.ProvanceDto
 import org.medtroniclabs.uhis.data.servicerecipient.PatientHistoryData
+import org.medtroniclabs.uhis.data.telesupport.TCPatientDetailsResponse
 import org.medtroniclabs.uhis.db.entity.SubVillageEntity
 import org.medtroniclabs.uhis.db.entity.VillageEntity
 import org.medtroniclabs.uhis.di.IoDispatcher
@@ -57,7 +60,7 @@ class PatientListViewModel @Inject constructor(
     private val apiHelper: ApiHelper,
     private val medicalReviewRepo: MedicalReviewRepository,
     private val onBoardingRepo: OnBoardingRepository,
-    @IoDispatcher private val dispatcherIO: CoroutineDispatcher,
+    @param:IoDispatcher private val dispatcherIO: CoroutineDispatcher,
 ) : ViewModel(), GetPatientsCount {
     // Origin
     var origin = ""
@@ -151,7 +154,7 @@ class PatientListViewModel @Inject constructor(
                         searchQRValue = searchQRValue,
                         isParaCounsellingDisabled = null,
                         counsellorId = null,
-                        unionId = null,
+                        unionId = if (origin == UIConstants.FOLLOW_UP && followUpType == DefinedParams.SCREENED) userUnionListResponse.value else null,
                         userId = null,
                         prescribedSiteId = null,
                     ),
@@ -159,7 +162,7 @@ class PatientListViewModel @Inject constructor(
                     getPatientsCount = this,
                     origin = origin,
                     isPsychologist = null,
-                    followUpType = null,
+                    followUpType = if (origin == UIConstants.FOLLOW_UP) followUpType else null,
                     isFilteredUnion,
                 )
             },
@@ -315,21 +318,20 @@ class PatientListViewModel @Inject constructor(
     ) {
         viewModelScope.launch(dispatcherIO) {
             tcPatientDetailLiveData.postLoading()
-//            try {
-//                val response =
-//                    medicalReviewRepo.getTCPatientRecord(PatientDetailsFollowUp(patientTrackId = patientTrackId, callRegisterId = null))
-//                if (response.isSuccessful && response.body()?.entity != null) {
-//                    tcPatientDetailLiveData.postSuccess(getFormattedPatientHistory(response.body()?.entity))
-//                    if (callType != null) {
-//                        patientCallRegister(ctx, RegisterCallRequest(patientTrackId, callType))
-//                    }
-//                } else {
-//                    tcPatientDetailLiveData.postError()
-//                }
-//
-//            } catch (e: Exception) {
-//                tcPatientDetailLiveData.postError(e.localizedMessage)
-//            }
+            try {
+                val response =
+                    medicalReviewRepo.getTCPatientRecord(PatientDetailsFollowUp(patientTrackId = patientTrackId, callRegisterId = null))
+                if (response.isSuccessful && response.body()?.entity != null) {
+                    tcPatientDetailLiveData.postSuccess(getFormattedPatientHistory(response.body()?.entity))
+                    if (callType != null) {
+                        patientCallRegister(ctx, RegisterCallRequest(patientTrackId, callType))
+                    }
+                } else {
+                    tcPatientDetailLiveData.postError()
+                }
+            } catch (e: Exception) {
+                tcPatientDetailLiveData.postError(e.localizedMessage)
+            }
 
             tcPatientDetailLiveData.postError()
         }
@@ -337,34 +339,84 @@ class PatientListViewModel @Inject constructor(
 
     fun fetchUnionOrAccountIdList() {
         viewModelScope.launch(dispatcherIO) {
+            // TODO get site details from BE
 //            if (CommonUtils.isHealthEducator()) {
 //                medicalReviewRepo.getAssignedCountSubCountyAccountIds().let { list ->
 //                    heAllAccountIds = list.map { it.accountId }.toSet()
 //                }
 //            }
-//            userUnionListResponse.postValue(onBoardingRepo.getUserUnions().map { it._id })
+            val chiefDomId = SecuredPreference.getLong(SecuredPreference.EnvironmentKey.DEFAULT_CHIEFDOM_ID_FOR_NURSE.name)
+            val response = onBoardingRepo.getVillageList(chiefDomId)
+            userUnionListResponse.postValue(response.map { it.id })
+        }
+    }
+
+    fun patientCallRegister(
+        context: Context,
+        request: RegisterCallRequest,
+    ) {
+        callStartTime = System.currentTimeMillis()
+        viewModelScope.launch(dispatcherIO) {
+            try {
+                if (connectivityManager.isNetworkAvailable()) {
+                    registerCallResponse.postLoading()
+                    val response =
+                        medicalReviewRepo.patientCallRegister(registerCallRequest = request)
+                    if (response.isSuccessful) {
+                        response.body()?.entity?.let {
+                            registerCallResponse.postSuccess(it)
+                        }
+                    } else {
+                        registerCallResponse.postError()
+                    }
+                } else {
+                    registerCallResponse.postError(context.getString(R.string.no_internet_error))
+                }
+            } catch (_: Exception) {
+                registerCallResponse.postError()
+            }
         }
     }
 
     fun getPatientCallRegister(context: Context) {
         viewModelScope.launch(dispatcherIO) {
-//            try {
-//                if (connectivityManager.isNetworkAvailable()) {
-//                    getPatientRegisterResponse.postLoading()
-//                    val response = medicalReviewRepo.getPatientCallRegister()
-//                    if (response.isSuccessful) {
-//                        getPatientRegisterResponse.postSuccess(response.body()?.entity)
-//                    } else {
-//                        getPatientRegisterResponse.postError()
-//                    }
-//                } else {
-//                    getPatientRegisterResponse.postError(context.getString(R.string.no_internet_error))
-//                }
-//            } catch (e: Exception) {
-//                getPatientRegisterResponse.postError()
-//            }
+            try {
+                if (connectivityManager.isNetworkAvailable()) {
+                    getPatientRegisterResponse.postLoading()
+                    val response = medicalReviewRepo.getPatientCallRegister()
+                    if (response.isSuccessful) {
+                        getPatientRegisterResponse.postSuccess(response.body()?.entity)
+                    } else {
+                        getPatientRegisterResponse.postError()
+                    }
+                } else {
+                    getPatientRegisterResponse.postError(context.getString(R.string.no_internet_error))
+                }
+            } catch (_: Exception) {
+                getPatientRegisterResponse.postError()
+            }
+        }
+    }
 
-            getPatientRegisterResponse.postError()
+    fun updateCallStatus(request: UpdatePatientCallRegister) {
+        viewModelScope.launch(dispatcherIO) {
+            try {
+                if (connectivityManager.isNetworkAvailable()) {
+                    statusUpdateResponse.postLoading()
+                    val response = medicalReviewRepo.updatePatientCallRegister(request)
+                    if (response.isSuccessful) {
+                        response.body()?.let {
+                            statusUpdateResponse.postSuccess()
+                        } ?: kotlin.run {
+                            statusUpdateResponse.postError()
+                        }
+                    } else {
+                        statusUpdateResponse.postError()
+                    }
+                }
+            } catch (_: Exception) {
+                statusUpdateResponse.postError()
+            }
         }
     }
 
@@ -403,7 +455,7 @@ class PatientListViewModel @Inject constructor(
                     } else {
                         patientVisitResponse.postError()
                     }
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     patientVisitResponse.postError()
                 }
             }
@@ -412,10 +464,24 @@ class PatientListViewModel @Inject constructor(
         }
     }
 
+    fun getAllDivisionList() {
+//        viewModelScope.launch(dispatcherIO) {
+//            if (CommonUtils.isHealthEducator()) {
+//                medicalReviewRepo.getAssignedCountSubCountyAccountIds().let { list ->
+//                    heAssignedCounties = list.map { it.countyId }.toSet()
+//                    heAssignedSubCounties = list.map { it.subCountyId }.toSet()
+//                    heAssignedUpazila = list.map { it.accountId }.toSet()
+//                }
+//            }
+//
+//            divisionListLiveData.postValue(medicalReviewRepo.getAllCounty(heAssignedCounties))
+//        }
+    }
+
     fun getAllUnionList() {
         viewModelScope.launch(dispatcherIO) {
-            val cheifDomId = SecuredPreference.getLong(SecuredPreference.EnvironmentKey.DEFAULT_CHIEFDOM_ID_FOR_NURSE.name)
-            val response = onBoardingRepo.getVillageList(cheifDomId)
+            val chiefDomId = SecuredPreference.getLong(SecuredPreference.EnvironmentKey.DEFAULT_CHIEFDOM_ID_FOR_NURSE.name)
+            val response = onBoardingRepo.getVillageList(chiefDomId)
             unionListResponse.postValue(
                 Resource(
                     ResourceState.SUCCESS,
@@ -435,5 +501,28 @@ class PatientListViewModel @Inject constructor(
                 ),
             )
         }
+    }
+
+    private fun getFormattedPatientHistory(data: TCPatientDetailsResponse?): List<PatientHistoryData> {
+        val history = mutableListOf<PatientHistoryData>()
+
+        data?.let { res ->
+            res.bioData?.let {
+                val items = it.getPatientHistoryDataItems()
+                history.add(PatientHistoryData(title = R.string.bio_data, items = listOf(items), isPaginationRequired = false))
+            }
+
+            if (res.lastTenClinicalInformation.isNotEmpty()) {
+                val items = res.lastTenClinicalInformation.map { it.getPatientHistoryDataItems() }.toList()
+                history.add(PatientHistoryData(title = R.string.clinical_information, items = items))
+            }
+
+            if (res.lastTenCallInformation.isNotEmpty()) {
+                val items = res.lastTenCallInformation.map { it.getPatientHistoryDataItems() }.toList()
+                history.add(PatientHistoryData(title = R.string.call_information, items = items))
+            }
+        }
+
+        return history
     }
 }

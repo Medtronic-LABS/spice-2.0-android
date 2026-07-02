@@ -7,6 +7,10 @@ import org.medtroniclabs.uhis.data.PrescriptionListRequest
 import org.medtroniclabs.uhis.data.medicalreview.ReqBPBGLogList
 import org.medtroniclabs.uhis.data.medicalreview.ResLabTestRecommendations
 import org.medtroniclabs.uhis.data.model.MedicalReviewBaseRequest
+import org.medtroniclabs.uhis.data.model.PatientDetailsFollowUp
+import org.medtroniclabs.uhis.data.model.RegisterCallRequest
+import org.medtroniclabs.uhis.data.model.RegisterCallResponse
+import org.medtroniclabs.uhis.data.model.UpdatePatientCallRegister
 import org.medtroniclabs.uhis.data.registration.AssessmentListRequest
 import org.medtroniclabs.uhis.data.registration.BadgeModel
 import org.medtroniclabs.uhis.data.registration.ConfirmDiagnosesRequest
@@ -29,6 +33,7 @@ import org.medtroniclabs.uhis.data.registration.SingleWindowModel
 import org.medtroniclabs.uhis.data.registration.SiteRoleModel
 import org.medtroniclabs.uhis.data.registration.TerminateSessionModel
 import org.medtroniclabs.uhis.data.registration.TransferCreateRequest
+import org.medtroniclabs.uhis.data.telesupport.TCPatientDetailsResponse
 import org.medtroniclabs.uhis.db.entity.SiteEntity
 import org.medtroniclabs.uhis.db.local.RoomHelper
 import org.medtroniclabs.uhis.model.LabTestListRequest
@@ -202,4 +207,14 @@ class MedicalReviewRepository @Inject constructor(
         apiHelper.getPrescriptionRefillHistory(request)
 
     suspend fun createPatientVisit(request: PatientVisitRequest) = apiHelper.createPatientVisit(request)
+
+    suspend fun getPatientCallRegister(): Response<APIResponse<RegisterCallResponse>> = apiHelper.getCallRegister()
+
+    suspend fun updatePatientCallRegister(request: UpdatePatientCallRegister): Response<APIResponse<UpdatePatientCallRegister>> =
+        apiHelper.updateStatusCallRegister(request)
+
+    suspend fun getTCPatientRecord(request: PatientDetailsFollowUp): Response<APIResponse<TCPatientDetailsResponse>> = apiHelper.getTCPatientRecord(request)
+
+    suspend fun patientCallRegister(registerCallRequest: RegisterCallRequest): Response<APIResponse<RegisterCallResponse>> =
+        apiHelper.callRegister(registerCallRequest)
 }

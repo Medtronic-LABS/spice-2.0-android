@@ -88,12 +88,66 @@
                 android:textSize="@dimen/_14ssp" />
 
             <RadioButton
+                android:id="@+id/rbLatestMedicalReview"
+                style="@style/RadioButton_General"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/latest_medical_review_due_date"
+                android:textColor="@color/enabled_disbled_color"
+                android:textSize="@dimen/_14ssp"
+                android:visibility="gone" />
+
+            <RadioButton
+                android:id="@+id/rbOldestMedicalReview"
+                style="@style/RadioButton_General"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/oldest_medical_review_due_date"
+                android:textColor="@color/enabled_disbled_color"
+                android:textSize="@dimen/_14ssp"
+                android:visibility="gone" />
+
+            <RadioButton
+                android:id="@+id/rbLatestNextReview"
+                style="@style/RadioButton_General"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/latest_next_review_date"
+                android:textColor="@color/enabled_disbled_color"
+                android:textSize="@dimen/_14ssp"
+                android:visibility="gone" />
+
+            <RadioButton
+                android:id="@+id/rbOldestNextReview"
+                style="@style/RadioButton_General"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/oldest_next_review_date"
+                android:textColor="@color/enabled_disbled_color"
+                android:textSize="@dimen/_14ssp"
+                android:visibility="gone" />
+
+            <RadioButton
                 android:id="@+id/rbAssessmentDueDate"
                 style="@style/RadioButton_General"
                 android:fontFamily="@font/inter_regular"
                 android:text="@string/assessment_due_date"
                 android:textColor="@color/enabled_disbled_color"
                 android:textSize="@dimen/_14ssp" />
+
+            <RadioButton
+                android:id="@+id/rbLatestScreening"
+                style="@style/RadioButton_General"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/latest_screening_date"
+                android:textColor="@color/enabled_disbled_color"
+                android:textSize="@dimen/_14ssp"
+                android:visibility="gone" />
+
+            <RadioButton
+                android:id="@+id/rbOldestScreening"
+                style="@style/RadioButton_General"
+                android:fontFamily="@font/inter_regular"
+                android:text="@string/oldest_screening_date"
+                android:textColor="@color/enabled_disbled_color"
+                android:textSize="@dimen/_14ssp"
+                android:visibility="gone" />
 
         </RadioGroup>
 

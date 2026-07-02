@@ -4,6 +4,8 @@ data class PatientListResModel(
     val id: Long? = null,
     val nationalId: String? = null,
     val programId: Long? = null,
+    val firstName: String? = null,
+    val lastName: String? = null,
     val name: String? = null,
     val gender: String? = null,
     val age: Int? = null,

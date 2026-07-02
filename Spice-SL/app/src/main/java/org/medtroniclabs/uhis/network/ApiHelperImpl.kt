@@ -83,10 +83,12 @@ import org.medtroniclabs.uhis.data.model.MedicalReviewBaseRequest
 import org.medtroniclabs.uhis.data.model.MotherNeonateAncRequest
 import org.medtroniclabs.uhis.data.model.MotherNeonatePncRequest
 import org.medtroniclabs.uhis.data.model.PatientDataModel
+import org.medtroniclabs.uhis.data.model.PatientDetailsFollowUp
 import org.medtroniclabs.uhis.data.model.PatientEncounterResponse
 import org.medtroniclabs.uhis.data.model.PatientListResModel
 import org.medtroniclabs.uhis.data.model.PatientTypeCreateRequest
 import org.medtroniclabs.uhis.data.model.PncSubmitResponse
+import org.medtroniclabs.uhis.data.model.RegisterCallRequest
 import org.medtroniclabs.uhis.data.model.RegistrationResponse
 import org.medtroniclabs.uhis.data.model.RequestChangePassword
 import org.medtroniclabs.uhis.data.model.RequestMemberDetails
@@ -94,6 +96,7 @@ import org.medtroniclabs.uhis.data.model.ResponseChangePassword
 import org.medtroniclabs.uhis.data.model.SiteRoleResponse
 import org.medtroniclabs.uhis.data.model.TbHistory
 import org.medtroniclabs.uhis.data.model.TbMedicalReviewCreateRequest
+import org.medtroniclabs.uhis.data.model.UpdatePatientCallRegister
 import org.medtroniclabs.uhis.data.model.ViralLoadRequest
 import org.medtroniclabs.uhis.data.model.ViralLoadResponse
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseHold
@@ -896,4 +899,12 @@ class ApiHelperImpl @Inject constructor(
 
     override suspend fun getProviderDashboardDetails(request: UserDashboardRequest): Response<APIResponse<UserDashboardResponse>> =
         apiService.getProviderDashboardDetails(request)
+
+    override suspend fun getTCPatientRecord(request: PatientDetailsFollowUp) = apiService.getTCPatientRecord(request)
+
+    override suspend fun callRegister(request: RegisterCallRequest) = apiService.callRegister(request)
+
+    override suspend fun getCallRegister() = apiService.getCallRegister()
+
+    override suspend fun updateStatusCallRegister(request: UpdatePatientCallRegister) = apiService.updateStatusCallRegister(request)
 }

@@ -49,6 +49,7 @@ import org.medtroniclabs.uhis.ncd.medicalreview.NCDMRUtil
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
 import org.medtroniclabs.uhis.ui.BaseFragment
+import org.medtroniclabs.uhis.ui.followup.fragment.PatientDetailHistoryDialogFragment
 import org.medtroniclabs.uhis.ui.medicalreview.pharmacist.activity.NCDPharmacistActivity
 import org.medtroniclabs.uhis.ui.patient.CallRegisterInterface
 import org.medtroniclabs.uhis.ui.patient.EnrollmentFormBuilderActivity
@@ -61,10 +62,11 @@ import org.medtroniclabs.uhis.ui.patient.TermsAndConditionActivity
 import org.medtroniclabs.uhis.ui.patient.UIConstants
 import org.medtroniclabs.uhis.ui.patient.adapter.PatientsListAdapter
 import org.medtroniclabs.uhis.ui.patient.viewmodel.PatientListViewModel
+import timber.log.Timber
 import org.medtroniclabs.uhis.common.DefinedParams as CommonDefinedParams
 
 @AndroidEntryPoint
-class PatientListFragment() : BaseFragment(), PatientSelectionListener, CallRegisterInterface, FilterSortInterface {
+class PatientListFragment : BaseFragment(), PatientSelectionListener, CallRegisterInterface, FilterSortInterface {
     private lateinit var binding: FragmentPatientListBinding
     private val activityVm: PatientListViewModel by activityViewModels()
     private val fragmentVm: PatientListViewModel by viewModels()
@@ -138,7 +140,7 @@ class PatientListFragment() : BaseFragment(), PatientSelectionListener, CallRegi
                     origin = keyOrigin
                 }
                 it.getString(SELECTED_TAB)?.let { keySelectedTab ->
-                    followUpType = if (keySelectedTab.equals(DefinedParams.SCREENING)) DefinedParams.SCREENED else keySelectedTab.uppercase().replace(" ", "_")
+                    followUpType = if (keySelectedTab == DefinedParams.SCREENING) DefinedParams.SCREENED else keySelectedTab.uppercase().replace(" ", "_")
                 }
             }
         }
@@ -163,17 +165,6 @@ class PatientListFragment() : BaseFragment(), PatientSelectionListener, CallRegi
         binding.llExactSearch.etPatientSearch.text
             ?.clear()
         fragmentVm.searchPatientId = ""
-
-        /*fragmentVm.apply {
-            requireArguments().let {
-                it.getString(ORIGIN)?.let { keyOrigin ->
-                    origin = keyOrigin
-                }
-                it.getString(SELECTED_TAB)?.let { keySelectedTab->
-                    followUpType = if(keySelectedTab.equals(DefinedParams.SCREENING)) DefinedParams.SCREENED else keySelectedTab.uppercase().replace(" ", "_")
-                }
-            }
-        }*/
     }
 
     private fun setListeners() {
@@ -252,6 +243,7 @@ class PatientListFragment() : BaseFragment(), PatientSelectionListener, CallRegi
 
     private fun setPatientListAdapter() {
         patientsListAdapter = PatientsListAdapter(this, fragmentVm.origin, fragmentVm.followUpType)
+        Timber.tag("bug_n_bug").d("Followup Type : ${fragmentVm.followUpType}")
         binding.rvPatientsList.apply {
             layoutManager = GridLayoutManager(requireContext(), activityVm.spanCount)
             adapter = patientsListAdapter
@@ -321,7 +313,7 @@ class PatientListFragment() : BaseFragment(), PatientSelectionListener, CallRegi
                 }
                 ResourceState.ERROR -> {
                     hideLoading()
-                    resourceState?.message?.let { message ->
+                    resourceState.message?.let { message ->
                         (activity as BaseActivity).showErrorDialogue(
                             getString(R.string.error),
                             message,
@@ -349,29 +341,28 @@ class PatientListFragment() : BaseFragment(), PatientSelectionListener, CallRegi
                 }
 
                 ResourceState.SUCCESS -> {
-//                    if (resourceState.data?.id != null) {
-//                        hideLoading()
-//                        val existingDialog = childFragmentManager.findFragmentByTag(CallResultsDialogFragment.TAG)
-//                        if (existingDialog == null) {
-//                            val callResultsDialogFragment = CallResultsDialogFragment.newInstance(fragmentVm.followUpType)
-//                            val bundle = Bundle()
-//                            bundle.putLong(DefinedParams.id, resourceState.data.id)
-//                            bundle.putString(DefinedParams.NAME, "${resourceState.data.firstName} ${resourceState.data.lastName}")
-//                            bundle.putLong(DefinedParams.Age, resourceState.data.age)
-//                            bundle.putString(DefinedParams.Gender, resourceState.data.gender)
-//                            bundle.putString(DefinedParams.Phone_Number, resourceState.data.phoneNumber)
-//                            bundle.putString(DefinedParams.Call_Type, resourceState.data.callType)
-//                            bundle.putString(DefinedParams.PATIENT_HISTORY, getPatientHistoryDetail())
-//                            fragmentVm.callStartTime?.let { startTime ->
-//                                bundle.putLong(CALL_START_TIME, startTime)
-//                            }
-//                            callResultsDialogFragment.arguments = bundle
-//                            callResultsDialogFragment.show(childFragmentManager, CallResultsDialogFragment.TAG)
-//                        }
-//                    } else {
-//                        getPatients()
-//                    }
-                    getPatients()
+                    if (resourceState.data?.id != null) {
+                        hideLoading()
+                        val existingDialog = childFragmentManager.findFragmentByTag(CallResultsDialogFragment.TAG)
+                        if (existingDialog == null) {
+                            val callResultsDialogFragment = CallResultsDialogFragment.newInstance(fragmentVm.followUpType)
+                            val bundle = Bundle()
+                            bundle.putLong(CommonDefinedParams.id, resourceState.data.id)
+                            bundle.putString(DefinedParams.NAME, "${resourceState.data.firstName} ${resourceState.data.lastName}")
+                            bundle.putLong(CommonDefinedParams.AGE, resourceState.data.age)
+                            bundle.putString(CommonDefinedParams.GENDER, resourceState.data.gender)
+                            bundle.putString(CommonDefinedParams.PHONE_NUMBER, resourceState.data.phoneNumber)
+                            bundle.putString(CommonDefinedParams.CALL_TYPE, resourceState.data.callType)
+                            bundle.putString(CommonDefinedParams.PATIENT_HISTORY, getPatientHistoryDetail())
+                            fragmentVm.callStartTime?.let { startTime ->
+                                bundle.putLong(CommonDefinedParams.CALL_START_TIME, startTime)
+                            }
+                            callResultsDialogFragment.arguments = bundle
+                            callResultsDialogFragment.show(childFragmentManager, CallResultsDialogFragment.TAG)
+                        }
+                    } else {
+                        getPatients()
+                    }
                 }
 
                 ResourceState.ERROR -> {
@@ -388,10 +379,10 @@ class PatientListFragment() : BaseFragment(), PatientSelectionListener, CallRegi
                 ResourceState.SUCCESS -> {
                     if (shouldShowPatientHistory) {
                         hideLoading()
-//                        resourceState.data?.let {
-//                            val dialog = PatientDetailHistoryDialogFragment(it)
-//                            dialog.show(childFragmentManager, "Test_Tag")
-//                        }
+                        resourceState.data?.let {
+                            val dialog = PatientDetailHistoryDialogFragment.newInstance(it)
+                            dialog.show(childFragmentManager, PatientDetailHistoryDialogFragment::class.simpleName)
+                        }
                     }
                 }
                 ResourceState.ERROR -> {
@@ -457,6 +448,11 @@ class PatientListFragment() : BaseFragment(), PatientSelectionListener, CallRegi
         when (fragmentVm.origin) {
             UIConstants.ENROLLMENT_UNIQUE_ID -> {
                 proceedRegistration(item)
+            }
+
+            UIConstants.FOLLOW_UP -> {
+                shouldShowPatientHistory = true
+                fragmentVm.getTCPatientDetails(requireContext(), item.id!!)
             }
 
             else -> {
@@ -741,7 +737,7 @@ class PatientListFragment() : BaseFragment(), PatientSelectionListener, CallRegi
                 binding.tvNoPatientsFound.text = getString(R.string.no_patient_found)
             } else if (fragmentVm.origin == UIConstants.MY_PATIENTS_UNIQUE_ID) {
                 binding.tvNoPatientsFound.text = getString(R.string.no_patient_found)
-                binding.btnEnrol.text = "Register"
+                binding.btnEnrol.setText(R.string.register)
                 binding.btnEnrol.visibility = handleRegistrationBtnVisibility(true)
             } else {
                 binding.tvNoPatientsFound.text = getString(R.string.screening_after_search)
@@ -806,8 +802,9 @@ class PatientListFragment() : BaseFragment(), PatientSelectionListener, CallRegi
 
             binding.llSortFilter.btnSort -> {
                 activityVm.sort = sortModel()
-//                SortingDialogFragment.newInstance()
-//                    .show(childFragmentManager, SortingDialogFragment.TAG)
+                SortingDialogFragment
+                    .newInstance()
+                    .show(childFragmentManager, SortingDialogFragment.TAG)
             }
         }
     }
@@ -851,7 +848,9 @@ class PatientListFragment() : BaseFragment(), PatientSelectionListener, CallRegi
         patientsListAdapter.submitData(lifecycle, PagingData.empty())
         if (displayPatients()) {
             if (isFollowUp()) {
-                getPatientCallRegister()
+                // TODO : Actual call is getPatientCallRegister(). But, triggering getPatients() for testing
+//                getPatientCallRegister()
+                getPatients()
             } else {
                 getPatients()
             }

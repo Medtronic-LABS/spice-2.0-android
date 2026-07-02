@@ -37,7 +37,7 @@ interface FollowUpDao {
             "fu.type=:type AND " +
             "(hhm.name LIKE '%' || :search || '%' OR hhm.phone_number LIKE '%' || :search || '%' OR :search IS NULL) AND " +
             "CASE WHEN :fromDate = '' THEN 1 ELSE date(fu.encounterDate) BETWEEN :fromDate AND :toDate END AND " +
-            "CASE WHEN :remainingAttempt IS NULL THEN 1 ELSE (CASE WHEN (:screeningRetryAttempts - fu.attempts) < 1 THEN 1 ELSE (:screeningRetryAttempts - fu.attempts) END) = :remainingAttempt END AND " +
+            "CASE WHEN :remainingAttempt IS NULL THEN 1 ELSE remainingAttempts = :remainingAttempt END AND " +
             "CASE WHEN :callStatus IS NULL OR :callStatus = '' THEN 1 ELSE recentCallStatus = :callStatus END " +
             "ORDER BY " +
             "CASE WHEN :sortOrder = 'DEFAULT' THEN remainingAttempts END DESC, " +

@@ -216,6 +216,8 @@ object DefinedParams {
     const val TITLE = "Title"
     const val Count = "Count"
     const val SCREENED = "SCREENED"
+    const val ASSESSMENT_FOLLOW_UP = "Assessment"
+    const val SCREENING_FOLLOW_UP = "Screening"
     const val ASSESSED = "ASSESSED"
     const val ENROLLED = "ENROLLED"
     const val REGISTERED = "REGISTERED"
@@ -413,7 +415,8 @@ object DefinedParams {
     const val MISSEDVISIT = "MISSED_VISIT"
     const val REDRISK = "RED_RISK"
     const val LTF = "LTF"
-    const val CALL_TYPE = "Call_Type"
+    const val CALL_TYPE = "call_type"
+    const val PATIENT_HISTORY = "patient_history"
 
     /**
      * Unsuccessful call reason

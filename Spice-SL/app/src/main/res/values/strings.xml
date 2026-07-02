@@ -1946,6 +1946,24 @@
     <string name="share">Share</string>
     <string name="screened_date">Screened Date</string>
     <string name="screened_by">Screened By</string>
+    <string name="address">Address</string>
+    <string name="enrolled_date">Enrolled Date</string>
+    <string name="cvd_risk_bmi">CVD Risk, BMI</string>
+    <string name="co_morbidity">Co-Morbidity</string>
+    <string name="visit_date">Visit Date</string>
+    <string name="visit_place">Visit Place</string>
+    <string name="bg_fbs">BG (FBS)</string>
+    <string name="medication">Medication</string>
+    <string name="referred_to_cc">Referred to CC</string>
+    <string name="performed_by">Performed By</string>
+    <string name="clinical_information">Clinical Information</string>
+    <string name="latest_medical_review_due_date">Latest Medical Review Date</string>
+    <string name="oldest_medical_review_due_date">Oldest Medical Review Date</string>
+    <string name="latest_next_review_date">Latest Next Review Date</string>
+    <string name="oldest_next_review_date">Oldest Next Review Date</string>
+    <string name="reason_referral">Reason for referral</string>
+    <string name="division">Division</string>
+    <string name="district">District</string>
     <string-array name="mode_of_delivery">
         <item>Normal Delivery</item>
         <item>Assisted Delivery</item>

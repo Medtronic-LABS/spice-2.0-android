@@ -88,6 +88,13 @@
                 app:layout_constraintStart_toEndOf="@+id/tvCardNationalID"
                 app:layout_constraintTop_toBottomOf="@+id/tvLabelPatientID" />
 
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrier_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="tvCardNationalID,tvCardPatientID" />
+
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvBPStatus"
                 style="@style/TextStyle_Regular_16_Blue"
@@ -99,7 +106,7 @@
                 android:textColor="@color/secondary_black"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvCardNationalID"
+                app:layout_constraintTop_toBottomOf="@+id/barrier_id"
                 tools:text="@string/high_risk"/>
 
             <androidx.constraintlayout.widget.ConstraintLayout

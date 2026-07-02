@@ -80,10 +80,12 @@ import org.medtroniclabs.uhis.data.model.MedicalReviewBaseRequest
 import org.medtroniclabs.uhis.data.model.MotherNeonateAncRequest
 import org.medtroniclabs.uhis.data.model.MotherNeonatePncRequest
 import org.medtroniclabs.uhis.data.model.PatientDataModel
+import org.medtroniclabs.uhis.data.model.PatientDetailsFollowUp
 import org.medtroniclabs.uhis.data.model.PatientEncounterResponse
 import org.medtroniclabs.uhis.data.model.PatientListResModel
 import org.medtroniclabs.uhis.data.model.PatientTypeCreateRequest
 import org.medtroniclabs.uhis.data.model.PncSubmitResponse
+import org.medtroniclabs.uhis.data.model.RegisterCallRequest
 import org.medtroniclabs.uhis.data.model.RegistrationResponse
 import org.medtroniclabs.uhis.data.model.RequestChangePassword
 import org.medtroniclabs.uhis.data.model.RequestMemberDetails
@@ -91,6 +93,7 @@ import org.medtroniclabs.uhis.data.model.ResponseChangePassword
 import org.medtroniclabs.uhis.data.model.SiteRoleResponse
 import org.medtroniclabs.uhis.data.model.TbHistory
 import org.medtroniclabs.uhis.data.model.TbMedicalReviewCreateRequest
+import org.medtroniclabs.uhis.data.model.UpdatePatientCallRegister
 import org.medtroniclabs.uhis.data.model.ViralLoadRequest
 import org.medtroniclabs.uhis.data.model.ViralLoadResponse
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseHold
@@ -155,6 +158,7 @@ import org.medtroniclabs.uhis.data.resource.CD4DetailsRequest
 import org.medtroniclabs.uhis.data.resource.CD4DetailsResponse
 import org.medtroniclabs.uhis.data.resource.LabourDeliverySummaryRequest
 import org.medtroniclabs.uhis.data.resource.RequestAllEntities
+import org.medtroniclabs.uhis.data.telesupport.TCPatientDetailsResponse
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
 import org.medtroniclabs.uhis.model.ARTResponse
 import org.medtroniclabs.uhis.model.ArtRequest
@@ -248,6 +252,7 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
+import org.medtroniclabs.uhis.data.model.RegisterCallResponse as ModelRegisterCallResponse
 
 interface ApiService {
     @POST("/auth-service/session")
@@ -1427,4 +1432,22 @@ interface ApiService {
     suspend fun getProviderDashboardDetails(
         @Body request: UserDashboardRequest,
     ): Response<APIResponse<UserDashboardResponse>>
+
+    @POST("/spice-service/tele-support/patient-record")
+    suspend fun getTCPatientRecord(
+        @Body request: PatientDetailsFollowUp,
+    ): Response<APIResponse<TCPatientDetailsResponse>>
+
+    @POST("spice-service/call-register")
+    suspend fun callRegister(
+        @Body request: RegisterCallRequest,
+    ): Response<APIResponse<ModelRegisterCallResponse>>
+
+    @GET("spice-service/call-register")
+    suspend fun getCallRegister(): Response<APIResponse<ModelRegisterCallResponse>>
+
+    @PUT("spice-service/call-register")
+    suspend fun updateStatusCallRegister(
+        @Body request: UpdatePatientCallRegister,
+    ): Response<APIResponse<UpdatePatientCallRegister>>
 }

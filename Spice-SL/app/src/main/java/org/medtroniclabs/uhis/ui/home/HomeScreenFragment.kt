@@ -32,6 +32,7 @@ import org.medtroniclabs.uhis.ui.landing.viewmodel.LandingViewModel
 import org.medtroniclabs.uhis.ui.membersearch.MemberSearchActivity
 import org.medtroniclabs.uhis.ui.patient.AdvancedSearchActivity
 import org.medtroniclabs.uhis.ui.patient.NurseDashboardActivity
+import org.medtroniclabs.uhis.ui.patient.UIConstants
 import org.medtroniclabs.uhis.ui.peersupervisor.PerformanceMonitoringActivity
 import org.medtroniclabs.uhis.ui.services.ServicesActivity
 
@@ -257,6 +258,17 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
 
             MenuConstants.SERVICE_RECIPIENT -> {
                 startActivity(Intent(requireContext(), ServicesActivity::class.java))
+            }
+
+            MenuConstants.TELE_SUPPORT -> {
+                withNetworkAvailability(online = {
+                    val bundle = Bundle().apply {
+                        putString(DefinedParams.ORIGIN, UIConstants.FOLLOW_UP)
+                    }
+                    val intent = Intent(requireContext(), AdvancedSearchActivity::class.java)
+                    intent.putExtras(bundle)
+                    startActivity(intent)
+                })
             }
         }
     }

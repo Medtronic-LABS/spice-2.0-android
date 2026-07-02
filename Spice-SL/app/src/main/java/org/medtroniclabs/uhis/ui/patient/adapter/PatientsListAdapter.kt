@@ -1,12 +1,12 @@
 package org.medtroniclabs.uhis.ui.patient.adapter
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.graphics.toColorInt
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -79,11 +79,12 @@ class PatientsListAdapter(
                     patientFollowupGroup.visibility = View.GONE
                 }
 
-                val nameTxt = item.name ?: ""
+                val nameTxt = item.name ?: item.firstName?.let { firstName -> StringConverter.appendTexts(firstName, item.lastName) } ?: ""
+                val age = item.birthDate?.let { birthDate -> DateUtils.getAge(birthDate) } ?: item.age?.toString()
                 tvCardPatientName.text = CommonUtils.capitalize(
                     StringConverter.appendTexts(
                         firstText = nameTxt,
-                        DateUtils.getAge(item.birthDate),
+                        age,
                         CommonUtils.getGenderConstant(item.gender),
                         separator = "-",
                     ),
@@ -121,7 +122,7 @@ class PatientsListAdapter(
         binding: BdListItemPatientBinding,
     ) {
         with(binding) {
-            if (!item.referredReasons.isNullOrEmpty() && !selectedTab.isNullOrEmpty()) {
+            if (!item.referredReasons.isNullOrEmpty() && selectedTab.isNotEmpty()) {
                 tvBPStatus.visibility = View.VISIBLE
                 setBpStatus(item.referredReasons, context, binding)
             } else {
@@ -187,19 +188,20 @@ class PatientsListAdapter(
         context: Context,
         binding: BdListItemPatientBinding,
     ) {
-        if (referredReasons.contains(DefinedParams.BG) &&
-            referredReasons.contains(
-                DefinedParams.BP,
-            )
-        ) {
-            binding.tvBPStatus.text = context.getString(R.string.high_both)
-        } else if (referredReasons.contains(DefinedParams.BP)) {
-            binding.tvBPStatus.text = context.getString(R.string.high_bp)
-        } else if (referredReasons.contains(DefinedParams.BG)) {
-            binding.tvBPStatus.text = context.getString(R.string.high_bg)
-        } else {
-            binding.tvBPStatus.text = ""
+        val bpStatus = StringBuilder()
+        referredReasons.forEach { string ->
+            bpStatus.append(" ")
+            if (string.contains(DefinedParams.BG) &&
+                string.contains(DefinedParams.BP)
+            ) {
+                bpStatus.append(context.getString(R.string.high_both))
+            } else if (string.contains(DefinedParams.BP)) {
+                bpStatus.append(context.getString(R.string.high_bp))
+            } else if (string.contains(DefinedParams.BG)) {
+                bpStatus.append(context.getString(R.string.high_bg))
+            }
         }
+        binding.tvBPStatus.text = bpStatus.trim()
     }
 
     private fun getDaysStringMR(it: Long): Int = if (it == 1L) R.string.day_due_at_mr else R.string.days_due_at_mr
@@ -225,7 +227,7 @@ class PatientsListAdapter(
         if (view.background != null) {
             val drawable = view.background as GradientDrawable
             drawable.mutate()
-            drawable.setStroke(3, Color.parseColor(colorCode))
+            drawable.setStroke(3, colorCode.toColorInt())
         }
     }
 }

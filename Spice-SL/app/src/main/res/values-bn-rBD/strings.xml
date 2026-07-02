@@ -1869,6 +1869,24 @@
     <string name="share">শেয়ার করুন</string>
     <string name="screened_date">স্ক্রিনিং করা হয়েছে তারিখ</string>
     <string name="screened_by">এর মাধ্যমে যাচাইকৃত</string>
+    <string name="address">ঠিকানা</string>
+    <string name="enrolled_date">নিবন্ধণের তারিখ</string>
+    <string name="cvd_risk_bmi">সিভিডি ঝুঁকি , বি এম আই </string>
+    <string name="co_morbidity">অন্যান্য রোগের তথ্য</string>
+    <string name="visit_date">ভিজিটের তারিখ</string>
+    <string name="visit_place">ভিজিটের স্থান</string>
+    <string name="bg_fbs">ব্লাড গ্লুকোজ (খালি পেটে)</string>
+    <string name="medication">ঔষধের তালিকা</string>
+    <string name="referred_to_cc">নিকটবর্তী কমিউনিটি ক্লিনিকে রেফার করা হয়েছে</string>
+    <string name="performed_by">সেবা প্র্রদানকারী</string>
+    <string name="clinical_information">রোগ/চিকিৎসা সংক্রান্ত তথ্য</string>
+    <string name="latest_medical_review_due_date">সর্বশেষ ফলোআপ তারিখ</string>
+    <string name="oldest_medical_review_due_date">সর্বপ্রথম ফলোআপ তারিখ</string>
+    <string name="latest_next_review_date">পরবর্তী ভিজিটের তারিখ অনুসারে (নতুন থেকে পুরাতন)</string>
+    <string name="oldest_next_review_date">পরবর্তী ভিজিটের তারিখ অনুসারে (পুরাতন থেকে নতুন)</string>
+    <string name="reason_referral">রেফারের কারণ</string>
+    <string name="division">বিভাগ</string>
+    <string name="district">জেলা</string>
     <string-array name="mode_of_delivery">
         <item>স্বাভাবিক</item>
         <item>প্রসবে সহায়তা নিয়ে প্রসব করাতে হয়েছে (ভ্যাকুয়াম কাপ বা ফোরসেপ ব্যবহার করে প্রসব)</item>

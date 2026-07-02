@@ -279,7 +279,8 @@ class FollowUpMyPatientActivity : BaseActivity() {
             llFilter.btnSort.safeClickListener {
                 handleFollowUpSortClick()
             }
-            binding.llExactSearch.btnSearch.gone()
+            llExactSearch.btnSearch.gone()
+            tvHPatientCount.text = ""
             attachTextWatcher()
         }
     }

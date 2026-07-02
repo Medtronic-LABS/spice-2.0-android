@@ -2500,6 +2500,7 @@ object CommonUtils {
         return when (gender.lowercase()) {
             DefinedParams.FEMALE.lowercase() -> "F"
             DefinedParams.MALE.lowercase() -> "M"
+            DefinedParams.OTHER.lowercase() -> "O"
             else -> ""
         }
     }
