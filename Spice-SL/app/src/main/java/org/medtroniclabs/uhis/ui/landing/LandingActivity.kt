@@ -226,7 +226,11 @@ class LandingActivity :
             .wifiOnlyModelDownload(false)
             .forceMode(CoachingMode.EDGE)
             .build()
-        MicroCoachingSDK.getInstance().syncCoordinator.schedulePeriodic()
+        // No schedulePeriodic() workaround needed anymore: Builder.build() now
+        // shuts the old instance down BEFORE constructing the new one, so the
+        // new instance's periodic sync is no longer cancelled by the old
+        // instance's teardown. (The SDK also exposes updateAuthToken() for
+        // token-only refreshes that don't change persona/language/mode.)
         // Drawer item is `visible="false"` in XML — reveal it now that the SDK has a token.
         binding.navView.menu
             .findItem(R.id.chwAssistant)

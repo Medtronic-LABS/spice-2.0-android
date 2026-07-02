@@ -237,7 +237,9 @@ class SpiceBaseApplication : Application(), Configuration.Provider {
 
     private fun unRegisterFragmentLifecycleCallbacks(activity: AppCompatActivity?) {
         activity ?: return
-        val listener = fragmentCallbacks[activity] ?: return
+        // remove() (not just a lookup) — leaving the entry keyed the map on the
+        // destroyed Activity forever, retaining it and its view tree.
+        val listener = fragmentCallbacks.remove(activity) ?: return
         activity.supportFragmentManager.unregisterFragmentLifecycleCallbacks(listener)
     }
 
