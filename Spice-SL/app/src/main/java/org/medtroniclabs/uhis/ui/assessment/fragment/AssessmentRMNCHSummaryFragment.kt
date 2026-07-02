@@ -286,28 +286,50 @@ class AssessmentRMNCHSummaryFragment : BaseFragment(), View.OnClickListener {
     }
 
     /**
-     * Binds instructions card for PNC
+     * Binds instructions card for ANC
      */
     private fun bindAncInstructions(
         ancMap: Map<*, *>?,
         insertIndex: Int,
     ) {
+        var currentInsertIndex = insertIndex
+
+        resolveNutritionCounselling(ancMap)?.let { nutritionLayout ->
+            val nutritionCardBinding = getCounsellingCardBinding()
+            nutritionCardBinding.cardTitle.text = translateTitle(
+                nutritionLayout.titleCulture,
+                nutritionLayout.title,
+                isTranslationEnabled,
+            )
+            addInlineInstructionMessages(nutritionLayout, nutritionCardBinding.llFamilyRoot)
+            insertSummaryCard(nutritionCardBinding.root, currentInsertIndex)
+            if (currentInsertIndex >= 0) {
+                currentInsertIndex += 1
+            }
+        }
+
         // Get counselling card layout info for title
         val counsellingCardLayout = viewModel.formLayoutsLiveData.value
             ?.data
             ?.formLayout
             ?.firstOrNull { it.id == AssessmentDefinedParams.GROUP_COUNSELLING && it.viewType == ViewType.VIEW_TYPE_FORM_CARD_FAMILY }
 
-        // Get counselling items
+        // Get counselling items (nutrition is rendered in its own card above)
         val counsellingItems = viewModel.formLayoutsLiveData.value
             ?.data
             ?.formLayout
             ?.filter {
-                it.id == AssessmentDefinedParams.NUTRITION_COUNSELLING ||
-                    it.id == AssessmentDefinedParams.CARE_DURING_ANTENATAL_PERIOD ||
-                    it.id == AssessmentDefinedParams.BIRTH_PREPAREDNESS ||
-                    it.id == AssessmentDefinedParams.NEW_BORN_CARE_EDUCATION ||
-                    (it.viewType == ViewType.VIEW_TYPE_INSTRUCTION && it.isSummary == true && it.family == AssessmentDefinedParams.GROUP_COUNSELLING)
+                it.id != AssessmentDefinedParams.NUTRITION_COUNSELLING &&
+                    (
+                        it.id == AssessmentDefinedParams.CARE_DURING_ANTENATAL_PERIOD ||
+                            it.id == AssessmentDefinedParams.BIRTH_PREPAREDNESS ||
+                            it.id == AssessmentDefinedParams.NEW_BORN_CARE_EDUCATION ||
+                            (
+                                it.viewType == ViewType.VIEW_TYPE_INSTRUCTION &&
+                                    it.isSummary == true &&
+                                    it.family == AssessmentDefinedParams.GROUP_COUNSELLING
+                            )
+                    )
             }?.sortedBy { it.orderId ?: Int.MAX_VALUE }
             ?.toMutableList()
 
@@ -317,85 +339,6 @@ class AssessmentRMNCHSummaryFragment : BaseFragment(), View.OnClickListener {
             // Newborn care : Shown only during 3rd trimester
             if (gestationalAge.first < AssessmentDefinedParams.GESTATIONAL_AGE_WEEK_27) {
                 counsellingItems?.removeIf { it.id == AssessmentDefinedParams.NEW_BORN_CARE_EDUCATION }
-            }
-        }
-
-        counsellingItems?.firstOrNull { it.id == AssessmentDefinedParams.NUTRITION_COUNSELLING }?.let { nutritionCounselling ->
-            val options = nutritionCounselling.optionsList
-            val instructions = arrayListOf<String>()
-            val instructionsCulture = arrayListOf<String>()
-            if (!options.isNullOrEmpty()) {
-                val medicalHistoryPhysicalExaminationMap = ancMap?.get(AssessmentDefinedParams.GROUP_MEDICAL_HISTORY_PHYSICAL_EXAMINATION) as? Map<*, *>
-                val bmi = CommonUtils.getDouble(medicalHistoryPhysicalExaminationMap?.get(AssessmentDefinedParams.BMI)).takeIf { it > 0 }
-                bmi?.let {
-                    if (bmi < AssessmentDefinedParams.BMI_NORMAL_WEIGHT_THRESHOLD) {
-                        val option = options.firstOrNull { it[DefinedParams.ID] == "underWeight" }
-                        option?.let {
-                            instructions.add(option[DefinedParams.NAME] as? String ?: "")
-                            instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
-                        }
-                    } else if (bmi < AssessmentDefinedParams.BMI_OVER_WEIGHT_THRESHOLD) {
-                        val option = options.firstOrNull { it[DefinedParams.ID] == "normalWeight" }
-                        option?.let {
-                            instructions.add(option[DefinedParams.NAME] as? String ?: "")
-                            instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
-                        }
-                    } else if (bmi < AssessmentDefinedParams.BMI_OBSESS_WEIGHT_THRESHOLD) {
-                        val option = options.firstOrNull { it[DefinedParams.ID] == "overWeight" }
-                        option?.let {
-                            instructions.add(option[DefinedParams.NAME] as? String ?: "")
-                            instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
-                        }
-                    } else {
-                        val option = options.firstOrNull { it[DefinedParams.ID] == "obsess" }
-                        option?.let {
-                            instructions.add(option[DefinedParams.NAME] as? String ?: "")
-                            instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
-                        }
-                    }
-                }
-                val pointOfCareInvestigationMap = ancMap?.get(AssessmentDefinedParams.GROUP_POINT_OF_CARE_INVESTIGATIONS) as? Map<*, *>
-                val hb = CommonUtils.getDouble(pointOfCareInvestigationMap?.get(AssessmentDefinedParams.HEMOGLOBIN)).takeIf { it > 0 }
-                hb?.let {
-                    if (hb < AssessmentDefinedParams.HEMOGLOBIN_SEVERE_ANEMIA_THRESHOLD) {
-                        val option = options.firstOrNull { it[DefinedParams.ID] == "severeAnemia" }
-                        option?.let {
-                            instructions.add(option[DefinedParams.NAME] as? String ?: "")
-                            instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
-                        }
-                    } else if (hb < AssessmentDefinedParams.HEMOGLOBIN_MODERATE_ANEMIA_THRESHOLD) {
-                        val option = options.firstOrNull { it[DefinedParams.ID] == "moderateAnemia" }
-                        option?.let {
-                            instructions.add(option[DefinedParams.NAME] as? String ?: "")
-                            instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
-                        }
-                    } else if (hb < AssessmentDefinedParams.HEMOGLOBIN_MILD_ANEMIA_THRESHOLD) {
-                        val option = options.firstOrNull { it[DefinedParams.ID] == "mildAnemia" }
-                        option?.let {
-                            instructions.add(option[DefinedParams.NAME] as? String ?: "")
-                            instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
-                        }
-                    } else {
-                        // Do nothing
-                    }
-                }
-                val fastingSugar = CommonUtils.getDouble(pointOfCareInvestigationMap?.get(AssessmentDefinedParams.BLOOD_SUGAR_FASTING)).takeIf { it > 0 }
-                val randomSugar = CommonUtils.getDouble(pointOfCareInvestigationMap?.get(AssessmentDefinedParams.BLOOD_SUGAR_RANDOM)).takeIf { it > 0 }
-                if ((fastingSugar != null && fastingSugar < AssessmentDefinedParams.LOW_SUGAR_THRESHOLD) ||
-                    (randomSugar != null && randomSugar < AssessmentDefinedParams.LOW_SUGAR_THRESHOLD)
-                ) {
-                    val option = options.firstOrNull { it[DefinedParams.ID] == "lowSugar" }
-                    option?.let {
-                        instructions.add(option[DefinedParams.NAME] as? String ?: "")
-                        instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
-                    }
-                }
-            }
-            if (instructions.isEmpty() || instructionsCulture.isEmpty()) {
-                counsellingItems.removeIf { it.id == AssessmentDefinedParams.NUTRITION_COUNSELLING }
-            } else {
-                nutritionCounselling.instructions = instructions
-                nutritionCounselling.instructionsCulture = instructionsCulture
             }
         }
 
@@ -424,15 +367,133 @@ class AssessmentRMNCHSummaryFragment : BaseFragment(), View.OnClickListener {
                 addInstructionsCard(data, counsellingCardBinding.llFamilyRoot)
             }
 
-            val layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-            layoutParams.updateMarginsRelative(start = 6.px, end = 6.px)
-            // Insert counselling card
-            if (insertIndex >= 0) {
-                binding.scrollViewLL.addView(counsellingCardBinding.root, insertIndex, layoutParams)
+            insertSummaryCard(counsellingCardBinding.root, currentInsertIndex)
+        }
+    }
+
+    private fun addInlineInstructionMessages(
+        data: FormLayout,
+        llLayout: LinearLayout,
+    ) {
+        val instructionsList =
+            if (isTranslationEnabled && !data.instructionsCulture.isNullOrEmpty()) {
+                data.instructionsCulture
             } else {
-                // Fallback: add to end
-                binding.scrollViewLL.addView(counsellingCardBinding.root, layoutParams)
+                data.instructions
+            } ?: return
+
+        instructionsList.filter { it.isNotBlank() }.forEach { message ->
+            with(AssessmentCommonUtils.getTextSummaryLabelLayoutBinding(context)) {
+                root.setPadding(0)
+                with(tvTitle) {
+                    setPadding(8.px)
+                    text = message
+                    setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                    setBackgroundResource(R.drawable.bg_red_risk_orange)
+                }
+                llLayout.addView(root)
             }
+        }
+    }
+
+    private fun resolveNutritionCounselling(ancMap: Map<*, *>?): FormLayout? {
+        val nutritionCounselling = viewModel.formLayoutsLiveData.value
+            ?.data
+            ?.formLayout
+            ?.firstOrNull { it.id == AssessmentDefinedParams.NUTRITION_COUNSELLING }
+            ?: return null
+
+        val options = nutritionCounselling.optionsList
+        val instructions = arrayListOf<String>()
+        val instructionsCulture = arrayListOf<String>()
+        if (!options.isNullOrEmpty()) {
+            val medicalHistoryPhysicalExaminationMap =
+                ancMap?.get(AssessmentDefinedParams.GROUP_MEDICAL_HISTORY_PHYSICAL_EXAMINATION) as? Map<*, *>
+            val bmi = CommonUtils.getDouble(medicalHistoryPhysicalExaminationMap?.get(AssessmentDefinedParams.BMI)).takeIf { it > 0 }
+            bmi?.let {
+                if (bmi < AssessmentDefinedParams.BMI_NORMAL_WEIGHT_THRESHOLD) {
+                    val option = options.firstOrNull { it[DefinedParams.ID] == "underWeight" }
+                    option?.let {
+                        instructions.add(option[DefinedParams.NAME] as? String ?: "")
+                        instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
+                    }
+                } else if (bmi < AssessmentDefinedParams.BMI_OVER_WEIGHT_THRESHOLD) {
+                    val option = options.firstOrNull { it[DefinedParams.ID] == "normalWeight" }
+                    option?.let {
+                        instructions.add(option[DefinedParams.NAME] as? String ?: "")
+                        instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
+                    }
+                } else if (bmi < AssessmentDefinedParams.BMI_OBSESS_WEIGHT_THRESHOLD) {
+                    val option = options.firstOrNull { it[DefinedParams.ID] == "overWeight" }
+                    option?.let {
+                        instructions.add(option[DefinedParams.NAME] as? String ?: "")
+                        instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
+                    }
+                } else {
+                    val option = options.firstOrNull { it[DefinedParams.ID] == "obsess" }
+                    option?.let {
+                        instructions.add(option[DefinedParams.NAME] as? String ?: "")
+                        instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
+                    }
+                }
+            }
+            val pointOfCareInvestigationMap =
+                ancMap?.get(AssessmentDefinedParams.GROUP_POINT_OF_CARE_INVESTIGATIONS) as? Map<*, *>
+            val hb = CommonUtils.getDouble(pointOfCareInvestigationMap?.get(AssessmentDefinedParams.HEMOGLOBIN)).takeIf { it > 0 }
+            hb?.let {
+                if (hb < AssessmentDefinedParams.HEMOGLOBIN_SEVERE_ANEMIA_THRESHOLD) {
+                    val option = options.firstOrNull { it[DefinedParams.ID] == "severeAnemia" }
+                    option?.let {
+                        instructions.add(option[DefinedParams.NAME] as? String ?: "")
+                        instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
+                    }
+                } else if (hb < AssessmentDefinedParams.HEMOGLOBIN_MODERATE_ANEMIA_THRESHOLD) {
+                    val option = options.firstOrNull { it[DefinedParams.ID] == "moderateAnemia" }
+                    option?.let {
+                        instructions.add(option[DefinedParams.NAME] as? String ?: "")
+                        instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
+                    }
+                } else if (hb < AssessmentDefinedParams.HEMOGLOBIN_MILD_ANEMIA_THRESHOLD) {
+                    val option = options.firstOrNull { it[DefinedParams.ID] == "mildAnemia" }
+                    option?.let {
+                        instructions.add(option[DefinedParams.NAME] as? String ?: "")
+                        instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
+                    }
+                }
+            }
+            val fastingSugar =
+                CommonUtils.getDouble(pointOfCareInvestigationMap?.get(AssessmentDefinedParams.BLOOD_SUGAR_FASTING)).takeIf { it > 0 }
+            val randomSugar =
+                CommonUtils.getDouble(pointOfCareInvestigationMap?.get(AssessmentDefinedParams.BLOOD_SUGAR_RANDOM)).takeIf { it > 0 }
+            if ((fastingSugar != null && fastingSugar < AssessmentDefinedParams.LOW_SUGAR_THRESHOLD) ||
+                (randomSugar != null && randomSugar < AssessmentDefinedParams.LOW_SUGAR_THRESHOLD)
+            ) {
+                val option = options.firstOrNull { it[DefinedParams.ID] == "lowSugar" }
+                option?.let {
+                    instructions.add(option[DefinedParams.NAME] as? String ?: "")
+                    instructionsCulture.add(option[DefinedParams.CULTURE_VALUE] as? String ?: "")
+                }
+            }
+        }
+        if (instructions.isEmpty() || instructionsCulture.isEmpty()) {
+            return null
+        }
+
+        nutritionCounselling.instructions = instructions
+        nutritionCounselling.instructionsCulture = instructionsCulture
+        return nutritionCounselling
+    }
+
+    private fun insertSummaryCard(
+        cardRoot: View,
+        insertIndex: Int,
+    ) {
+        val layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        layoutParams.updateMarginsRelative(start = 6.px, end = 6.px)
+        if (insertIndex >= 0) {
+            binding.scrollViewLL.addView(cardRoot, insertIndex, layoutParams)
+        } else {
+            binding.scrollViewLL.addView(cardRoot, layoutParams)
         }
     }
 
