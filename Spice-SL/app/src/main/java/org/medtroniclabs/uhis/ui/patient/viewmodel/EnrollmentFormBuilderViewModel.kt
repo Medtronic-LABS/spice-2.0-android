@@ -137,6 +137,7 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
         ) {
             var request = CommonUtils.addValuesInJSON(requestJson, DefinedParams.IS_GENERATED_NATIONAL_ID, isNationalIdGenerated, DefinedParams.BIO_DATA)
             val rootJson: JsonObject = StringConverter.getJsonObject(request)
+            ensurePhoneNumberCategoryIfMissing(rootJson)
 
             rootJson.let {
                 viewModelScope.launch(dispatcherIO) {
@@ -239,6 +240,7 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
             villageId: Long? = null,
             enrollmentReq: JsonObject,
         ) {
+            ensurePhoneNumberCategoryIfMissing(enrollmentReq)
             val response = onBoardingRepo.createPatient(enrollmentReq)
             if (response.isSuccessful) {
                 if (response.body()?.status == true) {
@@ -557,6 +559,13 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
                         }
                     }
                 }
+            }
+        }
+
+        private fun ensurePhoneNumberCategoryIfMissing(request: JsonObject) {
+            val bioData = request.getAsJsonObject(DefinedParams.BIO_DATA) ?: return
+            if (!bioData.has(DefinedParams.PHONE_NUMBER_CATEGORY)) {
+                bioData.addProperty(DefinedParams.PHONE_NUMBER_CATEGORY, "")
             }
         }
     }

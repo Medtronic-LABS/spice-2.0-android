@@ -137,6 +137,7 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
                     hideProgress()
                     resourceState.data?.let {
                         FormAutofill.start(requireContext(), formGenerator, it)
+                        prefillHouseNumber(it)
                         if (CommonUtils.isCommunity()) {
                             prefillCommunityFields(it)
                         }
@@ -353,6 +354,15 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
     }
 
     /**
+     * Patient details API returns `houseHoldNumber`; the edit form field id is `houseNumber`.
+     */
+    private fun prefillHouseNumber(model: PatientListRespModel) {
+        model.houseHoldNumber?.takeIf { it.isNotBlank() }?.let {
+            setEditTextValue(HOUSE_NUMBER_FIELD, it)
+        }
+    }
+
+    /**
      * Generic [FormAutofill] only handles plain string EditText/Spinner and string single-selections.
      * The community edit form ([REGISTRATION_FORM_ASSET]) also carries field types that need explicit
      * prefill: the Date of Birth ([ViewType.VIEW_TYPE_FORM_AGE_OR_DOB]), numeric height/weight, and the
@@ -455,5 +465,6 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
         private const val KIDNEY_DISEASE_FIELD = "kidneyDisease"
         private const val COPD_FIELD = "copd"
         private const val QR_CODE_FIELD = "qrCode"
+        private const val HOUSE_NUMBER_FIELD = "houseNumber"
     }
 }

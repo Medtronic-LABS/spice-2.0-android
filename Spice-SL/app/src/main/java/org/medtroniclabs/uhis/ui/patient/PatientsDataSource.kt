@@ -3,6 +3,7 @@ package org.medtroniclabs.uhis.ui.patient
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import org.medtroniclabs.uhis.common.CommonUtils
+import org.medtroniclabs.uhis.common.FilterEnum
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.APIResponse
 import org.medtroniclabs.uhis.data.model.FilterModel
@@ -94,6 +95,11 @@ class PatientsDataSource(
                         isSearchUserOrgPatient = isSiteBasedSearch,
                         patientSort = null,
                         patientFilter = null,
+                        status = if (origin == UIConstants.ENROLLMENT_UNIQUE_ID) {
+                            searchModel.patientFilter?.patientStatus ?: FilterEnum.NOT_ENROLLED.name
+                        } else {
+                            null
+                        },
                     )
                     when {
                         isFollowUp -> apiHelper.patientFollowUpList(request)
