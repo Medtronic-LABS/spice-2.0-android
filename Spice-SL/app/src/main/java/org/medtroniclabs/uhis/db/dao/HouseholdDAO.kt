@@ -292,6 +292,12 @@ interface HouseholdDAO {
                     ON sv.id = hh.sub_village_id
                 LEFT JOIN ShasthyaShebikaLinkedVillageEntity AS sslv
                     ON sslv.subVillageId = hh.sub_village_id
+                    AND EXISTS (
+                        SELECT 1
+                        FROM ShasthyaShebikaEntity AS active_ss
+                        WHERE active_ss.id = sslv.shasthyaShebikaId
+                            AND active_ss.isActive = true
+                    )
                 LEFT JOIN ShasthyaShebikaEntity AS ss_fallback
                     ON ss_fallback.id = sslv.shasthyaShebikaId
                 $whereClause

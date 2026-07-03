@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "08407ecb364602406fb8a096b7d9e032",
+    "identityHash": "74941ff18c182b9515bad1abc99d4515",
     "entities": [
       {
         "tableName": "Household",
@@ -3421,7 +3421,7 @@
       },
       {
         "tableName": "ShasthyaShebikaEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `phoneNumber` TEXT, `ssId` TEXT, `shasthyaKormiId` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `phoneNumber` TEXT, `ssId` TEXT, `shasthyaKormiId` INTEGER, `isActive` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -3448,6 +3448,11 @@
           {
             "fieldPath": "shasthyaKormiId",
             "columnName": "shasthyaKormiId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "isActive",
+            "columnName": "isActive",
             "affinity": "INTEGER"
           }
         ],
@@ -4197,7 +4202,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '08407ecb364602406fb8a096b7d9e032')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '74941ff18c182b9515bad1abc99d4515')"
     ]
   }
 }
