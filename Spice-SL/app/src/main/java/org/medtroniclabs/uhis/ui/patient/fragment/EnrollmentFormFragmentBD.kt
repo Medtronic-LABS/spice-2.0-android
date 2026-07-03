@@ -101,11 +101,8 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
     }
 
     private fun getFormDataForWorkflow() {
-        if (viewModel.isConfirmDiagnosis && viewModel.patientTrackId != -1L) {
-            viewModel.patientTrackId?.let {
-                val request = RequestPatientDetail(it.toString())
-                patientDetailsViewModel.getScreeningDetails(request)
-            }
+        if (viewModel.isConfirmDiagnosis && !viewModel.memberReference.isNullOrBlank()) {
+            patientDetailsViewModel.getScreeningDetails(RequestPatientDetail(viewModel.memberReference!!))
         } else {
             viewModel.fetchWorkFlow(MenuConstants.MENU_REGISTRATION)
         }
@@ -488,7 +485,11 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
             }
             result?.first?.let {
                 binding.btnSubmit.isEnabled = false
-                viewModel.enrollPatient(requireContext(), it)
+                viewModel.enrollPatient(
+                    requireContext(),
+                    it,
+                    patientTrackerId = viewModel.patientTrackId,
+                )
             }
         }
     }
@@ -620,8 +621,9 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
                 }
             }
 
-            memberDetail.qrCode?.let {
+            memberDetail.qrCode?.let { qrCode ->
                 formGenerator.showHideCardFamily(false, DefinedParams.QR_CARD)
+                formGenerator.getResultMap()[DefinedParams.QR_CODE] = qrCode
             }
         }
     }

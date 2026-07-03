@@ -59,6 +59,7 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
         var enrollPatientLiveData = MutableLiveData<Resource<PatientCreateResponse>>()
         var groupedEnrollmentHashMap = HashMap<String, Any>()
         var patientTrackId: Long? = null
+        var memberReference: String? = null
 
         var isFromProceedEnrollment: Boolean = false
         var list = ArrayList<RiskClassificationModel>()

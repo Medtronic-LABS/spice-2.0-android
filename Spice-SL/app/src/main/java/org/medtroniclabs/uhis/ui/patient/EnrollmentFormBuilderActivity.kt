@@ -60,6 +60,7 @@ class EnrollmentFormBuilderActivity : BaseActivity() {
     private fun getIntentValues() {
         patientDetailsViewModel.patientId = intent.getLongExtra(DefinedParams.PATIENT_ID, -1L)
         viewModel.patientTrackId = intent.getLongExtra(DefinedParams.PATIENT_ID, -1L)
+        viewModel.memberReference = intent.getStringExtra(IntentConstants.INTENT_MEMBER_REFERENCE)
         viewModel.isFromDirectEnrollment =
             intent.getBooleanExtra(IntentConstants.IS_FROM_DIRECT_ENROLLMENT, false)
     }

@@ -155,8 +155,12 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
                 ResourceState.LOADING -> showLoading()
                 ResourceState.SUCCESS -> {
                     hideLoading()
-                    resourceState.data?.confirmDiagnosis?.let {
-                        confirmedDiagnosis(it)
+                    resourceState.data?.let { data ->
+                        // patient/patientDetails returns confirmed diagnoses under
+                        // patientConfirmDiagnosis; confirmDiagnosis can be null in that payload.
+                        val diagnosesToShow = data.patientConfirmDiagnosis ?: data.confirmDiagnosis
+                        medicalReviewBaseViewModel.confirmDiagnosis = diagnosesToShow
+                        confirmedDiagnosis(diagnosesToShow)
                     }
                 }
 

@@ -504,6 +504,10 @@ class PatientListFragment : BaseFragment(), PatientSelectionListener, CallRegist
                     item.id ?: -1L,
                 )
                 putExtra(
+                    IntentConstants.INTENT_MEMBER_REFERENCE,
+                    item.memberReference,
+                )
+                putExtra(
                     IntentConstants.IS_FROM_DIRECT_ENROLLMENT,
                     true,
                 )

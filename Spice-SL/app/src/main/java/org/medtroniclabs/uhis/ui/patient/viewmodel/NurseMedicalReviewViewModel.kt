@@ -106,6 +106,10 @@ class NurseMedicalReviewViewModel @Inject constructor(
                     if (response.isSuccessful) {
                         val res = response.body()
                         if (res?.status == true) {
+                            // Keep in-memory patient details in sync so bio-data and the
+                            // edit-diagnosis dialog both see the latest confirmations.
+                            patientDetailsValue = res.entity
+                            patientDetailsDiagnosisResponse.postSuccess(res.entity)
                             latestConfirmDiagnosesList.postSuccess(res.entity)
                         } else {
                             latestConfirmDiagnosesList.postError()
