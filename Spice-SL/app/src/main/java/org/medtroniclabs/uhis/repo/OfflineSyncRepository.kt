@@ -380,12 +380,6 @@ class OfflineSyncRepository @Inject constructor(
             ).takeIf { it > 0 } ?: roomHelper.getHouseholdMemberIdByFhirId(requestedMemberId)
             ?: return null
 
-        response.followUps?.forEach { followUp ->
-            followUp.patientStatus = followUp.patientStatus ?: ""
-            followUp.syncStatus = OfflineSyncStatus.Success
-            roomHelper.insertOrUpdateFollowUp(followUp)
-        }
-
         response.pregnancyInfos?.forEach {
             roomHelper.insertUpdatePregnancyDetailFromBE(it)
         }
