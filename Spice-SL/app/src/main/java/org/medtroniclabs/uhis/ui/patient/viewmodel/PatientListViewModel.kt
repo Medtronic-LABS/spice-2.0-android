@@ -211,7 +211,10 @@ class PatientListViewModel @Inject constructor(
         } else {
             FilterModel(
                 isDefaultPcFilter = true,
-                patientStatus = FilterEnum.NOT_ENROLLED.name,
+                patientStatus = when (origin) {
+                    UIConstants.DISPENSE -> FilterEnum.ENROLLED.name
+                    else -> FilterEnum.NOT_ENROLLED.name
+                },
             )
         }
     }

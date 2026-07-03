@@ -76,6 +76,17 @@ class PatientsDataSource(
             CommonUtils.isPhysicianPrescriber() ||
             CommonUtils.isCHCP()
 
+    private fun searchStatusForOrigin(patientStatusFromFilter: String?): String? =
+        when (origin) {
+            UIConstants.ENROLLMENT_UNIQUE_ID ->
+                patientStatusFromFilter ?: FilterEnum.NOT_ENROLLED.name
+            UIConstants.DISPENSE ->
+                patientStatusFromFilter ?: FilterEnum.ENROLLED.name
+            else -> null
+        }
+
+    private fun clearsPatientStatusFromFilter(): Boolean = origin == UIConstants.ENROLLMENT_UNIQUE_ID || origin == UIConstants.DISPENSE
+
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PatientListResModel> {
         val pageIndex = params.key ?: PAGE_INDEX
         return try {
@@ -95,11 +106,7 @@ class PatientsDataSource(
                         isSearchUserOrgPatient = isSiteBasedSearch,
                         patientSort = null,
                         patientFilter = null,
-                        status = if (origin == UIConstants.ENROLLMENT_UNIQUE_ID) {
-                            searchModel.patientFilter?.patientStatus ?: FilterEnum.NOT_ENROLLED.name
-                        } else {
-                            null
-                        },
+                        status = searchStatusForOrigin(searchModel.patientFilter?.patientStatus),
                     )
                     when {
                         isFollowUp -> apiHelper.patientFollowUpList(request)
@@ -150,12 +157,8 @@ class PatientsDataSource(
                     val exactSearch = request.copy(
                         searchText = searchModel.searchText,
                         isSearchUserOrgPatient = isSiteBasedSearch,
-                        status = if (origin == UIConstants.ENROLLMENT_UNIQUE_ID) {
-                            request.patientFilter?.patientStatus
-                        } else {
-                            null
-                        },
-                        patientFilter = if (origin == UIConstants.ENROLLMENT_UNIQUE_ID) {
+                        status = searchStatusForOrigin(request.patientFilter?.patientStatus),
+                        patientFilter = if (clearsPatientStatusFromFilter()) {
                             null
                         } else {
                             request.patientFilter?.copy(patientStatus = null)
