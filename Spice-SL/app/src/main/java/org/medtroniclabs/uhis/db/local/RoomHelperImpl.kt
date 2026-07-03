@@ -865,6 +865,12 @@ class RoomHelperImpl @Inject constructor(
         phoneNumberCategory: String?,
     ) = memberDAO.updatePhoneNumberForHouseholdHead(id, phoneNumber)
 
+    override suspend fun updatePhoneNumberForMembersByCategory(
+        householdId: Long,
+        phoneNumber: String?,
+        category: String,
+    ) = memberDAO.updatePhoneNumberForMembersByCategory(householdId, phoneNumber, category)
+
     override suspend fun insertLinkHouseholdMembers(insertList: List<LinkHouseholdMember>) {
         linkHouseholdMemberDao.insert(insertList)
     }

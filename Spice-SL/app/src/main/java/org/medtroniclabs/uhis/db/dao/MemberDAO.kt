@@ -192,6 +192,18 @@ interface MemberDAO {
         updatedAt: Long = System.currentTimeMillis(),
     )
 
+    @Query(
+        "UPDATE householdmember SET phone_number = :phoneNumber, sync_status = :syncStatus, updated_at = :updatedAt " +
+            "WHERE household_id = :householdId AND phone_number_category = :category AND isActive = 1",
+    )
+    suspend fun updatePhoneNumberForMembersByCategory(
+        householdId: Long,
+        phoneNumber: String?,
+        category: String,
+        syncStatus: String = OfflineSyncStatus.NotSynced.name,
+        updatedAt: Long = System.currentTimeMillis(),
+    )
+
     @Query("UPDATE HouseholdMember SET household_id = :householdId, sync_status =:syncStatus, updated_at =:updatedAt  WHERE fhir_id IN (:memberIds)")
     suspend fun updateHouseholdHeadAndRelationShip(
         memberIds: List<String>,

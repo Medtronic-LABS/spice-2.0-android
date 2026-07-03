@@ -48,6 +48,7 @@ class MemberRegistrationViewModel @Inject constructor(
     var memberDob: String? = null
     var isPhuWalkInsFlow: Boolean? = null
     val householdHeadDobLiveData = MutableLiveData<String?>()
+    var householdHeadPhoneNumber: String? = null
 
     val householdMembersLiveData = MutableLiveData<List<HouseholdMemberWithTb>>()
 
@@ -63,6 +64,23 @@ class MemberRegistrationViewModel @Inject constructor(
             }
         } else {
             householdHeadDobLiveData.postValue(null)
+        }
+    }
+
+    /**
+     * Loads the Household Head's phone number for the given household.
+     *
+     * This is used to autofill the mobile number when a member selects
+     * "Head of Household" as the Mobile Number Category.
+     *
+     */
+    fun loadHouseholdHeadPhone(householdId: Long?) {
+        if (householdId == null || householdId == -1L) {
+            householdHeadPhoneNumber = null
+            return
+        }
+        viewModelScope.launch(dispatcherIO) {
+            householdHeadPhoneNumber = memberRegistrationRepository.getHouseholdHeadPhoneNumber(householdId)
         }
     }
 

@@ -61,6 +61,18 @@ class HouseholdMemberRepository @Inject constructor(
 
         // Only perform household-related operations if householdId is not null
         if (householdId != null) {
+            // Keep members using the Household Head's phone number in sync when it changes.
+            if (
+                memberEntity.isHouseholdHead &&
+                (beforeMember == null || beforeMember.phoneNumber != memberEntity.phoneNumber)
+            ) {
+                roomHelper.updatePhoneNumberForMembersByCategory(
+                    householdId,
+                    memberEntity.phoneNumber,
+                    MemberRegistration.PhoneNumberCategory.HOUSEHOLD_HEAD.value,
+                )
+            }
+
             // If updating a member who is household head, update household name with member's name
             if (entity != null && memberEntity.isHouseholdHead && memberEntity.name.isNotEmpty()) {
                 val householdEntity = roomHelper.getHouseHoldDetailsById(householdId)
@@ -449,6 +461,13 @@ class HouseholdMemberRepository @Inject constructor(
     ) = roomHelper.updateMemberDeceasedReason(id, status, deceasedReason)
 
     suspend fun getHouseholdHeadDob(householdId: Long): String = roomHelper.getHouseholdHeadDob(householdId)
+
+    suspend fun getHouseholdHeadPhoneNumber(householdId: Long): String? =
+        roomHelper
+            .getAllHouseHoldMemberList(householdId)
+            .firstOrNull { it.isHouseholdHead && it.isActive }
+            ?.phoneNumber
+            ?.takeIf { it.isNotBlank() }
 
     suspend fun updatePregnantStatus(
         memberId: Long,

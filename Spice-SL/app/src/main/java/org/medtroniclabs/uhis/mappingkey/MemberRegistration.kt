@@ -90,6 +90,13 @@ object MemberRegistration {
         NATIONAL_ID("nid"),
     }
 
+    enum class PhoneNumberCategory(val value: String) {
+        PERSONAL("personal"),
+        HOUSEHOLD_HEAD("household_head"),
+        FAMILY("family"),
+        FRIEND("friend"),
+    }
+
     fun isValidRelationAge(
         ctx: Context,
         dob: String,

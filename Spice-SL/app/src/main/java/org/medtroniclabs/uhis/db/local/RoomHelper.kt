@@ -545,6 +545,12 @@ interface RoomHelper {
         phoneNumberCategory: String?,
     )
 
+    suspend fun updatePhoneNumberForMembersByCategory(
+        householdId: Long,
+        phoneNumber: String?,
+        category: String,
+    )
+
     suspend fun insertLinkHouseholdMembers(insertList: List<LinkHouseholdMember>)
 
     suspend fun deleteLinkHouseholdMembersById(deleteListIds: List<String>)
