@@ -1398,6 +1398,9 @@ class RoomHelperImpl @Inject constructor(
         serviceProvided: String?,
     ): MemberAssessmentHistoryEntity? = memberAssessmentHistoryDao.getAssessmentHistory(memberFhirId, memberId, visitDate, serviceProvided)
 
+    override suspend fun getMemberAssessmentHistoryByEncounterId(encounterId: String): MemberAssessmentHistoryEntity? =
+        memberAssessmentHistoryDao.getAssessmentHistoryByEncounterId(encounterId)
+
     override suspend fun insertMemberAssessmentHistory(historyList: List<MemberAssessmentHistoryEntity>) =
         memberAssessmentHistoryDao.insertMemberAssessmentHistory(historyList)
 

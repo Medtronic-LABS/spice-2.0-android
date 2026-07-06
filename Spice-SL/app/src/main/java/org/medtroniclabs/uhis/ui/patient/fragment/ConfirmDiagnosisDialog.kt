@@ -104,7 +104,7 @@ class ConfirmDiagnosisDialog(val commonDialogInterface: CommonDialogInterface? =
         readArguments()
         //  Handle the diagnosis based on the nurse MR
         if (CommonUtils.isNurse()) {
-            handleDiagnosisResponse(nurseViewModel.patientDetailsDiagnosisResponse.value?.data)
+            handleDiagnosisResponse(nurseViewModel.patientDetailsValue)
         } else {
             handleDiagnosisResponse(viewModel.patientDetailsResponse.value?.data)
         }
@@ -179,20 +179,6 @@ class ConfirmDiagnosisDialog(val commonDialogInterface: CommonDialogInterface? =
             }
         }
 
-        //  For Nurse MR we get the patient details from nurseViewModel
-        nurseViewModel.patientDetailsDiagnosisResponse.observe(viewLifecycleOwner) { resourceState ->
-            when (resourceState.state) {
-                ResourceState.SUCCESS -> {
-                    resourceState.data?.let {
-                        patientDetails = it
-                    }
-                }
-                else -> {
-                    // Invoked if response state is not success
-                }
-            }
-        }
-
         medicalReviewBaseViewModel.diagnosisListResponse.observe(this) { responseList ->
             val list = validateResponseList(responseList)
             val removeItem: List<DiagnosisEntity> = validateEntityList(list)
@@ -236,7 +222,11 @@ class ConfirmDiagnosisDialog(val commonDialogInterface: CommonDialogInterface? =
                 ResourceState.SUCCESS -> {
                     hideLoading()
                     dismiss()
-                    commonDialogInterface?.onSuccess()
+                    val confirmedDiagnoses = viewModel.confirmDiagnosisRequestData.confirmDiagnosis
+                        ?.map { it.name }
+                        ?.let { ArrayList(it) }
+                    val diagnosisNotes = viewModel.confirmDiagnosisRequestData.diagnosisComments
+                    commonDialogInterface?.onSuccess(confirmedDiagnoses, diagnosisNotes)
                     if (isSummary) {
                         medicalReviewBaseViewModel.medicalReViewRequest?.let {
                             viewModel.getPatientMedicalReviewSummary(requireContext(), it, true)

@@ -126,6 +126,29 @@ class NurseMedicalReviewViewModel @Inject constructor(
         }
     }
 
+    fun applyLocalConfirmDiagnosis(
+        confirmedDiagnoses: ArrayList<String>,
+        diagnosisNotes: String?,
+    ) {
+        val current = patientDetailsValue ?: return
+        val updatedUnselected = current.unselectedDiagnosis
+            ?.filterNot { unselected ->
+                confirmedDiagnoses.any { confirmed ->
+                    confirmed.equals(unselected.name, ignoreCase = true) ||
+                        confirmed.equals(unselected.cultureValue, ignoreCase = true)
+                }
+            }?.let { ArrayList(it) }
+        val updatedDetails = current.copy(
+            patientConfirmDiagnosis = confirmedDiagnoses,
+            confirmDiagnosis = confirmedDiagnoses,
+            diagnosisComments = diagnosisNotes,
+            unselectedDiagnosis = updatedUnselected,
+        )
+        patientDetailsValue = updatedDetails
+        unselectedDiagnosis = updatedUnselected
+        latestConfirmDiagnosesList.postSuccess(updatedDetails)
+    }
+
     fun getSymptomListByType(type: String) {
         viewModelScope.launch(dispatcherIO) {
             try {

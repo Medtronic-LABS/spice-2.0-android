@@ -169,22 +169,6 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
                 }
             }
         }
-        nurseViewModel.patientDetailsDiagnosisResponse.observe(viewLifecycleOwner) { resourceState ->
-            when (resourceState.state) {
-                ResourceState.LOADING -> showLoading()
-                ResourceState.SUCCESS -> {
-                    hideLoading()
-                    resourceState.data?.let {
-                        openConfirmDiagnosisDialog()
-                    }
-                }
-
-                ResourceState.ERROR -> {
-                    hideLoading()
-                }
-            }
-        }
-
         nurseBioDataViewModel.cvdRiskResult.observe(viewLifecycleOwner) { result ->
             binding.tvCvdRisk.text = result.display
             binding.tvCvdRisk.setTextColor(
@@ -224,7 +208,6 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
                             )
                         }
                         showBioData(it)
-                        openConfirmDiagnosisDialog()
                     }
                 }
 
@@ -236,37 +219,18 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun openConfirmDiagnosis() {
-        nurseViewModel.isConfirmDiagnosis = true
-        val request = nurseViewModel.patientId?.let {
-            PatientDetailsModel(
-                it,
-                isAssessmentDataRequired = false,
-            )
-        }
-        if (request != null) {
-            context?.let { nurseViewModel.getPatientDetailsDiagnosis(it, request) }
-        }
-    }
-
-    private fun openConfirmDiagnosisDialog() {
-        if (nurseViewModel.isConfirmDiagnosis) {
-            ConfirmDiagnosisDialog
-                .newInstance(true, commonDialogInterface)
-                .show(childFragmentManager, ConfirmDiagnosisDialog.TAG)
-            nurseViewModel.isConfirmDiagnosis = false
-        }
+        ConfirmDiagnosisDialog
+            .newInstance(true, commonDialogInterface)
+            .show(childFragmentManager, ConfirmDiagnosisDialog.TAG)
     }
 
     private val commonDialogInterface = object : CommonDialogInterface {
-        override fun onSuccess() {
-            val request = nurseViewModel.patientId?.let {
-                PatientDetailsModel(
-                    it,
-                    isAssessmentDataRequired = false,
-                )
-            }
-            if (request != null) {
-                nurseViewModel.getLatestDiagnoses(requireContext(), request)
+        override fun onSuccess(
+            confirmedDiagnoses: ArrayList<String>?,
+            diagnosisNotes: String?,
+        ) {
+            if (!confirmedDiagnoses.isNullOrEmpty()) {
+                nurseViewModel.applyLocalConfirmDiagnosis(confirmedDiagnoses, diagnosisNotes)
             }
         }
     }

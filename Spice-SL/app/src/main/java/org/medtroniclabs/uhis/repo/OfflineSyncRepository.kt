@@ -394,21 +394,23 @@ class OfflineSyncRepository @Inject constructor(
     }
 
     private suspend fun saveAssessmentHistory(assessmentHistory: List<MemberAssessmentHistoryEntity>) {
-        if (assessmentHistory.isEmpty()) return
-        val filteredHistory = assessmentHistory.filterNot {
-            AssessmentUtil.isMedicalReviewVisitService(it.serviceProvided)
-        }
+        val filteredHistory = assessmentHistory
+            .filterNot { AssessmentUtil.isMedicalReviewVisitService(it.serviceProvided) }
+            .distinctBy(::assessmentHistoryDedupKey)
         if (filteredHistory.isEmpty()) return
         // Resolve each row against existing local data, then persist in a single batch insert.
         // A per-row insert here turns a full first-time sync into N separate Room transactions (UHIS-1387).
         val updatedHistoryList = filteredHistory.map { history ->
             val memberId = roomHelper.getHouseholdMemberIdByFhirId(history.memberFhirId)
-            val existingHistory = roomHelper.getMemberAssessmentHistory(
-                history.memberFhirId,
-                memberId,
-                history.visitDate,
-                history.serviceProvided?.uppercase(Locale.ENGLISH),
-            )
+            val existingHistory = history.encounterId
+                ?.takeIf { it.isNotBlank() }
+                ?.let { roomHelper.getMemberAssessmentHistoryByEncounterId(it) }
+                ?: roomHelper.getMemberAssessmentHistory(
+                    history.memberFhirId,
+                    memberId,
+                    history.visitDate,
+                    history.serviceProvided,
+                )
             if (existingHistory != null) {
                 history.copy(id = existingHistory.id, memberId = memberId)
             } else {
@@ -417,6 +419,14 @@ class OfflineSyncRepository @Inject constructor(
         }
         roomHelper.insertMemberAssessmentHistory(updatedHistoryList)
     }
+
+    private fun assessmentHistoryDedupKey(history: MemberAssessmentHistoryEntity): String =
+        history.encounterId?.takeIf { it.isNotBlank() }
+            ?: listOfNotNull(
+                history.memberFhirId,
+                history.visitDate,
+                history.serviceProvided?.lowercase(Locale.ENGLISH),
+            ).joinToString("|")
 
     private suspend fun saveRequestInitialDownload(
         requestInitialDownload: ResponseInitialDownload,

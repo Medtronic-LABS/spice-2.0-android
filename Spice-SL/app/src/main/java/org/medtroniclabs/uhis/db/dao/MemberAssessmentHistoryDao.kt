@@ -23,7 +23,24 @@ interface MemberAssessmentHistoryDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateAssessmentHistory(assessmentHistory: MemberAssessmentHistoryEntity)
 
-    @Query("SELECT * FROM memberassessmenthistory WHERE (memberFhirId = :memberFhirId OR memberId = :memberId) AND visitDate = :visitDate AND serviceProvided = :serviceProvided LIMIT 1")
+    @Query(
+        """
+        SELECT * FROM memberassessmenthistory
+        WHERE encounterId = :encounterId
+        LIMIT 1
+        """,
+    )
+    suspend fun getAssessmentHistoryByEncounterId(encounterId: String): MemberAssessmentHistoryEntity?
+
+    @Query(
+        """
+        SELECT * FROM memberassessmenthistory
+        WHERE (memberFhirId = :memberFhirId OR memberId = :memberId)
+            AND visitDate = :visitDate
+            AND LOWER(serviceProvided) = LOWER(:serviceProvided)
+        LIMIT 1
+        """,
+    )
     suspend fun getAssessmentHistory(
         memberFhirId: String?,
         memberId: Long?,

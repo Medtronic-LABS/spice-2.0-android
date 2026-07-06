@@ -1,5 +1,8 @@
 package org.medtroniclabs.uhis.ui.patient.util
 
 interface CommonDialogInterface {
-    fun onSuccess()
+    fun onSuccess(
+        confirmedDiagnoses: ArrayList<String>? = null,
+        diagnosisNotes: String? = null,
+    )
 }

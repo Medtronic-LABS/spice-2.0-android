@@ -977,6 +977,8 @@ interface RoomHelper {
         serviceProvided: String?,
     ): MemberAssessmentHistoryEntity?
 
+    suspend fun getMemberAssessmentHistoryByEncounterId(encounterId: String): MemberAssessmentHistoryEntity?
+
     suspend fun insertMemberAssessmentHistory(historyList: List<MemberAssessmentHistoryEntity>)
 
     suspend fun deleteAllMemberAssessmentHistory()
