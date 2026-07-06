@@ -96,7 +96,7 @@ class ServicesViewModel @Inject constructor(
                         restrictExternalToSkCreator = restrictExternalToSkCreator,
                     )
                 }
-                Timber.tag("bug_n_bug").d("Time taken for count in seconds : " + counts.duration.inWholeSeconds)
+                Timber.tag("bug_n_bug").d("Time taken for count in seconds : %s", counts.duration.inWholeSeconds)
                 val members = measureTimedValue {
                     memberRepository
                         .getServiceMembers(
@@ -109,7 +109,7 @@ class ServicesViewModel @Inject constructor(
                             restrictExternalToSkCreator = restrictExternalToSkCreator,
                         )
                 }
-                Timber.tag("bug_n_bug").d("Time taken for filtered data in seconds : " + members.duration.inWholeSeconds)
+                Timber.tag("bug_n_bug").d("Time taken for filtered data in seconds : %s", members.duration.inWholeSeconds)
                 emitSource(
                     members.value.map { memberList ->
                         Resource(
@@ -254,6 +254,10 @@ class ServicesViewModel @Inject constructor(
     fun filterMemberListByQr(qrCodeString: String) {
         val filter = ServicesSearchFilter().apply {
             qrCode = qrCodeString
+            // Retain existing static filter as for different list, the checks are different. e.g, external member vs household member.
+            filterLiveData.value?.staticFilter?.let { existingStaticFilter ->
+                staticFilter = existingStaticFilter
+            }
         }
         filterLiveData.postValue(filter)
     }
