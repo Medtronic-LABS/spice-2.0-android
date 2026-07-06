@@ -53,6 +53,7 @@ object MenuConstants {
     const val FP_MENU_MR = "FAMILY PLANNING"
     const val HIV = "HIV"
     const val PREGNANCY_OUTCOME = "pregnancyOutcome"
+    const val MEDICAL_REVIEW_VISIT_SERVICE = "medicalreviewvisit"
     const val PNC_MOTHER: String = RMNCH.PNC_MOTHER_MENU
     const val CHILDHOOD_VISIT: String = RMNCH.CHILD_MENU
     const val ANC: String = RMNCH.ANC

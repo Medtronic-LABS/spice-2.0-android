@@ -43,6 +43,8 @@ import kotlin.text.lastIndexOf
 import kotlin.text.substring
 
 object AssessmentUtil {
+    fun isMedicalReviewVisitService(serviceProvided: String?): Boolean = serviceProvided.equals(MenuConstants.MEDICAL_REVIEW_VISIT_SERVICE, ignoreCase = true)
+
     fun calculateAverageBloodPressure(resultMap: HashMap<String, Any>): Pair<Int, Int> {
         val bpLogs = resultMap[BP_LOG] as HashMap<String, Any>
 

@@ -84,6 +84,7 @@ import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH.PNCNeonatal
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH.PNC_MOTHER_MENU
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH.PNC_NEONATE_KEY
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH.visitNo
+import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 import org.medtroniclabs.uhis.ui.boarding.ResourceLoadingSyncProgress
 import retrofit2.Response
 import timber.log.Timber
@@ -394,9 +395,13 @@ class OfflineSyncRepository @Inject constructor(
 
     private suspend fun saveAssessmentHistory(assessmentHistory: List<MemberAssessmentHistoryEntity>) {
         if (assessmentHistory.isEmpty()) return
+        val filteredHistory = assessmentHistory.filterNot {
+            AssessmentUtil.isMedicalReviewVisitService(it.serviceProvided)
+        }
+        if (filteredHistory.isEmpty()) return
         // Resolve each row against existing local data, then persist in a single batch insert.
         // A per-row insert here turns a full first-time sync into N separate Room transactions (UHIS-1387).
-        val updatedHistoryList = assessmentHistory.map { history ->
+        val updatedHistoryList = filteredHistory.map { history ->
             val memberId = roomHelper.getHouseholdMemberIdByFhirId(history.memberFhirId)
             val existingHistory = roomHelper.getMemberAssessmentHistory(
                 history.memberFhirId,
