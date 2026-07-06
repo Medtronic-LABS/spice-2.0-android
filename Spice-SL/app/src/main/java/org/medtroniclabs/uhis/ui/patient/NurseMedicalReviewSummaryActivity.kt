@@ -210,7 +210,10 @@ class NurseMedicalReviewSummaryActivity : BaseActivity(), View.OnClickListener {
     }
 
     private val commonDialogInterface = object : CommonDialogInterface {
-        override fun onSuccess() {
+        override fun onSuccess(
+            confirmedDiagnoses: ArrayList<String>?,
+            diagnosisNotes: String?,
+        ) {
             showReviewStatus()
         }
     }

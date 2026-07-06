@@ -122,7 +122,7 @@ class PatientTypeDialog(
 
     private fun closeDialog() {
         dismiss()
-        commonDialogInterface.onSuccess()
+        commonDialogInterface.onSuccess(null, null)
     }
 
     private fun loadSites(data: ArrayList<SiteEntity>) {
