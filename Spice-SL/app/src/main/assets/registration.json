@@ -142,6 +142,49 @@
       "cultureErrorMessage": ""
     },
     {
+      "condition": [
+        {
+          "eqList": [
+            "nid",
+            "brn"
+          ],
+          "targetId": "identityValue",
+          "visibility": "visible"
+        }
+      ],
+      "errorMessage": "Please select ID Type",
+      "cultureErrorMessage": "অনুগ্রহ করে আইডির ধরন নির্বাচন করুন",
+      "family": "bioData",
+      "fieldName": "ID Type",
+      "id": "identityType",
+      "isEditable": true,
+      "isEnabled": true,
+      "isMandatory": true,
+      "isNeededDefault": true,
+      "optionsList": [
+        {
+          "id": "nid",
+          "name": "National ID",
+          "cultureValue": "জাতীয় পরিচয় পত্র (NID)"
+        },
+        {
+          "id": "brn",
+          "name": "BRN",
+          "cultureValue": "জন্ম নিবন্ধন নম্বর (BRN)"
+        },
+        {
+          "id": "na",
+          "name": "Not Available",
+          "cultureValue": "সাথে নেই"
+        }
+      ],
+      "title": "ID Type",
+      "titleCulture": "আইডির ধরন",
+      "orderId": 5,
+      "viewType": "Spinner",
+      "visibility": "visible"
+    },
+    {
       "family": "bioData",
       "fieldName": "National ID",
       "hint": "Enter National ID",
@@ -149,14 +192,14 @@
       "id": "identityValue",
       "inputType": 96,
       "isEditable": true,
-      "isEnabled": false,
+      "isEnabled": true,
       "isMandatory": true,
       "isNeededDefault": true,
-      "orderId": 5,
+      "orderId": 6,
       "title": "National ID",
       "titleCulture": "জাতীয় পরিচয়পত্র (NID)",
       "viewType": "EditText",
-      "visibility": "visible"
+      "visibility": "gone"
     },
     {
       "familyOrder": 1.0,

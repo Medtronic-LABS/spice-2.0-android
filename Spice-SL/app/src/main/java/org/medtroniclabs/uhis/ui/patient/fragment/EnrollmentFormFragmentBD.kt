@@ -17,6 +17,7 @@ import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.activityViewModels
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.convertToUtcDateTime
@@ -94,6 +95,7 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.prefetchNationalIds()
         initView()
         getFormDataForWorkflow()
         setListeners()
@@ -435,6 +437,34 @@ class EnrollmentFormFragmentBD : BaseFragment(), FormEventListener {
     ) {
         resultMap?.let { resultHashMap ->
             val map = HashMap<String, Any>(resultHashMap)
+
+            if (formGenerator.isViewVisible(DefinedParams.IDENTITY_VALUE)) {
+                val identityValue = map[DefinedParams.IDENTITY_VALUE] as? String
+                val identityType = map[DefinedParams.IDENTITY_TYPE] as? String
+                if (MemberRegistration.IdType.NATIONAL_ID.value == identityType &&
+                    (
+                        identityValue == null ||
+                            !identityValue.isDigitsOnly() ||
+                            !MemberRegistration.NATIONAL_ID_LENGTH.contains(identityValue.length)
+                    )
+                ) {
+                    formGenerator.showErrorAndScrollTo(DefinedParams.IDENTITY_VALUE, getString(R.string.national_id_validation))
+                    return
+                }
+
+                val originalIdentityValue =
+                    patientDetailsViewModel.screeningDetailResponse.value
+                        ?.data
+                        ?.identityValue
+                if (MemberRegistration.IdType.NATIONAL_ID.value == identityType &&
+                    identityValue != originalIdentityValue &&
+                    viewModel.nationalIdsSet.contains(identityValue)
+                ) {
+                    formGenerator.showErrorAndScrollTo(DefinedParams.IDENTITY_VALUE, getString(R.string.national_id_already_exists))
+                    return
+                }
+            }
+
             val isGeneratedNationalId = map.get(DefinedParams.NATIONAL_ID) as? String
 
             (map).let { bioData ->

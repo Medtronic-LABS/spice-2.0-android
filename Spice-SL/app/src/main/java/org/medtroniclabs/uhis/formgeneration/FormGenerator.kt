@@ -2708,6 +2708,20 @@ class FormGenerator(
         }
     }
 
+    fun showErrorAndScrollTo(
+        id: String,
+        message: String,
+    ) {
+        showError(id, message)
+        val focusView =
+            getViewByTag(id + titleSuffix)
+                ?: getViewByTag(id + rootSuffix)
+                ?: getViewByTag(id)
+        focusView?.let { view ->
+            scrollView?.let { scrollToView(it, view) }
+        }
+    }
+
     fun hideError(id: String) {
         val errorView = getViewByTag(id + errorSuffix)
         errorView?.visibility = View.GONE

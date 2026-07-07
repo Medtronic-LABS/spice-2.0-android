@@ -2505,6 +2505,15 @@ object CommonUtils {
         }
     }
 
+    fun ensurePhoneNumberCategoryIfMissing(
+        bioData: MutableMap<String, Any>,
+        fieldKey: String,
+    ) {
+        if (!bioData.containsKey(fieldKey)) {
+            bioData[fieldKey] = ""
+        }
+    }
+
     fun addValuesInJSON(
         jsonString: String,
         key: String,

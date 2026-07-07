@@ -33,12 +33,14 @@ import org.medtroniclabs.uhis.di.IoDispatcher
 import org.medtroniclabs.uhis.formgeneration.FormGenerator
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
 import org.medtroniclabs.uhis.formgeneration.model.FormLayout
+import org.medtroniclabs.uhis.mappingkey.MemberRegistration
 import org.medtroniclabs.uhis.mappingkey.Screening
 import org.medtroniclabs.uhis.ncd.data.PatientVisitRequest
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.network.utils.ConnectivityManager
 import org.medtroniclabs.uhis.network.utils.DoesNetworkHaveInternet
+import org.medtroniclabs.uhis.repo.HouseholdMemberRepository
 import org.medtroniclabs.uhis.repo.MedicalReviewRepository
 import org.medtroniclabs.uhis.repo.OnBoardingRepository
 import java.lang.reflect.Type
@@ -48,6 +50,7 @@ import javax.inject.Inject
 class EnrollmentFormBuilderViewModel @Inject constructor(
     private val onBoardingRepo: OnBoardingRepository,
     private val medicalReviewRepo: MedicalReviewRepository,
+    private val householdMemberRepository: HouseholdMemberRepository,
     @IoDispatcher private val dispatcherIO: CoroutineDispatcher,
 ) :
     ViewModel() {
@@ -77,6 +80,15 @@ class EnrollmentFormBuilderViewModel @Inject constructor(
         val patientVisitIDResponse = MutableLiveData<Resource<PatientDetails>>()
         var isNationalIdGenerated: Boolean = false
         var nationalId: String = "-1"
+        val nationalIdsSet = HashSet<String>()
+
+        fun prefetchNationalIds() {
+            viewModelScope.launch(dispatcherIO) {
+                val ids = householdMemberRepository.getAllNationalIds(MemberRegistration.IdType.NATIONAL_ID.value)
+                nationalIdsSet.clear()
+                nationalIdsSet.addAll(ids)
+            }
+        }
 
         fun fetchWorkFlow(formType: String) {
             viewModelScope.launch(dispatcherIO) {

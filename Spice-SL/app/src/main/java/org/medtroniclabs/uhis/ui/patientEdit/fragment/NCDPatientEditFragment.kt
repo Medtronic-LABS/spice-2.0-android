@@ -5,15 +5,20 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.text.InputFilter
+import android.text.InputType
 import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.Spinner
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.text.color
+import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
 import org.medtroniclabs.uhis.R
@@ -34,6 +39,8 @@ import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.formgeneration.listener.FormEventListener
 import org.medtroniclabs.uhis.formgeneration.model.FormLayout
 import org.medtroniclabs.uhis.formgeneration.utility.CheckBoxDialog
+import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
+import org.medtroniclabs.uhis.mappingkey.MemberRegistration
 import org.medtroniclabs.uhis.mappingkey.Screening
 import org.medtroniclabs.uhis.model.PatientListRespModel
 import org.medtroniclabs.uhis.ncd.medicalreview.viewmodel.NCDFormViewModel
@@ -47,6 +54,7 @@ import org.medtroniclabs.uhis.ui.mypatients.viewmodel.PatientDetailViewModel
 import org.medtroniclabs.uhis.ui.patient.UIConstants
 import org.medtroniclabs.uhis.ui.patientEdit.NCDPatientEditActivity
 import org.medtroniclabs.uhis.ui.patientEdit.viewModel.NCDPatientEditViewModel
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams as FormDefinedParams
 
 @AndroidEntryPoint
 class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickListener {
@@ -71,6 +79,7 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.prefetchNationalIds()
         initializeFormBuilder()
         attachObserver()
         setListener()
@@ -88,8 +97,10 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
             binding.scrollView,
             translate = SecuredPreference.getIsTranslationEnabled(),
         ) { map, id ->
-            if (id == HEIGHT_FIELD || id == WEIGHT_FIELD) {
-                renderBmi(map)
+            when (id) {
+                HEIGHT_FIELD, WEIGHT_FIELD -> renderBmi(map)
+                IDENTITY_TYPE_FIELD -> onIdentityTypeSelected(map[id] as? String)
+                IDENTITY_VALUE_FIELD -> formGenerator.hideError(id)
             }
         }
         if (CommonUtils.isCommunity()) {
@@ -118,6 +129,9 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
                         binding.actionButton.visibility = View.VISIBLE
                         binding.actionButton.isEnabled = data.isNotEmpty()
                         formGenerator.populateEditableViews(list)
+                        patientViewModel.patientDetailsLiveData.value?.data?.let { patient ->
+                            prefillPatientFields(patient)
+                        }
                     }
                 }
             }
@@ -135,13 +149,7 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
 
                 ResourceState.SUCCESS -> {
                     hideProgress()
-                    resourceState.data?.let {
-                        FormAutofill.start(requireContext(), formGenerator, it)
-                        prefillHouseNumber(it)
-                        if (CommonUtils.isCommunity()) {
-                            prefillCommunityFields(it)
-                        }
-                    }
+                    resourceState.data?.let { prefillPatientFields(it) }
                 }
             }
         }
@@ -321,8 +329,39 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
         resultMap: HashMap<String, Any>?,
         serverData: List<FormLayout>?,
     ) {
+        if (formGenerator.isViewVisible(IDENTITY_VALUE_FIELD)) {
+            val identityValue = resultMap?.get(IDENTITY_VALUE_FIELD) as? String
+            val identityType = resultMap?.get(IDENTITY_TYPE_FIELD) as? String
+            if (MemberRegistration.IdType.NATIONAL_ID.value == identityType &&
+                (
+                    identityValue == null ||
+                        !identityValue.isDigitsOnly() ||
+                        !MemberRegistration.NATIONAL_ID_LENGTH.contains(identityValue.length)
+                )
+            ) {
+                formGenerator.showErrorAndScrollTo(IDENTITY_VALUE_FIELD, getString(R.string.national_id_validation))
+                return
+            }
+
+            val originalIdentityValue =
+                patientViewModel.patientDetailsLiveData.value
+                    ?.data
+                    ?.identityValue
+            if (MemberRegistration.IdType.NATIONAL_ID.value == identityType &&
+                identityValue != originalIdentityValue &&
+                viewModel.nationalIdsSet.contains(identityValue)
+            ) {
+                formGenerator.showErrorAndScrollTo(IDENTITY_VALUE_FIELD, getString(R.string.national_id_already_exists))
+                return
+            }
+        }
+
         val map = HashMap<String, Any>()
         if (resultMap != null) {
+            CommonUtils.ensurePhoneNumberCategoryIfMissing(
+                resultMap,
+                FormDefinedParams.PHONE_NUMBER_CATEGORY,
+            )
             map[DefinedParams.BioData] = resultMap as HashMap<String, Any>
         }
         map[DefinedParams.HealthFacilityFhirId] = SecuredPreference.getOrganizationFhirId()
@@ -356,6 +395,14 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
     /**
      * Patient details API returns `houseHoldNumber`; the edit form field id is `houseNumber`.
      */
+    private fun prefillPatientFields(model: PatientListRespModel) {
+        FormAutofill.start(requireContext(), formGenerator, model)
+        prefillHouseNumber(model)
+        if (CommonUtils.isCommunity()) {
+            prefillCommunityFields(model)
+        }
+    }
+
     private fun prefillHouseNumber(model: PatientListRespModel) {
         model.houseHoldNumber?.takeIf { it.isNotBlank() }?.let {
             setEditTextValue(HOUSE_NUMBER_FIELD, it)
@@ -369,6 +416,7 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
      * boolean Yes/No single-selections (smoking). This fills those from the patient details.
      */
     private fun prefillCommunityFields(model: PatientListRespModel) {
+        prefillIdentityFields(model)
         model.gender?.let { selectSingleOption(it, GENDER_FIELD) }
         model.isPregnant?.let { selectSingleOption(it.toString(), IS_PREGNANT_FIELD) }
         (model.birthDate ?: model.dateOfBirth)?.let { prefillDateOfBirth(it) }
@@ -387,6 +435,95 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
         // patient-details API doesn't return the value, so show the linked state (re-scan stays
         // available) without seeding a value that would overwrite the link on submit.
         formGenerator.markQrAlreadyLinked(QR_CODE_FIELD)
+    }
+
+    /**
+     * Prefills identity fields and locks them only when both ID type (NID/BRN) and value are present.
+     * Otherwise both fields stay editable so the nurse can complete missing data.
+     */
+    private fun prefillIdentityFields(model: PatientListRespModel) {
+        val identityType = model.identityType?.takeIf { it.isNotBlank() }
+        val identityValue = model.identityValue?.takeIf { it.isNotBlank() }
+        val hasNidOrBrn = identityType == FormDefinedParams.IDENTITY_TYPE_NID ||
+            identityType == FormDefinedParams.IDENTITY_TYPE_BRN
+        val isIdentityLocked = hasNidOrBrn && !identityValue.isNullOrBlank()
+
+        identityType?.let { selectIdentityType(it) }
+
+        if (hasNidOrBrn) {
+            showIdentityValueField()
+            formGenerator.updateNationalIdLabelForIdType(
+                identityType,
+                SecuredPreference.getIsTranslationEnabled(),
+                optionsViewId = IDENTITY_TYPE_FIELD,
+                viewId = IDENTITY_VALUE_FIELD,
+            )
+            applyIdentityValueInputType(identityType)
+            identityValue?.let { setEditTextValue(IDENTITY_VALUE_FIELD, it) }
+            setIdentityFieldEnabled(IDENTITY_VALUE_FIELD, !isIdentityLocked)
+        }
+
+        setIdentityFieldEnabled(IDENTITY_TYPE_FIELD, !isIdentityLocked)
+    }
+
+    private fun selectIdentityType(identityType: String) {
+        val typeView = formGenerator.getViewByTag(IDENTITY_TYPE_FIELD) as? Spinner ?: return
+        val adapter = typeView.adapter as? CustomSpinnerAdapter ?: return
+        val index = adapter.getIndexOfItemById(identityType)
+        if (index > 0) {
+            typeView.setSelection(index, false)
+            typeView.onItemSelectedListener?.onItemSelected(
+                typeView,
+                typeView.selectedView,
+                typeView.selectedItemPosition,
+                typeView.selectedItemId,
+            )
+        }
+    }
+
+    private fun onIdentityTypeSelected(selectedId: String?) {
+        applyIdentityValueInputType(selectedId)
+        formGenerator.updateNationalIdLabelForIdType(
+            selectedId,
+            SecuredPreference.getIsTranslationEnabled(),
+            optionsViewId = IDENTITY_TYPE_FIELD,
+            viewId = IDENTITY_VALUE_FIELD,
+        )
+    }
+
+    private fun applyIdentityValueInputType(identityType: String?) {
+        val nationalIdView = formGenerator.getViewByTag(IDENTITY_VALUE_FIELD) as? EditText ?: return
+        if (MemberRegistration.IdType.NATIONAL_ID.value == identityType) {
+            nationalIdView.inputType = InputType.TYPE_CLASS_NUMBER
+            val filters = nationalIdView.filters.toMutableList()
+            if (filters.none { it is InputFilter.LengthFilter }) {
+                filters.add(InputFilter.LengthFilter(MemberRegistration.MAX_LENGTH_NATIONAL_ID))
+            }
+            nationalIdView.filters = filters.toTypedArray()
+        } else {
+            nationalIdView.inputType = InputType.TYPE_CLASS_TEXT
+            nationalIdView.filters = nationalIdView.filters
+                .filterNot { it is InputFilter.LengthFilter }
+                .toTypedArray()
+        }
+    }
+
+    private fun setIdentityFieldEnabled(
+        fieldId: String,
+        enabled: Boolean,
+    ) {
+        formGenerator.getViewByTag(fieldId)?.let { input ->
+            input.isEnabled = enabled
+            if (enabled) {
+                input.setBackgroundResource(R.drawable.edittext_background)
+            } else {
+                formGenerator.disableView(input)
+            }
+        }
+    }
+
+    private fun showIdentityValueField() {
+        formGenerator.getViewByTag(IDENTITY_VALUE_FIELD + AssessmentDefinedParams.rootSuffix)?.visibility = View.VISIBLE
     }
 
     private fun renderBmi(resultHashMap: HashMap<String, Any>) {
@@ -466,5 +603,7 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
         private const val COPD_FIELD = "copd"
         private const val QR_CODE_FIELD = "qrCode"
         private const val HOUSE_NUMBER_FIELD = "houseNumber"
+        private const val IDENTITY_TYPE_FIELD = "identityType"
+        private const val IDENTITY_VALUE_FIELD = "identityValue"
     }
 }
