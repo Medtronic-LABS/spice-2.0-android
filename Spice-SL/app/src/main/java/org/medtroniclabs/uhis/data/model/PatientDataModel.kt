@@ -17,6 +17,7 @@ data class PatientDataModel(
     val phoneNumber: String? = null,
     val isLabtestReferred: Boolean? = null,
     val isMedicationPrescribed: Boolean? = null,
+    val medicineDispense: Boolean? = null,
     var patientSort: SortModel? = null,
     var patientFilter: FilterModel? = null,
     val searchQRValue: String? = null,

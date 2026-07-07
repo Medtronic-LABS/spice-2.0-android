@@ -77,15 +77,20 @@ class PatientsDataSource(
             CommonUtils.isCHCP()
 
     private fun searchStatusForOrigin(patientStatusFromFilter: String?): String? =
-        when (origin) {
-            UIConstants.ENROLLMENT_UNIQUE_ID ->
+        when {
+            origin.equals(UIConstants.ENROLLMENT_UNIQUE_ID, ignoreCase = true) ->
                 patientStatusFromFilter ?: FilterEnum.NOT_ENROLLED.name
-            UIConstants.DISPENSE ->
+            isDispenseOrigin() ->
                 patientStatusFromFilter ?: FilterEnum.ENROLLED.name
             else -> null
         }
 
-    private fun clearsPatientStatusFromFilter(): Boolean = origin == UIConstants.ENROLLMENT_UNIQUE_ID || origin == UIConstants.DISPENSE
+    private fun clearsPatientStatusFromFilter(): Boolean = origin.equals(UIConstants.ENROLLMENT_UNIQUE_ID, ignoreCase = true) || isDispenseOrigin()
+
+    /** Dispense search (text/QR) must flag medicine dispense; scoped to origin, not role. */
+    private fun isDispenseOrigin(): Boolean = origin.equals(UIConstants.DISPENSE, ignoreCase = true)
+
+    private fun medicineDispenseForSearch(): Boolean? = if (isDispenseOrigin()) true else null
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PatientListResModel> {
         val pageIndex = params.key ?: PAGE_INDEX
@@ -107,6 +112,7 @@ class PatientsDataSource(
                         patientSort = null,
                         patientFilter = null,
                         status = searchStatusForOrigin(searchModel.patientFilter?.patientStatus),
+                        medicineDispense = medicineDispenseForSearch(),
                     )
                     when {
                         isFollowUp -> apiHelper.patientFollowUpList(request)
@@ -158,6 +164,7 @@ class PatientsDataSource(
                         searchText = searchModel.searchText,
                         isSearchUserOrgPatient = isSiteBasedSearch,
                         status = searchStatusForOrigin(request.patientFilter?.patientStatus),
+                        medicineDispense = medicineDispenseForSearch(),
                         patientFilter = if (clearsPatientStatusFromFilter()) {
                             null
                         } else {
