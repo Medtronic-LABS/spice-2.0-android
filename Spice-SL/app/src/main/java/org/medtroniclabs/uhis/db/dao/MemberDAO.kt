@@ -446,7 +446,7 @@ interface MemberDAO {
      * @return A map where the key is the member entity and the value is a list of their assessment histories.
      */
     @Transaction
-    @Query("SELECT * FROM HouseHoldMember AS hhm LEFT JOIN memberassessmenthistory AS mah ON hhm.id = mah.memberId WHERE hhm.id = :memberId ORDER BY mah.visitDate DESC")
+    @Query("SELECT * FROM HouseHoldMember AS hhm LEFT JOIN memberassessmenthistory AS mah ON hhm.id = mah.memberId WHERE hhm.id = :memberId ORDER BY mah.visitDate DESC, mah.encounterId DESC")
     fun getMemberWithAssessmentHistory(memberId: Long): LiveData<Map<HouseholdMemberEntity, List<MemberAssessmentHistoryEntity>>?>
 
     @Query("SELECT * FROM HouseHoldMember WHERE qr_code = :qrCode AND (:memberId IS NULL OR id != :memberId)")

@@ -328,60 +328,29 @@ interface MemberAssessmentHistoryDao {
             ) AS pwIdentifiedFirst4MonthsWithAncCount,
             COALESCE(
                 (
-                    SELECT COUNT(DISTINCT exactly_3.memberFhirId)
-                    FROM (
-                        SELECT h.memberFhirId
-                        FROM MemberAssessmentHistory AS h
-                        INNER JOIN filtered_members AS fm ON fm.memberFhirId = h.memberFhirId
-                        WHERE LOWER(h.serviceProvided) = 'anc'
-                          AND h.memberFhirId IS NOT NULL
-                          AND h.memberFhirId != ''
-                          AND (h.practitionerId IS NULL OR h.practitionerId IS :userId)
-                          AND (
-                              CASE
-                                  WHEN :subVillageIdsSize > 0
+                    SELECT COUNT(DISTINCT h.memberFhirId)
+                    FROM MemberAssessmentHistory AS h
+                    INNER JOIN filtered_members AS fm ON fm.memberFhirId = h.memberFhirId
+                    WHERE LOWER(h.serviceProvided) = 'anc'
+                      AND h.memberFhirId IS NOT NULL
+                      AND h.memberFhirId != ''
+                      AND (h.practitionerId IS NULL OR h.practitionerId IS :userId)
+                      AND CAST(json_extract(h.observations, '$.ancVisitNumber') AS INTEGER) = 3
+                      AND (:startDate IS NULL OR date(datetime(h.visitDate, 'localtime')) >= :startDate)
+                      AND (:endDate   IS NULL OR date(datetime(h.visitDate, 'localtime')) <= :endDate)
+                      AND (
+                          CASE
+                              WHEN :subVillageIdsSize > 0
                                   THEN fm.subVillageId IN (:subVillageIds)
-
-                                  WHEN :ssIdsSize > 0
+                              WHEN :ssIdsSize > 0
                                   THEN fm.subVillageId IN (
                                       SELECT DISTINCT sslv.subVillageId
                                       FROM ShasthyaShebikaLinkedVillageEntity AS sslv
                                       WHERE sslv.shasthyaShebikaId IN (:ssIds)
                                   )
-
-                                  ELSE 1
-                              END
-                          )
-                        GROUP BY h.memberFhirId
-                        HAVING COUNT(*) = 3
-                    ) AS exactly_3
-                    INNER JOIN (
-                        SELECT h.memberFhirId, MAX(h.visitDate) AS latest_visit_date
-                        FROM MemberAssessmentHistory AS h
-                        INNER JOIN filtered_members AS fm ON fm.memberFhirId = h.memberFhirId
-                        WHERE LOWER(h.serviceProvided) = 'anc'
-                          AND h.memberFhirId IS NOT NULL
-                          AND h.memberFhirId != ''
-                          AND (h.practitionerId IS NULL OR h.practitionerId IS :userId)
-                          AND (
-                              CASE
-                                  WHEN :subVillageIdsSize > 0
-                                  THEN fm.subVillageId IN (:subVillageIds)
-
-                                  WHEN :ssIdsSize > 0
-                                  THEN fm.subVillageId IN (
-                                      SELECT DISTINCT sslv.subVillageId
-                                      FROM ShasthyaShebikaLinkedVillageEntity AS sslv
-                                      WHERE sslv.shasthyaShebikaId IN (:ssIds)
-                                  )
-
-                                  ELSE 1
-                              END
-                          )
-                        GROUP BY h.memberFhirId
-                    ) AS latest ON latest.memberFhirId = exactly_3.memberFhirId
-                    WHERE (:startDate IS NULL OR date(datetime(latest.latest_visit_date, 'localtime')) >= :startDate)
-                      AND (:endDate IS NULL OR date(datetime(latest.latest_visit_date, 'localtime')) <= :endDate)
+                              ELSE 1
+                          END
+                      )
                 ),
                 0
             ) AS anc3PlusCount,
