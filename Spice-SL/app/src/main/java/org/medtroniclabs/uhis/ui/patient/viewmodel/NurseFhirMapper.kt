@@ -61,7 +61,9 @@ object NurseFhirMapper {
                     dosageUnitValue = item.dosageUnitValue,
                     dosageUnitName = item.dosageUnitName,
                     dosageFrequencyName = item.dosageFrequencyName ?: item.frequencyName,
-                    patientVisitId = null,
+                    // Keep the real encounter id so the selected date can be matched/highlighted
+                    // and previous/next navigation can resolve the current position.
+                    patientVisitId = item.encounterId?.toLongOrNull() ?: entity.encounterId?.toLongOrNull(),
                     createdAt = item.prescribedSince ?: entity.dateOfReview ?: "",
                     prescribedSince = item.prescribedSince,
                     dosageFormName = item.dosageFormName,
@@ -174,7 +176,9 @@ object NurseFhirMapper {
             dates.add(
                 VisitDateModel(
                     visitDate = referredDate.date ?: "",
-                    _id = index.toLong(),
+                    // Carry the real FHIR encounter id so date navigation can round-trip it back
+                    // to the prescribed-details endpoint; fall back to the index only if absent.
+                    _id = referredDate.id?.toLongOrNull() ?: index.toLong(),
                 ),
             )
         }
