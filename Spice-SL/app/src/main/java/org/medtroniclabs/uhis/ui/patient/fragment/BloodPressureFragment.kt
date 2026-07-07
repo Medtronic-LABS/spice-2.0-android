@@ -7,8 +7,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
 import org.medtroniclabs.uhis.R
+import org.medtroniclabs.uhis.appextensions.gone
+import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_ddMMMyyyy
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMdd
@@ -31,7 +34,6 @@ import org.medtroniclabs.uhis.ui.common.GeneralInfoDialog
 import org.medtroniclabs.uhis.ui.patient.viewmodel.MedicalReviewBaseViewModel
 import org.medtroniclabs.uhis.ui.patient.viewmodel.NurseMedicalReviewViewModel
 import org.medtroniclabs.uhis.ui.patient.viewmodel.PatientDetailViewModel
-import kotlin.getValue
 
 class BloodPressureFragment : BaseFragment(), View.OnClickListener {
     private lateinit var binding: FragmentBloodPressureBinding
@@ -43,6 +45,9 @@ class BloodPressureFragment : BaseFragment(), View.OnClickListener {
         const val TAG = "BloodPressureFragment"
 
         fun newInstance(): BloodPressureFragment = BloodPressureFragment()
+
+        private const val MIN_VALUE = 30
+        private const val MAX_VALUE = 300
     }
 
     private var bpReadings: List<Triple<String, String, Boolean>> = listOf()
@@ -94,6 +99,14 @@ class BloodPressureFragment : BaseFragment(), View.OnClickListener {
         nurseMedicalReviewViewModel.nurseMrRequestModel.bpLog?.bpLogDetails =
             nurseMedicalReviewViewModel.nurseMrRequestModel.bpLog?.bpLogDetails
                 ?: arrayListOf() // Initialize bpLogDetails as an empty list if it's null
+
+        binding.etSystolic.addTextChangedListener {
+            validateSystolicOnTextChange()
+        }
+        binding.etDiastolicOne.addTextChangedListener {
+            validateDiastolicOnTextChange()
+            validateSystolicOnTextChange()
+        }
     }
 
     override fun onClick(view: View?) {
@@ -109,12 +122,86 @@ class BloodPressureFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
+    private fun validateSystolicOnTextChange() {
+        val systolic = binding.etSystolic.text
+            .toString()
+            .takeIf { it.isNotBlank() }
+            ?.toDoubleOrNull()
+        val diastolic = binding.etDiastolicOne.text
+            .toString()
+            .takeIf { it.isNotBlank() }
+            ?.toDoubleOrNull()
+        when {
+            systolic == null -> {
+                binding.tvSystolicErrorMessage.visible()
+                binding.tvSystolicErrorMessage.setText(R.string.default_user_input_error)
+            }
+
+            systolic <= MIN_VALUE -> {
+                binding.tvSystolicErrorMessage.visible()
+                binding.tvSystolicErrorMessage.setText(R.string.systolic_error_min)
+            }
+
+            systolic >= MAX_VALUE -> {
+                binding.tvSystolicErrorMessage.visible()
+                binding.tvSystolicErrorMessage.setText(R.string.systolic_error_max)
+            }
+
+            diastolic != null && systolic < diastolic -> {
+                binding.tvSystolicErrorMessage.visible()
+                binding.tvSystolicErrorMessage.setText(R.string.systolic_greater_than_diastolic)
+            }
+
+            else -> {
+                binding.tvSystolicErrorMessage.gone()
+            }
+        }
+    }
+
+    private fun validateDiastolicOnTextChange() {
+        val systolic = binding.etSystolic.text
+            .toString()
+            .takeIf { it.isNotBlank() }
+            ?.toDoubleOrNull()
+        val diastolic = binding.etDiastolicOne.text
+            .toString()
+            .takeIf { it.isNotBlank() }
+            ?.toDoubleOrNull()
+        when {
+            diastolic == null -> {
+                binding.tvDiastolicErrorMessage.visible()
+                binding.tvDiastolicErrorMessage.setText(R.string.default_user_input_error)
+            }
+
+            diastolic <= MIN_VALUE -> {
+                binding.tvDiastolicErrorMessage.visible()
+                binding.tvDiastolicErrorMessage.setText(R.string.diastolic_error_min)
+            }
+
+            diastolic >= MAX_VALUE -> {
+                binding.tvDiastolicErrorMessage.visible()
+                binding.tvDiastolicErrorMessage.setText(R.string.diastolic_error_max)
+            }
+
+            systolic != null && systolic < diastolic -> {
+                binding.tvDiastolicErrorMessage.gone()
+                binding.tvSystolicErrorMessage.visible()
+                binding.tvSystolicErrorMessage.setText(R.string.systolic_greater_than_diastolic)
+            }
+
+            else -> {
+                binding.tvDiastolicErrorMessage.gone()
+            }
+        }
+    }
+
     private fun attachObserver() {
         medicalReviewBaseViewModel.formResponseLiveData.observe(viewLifecycleOwner) { resourceState ->
             when (resourceState.state) {
                 ResourceState.LOADING -> {
                     showLoading()
                 }
+
                 ResourceState.SUCCESS -> {
                     resourceState.data
                         ?.formLayout
@@ -128,6 +215,7 @@ class BloodPressureFragment : BaseFragment(), View.OnClickListener {
                             instructions?.let { medicalReviewBaseViewModel.instructionsList.addAll(it) }
                         }
                 }
+
                 ResourceState.ERROR -> {
                     hideLoading()
                 }
@@ -255,8 +343,6 @@ class BloodPressureFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
-    private fun isTablet(): Boolean = resources.configuration.smallestScreenWidthDp >= 600
-
     private fun toggleView(expand: Boolean) {
         isExpanded = expand
         binding.tvViewMore.visibility = if (expand) View.GONE else View.VISIBLE
@@ -267,15 +353,16 @@ class BloodPressureFragment : BaseFragment(), View.OnClickListener {
 
     fun validation(): Boolean {
         var isValid = true
-        var systolic = binding.etSystolic.text
+
+        val systolicString = binding.etSystolic.text
             .toString()
             .takeIf { it.isNotBlank() }
-            ?.toDoubleOrNull()
-        var diastolic = binding.etDiastolicOne.text
+        val diastolicString = binding.etDiastolicOne.text
             .toString()
-            .trim()
             .takeIf { it.isNotBlank() }
-            ?.toDoubleOrNull()
+        val systolic = systolicString?.toDoubleOrNull()
+        val diastolic = diastolicString?.toDoubleOrNull()
+
         nurseMedicalReviewViewModel.nurseMrRequestModel.bpLog
             ?.bpLogDetails
             ?.clear()
@@ -298,29 +385,22 @@ class BloodPressureFragment : BaseFragment(), View.OnClickListener {
             bpLogDetails?.add(BpLogDetails(diastolic = diastolic, systolic = systolic))
         }
 
-        nurseMedicalReviewViewModel.systolic = binding.etSystolic.text
-            .toString()
-            .trim()
-        nurseMedicalReviewViewModel.diastolic = binding.etDiastolicOne.text
-            .toString()
-            .trim()
-
-        var systolicValue: Double? = nurseMedicalReviewViewModel.systolic?.toDoubleOrNull()
-        var diastolicValue: Double? = nurseMedicalReviewViewModel.diastolic?.toDoubleOrNull()
+        nurseMedicalReviewViewModel.systolic = systolicString
+        nurseMedicalReviewViewModel.diastolic = diastolicString
 
         if (nurseMedicalReviewViewModel.systolic.isNullOrEmpty()) {
             isValid = false
             binding.tvSystolicErrorMessage.visibility = View.VISIBLE
-        } else if (systolicValue != null && diastolicValue != null) {
-            if (systolicValue < diastolicValue) {
+        } else if (systolic != null && diastolic != null) {
+            if (systolic < diastolic) {
                 isValid = false
                 binding.tvSystolicErrorMessage.visibility = View.VISIBLE
                 binding.tvSystolicErrorMessage.text = getString(R.string.systolic_greater_than_diastolic)
-            } else if (systolicValue >= 300 && diastolicValue >= 300) {
+            } else if (systolic >= MAX_VALUE && diastolic >= MAX_VALUE) {
                 isValid = false
                 binding.tvSystolicErrorMessage.visibility = View.VISIBLE
                 binding.tvSystolicErrorMessage.text = getString(R.string.systolic_diastolic_max_validation, "300")
-            } else if (systolicValue <= 30 && diastolicValue <= 30) {
+            } else if (systolic <= MIN_VALUE && diastolic <= MIN_VALUE) {
                 isValid = false
                 binding.tvSystolicErrorMessage.visibility = View.VISIBLE
                 binding.tvSystolicErrorMessage.text = getString(R.string.systolic_diastolic_min_validation, "30")

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.CommonUtils
@@ -36,7 +37,6 @@ import timber.log.Timber
 import java.util.Calendar
 import java.util.Locale
 import java.util.UUID
-import kotlin.getValue
 
 class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
     private val viewModel: MedicalReviewBaseViewModel by activityViewModels()
@@ -49,6 +49,14 @@ class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
         const val TAG = "BloodGlucoseFragment"
 
         fun newInstance(): BloodGlucoseFragment = BloodGlucoseFragment()
+
+        private const val OGTT_MIN_VALUE = 0.6
+        private const val OGTT_MAX_VALUE = 33.0
+        private const val HB1AC_MIN_VALUE = 1.0
+        private const val HB1AC_MAX_VALUE = 50.0
+
+        private const val GLUCOSE_MIN_VALUE = 0.6
+        private const val GLUCOSE_MAX_VALUE = 33.0
     }
 
     private var bgReadings: List<Triple<String, String?, Boolean>> = listOf()
@@ -103,6 +111,10 @@ class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
             selectionCallBack,
             binding.etInvestigationSelect,
         )
+
+        binding.etReadingValue.addTextChangedListener { validateBloodGlucoseValueOnTextChange() }
+        binding.etHbA1cReadingValue.addTextChangedListener { validateHbA1cOnTextChange() }
+        binding.etOgttReadingValue.addTextChangedListener { validateOgttOnTextChange() }
     }
 
     private fun attachObserver() {
@@ -226,10 +238,9 @@ class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
                     marginEnd = 20
                 }
             }
-            if (item.first != null && item.first != "") {
+            if (item.first != "") {
                 row.addView(imageView)
-            }
-            if (item.first != null && item.first != "") {
+
                 val textViewBG = TextView(requireContext()).apply {
                     text = item.first
                     textSize = 16f
@@ -255,7 +266,7 @@ class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
                     }
                 setPadding(10, 10, 10, 10)
             }
-            if (item.first != null && item.first != "" && item.second != null) {
+            if (item.first != "" && item.second != null) {
                 row.addView(separatorTextView)
             }
 
@@ -359,6 +370,99 @@ class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
+    /**
+     * Validates the glucose reading field on text change.
+     * Required when an investigation type (FBS/RBS) is selected; otherwise optional.
+     * When present, the value must be within [GLUCOSE_MIN_VALUE]..[GLUCOSE_MAX_VALUE].
+     */
+    private fun validateBloodGlucoseValueOnTextChange() {
+        val text = binding.etReadingValue.text
+            .toString()
+            .trim()
+        val isGlucoseTypeSelected = !nurseViewModel.glucoseLog?.glucoseType.isNullOrEmpty()
+        if (text.isEmpty()) {
+            if (isGlucoseTypeSelected) {
+                binding.tvReadingValueErrorMessage.visibility = View.VISIBLE
+                binding.tvReadingValueErrorMessage.text = getString(R.string.default_user_input_error)
+            } else {
+                binding.tvReadingValueErrorMessage.visibility = View.GONE
+            }
+            return
+        }
+        val value = text.toDoubleOrNull()
+        if (value == null || value !in GLUCOSE_MIN_VALUE..GLUCOSE_MAX_VALUE) {
+            binding.tvReadingValueErrorMessage.visibility = View.VISIBLE
+            binding.tvReadingValueErrorMessage.text =
+                getString(
+                    R.string.general_min_max_validation,
+                    GLUCOSE_MIN_VALUE.toString(),
+                    GLUCOSE_MAX_VALUE.toString(),
+                )
+        } else {
+            binding.tvReadingValueErrorMessage.visibility = View.GONE
+        }
+    }
+
+    /**
+     * Validates the HbA1c field on text change.
+     * Empty values are ignored; when present, must be within [HB1AC_MIN_VALUE]..[HB1AC_MAX_VALUE].
+     */
+    private fun validateHbA1cOnTextChange() {
+        val text = binding.etHbA1cReadingValue.text
+            .toString()
+            .trim()
+        if (text.isEmpty()) {
+            binding.tvHBA1cReadingValueErrorMessage.visibility = View.GONE
+            return
+        }
+        val value = text.toDoubleOrNull()
+        if (value == null || value !in HB1AC_MIN_VALUE..HB1AC_MAX_VALUE) {
+            binding.tvHBA1cReadingValueErrorMessage.visibility = View.VISIBLE
+            binding.tvHBA1cReadingValueErrorMessage.text =
+                getString(
+                    R.string.general_min_max_validation,
+                    HB1AC_MIN_VALUE.toString(),
+                    HB1AC_MAX_VALUE.toString(),
+                )
+        } else {
+            binding.tvHBA1cReadingValueErrorMessage.visibility = View.GONE
+        }
+    }
+
+    /**
+     * Validates the OGTT field on text change.
+     * Empty values are ignored; when present, must be within [OGTT_MIN_VALUE]..[OGTT_MAX_VALUE].
+     */
+    private fun validateOgttOnTextChange() {
+        val text = binding.etOgttReadingValue.text
+            .toString()
+            .trim()
+        if (text.isEmpty()) {
+            binding.tvOgttReadingValueErrorMessage.visibility = View.GONE
+            return
+        }
+        val value = text.toDoubleOrNull()
+        if (value == null || value !in OGTT_MIN_VALUE..OGTT_MAX_VALUE) {
+            binding.tvOgttReadingValueErrorMessage.visibility = View.VISIBLE
+            binding.tvOgttReadingValueErrorMessage.text =
+                getString(
+                    R.string.general_min_max_validation,
+                    OGTT_MIN_VALUE.toString(),
+                    OGTT_MAX_VALUE.toString(),
+                )
+        } else {
+            binding.tvOgttReadingValueErrorMessage.visibility = View.GONE
+        }
+    }
+
+    /**
+     * Validates all glucose form inputs before adding a reading or submitting.
+     * Checks investigation type, date, and numeric ranges for glucose, HbA1c, and OGTT.
+     * Populates [nurseViewModel.glucoseLog] and calls [loadRequestData] when valid.
+     *
+     * @param isSubmit when true, defers [loadRequestData] until the first successful submit
+     * @return true if all applicable validation rules pass
+     */
     fun validation(isSubmit: Boolean = false): Boolean {
         var isValid = true
         val readingValue = binding.etReadingValue.text
@@ -387,29 +491,21 @@ class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
         }
 
         nurseViewModel.glucoseLog?.apply {
-            // Check if any of the two values are present
-            val isAnyValuePresent =
-                glucoseValue != null && glucoseType.isNullOrEmpty()
-
             if (!glucoseType.isNullOrEmpty()) {
                 glucoseValue?.let {
-                    if (it > 33.0 || it < 0.6) {
+                    if (it !in GLUCOSE_MIN_VALUE..GLUCOSE_MAX_VALUE) {
                         isValid = false
                         binding.tvReadingValueErrorMessage.visibility = View.VISIBLE
                         binding.tvReadingValueErrorMessage.text =
-                            getString(R.string.general_min_max_validation, "0.6", "33.0")
+                            getString(R.string.general_min_max_validation, GLUCOSE_MIN_VALUE.toString(), GLUCOSE_MAX_VALUE.toString())
                     } else {
                         binding.tvReadingValueErrorMessage.visibility = View.GONE
                     }
                 } ?: run {
-                    if (!isAnyValuePresent) { // Only show if all values are null
-                        isValid = false
-                        binding.tvReadingValueErrorMessage.visibility = View.VISIBLE
-                        binding.tvReadingValueErrorMessage.text =
-                            getString(R.string.default_user_input_error)
-                    } else {
-                        binding.tvReadingValueErrorMessage.visibility = View.GONE
-                    }
+                    isValid = false
+                    binding.tvReadingValueErrorMessage.visibility = View.VISIBLE
+                    binding.tvReadingValueErrorMessage.text =
+                        getString(R.string.default_user_input_error)
                 }
 
                 if (glucoseDate == null) {
@@ -422,7 +518,7 @@ class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
                 }
             }
 
-// Glucose Value Validation
+            // Glucose Value Validation
             if (glucoseValue != null) {
                 if (glucoseType.isNullOrEmpty()) {
                     isValid = false
@@ -442,13 +538,13 @@ class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
                 }
             }
 
-// HBA1c Validation
+            // HBA1c Validation
             hba1c?.let {
-                if (it > 50 || it < 1) {
+                if (it !in HB1AC_MIN_VALUE..HB1AC_MAX_VALUE) {
                     isValid = false
                     binding.tvHBA1cReadingValueErrorMessage.visibility = View.VISIBLE
                     binding.tvHBA1cReadingValueErrorMessage.text =
-                        getString(R.string.general_min_max_validation, "1", "50")
+                        getString(R.string.general_min_max_validation, HB1AC_MIN_VALUE.toString(), HB1AC_MAX_VALUE.toString())
                 } else {
                     binding.tvHBA1cReadingValueErrorMessage.visibility = View.GONE
                 }
@@ -463,13 +559,13 @@ class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
                 }
             }
 
-// OGTT Validation
+            // OGTT Validation
             ogtt?.let {
-                if (it > 33.0 || it < 0.6) {
+                if (it !in OGTT_MIN_VALUE..OGTT_MAX_VALUE) {
                     isValid = false
                     binding.tvOgttReadingValueErrorMessage.visibility = View.VISIBLE
                     binding.tvOgttReadingValueErrorMessage.text =
-                        getString(R.string.general_min_max_validation, "0.6", "33.0")
+                        getString(R.string.general_min_max_validation, OGTT_MIN_VALUE.toString(), OGTT_MAX_VALUE.toString())
                 } else {
                     binding.tvOgttReadingValueErrorMessage.visibility = View.GONE
                 }
@@ -564,7 +660,7 @@ class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
     }
 
     private val selectionCallBack: (selectedID: Any?, elementId: String, serverViewModel: FormLayout, name: String?) -> Unit =
-        { selectedID, _, serverViewModel, _ ->
+        { selectedID, _, _, _ ->
             val currentSelection = nurseViewModel.glucoseType[DefinedParams.INVESTIGATION_TYPE]
             if (currentSelection == selectedID) {
                 nurseViewModel.glucoseType.remove(DefinedParams.INVESTIGATION_TYPE)
@@ -573,6 +669,7 @@ class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
                 nurseViewModel.glucoseType[DefinedParams.INVESTIGATION_TYPE] = selectedID as String
                 nurseViewModel.glucoseLog?.glucoseType = selectedID
             }
+            validateBloodGlucoseValueOnTextChange()
         }
 
     private fun loadAddListEdit() {
@@ -587,7 +684,7 @@ class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
                     value.ogtt,
                     context,
                 )
-                if (!formattedString.isNullOrEmpty()) {
+                if (formattedString.isNotEmpty()) {
                     medicationEditBinding.etFbsValue.text = formattedString
                     medicationEditBinding.ivDate.text = binding.etInvestigationDate.text
                     binding.llAddNewReadingList.addView(medicationEditBinding.root)
