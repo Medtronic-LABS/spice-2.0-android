@@ -153,6 +153,7 @@ object AssessmentUtil {
             RMNCH.ANC.lowercase() -> context.getString(R.string.anc)
             RMNCH.PNC_MOTHER_MENU.lowercase() -> context.getString(R.string.pnc)
             RMNCH.CHILD_MENU.lowercase() -> context.getString(R.string.child_health)
+            MenuConstants.MENU_REGISTRATION.lowercase() -> context.getString(R.string.enrollment)
             else -> service.uppercase(Locale.ENGLISH)
         }
 

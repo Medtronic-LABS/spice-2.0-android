@@ -14,6 +14,7 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
 import org.medtroniclabs.uhis.ui.assessment.FamilyPlanning
 import org.medtroniclabs.uhis.ui.assessment.PregnancyOutcome
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
+import org.medtroniclabs.uhis.ui.assessment.utils.EnrollmentObservationFormatter
 import org.medtroniclabs.uhis.ui.household.adapter.MemberAssessmentHistoryAdapterUtil.shouldShowNextFollowUpDate
 import org.medtroniclabs.uhis.ui.household.adapter.MemberAssessmentHistoryAdapterUtil.shouldShowReferralStatus
 
@@ -77,44 +78,46 @@ object MemberAssessmentHistoryAdapterUtil {
                 DateUtils.formatDateToDisplayFormat(visitDateMillis) ?: "",
             ),
         )
-        val currentStatus = if (service.equals(MenuConstants.FP_MENU_ID, true)) {
-            resolveArrayValue(
-                context,
-                FamilyPlanning.FamilyPlanningMethods,
-                R.array.family_planning_methods,
-                observations?.familyPlanningMethods,
-            )
-        } else if (service.equals(MenuConstants.PREGNANCY_OUTCOME, true)) {
-            resolveArrayValue(
-                context,
-                PregnancyOutcome.ModeOfDelivery,
-                R.array.mode_of_delivery,
-                observations?.modeOfDelivery,
-            )
-        } else {
-            AssessmentUtil.formatServiceHistoryCurrentStatus(
-                history.customStatus,
-                context,
-                history.serviceProvided,
-                history.referralStatus,
+        if (!isEnrollmentService(service)) {
+            val currentStatus = if (service.equals(MenuConstants.FP_MENU_ID, true)) {
+                resolveArrayValue(
+                    context,
+                    FamilyPlanning.FamilyPlanningMethods,
+                    R.array.family_planning_methods,
+                    observations?.familyPlanningMethods,
+                )
+            } else if (service.equals(MenuConstants.PREGNANCY_OUTCOME, true)) {
+                resolveArrayValue(
+                    context,
+                    PregnancyOutcome.ModeOfDelivery,
+                    R.array.mode_of_delivery,
+                    observations?.modeOfDelivery,
+                )
+            } else {
+                AssessmentUtil.formatServiceHistoryCurrentStatus(
+                    history.customStatus,
+                    context,
+                    history.serviceProvided,
+                    history.referralStatus,
+                )
+            }
+            val statusColor = if (
+                currentStatus?.contains(context.getString(R.string.high_risk_pw), true) == true ||
+                currentStatus?.contains(context.getString(R.string.high_risk_pnc), true) == true
+            ) {
+                Color.RED
+            } else {
+                null
+            }
+            val statusLabel = getStatusLabel(context, history)
+            summaryItems.add(
+                SummaryItem(
+                    statusLabel,
+                    CommonUtils.getStringElse(currentStatus, context.getString(R.string.separator_double_hyphen)),
+                    valueColor = statusColor,
+                ),
             )
         }
-        val statusColor = if (
-            currentStatus?.contains(context.getString(R.string.high_risk_pw), true) == true ||
-            currentStatus?.contains(context.getString(R.string.high_risk_pnc), true) == true
-        ) {
-            Color.RED
-        } else {
-            null
-        }
-        val statusLabel = getStatusLabel(context, history)
-        summaryItems.add(
-            SummaryItem(
-                statusLabel,
-                CommonUtils.getStringElse(currentStatus, context.getString(R.string.separator_double_hyphen)),
-                valueColor = statusColor,
-            ),
-        )
         when (service) {
             MenuConstants.PREGNANT_WOMEN_PROFILE.lowercase() -> {
                 summaryItems.add(
@@ -207,6 +210,25 @@ object MemberAssessmentHistoryAdapterUtil {
                     ),
                 )
             }
+
+            MenuConstants.MENU_REGISTRATION.lowercase() -> {
+                EnrollmentObservationFormatter.formatDiagnosisFromObservations(observations)?.let { diagnosis ->
+                    summaryItems.add(
+                        SummaryItem(
+                            context.getString(R.string.diagnoses),
+                            diagnosis,
+                        ),
+                    )
+                }
+                EnrollmentObservationFormatter.formatHealthHistoryFromObservations(observations)?.let { healthHistory ->
+                    summaryItems.add(
+                        SummaryItem(
+                            context.getString(R.string.health_history),
+                            healthHistory,
+                        ),
+                    )
+                }
+            }
         }
         if (shouldShowReferralStatus(service)) {
             val referralStatus = AssessmentUtil.getReferralStatus(
@@ -275,6 +297,7 @@ object MemberAssessmentHistoryAdapterUtil {
             MenuConstants.PREGNANT_WOMEN_PROFILE.lowercase(),
             MenuConstants.PREGNANCY_OUTCOME.lowercase(),
             MenuConstants.FP_MENU_ID.lowercase(),
+            MenuConstants.MENU_REGISTRATION.lowercase(),
             -> false
 
             else -> true
@@ -291,10 +314,13 @@ object MemberAssessmentHistoryAdapterUtil {
             MenuConstants.PREGNANT_WOMEN_PROFILE.lowercase(),
             MenuConstants.PREGNANCY_OUTCOME.lowercase(),
             MenuConstants.FP_MENU_ID.lowercase(),
+            MenuConstants.MENU_REGISTRATION.lowercase(),
             -> false
 
             else -> true
         }
+
+    private fun isEnrollmentService(service: String): Boolean = service.equals(MenuConstants.MENU_REGISTRATION, ignoreCase = true)
 
     /**
      * Returns the ANC or PNC visit number from [observations], or an empty string.

@@ -29,6 +29,7 @@ import org.medtroniclabs.uhis.db.entity.PregnancyDetail
 import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.rmnch.PregnancyCohortRules
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
+import org.medtroniclabs.uhis.ui.assessment.utils.EnrollmentObservationFormatter
 import org.medtroniclabs.uhis.ui.externalmember.ExternalMemberRegistrationActivity
 import org.medtroniclabs.uhis.ui.externalmember.ExternalMemberRegistrationFragment
 import org.medtroniclabs.uhis.ui.household.HouseholdActivity
@@ -113,6 +114,9 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
             addSummaryView(getString(R.string.mobile_number), memberDetails.member.phoneNumber ?: getString(R.string.separator_double_hyphen))
             addSummaryView(getString(R.string.last_visit_date), lastActivity)
             addSummaryView(getString(R.string.services_provided), servicesProvided)
+            if (shouldShowNcdBioData()) {
+                addNcdBioDataFromEnrollment(memberDetails.history)
+            }
             if (memberDetails.member.isActive) {
                 binding.tvEdit.visible()
             } else {
@@ -287,6 +291,21 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
             return true
         }
         return false
+    }
+
+    private fun shouldShowNcdBioData(): Boolean = CommonUtils.isSk() || CommonUtils.isFoOrPo() || CommonUtils.isCHCP()
+
+    private fun addNcdBioDataFromEnrollment(history: List<MemberAssessmentHistoryEntity>) {
+        val enrollmentHistory = history.firstOrNull {
+            MenuConstants.MENU_REGISTRATION.equals(it.serviceProvided.orEmpty(), ignoreCase = true)
+        } ?: return
+        val observations = enrollmentHistory.observations ?: return
+        EnrollmentObservationFormatter.formatDiagnosisFromObservations(observations)?.let { diagnosis ->
+            addSummaryView(getString(R.string.diagnoses), diagnosis)
+        }
+        EnrollmentObservationFormatter.formatHealthHistoryFromObservations(observations)?.let { healthHistory ->
+            addSummaryView(getString(R.string.health_history), healthHistory)
+        }
     }
 
     private fun addSummaryView(

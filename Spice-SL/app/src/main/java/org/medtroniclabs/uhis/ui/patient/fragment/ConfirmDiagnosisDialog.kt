@@ -31,6 +31,7 @@ import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
 import org.medtroniclabs.uhis.ui.TagListCustomView
+import org.medtroniclabs.uhis.ui.assessment.utils.EnrollmentObservationFormatter
 import org.medtroniclabs.uhis.ui.patient.util.CommonDialogInterface
 import org.medtroniclabs.uhis.ui.patient.viewmodel.MedicalReviewBaseViewModel
 import org.medtroniclabs.uhis.ui.patient.viewmodel.NurseMedicalReviewViewModel
@@ -209,7 +210,14 @@ class ConfirmDiagnosisDialog(val commonDialogInterface: CommonDialogInterface? =
             }
 
             val selectedChips = chipItems.filter { chip ->
-                selectedDiagnosis.any { isDiagnosisSelected(it, chip) }
+                selectedDiagnosis.any { selected ->
+                    EnrollmentObservationFormatter.matchesDiagnosisChip(
+                        token = selected,
+                        chipValue = chip.value,
+                        chipName = chip.name,
+                        diagnosisLookup = list,
+                    )
+                }
             }
 
             tagListCustomView.addChipItemList(chipItems, selectedChips, diagnosisMap)
@@ -383,23 +391,5 @@ class ConfirmDiagnosisDialog(val commonDialogInterface: CommonDialogInterface? =
             medicalReviewBaseViewModel.getConfirmDiagnosisList(genderList, list)
             binding.etCommentDiagnosis.setText(it.diagnosisComments ?: "")
         }
-    }
-
-    /**
-     * Matches patientDetails diagnosis strings to local chip master data.
-     * Backend may return SNOMED display text (with qualifiers like "(disorder)")
-     * while chips use local names/values.
-     */
-    private fun isDiagnosisSelected(
-        selected: String,
-        chip: ChipViewItemModel,
-    ): Boolean {
-        val selectedNorm = selected.trim()
-        if (selectedNorm.equals(chip.name, ignoreCase = true)) return true
-        if (!chip.value.isNullOrBlank() && selectedNorm.equals(chip.value, ignoreCase = true)) return true
-        val selectedWithoutQualifier = selectedNorm
-            .replace(Regex("\\s*\\([^)]*\\)\\s*$"), "")
-            .trim()
-        return selectedWithoutQualifier.equals(chip.name, ignoreCase = true)
     }
 }

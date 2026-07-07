@@ -25,4 +25,9 @@ data class MemberAssessmentObservations(
     val abortion: String? = null,
     val newbornDeathNumbers: String? = null,
     val pregnancyEpisodeId: String? = null,
+    val heartAttack: String? = null,
+    val stroke: String? = null,
+    val kidneyDisease: String? = null,
+    val copd: String? = null,
+    val confirmDiagnosis: String? = null,
 )

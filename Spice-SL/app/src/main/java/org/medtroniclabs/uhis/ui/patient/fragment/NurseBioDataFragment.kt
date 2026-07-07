@@ -29,6 +29,7 @@ import org.medtroniclabs.uhis.ncd.medicalreview.NCDMRUtil
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseFragment
 import org.medtroniclabs.uhis.ui.MenuConstants
+import org.medtroniclabs.uhis.ui.assessment.utils.EnrollmentObservationFormatter
 import org.medtroniclabs.uhis.ui.patient.util.CommonDialogInterface
 import org.medtroniclabs.uhis.ui.patient.viewmodel.MedicalReviewBaseViewModel
 import org.medtroniclabs.uhis.ui.patient.viewmodel.NurseBioDataViewModel
@@ -336,10 +337,8 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun confirmedDiagnosis(confirmDiagnosis: ArrayList<String>?) {
-        var savedDiagnosis: String
-        confirmDiagnosis.let {
-            savedDiagnosis = it?.joinToString(", ") ?: getString(R.string.hyphen_symbol)
-        }
+        val savedDiagnosis = EnrollmentObservationFormatter.formatDiagnosisList(confirmDiagnosis)
+            ?: getString(R.string.hyphen_symbol)
         if (nurseBioDataViewModel.isSummary) {
             binding.tvDiagnosesText.text = savedDiagnosis
         } else {

@@ -92,6 +92,15 @@ class PatientsDataSource(
 
     private fun medicineDispenseForSearch(): Boolean? = if (isDispenseOrigin()) true else null
 
+    private fun FilterModel?.withoutDefaultPcFilterOnly(): FilterModel? {
+        if (this == null) return null
+        return if (copy(isDefaultPcFilter = false) == FilterModel(isDefaultPcFilter = false)) {
+            null
+        } else {
+            this
+        }
+    }
+
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PatientListResModel> {
         val pageIndex = params.key ?: PAGE_INDEX
         return try {
@@ -168,7 +177,9 @@ class PatientsDataSource(
                         patientFilter = if (clearsPatientStatusFromFilter()) {
                             null
                         } else {
-                            request.patientFilter?.copy(patientStatus = null)
+                            request.patientFilter
+                                ?.copy(patientStatus = null)
+                                .withoutDefaultPcFilterOnly()
                         },
                     )
 
