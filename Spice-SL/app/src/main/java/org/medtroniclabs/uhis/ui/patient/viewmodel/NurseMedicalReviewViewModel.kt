@@ -167,6 +167,9 @@ class NurseMedicalReviewViewModel @Inject constructor(
             viewModelScope.launch(dispatcherIO) {
                 nurseCreateResponse.postLoading()
                 try {
+                    // Confirm diagnosis is persisted separately via the confirm-diagnosis
+                    // endpoint, so it is sent as null here for the backend to skip it.
+                    nurseMrRequestModel.confirmDiagnosis = null
                     val response = medicalReviewRepo.createNurseMedicalReview(nurseMrRequestModel)
 
                     if (response.isSuccessful) {
