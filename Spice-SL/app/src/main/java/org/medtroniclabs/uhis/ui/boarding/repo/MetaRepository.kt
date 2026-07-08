@@ -75,6 +75,7 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FamilyPlanningMethods
 import org.medtroniclabs.uhis.ui.assessment.rmnch.PregnancyCohortRules
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
+import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 import org.medtroniclabs.uhis.ui.boarding.ResourceLoadingSyncProgress
 import org.medtroniclabs.uhis.ui.medicalreview.motherneonate.anc.MotherNeonateUtil
 import org.medtroniclabs.uhis.ui.medicalreview.utils.MedicalReviewTypeEnums
@@ -1150,7 +1151,7 @@ class MetaRepository @Inject constructor(
     ): Pair<Boolean, String?> {
         getANCPNCStatus(pregnancyDetail)?.let { workflow ->
             if (workflow == RMNCH.ANC) {
-                return checkIfLastServiceProvidedIsAfter(selectedHouseholdMemberID, MenuConstants.ANC, 15) to workflow
+                return isAncMenuDisabledByLastVisit(selectedHouseholdMemberID) to workflow
             } else if (workflow == RMNCH.PNC) {
                 return checkIfLastServiceProvidedIsAfter(selectedHouseholdMemberID, MenuConstants.PNC_MOTHER) to workflow
             }
@@ -1302,6 +1303,12 @@ class MetaRepository @Inject constructor(
     ): Boolean {
         val serviceHistory = getLastServiceHistory(memberLocalId, serviceTypeFor.lowercase(Locale.ENGLISH)) ?: return false
         return DateUtils.isIsoOffsetDateTimeOnLocalCalendarAfter(serviceHistory.visitDate, thresholdDays)
+    }
+
+    private suspend fun isAncMenuDisabledByLastVisit(memberLocalId: Long): Boolean {
+        val lastAncHistory = getLastServiceHistory(memberLocalId, MenuConstants.ANC) ?: return false
+        val ancVisitDays = AssessmentUtil.getAncMenuRevisitDays(lastAncHistory.customStatus)
+        return DateUtils.isIsoOffsetDateTimeOnLocalCalendarAfter(lastAncHistory.visitDate, ancVisitDays)
     }
 
     suspend fun getLastServiceHistory(

@@ -499,6 +499,17 @@ object AssessmentUtil {
     }
 
     /**
+     * Returns ANC menu revisit cooldown based on persisted summary status from the last ANC visit.
+     * Reuses HIGH_RISK_PW customStatus set by AssessmentStatusGenerator (same rule as summary UI).
+     */
+    fun getAncMenuRevisitDays(customStatus: ArrayList<String>?): Long =
+        if (customStatus?.contains(AssessmentStatus.HIGH_RISK_PW.name) == true) {
+            AssessmentDefinedParams.ANC_MENU_REVISIT_DAYS_HIGH_RISK
+        } else {
+            AssessmentDefinedParams.ANC_MENU_REVISIT_DAYS_NORMAL
+        }
+
+    /**
      * Returns services icon for the given service
      */
     fun mapServiceToServiceIcon(service: MemberAssessmentHistoryEntity): Int =

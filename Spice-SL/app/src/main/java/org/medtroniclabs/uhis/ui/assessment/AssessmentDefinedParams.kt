@@ -380,6 +380,8 @@ object AssessmentDefinedParams {
     const val FACILITY_IDENTIFIED_FOR_DELIVERY = "facilityIdentifiedForDelivery"
 
     const val ANC_VISIT_DATE = "ancVisitDate"
+    const val ANC_MENU_REVISIT_DAYS_NORMAL = 15L
+    const val ANC_MENU_REVISIT_DAYS_HIGH_RISK = 1L
 
     const val LABEL_HIGH_RISK_PREGNANT_WOMAN = "High risk pregnant woman"
 
