@@ -38,6 +38,7 @@ import org.medtroniclabs.uhis.formgeneration.config.ViewType
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.formgeneration.listener.FormEventListener
 import org.medtroniclabs.uhis.formgeneration.model.FormLayout
+import org.medtroniclabs.uhis.formgeneration.ui.FormResultComposer
 import org.medtroniclabs.uhis.formgeneration.utility.CheckBoxDialog
 import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
 import org.medtroniclabs.uhis.mappingkey.MemberRegistration
@@ -64,6 +65,9 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
     private val patientViewModel: PatientDetailViewModel by activityViewModels()
     private val ncdFormViewModel: NCDFormViewModel by activityViewModels()
     private lateinit var formGenerator: FormGenerator
+
+    private var isFormResolved = false
+    private var isPatientResolved = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -111,6 +115,10 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
     }
 
     private fun attachObserver() {
+        // Keep the loader on screen from entry until BOTH the form layout and the patient details
+        // have resolved. The two fetches share one loader, so hiding it as soon as the faster one
+        // finishes would flash an empty/half-built form; gate the hide behind both completing.
+        showProgress()
         ncdFormViewModel.ncdFormResponse.observe(viewLifecycleOwner) { resourceState ->
             when (resourceState.state) {
                 ResourceState.LOADING -> {
@@ -118,11 +126,11 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
                 }
 
                 ResourceState.ERROR -> {
-                    hideProgress()
+                    isFormResolved = true
+                    hideLoaderWhenReady()
                 }
 
                 ResourceState.SUCCESS -> {
-                    hideProgress()
                     resourceState.data?.let { list ->
                         val data =
                             list.filter { it.viewType != ViewType.VIEW_TYPE_FORM_CARD_FAMILY && it.isEditable }
@@ -133,6 +141,8 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
                             prefillPatientFields(patient)
                         }
                     }
+                    isFormResolved = true
+                    hideLoaderWhenReady()
                 }
             }
         }
@@ -144,12 +154,14 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
                 }
 
                 ResourceState.ERROR -> {
-                    hideProgress()
+                    isPatientResolved = true
+                    hideLoaderWhenReady()
                 }
 
                 ResourceState.SUCCESS -> {
-                    hideProgress()
                     resourceState.data?.let { prefillPatientFields(it) }
+                    isPatientResolved = true
+                    hideLoaderWhenReady()
                 }
             }
         }
@@ -174,6 +186,13 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
                     showSuccessDialog()
                 }
             }
+        }
+    }
+
+    /** Hides the shared entry loader only once the form layout and patient details have both resolved. */
+    private fun hideLoaderWhenReady() {
+        if (isFormResolved && isPatientResolved) {
+            hideProgress()
         }
     }
 
@@ -362,7 +381,11 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
                 resultMap,
                 FormDefinedParams.PHONE_NUMBER_CATEGORY,
             )
-            map[DefinedParams.BioData] = resultMap as HashMap<String, Any>
+            // The form emits a flat result map, but the backend EnrollmentRequestDTO expects the
+            // answers grouped by their `family` into top-level siblings (bioData, bioMetrics,
+            // patientHealthHistory, ...). Reuse the same grouping the enrollment flow applies so
+            // every family is nested correctly instead of being flattened into bioData.
+            map.putAll(groupResultByFamily(resultMap, serverData))
         }
         map[DefinedParams.HealthFacilityFhirId] = SecuredPreference.getOrganizationFhirId()
         // memberReference = member FHIR id (data.id), patientReference = patient FHIR id
@@ -587,6 +610,43 @@ class NCDPatientEditFragment : BaseFragment(), FormEventListener, View.OnClickLi
     }
 
     private fun numberToInput(value: Double?): String? = value?.let { if (it % 1.0 == 0.0) it.toLong().toString() else it.toString() }
+
+    /**
+     * Groups the flat form [resultMap] into top-level family buckets (bioData, bioMetrics,
+     * patientHealthHistory, ...) using the same [FormResultComposer] the enrollment flow relies on,
+     * so the update payload matches the backend EnrollmentRequestDTO. Falls back to the raw map
+     * under [DefinedParams.BioData] when the form layout is unavailable.
+     */
+    private fun groupResultByFamily(
+        resultMap: HashMap<String, Any>,
+        serverData: List<FormLayout>?,
+    ): HashMap<String, Any> {
+        // groupValues() consumes (removes) entries from the map it receives, so work on a copy to
+        // avoid clearing the FormGenerator's live values (which would make every field re-validate
+        // as empty on submit).
+        val mapCopy = HashMap<String, Any>(resultMap)
+        // The form stores Yes/No single-selects as strings, but the backend expects Booleans (same
+        // as the enrollment flow). Convert before grouping so the value lands in its family bucket
+        // already typed as a Boolean.
+        changeToBoolean(mapCopy, FormDefinedParams.IS_REGULAR_SMOKER)
+        return serverData?.let {
+            FormResultComposer().groupValues(serverData = it, resultMap = mapCopy).second
+        } ?: hashMapOf(DefinedParams.BioData to mapCopy)
+    }
+
+    /** Rewrites a Yes/No single-select answer stored as a string into the Boolean the backend expects. */
+    private fun changeToBoolean(
+        map: HashMap<String, Any>,
+        key: String,
+    ) {
+        map[key]?.let { value ->
+            map[key] = when (value) {
+                is Boolean -> value
+                is String -> value.equals(DefinedParams.YES, ignoreCase = true)
+                else -> false
+            }
+        }
+    }
 
     companion object {
         const val TAG = "NCDPatientEditFragment"
