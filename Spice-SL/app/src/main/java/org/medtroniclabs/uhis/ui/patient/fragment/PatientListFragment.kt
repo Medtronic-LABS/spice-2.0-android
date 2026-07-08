@@ -552,7 +552,9 @@ class PatientListFragment : BaseFragment(), PatientSelectionListener, CallRegist
         item.id?.let { patientRef ->
             item.memberReference?.let { memberRef ->
                 item.patientId?.let { patientId ->
-                    fragmentVm.createPatientVisit(requireContext(), patientRef, memberRef, patientId)
+                    item.patientReference?.let { patientReference ->
+                        fragmentVm.createPatientVisit(requireContext(), patientRef, memberRef, patientId, patientReference)
+                    }
                 }
             }
         }

@@ -14,6 +14,7 @@ data class PatientListResModel(
     val birthDate: String? = null,
     val patientId: String? = null,
     val memberReference: String? = null,
+    val patientReference: String? = null,
     val initialReview: Boolean,
     val redRiskPatient: Boolean? = null,
     val screeningLogId: Long? = null,

@@ -428,13 +428,14 @@ class PatientListViewModel @Inject constructor(
         patientRef: Long,
         memberRef: String,
         patientId: String,
+        patientReference: String,
     ) {
         if (connectivityManager.isNetworkAvailable()) {
             patientVisitResponse.postLoading()
             viewModelScope.launch(dispatcherIO) {
                 try {
                     val request = PatientVisitRequest(
-                        patientReference = patientRef.toString(),
+                        patientReference = patientReference,
                         memberReference = memberRef,
                         provenance = ProvanceDto(),
                     )
