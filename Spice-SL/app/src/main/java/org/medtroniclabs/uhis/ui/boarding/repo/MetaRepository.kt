@@ -79,7 +79,6 @@ import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 import org.medtroniclabs.uhis.ui.boarding.ResourceLoadingSyncProgress
 import org.medtroniclabs.uhis.ui.medicalreview.motherneonate.anc.MotherNeonateUtil
 import org.medtroniclabs.uhis.ui.medicalreview.utils.MedicalReviewTypeEnums
-import org.medtroniclabs.uhis.ui.patient.UIConstants.ENROLLMENT_UNIQUE_ID
 import org.medtroniclabs.uhis.ui.patient.UIConstants.SCREENING_UNIQUE_ID
 import java.lang.reflect.Type
 import java.util.Locale
@@ -285,16 +284,6 @@ class MetaRepository @Inject constructor(
                                         } ?: run {
                                             return@with Resource(state = ResourceState.ERROR)
                                         }
-
-                                        enrollment?.let {
-                                            roomHelper.insertConsentForm(
-                                                ConsentForm(
-                                                    type = ENROLLMENT_UNIQUE_ID,
-                                                    content = it.consentForm,
-                                                ),
-                                            )
-                                        }
-
                                         screening?.let {
                                             roomHelper.insertConsentForm(
                                                 ConsentForm(
@@ -642,19 +631,19 @@ class MetaRepository @Inject constructor(
                 )
             }
 
-            forms.EPI?.let {
+            forms.enrollment?.let {
                 roomHelper.insertConsentForm(
                     ConsentForm(
-                        type = ConsentFormType.EPI,
+                        type = ConsentFormType.enrollment,
                         content = it,
                     ),
                 )
             }
 
-            forms.HIV?.let {
+            forms.enrollmentCulture?.let {
                 roomHelper.insertConsentForm(
                     ConsentForm(
-                        type = ConsentFormType.HIV,
+                        type = ConsentFormType.enrollmentCulture,
                         content = it,
                     ),
                 )

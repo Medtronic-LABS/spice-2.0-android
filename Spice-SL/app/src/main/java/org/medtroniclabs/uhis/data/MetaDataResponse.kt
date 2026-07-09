@@ -254,7 +254,7 @@ data class LastCreatedAtAndPatientId(
     val lastPatientId: String?,
 )
 
-data class ConsentFormResponse(val household: String?, val householdCulture: String?, val EPI: String?, val HIV: String?)
+data class ConsentFormResponse(val household: String?, val householdCulture: String?, val enrollmentCulture: String?, val enrollment: String?)
 
 data class RiskFactorResponse(
     @SerializedName("non_lab")

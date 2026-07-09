@@ -14,21 +14,18 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
-import androidx.core.widget.addTextChangedListener
 import dagger.hilt.android.AndroidEntryPoint
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.hideKeyboard
 import org.medtroniclabs.uhis.common.ViewUtils.statusCheck
 import org.medtroniclabs.uhis.databinding.ActivityTermsAndConditionBinding
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
-import org.medtroniclabs.uhis.formgeneration.extension.markMandatory
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
 import org.medtroniclabs.uhis.ui.landing.LandingActivity
 import org.medtroniclabs.uhis.ui.patient.viewmodel.TermsAndConditionViewModel
 import kotlin.getValue
-import kotlin.text.trim
 
 @AndroidEntryPoint
 class TermsAndConditionActivity : BaseActivity(), View.OnClickListener {
@@ -55,13 +52,6 @@ class TermsAndConditionActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun attachObserver() {
-        binding.etUserInitial.addTextChangedListener { patientInitial ->
-            if (patientInitial.isNullOrBlank()) {
-                viewModel.patientInitial.value = null
-            } else {
-                viewModel.patientInitial.value = patientInitial.trim().toString()
-            }
-        }
         viewModel.consentDoneLiveDate.observe(this) { resourceState ->
             when (resourceState.state) {
                 ResourceState.LOADING -> {
@@ -76,12 +66,6 @@ class TermsAndConditionActivity : BaseActivity(), View.OnClickListener {
                 ResourceState.ERROR -> {
                     hideLoading()
                 }
-            }
-        }
-
-        viewModel.patientInitial.observe(this) { initial ->
-            if (viewModel.enrollmentConsent) {
-                binding.btnAccept.isEnabled = !initial.isNullOrBlank()
             }
         }
     }
@@ -103,18 +87,12 @@ class TermsAndConditionActivity : BaseActivity(), View.OnClickListener {
             intent.getBooleanExtra(IntentConstants.IS_FROM_SUMMARY_PAGE, false)
         viewModel.isFromDirectEnrollment =
             intent.getBooleanExtra(IntentConstants.IS_FROM_DIRECT_ENROLLMENT, false)
-        binding.tvTitle.markMandatory()
 
+        binding.btnAccept.isEnabled = true
         if (viewModel.enrollmentConsent) {
-            binding.tvTitle.visibility = View.VISIBLE
-            binding.btnAccept.isEnabled = false
-            binding.etUserInitial.visibility = View.VISIBLE
             binding.tvTermsAndConditionInfo.text =
                 getString(R.string.terms_condition_info_enrollment)
         } else {
-            binding.tvTitle.visibility = View.GONE
-            binding.btnAccept.isEnabled = true
-            binding.etUserInitial.visibility = View.GONE
             binding.tvTermsAndConditionInfo.text =
                 getString(R.string.terms_condition_info_screening)
         }
@@ -201,10 +179,6 @@ class TermsAndConditionActivity : BaseActivity(), View.OnClickListener {
                             putExtra(
                                 DefinedParams.PATIENT_ID,
                                 intent.getLongExtra(DefinedParams.PATIENT_ID, -1L),
-                            )
-                            putExtra(
-                                IntentConstants.INTENT_PATIENT_INITIAL,
-                                binding.etUserInitial.text?.toString(),
                             )
                             putExtra(
                                 IntentConstants.IS_FROM_DIRECT_ENROLLMENT,

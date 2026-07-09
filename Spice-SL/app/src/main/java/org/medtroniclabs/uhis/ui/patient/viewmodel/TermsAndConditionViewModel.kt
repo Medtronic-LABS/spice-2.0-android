@@ -10,6 +10,8 @@ import org.medtroniclabs.uhis.appextensions.postError
 import org.medtroniclabs.uhis.appextensions.postLoading
 import org.medtroniclabs.uhis.appextensions.postSuccess
 import org.medtroniclabs.uhis.common.CommonUtils
+import org.medtroniclabs.uhis.common.ConsentFormType
+import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.di.IoDispatcher
 import org.medtroniclabs.uhis.network.resource.Resource
@@ -28,7 +30,6 @@ class TermsAndConditionViewModel @Inject constructor(
         var isFromSummaryPage = false
         var isFromDirectEnrollment = false
         var consentDoneLiveDate = MutableLiveData<Resource<String>>()
-        var patientInitial = MutableLiveData<String?>()
         var isEyeFromScreening = false
         var isCataractScreening = false
 
@@ -38,7 +39,13 @@ class TermsAndConditionViewModel @Inject constructor(
                     consentDoneLiveDate.postLoading()
                     val response: String? = SecuredPreference.getUserId().let { userId ->
                         val uniqueID = when {
-                            enrollmentConsent -> UIConstants.ENROLLMENT_UNIQUE_ID
+                            enrollmentConsent -> {
+                                if (CommonUtils.parseUserLocale() == DefinedParams.EN) {
+                                    ConsentFormType.enrollment
+                                } else {
+                                    ConsentFormType.enrollmentCulture
+                                }
+                            }
                             isEyeFromScreening -> UIConstants.EYE_CARE_SCREENING_UNIQUE_ID
                             isCataractScreening -> UIConstants.CATARACT
                             else -> UIConstants.SCREENING_UNIQUE_ID
