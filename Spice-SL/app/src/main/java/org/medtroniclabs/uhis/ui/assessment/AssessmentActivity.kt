@@ -246,14 +246,7 @@ class AssessmentActivity : BaseActivity() {
             finish()
         } else {
             setupAnalytic(AnalyticsDefinedParams.BackButtonClicked)
-            when (supportFragmentManager.findFragmentById(R.id.fragmentContainer)) {
-                is AssessmentICCMSummaryFragment,
-                is AssessmentRMNCHSummaryFragment,
-                is AssessmentOtherSymptomSummaryFragment,
-                -> {
-                    finishSuccessFlow()
-                }
-
+            when (supportFragmentManager.findFragmentById(R.id.formsFragmentContainer)) {
                 is AssessmentNCDSummaryFragment -> {
                     val intent = Intent(this, LandingActivity::class.java)
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -262,7 +255,11 @@ class AssessmentActivity : BaseActivity() {
                 }
 
                 else -> {
-                    this@AssessmentActivity.finish()
+                    if (isFromSummary) {
+                        finishSuccessFlow()
+                    } else {
+                        finish()
+                    }
                 }
             }
         }

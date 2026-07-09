@@ -108,6 +108,7 @@ class OfflineSyncViewModel @Inject constructor(
     }
 
     fun startUploadingData(minutes: Long = 3) {
+        if (isPostOfflineSyncAlreadyRunning()) return
         viewModelScope.launch(dispatcherIO) {
             startProgress(minutes)
             val requestIds = offlineSyncRepository.postOfflineUnSyncedChangesWithMutex(OfflineConstant.SYNC_MODE_MANUAL)
@@ -148,4 +149,6 @@ class OfflineSyncViewModel @Inject constructor(
         progressJob?.cancel()
         statusLiveData.postValue(Pair(isSuccess, message))
     }
+
+    fun isPostOfflineSyncAlreadyRunning() = offlineSyncRepository.isPostOfflineSyncAlreadyRunning()
 }

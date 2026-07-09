@@ -30,7 +30,6 @@ class OfflineSyncActivity : BaseActivity() {
     private lateinit var binding: FragmentOfflineSyncBinding
     private lateinit var unSyncedCountAdapter: OfflineSyncEntitiesAdapter
     private val getStatusStartTimer = 30L // Seconds
-    private var isBackgroundSyncRunning: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,15 +40,7 @@ class OfflineSyncActivity : BaseActivity() {
 
         setListener()
         initObserver()
-        checkBGSyncStatus()
         viewModel.setUserJourney(getString(R.string.offline_sync))
-    }
-
-    private fun checkBGSyncStatus() {
-        val workManager = WorkManager.getInstance(this)
-        workManager.getWorkInfosForUniqueWorkLiveData(WORKER_UNIQUE_NAME).observe(this) {
-            isBackgroundSyncRunning = !it.isNullOrEmpty() && it[0].state == WorkInfo.State.RUNNING
-        }
     }
 
     private fun setListener() {
@@ -59,14 +50,8 @@ class OfflineSyncActivity : BaseActivity() {
 
         binding.btnStart.setOnClickListener {
             viewModel.setUserJourney(AnalyticsDefinedParams.STARTBUTTONTRIGGERED)
-            if (isBackgroundSyncRunning) {
-                showErrorDialogue(
-                    getString(R.string.alert),
-                    getString(R.string.background_sync_in_progress),
-                    isNegativeButtonNeed = false,
-                ) {
-                    finish()
-                }
+            if (isManualTriggerBlocked()) {
+                showAlreadyRunningPopup()
             } else {
                 initiateUpload()
             }
@@ -92,8 +77,35 @@ class OfflineSyncActivity : BaseActivity() {
         }
     }
 
+    private fun showAlreadyRunningPopup() {
+        showErrorDialogue(
+            getString(R.string.alert),
+            getString(R.string.background_sync_in_progress),
+            isNegativeButtonNeed = false,
+        ) {
+            finish()
+        }
+    }
+
+    /**
+     * Returns true if any of the worker for Post is already running
+     */
+    private fun isSyncWorkerAlreadyRunning(): Boolean {
+        val workManager = WorkManager.getInstance(this)
+        val workInfos = workManager.getWorkInfosForUniqueWork(WORKER_UNIQUE_NAME).get()
+        return workInfos.any {
+            it.state == WorkInfo.State.RUNNING
+        }
+    }
+
+    private fun isManualTriggerBlocked() = isSyncWorkerAlreadyRunning() || viewModel.isPostOfflineSyncAlreadyRunning()
+
     private fun initiateUpload() {
         if (viewModel.connectivityManager.isNetworkAvailable()) {
+            if (isManualTriggerBlocked()) {
+                showAlreadyRunningPopup()
+                return
+            }
             showProgressView()
             viewModel.startUploadingData()
         } else {

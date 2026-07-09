@@ -1,6 +1,5 @@
 package org.medtroniclabs.uhis.repo
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.JsonElement
@@ -9,13 +8,7 @@ import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.ResponseBody
-import org.medtroniclabs.uhis.BuildConfig
-import org.medtroniclabs.uhis.appextensions.IMG_FILE_NAME_EXTENSION
-import org.medtroniclabs.uhis.appextensions.SIGNATURE_FOLDER
 import org.medtroniclabs.uhis.appextensions.convertToUtcDateTime
 import org.medtroniclabs.uhis.appextensions.postError
 import org.medtroniclabs.uhis.appextensions.postSuccess
@@ -57,7 +50,6 @@ import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineSyncStatus
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineUtils
 import org.medtroniclabs.uhis.data.resource.RequestAllEntities
 import org.medtroniclabs.uhis.db.entity.CommunityProfile
-import org.medtroniclabs.uhis.db.entity.EntitiesName
 import org.medtroniclabs.uhis.db.entity.EntitiesName.COMMUNITY_PROFILE
 import org.medtroniclabs.uhis.db.entity.FollowUpCall
 import org.medtroniclabs.uhis.db.entity.LinkHouseholdMember
@@ -92,7 +84,9 @@ import java.io.File
 import java.lang.reflect.Type
 import java.util.Locale
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class OfflineSyncRepository @Inject constructor(
     private var apiHelper: ApiHelper,
     private var roomHelper: RoomHelper,
@@ -495,9 +489,7 @@ class OfflineSyncRepository @Inject constructor(
         }
 
         // Save Treatment details
-        requestInitialDownload.treatmentDetails.let {
-            insertOrUpdateTreatmentDetails(it)
-        }
+        insertOrUpdateTreatmentDetails(requestInitialDownload.treatmentDetails)
 
         // Save Rx Buddy Register Details
         requestInitialDownload.rxBuddies?.let {
@@ -661,75 +653,6 @@ class OfflineSyncRepository @Inject constructor(
         return apiHelper.fetchMemberAssessmentHistory(request)
     }
 
-    private suspend fun getUnSyncedEntities(): Response<SyncResponse> {
-        val req = RequestGetSyncStatus(
-            userId = SecuredPreference.getUserId(),
-            dataRequired = true,
-            statuses = listOf(OfflineSyncStatus.InProgress.name, OfflineSyncStatus.Failed.name),
-            types = listOf(EntitiesName.HOUSEHOLD, EntitiesName.HOUSEHOLD_MEMBER),
-        )
-
-        return apiHelper.getOfflineSyncStatus(req)
-    }
-
-    suspend fun uploadAllSignatures(): Boolean {
-        val hhSignatureDetails = roomHelper.getHHSignatureDetails()
-
-        if (hhSignatureDetails.isEmpty()) {
-            return true
-        }
-
-        val builder = MultipartBody.Builder()
-        builder.setType(MultipartBody.FORM)
-
-        hhSignatureDetails.forEach { hhSignatureDetail ->
-            getRenamedFile(hhSignatureDetail.signatureName, hhSignatureDetail.fhirId)?.let { file ->
-                val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
-                builder.addFormDataPart("signatureFile", file.name, requestFile)
-            }
-        }
-
-        val dataRequest = Gson().toJson(ProvanceDto())
-        builder.addFormDataPart("provenance", dataRequest)
-
-        return try {
-            val response = apiHelper.uploadAllConsentSignatures(builder.build())
-            if (response.isSuccessful) {
-                deleteAllSyncedImages()
-            }
-            true
-        } catch (_: Exception) {
-            false
-        }
-    }
-
-    private fun getRenamedFile(
-        oldFileName: String,
-        newFileName: String,
-    ): File? {
-        val signatureDirPath = "/data/data/${BuildConfig.APPLICATION_ID}/files/$SIGNATURE_FOLDER"
-        val signatureDir = File(signatureDirPath)
-
-        if (signatureDir.exists()) {
-            val oldFileNameWithExtension = "$oldFileName.$IMG_FILE_NAME_EXTENSION"
-            val newFileNameWithExtension = "$newFileName.$IMG_FILE_NAME_EXTENSION"
-            val oldFile = File(signatureDir, oldFileNameWithExtension)
-            val newFile = File(signatureDir, newFileNameWithExtension)
-            if (oldFile.exists()) {
-                oldFile.renameTo(newFile)
-                return newFile
-            }
-        }
-
-        return null
-    }
-
-    private fun deleteAllSyncedImages(): Boolean {
-        val imagesDirPath = "/data/data/${BuildConfig.APPLICATION_ID}/files/$SIGNATURE_FOLDER"
-        val imagesDir = File(imagesDirPath)
-        return deleteDirectory(imagesDir)
-    }
-
     private fun deleteDirectory(directory: File): Boolean {
         if (directory.exists()) {
             directory.listFiles()?.forEach { file ->
@@ -880,7 +803,6 @@ class OfflineSyncRepository @Inject constructor(
     }
 
     private suspend fun getRxBuddiesRequest(
-        hhmIds: MutableList<String>,
         rxBuddyRegisterIds: MutableList<Long>,
         rxBuddyFollowUpIds: MutableList<Long>,
     ): List<RxBuddy> {
@@ -973,7 +895,7 @@ class OfflineSyncRepository @Inject constructor(
         val rxBuddyFollowUpIds = mutableListOf<Long>()
 
         // uploadAllSignatures()
-        val rxBuddies = getRxBuddiesRequest(householdMemberIds, rxBuddyRegisterIds, rxBuddyFollowUpIds)
+        val rxBuddies = getRxBuddiesRequest(rxBuddyRegisterIds, rxBuddyFollowUpIds)
 
         val houseHoldList = roomHelper.getAllUnSyncedHouseHolds(householdIds) // Hot Fix change - Done
         householdIds.addAll(houseHoldList.map { it.referenceId!! })
@@ -1047,7 +969,7 @@ class OfflineSyncRepository @Inject constructor(
         request[OfflineConstant.RX_BUDDIES] = rxBuddies
 
         val data = Gson().toJson(request)
-        Log.d(" post data here", data)
+        Timber.tag("post data here").d(data)
 
         try {
             val apiResponse = apiHelper.postOfflineSync(request)
@@ -1064,7 +986,7 @@ class OfflineSyncRepository @Inject constructor(
                 roomHelper.updateRxBuddyFollowUpSyncStatus(rxBuddyFollowUpIds, OfflineSyncStatus.InProgress.name)
                 return listOf(request[OfflineConstant.REQUEST_ID] as String)
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             roomHelper.changeHouseholdStatus(householdIds, OfflineSyncStatus.NetworkError.name) // Change Status to InProgress
             roomHelper.changeHouseholdMemberStatus(householdMemberIds, OfflineSyncStatus.NetworkError.name) // Change Status to InProgress
             roomHelper.changeAssessmentStatus(assessmentIds, OfflineSyncStatus.NetworkError.name) // Change status to InProgress
@@ -1121,7 +1043,7 @@ class OfflineSyncRepository @Inject constructor(
             } else {
                 return false
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             return false
         }
     }
@@ -1131,4 +1053,6 @@ class OfflineSyncRepository @Inject constructor(
             return postOfflineUnSyncedChanges(syncMode)
         }
     }
+
+    fun isPostOfflineSyncAlreadyRunning() = mutex.isLocked
 }
