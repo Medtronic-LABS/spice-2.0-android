@@ -897,6 +897,8 @@
     <string name="enter_number">সংখ্যা লিখুন</string>
     <string name="maternal_outcomes">মাতৃ ফলাফল</string>
     <string name="ncd">এনসিডি</string>
+    <string name="ncd_enrollment">এনসিডি নিবন্ধন</string>
+    <string name="ncd_follow_up">এনসিডি ফলো-আপ</string>
     <string name="pregnancy_diagnosis">আপনার কি নিচের কোনো রোগ আগে নির্ণয় করা হয়েছে?</string>
     <string name="eclampsia">এক্লাম্পসিয়া</string>
     <string name="pre_eclampsia">প্রি-এক্লাম্পসিয়া</string>

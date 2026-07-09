@@ -922,6 +922,8 @@
     <string name="enter_number">Enter Number</string>
     <string name="maternal_outcomes">Maternal Outcomes</string>
     <string name="ncd">NCD</string>
+    <string name="ncd_enrollment">NCD Enrollment</string>
+    <string name="ncd_follow_up">NCD Follow up</string>
     <string name="pregnancy_diagnosis">Have you ever been diagnosed with any of the following?</string>
     <string name="eclampsia">Eclampsia</string>
     <string name="pre_eclampsia">Pre-Eclampsia</string>

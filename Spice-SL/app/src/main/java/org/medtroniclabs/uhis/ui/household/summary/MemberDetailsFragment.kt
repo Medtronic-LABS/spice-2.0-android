@@ -297,7 +297,7 @@ class MemberDetailsFragment : Fragment(), View.OnClickListener {
 
     private fun addNcdBioDataFromEnrollment(history: List<MemberAssessmentHistoryEntity>) {
         val enrollmentHistory = history.firstOrNull {
-            MenuConstants.MENU_REGISTRATION.equals(it.serviceProvided.orEmpty(), ignoreCase = true)
+            AssessmentUtil.isEnrollmentService(it.serviceProvided)
         } ?: return
         val observations = enrollmentHistory.observations ?: return
         EnrollmentObservationFormatter.formatDiagnosisFromObservations(observations)?.let { diagnosis ->

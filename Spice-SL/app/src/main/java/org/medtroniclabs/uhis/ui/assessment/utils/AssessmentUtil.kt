@@ -45,6 +45,10 @@ import kotlin.text.substring
 object AssessmentUtil {
     fun isMedicalReviewVisitService(serviceProvided: String?): Boolean = serviceProvided.equals(MenuConstants.MEDICAL_REVIEW_VISIT_SERVICE, ignoreCase = true)
 
+    fun isEnrollmentService(serviceProvided: String?): Boolean =
+        serviceProvided.equals(MenuConstants.MENU_REGISTRATION, ignoreCase = true) ||
+            serviceProvided.equals(MenuConstants.ENROLLMENT, ignoreCase = true)
+
     fun calculateAverageBloodPressure(resultMap: HashMap<String, Any>): Pair<Int, Int> {
         val bpLogs = resultMap[BP_LOG] as HashMap<String, Any>
 
@@ -148,12 +152,16 @@ object AssessmentUtil {
             MenuConstants.FP_MENU_ID.lowercase() -> context.getString(R.string.family_planning)
             MenuConstants.EYE_CARE_MENU_ID.lowercase() -> context.getString(R.string.eye_care)
             MenuConstants.CATARACT_MENU_ID.lowercase() -> context.getString(R.string.cataract)
-            MenuConstants.NCD_MENU_ID.lowercase() -> context.getString(R.string.ncd)
+            MenuConstants.NCD_MENU_ID.lowercase(), "bd_ncd" -> context.getString(R.string.ncd)
+            MenuConstants.MENU_REGISTRATION.lowercase(),
+            MenuConstants.ENROLLMENT.lowercase(),
+            -> context.getString(R.string.ncd_enrollment)
+            MenuConstants.NCD_MEDICAL_REVIEW_SERVICE.lowercase(),
+            -> context.getString(R.string.ncd_follow_up)
             MenuConstants.PREGNANCY_OUTCOME.lowercase() -> context.getString(R.string.pregnancy_outcome)
             RMNCH.ANC.lowercase() -> context.getString(R.string.anc)
             RMNCH.PNC_MOTHER_MENU.lowercase() -> context.getString(R.string.pnc)
             RMNCH.CHILD_MENU.lowercase() -> context.getString(R.string.child_health)
-            MenuConstants.MENU_REGISTRATION.lowercase() -> context.getString(R.string.enrollment)
             else -> service.uppercase(Locale.ENGLISH)
         }
 

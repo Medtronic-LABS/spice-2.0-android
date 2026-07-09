@@ -78,7 +78,7 @@ object MemberAssessmentHistoryAdapterUtil {
                 DateUtils.formatDateToDisplayFormat(visitDateMillis) ?: "",
             ),
         )
-        if (!isEnrollmentService(service)) {
+        if (!AssessmentUtil.isEnrollmentService(service)) {
             val currentStatus = if (service.equals(MenuConstants.FP_MENU_ID, true)) {
                 resolveArrayValue(
                     context,
@@ -211,7 +211,9 @@ object MemberAssessmentHistoryAdapterUtil {
                 )
             }
 
-            MenuConstants.MENU_REGISTRATION.lowercase() -> {
+            MenuConstants.MENU_REGISTRATION.lowercase(),
+            MenuConstants.ENROLLMENT.lowercase(),
+            -> {
                 EnrollmentObservationFormatter.formatDiagnosisFromObservations(observations)?.let { diagnosis ->
                     summaryItems.add(
                         SummaryItem(
@@ -298,6 +300,7 @@ object MemberAssessmentHistoryAdapterUtil {
             MenuConstants.PREGNANCY_OUTCOME.lowercase(),
             MenuConstants.FP_MENU_ID.lowercase(),
             MenuConstants.MENU_REGISTRATION.lowercase(),
+            MenuConstants.ENROLLMENT.lowercase(),
             -> false
 
             else -> true
@@ -315,12 +318,12 @@ object MemberAssessmentHistoryAdapterUtil {
             MenuConstants.PREGNANCY_OUTCOME.lowercase(),
             MenuConstants.FP_MENU_ID.lowercase(),
             MenuConstants.MENU_REGISTRATION.lowercase(),
+            MenuConstants.ENROLLMENT.lowercase(),
+            MenuConstants.NCD_MEDICAL_REVIEW_SERVICE.lowercase(),
             -> false
 
             else -> true
         }
-
-    private fun isEnrollmentService(service: String): Boolean = service.equals(MenuConstants.MENU_REGISTRATION, ignoreCase = true)
 
     /**
      * Returns the ANC or PNC visit number from [observations], or an empty string.
