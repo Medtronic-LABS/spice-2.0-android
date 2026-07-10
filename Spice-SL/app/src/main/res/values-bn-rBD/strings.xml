@@ -898,7 +898,7 @@
     <string name="maternal_outcomes">মাতৃ ফলাফল</string>
     <string name="ncd">এনসিডি</string>
     <string name="ncd_enrollment">এনসিডি নিবন্ধন</string>
-    <string name="ncd_follow_up">এনসিডি ফলো-আপ</string>
+    <string name="ncd_follow_up">এনসিডি ফলোআপ</string>
     <string name="pregnancy_diagnosis">আপনার কি নিচের কোনো রোগ আগে নির্ণয় করা হয়েছে?</string>
     <string name="eclampsia">এক্লাম্পসিয়া</string>
     <string name="pre_eclampsia">প্রি-এক্লাম্পসিয়া</string>
@@ -976,7 +976,7 @@
     <string name="other_allergies">Comments on allergies</string>
     <string name="other_medication">Other Medication</string>
     <string name="comment_current_medication">Comments on current medication</string>
-    <string name="enroll">Enroll</string>
+    <string name="enroll">নথিভুক্ত করুন</string>
     <string name="previous">previous</string>
     <string name="pharmacist_title">Pharmacist</string>
     <string name="freq">Freq.</string>
@@ -1216,7 +1216,7 @@
     <string name="yes_i_confirm">Yes, I Confirm</string>
     <string name="test_review_confirmation_message">Have you observed to confirm the test values and comments uploaded by the Lab Technician?</string>
     <string name="label_with_text" translatable="false">%1$s  :  %2$s</string>
-    <string name="follow_up">Follow-up</string>
+    <string name="follow_up">ফলো-আপ</string>
     <string name="follow_ups">%1$s ফলো-আপ কল ফলাফল আপলোডের জন্য অপেক্ষায় আছে।</string>
     <string name="follow_up_one">1 follow-up call result is waiting to upload.</string>
     <string name="no_follow_up">No follow-up call result found to upload.</string>

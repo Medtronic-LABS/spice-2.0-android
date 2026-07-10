@@ -15,9 +15,8 @@
       "isSummary": true,
       "isNeededDefault": true,
       "title": "Full Name",
-      "hintCulture": "প্রথম নাম লিখুন",
-      "titleCulture": "প্রথম নাম",
-      "condition": [],
+      "hintCulture": "নাম লিখুন",
+      "titleCulture": "নাম",
       "isEditable": true,
       "hint": "Enter Full Name",
       "isEnabled": true,
@@ -29,7 +28,7 @@
       "orderId": 0,
       "isMandatory": true,
       "maxLength": 100.0,
-      "cultureErrorMessage": "প্রথম নাম আবশ্যক এবং এর দৈর্ঘ্য ১ থেকে ১০০ এর মধ্যে হতে হবে।"
+      "cultureErrorMessage": "নাম আবশ্যক এবং এর দৈর্ঘ্য ১ থেকে ১০০ এর মধ্যে হতে হবে।"
     },
     {
       "fieldName": "Last Name",

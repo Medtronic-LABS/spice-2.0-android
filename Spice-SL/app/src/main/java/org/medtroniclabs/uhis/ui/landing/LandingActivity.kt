@@ -723,7 +723,7 @@ class LandingActivity :
             }
         }
 
-        if (CommonUtils.isFoPoOrChcp() || CommonUtils.isHealthEducator()) {
+        if (CommonUtils.isFoPoOrChcp() || CommonUtils.isHealthEducator() || CommonUtils.isNurse()) {
             menu.findItem(R.id.external_member)?.let { menu.removeItem(it.itemId) }
         }
 
