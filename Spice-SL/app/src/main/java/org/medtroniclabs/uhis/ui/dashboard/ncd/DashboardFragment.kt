@@ -109,6 +109,9 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
         attachObservers()
         viewModel.getMenus()
         viewModel.loadDashboardClinicalWorkflowGate()
+        if (CommonUtils.isCHCP()) {
+            binding.llFilter?.root?.gone()
+        }
     }
 
     private fun attachObservers() {
