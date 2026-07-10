@@ -67,6 +67,7 @@
                 android:layout_height="@dimen/_40sdp"
                 android:layout_margin="@dimen/_8sdp"
                 android:background="@drawable/et_background"
+                android:inputType="numberDecimal"
                 android:maxLength="10"
                 android:paddingHorizontal="@dimen/_5sdp"
                 android:textColor="@color/black"

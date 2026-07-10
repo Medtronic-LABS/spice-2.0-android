@@ -38,6 +38,7 @@ import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
 import org.medtroniclabs.uhis.mappingkey.Screening
 import org.medtroniclabs.uhis.ncd.medicalreview.MedicationListener
+import org.medtroniclabs.uhis.ncd.medicalreview.NCDMRUtil
 import org.medtroniclabs.uhis.ncd.medicalreview.prescription.adapter.NCDDiscontinuedMedicationAdapter
 import org.medtroniclabs.uhis.ncd.medicalreview.prescription.adapter.NCDPrescriptionAdapter
 import org.medtroniclabs.uhis.ncd.medicalreview.prescription.dialog.NCDInstructionExpansionDialog
@@ -592,6 +593,7 @@ class NCDPrescriptionActivity :
 
         // Dosage Unit Value
         medicationEditBinding.etDosage.visibility = View.VISIBLE
+        NCDMRUtil.applyDosageInputRestrictions(medicationEditBinding.etDosage)
         medicationEditBinding.etDosage.setText(model.enteredDosageUnitValue ?: "")
 
         medicationEditBinding.tvDosage.visibility = View.GONE
@@ -990,12 +992,10 @@ class NCDPrescriptionActivity :
             0
         }
 
-    private fun checkValue(it: Editable?): Editable? =
-        if (it.isNullOrBlank()) {
-            null
-        } else {
-            it
-        }
+    private fun checkValue(it: Editable?): Editable? {
+        if (it.isNullOrBlank()) return null
+        return if (NCDMRUtil.isValidDosageValue(it.toString())) it else null
+    }
 
     private fun editSpinnerFrequency(
         selectedItem: Map<String, Any>,
@@ -1198,7 +1198,7 @@ class NCDPrescriptionActivity :
         prescriptionModel.let { prescription ->
             var isValid = true
             val invalidList = ArrayList<String>()
-            if (prescription.enteredDosageUnitValue.isNullOrBlank()) {
+            if (!NCDMRUtil.isValidDosageValue(prescription.enteredDosageUnitValue)) {
                 isValid = false
                 invalidList.add(getString(R.string.dosage))
             }

@@ -1,6 +1,8 @@
 package org.medtroniclabs.uhis.ncd.medicalreview
 
 import android.content.Context
+import android.text.InputFilter
+import android.text.InputType
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatEditText
 import org.medtroniclabs.uhis.R
@@ -250,6 +252,30 @@ object NCDMRUtil {
     fun getUserName(): String {
         val userDetails = SecuredPreference.getUserDetails()
         return "${userDetails?.firstName} ${userDetails?.lastName}"
+    }
+
+    private val dosageValuePattern = Regex("^\\d*(\\.\\d*)?$")
+
+    fun isValidDosageValue(value: String?): Boolean {
+        val trimmed = value?.trim().orEmpty()
+        if (trimmed.isEmpty()) return false
+        val numeric = trimmed.toDoubleOrNull() ?: return false
+        return numeric > 0
+    }
+
+    fun applyDosageInputRestrictions(editText: AppCompatEditText) {
+        editText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+        editText.filters = arrayOf(
+            InputFilter.LengthFilter(10),
+            InputFilter { source, start, end, dest, dstart, dend ->
+                val newValue = buildString {
+                    append(dest.subSequence(0, dstart))
+                    append(source.subSequence(start, end))
+                    append(dest.subSequence(dend, dest.length))
+                }
+                if (newValue.isEmpty() || dosageValuePattern.matches(newValue)) null else ""
+            },
+        )
     }
 
     fun createPrescription(

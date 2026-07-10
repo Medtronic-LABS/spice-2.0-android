@@ -43,6 +43,7 @@ import org.medtroniclabs.uhis.databinding.LayoutMedicationNewBinding
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
+import org.medtroniclabs.uhis.ncd.medicalreview.NCDMRUtil
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseFragment
 import org.medtroniclabs.uhis.ui.TagListCustomView
@@ -463,6 +464,7 @@ class NurseMedicalReviewPrescriptionFragment :
 
         // Dosage Unit Value
         medicationEditBinding.etDosage.visibility = View.VISIBLE
+        NCDMRUtil.applyDosageInputRestrictions(medicationEditBinding.etDosage)
         medicationEditBinding.etDosage.setText(
             model.enteredDosageUnitValue ?: getString(R.string.empty_space),
         )
@@ -1099,12 +1101,10 @@ class NurseMedicalReviewPrescriptionFragment :
         }
     }
 
-    private fun checkValue(it: Editable?): Editable? =
-        if (it.isNullOrBlank()) {
-            null
-        } else {
-            it
-        }
+    private fun checkValue(it: Editable?): Editable? {
+        if (it.isNullOrBlank()) return null
+        return if (NCDMRUtil.isValidDosageValue(it.toString())) it else null
+    }
 
     override fun onItemClick(
         p0: AdapterView<*>?,
@@ -1525,7 +1525,7 @@ class NurseMedicalReviewPrescriptionFragment :
         prescriptionModel.let { prescription ->
             var isValid = true
             val invalidList = ArrayList<String>()
-            if (prescription.enteredDosageUnitValue.isNullOrBlank()) {
+            if (!NCDMRUtil.isValidDosageValue(prescription.enteredDosageUnitValue)) {
                 isValid = false
                 invalidList.add(getString(R.string.dosage))
             }

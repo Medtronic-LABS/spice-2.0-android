@@ -215,13 +215,27 @@ interface MemberAssessmentHistoryDao {
                   AND EXISTS (
                       SELECT 1 FROM memberassessmenthistory AS n
                       WHERE n.memberId = e.memberId
-                        AND LOWER(n.serviceProvided) = 'ncd'
+                        AND (
+                            LOWER(n.serviceProvided) = 'ncd'
+                            OR (
+                                LOWER(n.serviceProvided) = 'cataract'
+                                AND n.customStatus IS NOT NULL
+                                AND INSTR(n.customStatus, 'NCD_SERVICE_IN_CATARACT_CAMP') > 0
+                            )
+                        )
                         AND date(datetime(n.visitDate, 'localtime')) <= date(datetime(e.visitDate, 'localtime'))
                         AND n.practitionerId IS :userId
                         AND NOT EXISTS (
                             SELECT 1 FROM memberassessmenthistory AS n2
                             WHERE n2.memberId = e.memberId
-                              AND LOWER(n2.serviceProvided) = 'ncd'
+                              AND (
+                                  LOWER(n2.serviceProvided) = 'ncd'
+                                  OR (
+                                      LOWER(n2.serviceProvided) = 'cataract'
+                                      AND n2.customStatus IS NOT NULL
+                                      AND INSTR(n2.customStatus, 'NCD_SERVICE_IN_CATARACT_CAMP') > 0
+                                  )
+                              )
                               AND date(datetime(n2.visitDate, 'localtime')) <= date(datetime(e.visitDate, 'localtime'))
                               AND (
                                   date(datetime(n2.visitDate, 'localtime')) > date(datetime(n.visitDate, 'localtime'))

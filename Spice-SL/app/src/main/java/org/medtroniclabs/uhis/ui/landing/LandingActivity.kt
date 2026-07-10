@@ -1040,12 +1040,10 @@ class LandingActivity :
         val refreshFragment =
             intent.getBooleanExtra(REFRESH_FRAGMENT, false)
         if (refreshFragment) {
-            if (CommonUtils.isNonCommunity()) {
-                supportFragmentManager.fragments.forEach { fragment ->
-                    supportFragmentManager.beginTransaction().remove(fragment).commit()
-                }
-                handleNavigation()
-            } else {
+            // PatientSearchFragment is the home only for community role-based users.
+            // FO/PO/CHCP are community but not role-based, so route them the same way
+            // handleNavigation() does (HomeScreenFragment) to keep the home icon consistent.
+            if (CommonUtils.isCommunity() && CommonUtils.isRolePresent()) {
                 val fragment = supportFragmentManager.findFragmentByTag(PatientSearchFragment.TAG)
                 fragment?.let {
                     supportFragmentManager.beginTransaction().remove(it).commit()
@@ -1054,6 +1052,11 @@ class LandingActivity :
                     R.id.fragmentContainerView,
                     tag = PatientSearchFragment.TAG,
                 )
+            } else {
+                supportFragmentManager.fragments.forEach { fragment ->
+                    supportFragmentManager.beginTransaction().remove(fragment).commit()
+                }
+                handleNavigation()
             }
         }
     }
