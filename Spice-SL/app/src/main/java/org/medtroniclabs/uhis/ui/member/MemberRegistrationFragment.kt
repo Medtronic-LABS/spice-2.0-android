@@ -291,7 +291,7 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
             }
         }
 
-        memberRegistrationViewModel.addnewMemberReq.observe(viewLifecycleOwner) { resourceState ->
+        memberRegistrationViewModel.addNewMemberReq.observe(viewLifecycleOwner) { resourceState ->
             when (resourceState.state) {
                 ResourceState.LOADING -> {
                     (activity as BaseActivity?)?.showLoading()
@@ -788,7 +788,6 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
             if (memberRegistrationViewModel.medicalReviewFlow) {
                 memberRegistrationViewModel.addNewMember(
                     map,
-                    formGenerator,
                     location = householdRegistrationViewModel.getCurrentLocation(),
                 )
                 return
@@ -816,6 +815,7 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
                     map,
                     householdRegistrationViewModel.householdId,
                     location = location,
+                    editMemberId = householdRegistrationViewModel.memberID.takeIf { it != -1L },
                 )
                 return
             }
@@ -845,8 +845,6 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
                     householdEntity,
                     map,
                     householdRegistrationViewModel.getCurrentLocation(),
-                    householdRegistrationViewModel.initialValue,
-                    householdRegistrationViewModel.signatureFilename,
                 )
             }
         }

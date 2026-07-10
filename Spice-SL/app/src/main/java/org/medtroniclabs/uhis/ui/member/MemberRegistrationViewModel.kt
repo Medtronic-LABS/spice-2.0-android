@@ -1,11 +1,9 @@
 package org.medtroniclabs.uhis.ui.member
 
-import android.content.Context
 import android.location.Location
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.appextensions.postError
@@ -13,13 +11,11 @@ import org.medtroniclabs.uhis.appextensions.postLoading
 import org.medtroniclabs.uhis.appextensions.postSuccess
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams.HouseholdHead
-import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberWithTb
 import org.medtroniclabs.uhis.data.offlinesync.model.ProvanceDto
 import org.medtroniclabs.uhis.db.entity.HouseholdEntity
 import org.medtroniclabs.uhis.db.entity.HouseholdMemberEntity
 import org.medtroniclabs.uhis.db.entity.VillageEntity
 import org.medtroniclabs.uhis.di.IoDispatcher
-import org.medtroniclabs.uhis.formgeneration.FormGenerator
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.HOUSEHOLD_HEAD_RELATIONSHIP
 import org.medtroniclabs.uhis.mappingkey.MemberRegistration
 import org.medtroniclabs.uhis.model.medicalreview.AddMemberRegRequest
@@ -31,10 +27,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MemberRegistrationViewModel @Inject constructor(
-    @IoDispatcher override var dispatcherIO: CoroutineDispatcher,
+    @param:IoDispatcher override var dispatcherIO: CoroutineDispatcher,
     private val memberRegistrationRepository: HouseholdMemberRepository,
     private val houseHoldRepository: HouseHoldRepository,
-    @ApplicationContext private val context: Context,
 ) : BaseViewModel(dispatcherIO) {
     var selectedHouseholdId: Long = -1L
     var memberRegistrationLiveData = MutableLiveData<Resource<Long>>()
@@ -42,15 +37,13 @@ class MemberRegistrationViewModel @Inject constructor(
     val memberDetailsLiveData = MutableLiveData<Resource<HouseholdMemberEntity>>()
     val formLayoutsLiveData = MutableLiveData<Resource<String>>()
     var medicalReviewFlow = false
-    val addnewMemberReq = MutableLiveData<Resource<String>>()
+    val addNewMemberReq = MutableLiveData<Resource<String>>()
     var villageDetails: List<VillageEntity>? = null
     var addNewMember: Boolean = false
     var memberDob: String? = null
     var isPhuWalkInsFlow: Boolean? = null
     val householdHeadDobLiveData = MutableLiveData<String?>()
     var householdHeadPhoneNumber: String? = null
-
-    val householdMembersLiveData = MutableLiveData<List<HouseholdMemberWithTb>>()
 
     /**
      * Set of National IDs already registered in the database.
@@ -106,8 +99,6 @@ class MemberRegistrationViewModel @Inject constructor(
         householdEntity: HouseholdEntity,
         memberResultMap: HashMap<String, Any>,
         location: Location?,
-        initial: String? = null,
-        signature: String? = null,
     ) {
         memberRegistrationLiveData.postLoading()
         try {
@@ -134,8 +125,6 @@ class MemberRegistrationViewModel @Inject constructor(
                 registerMember(
                     memberResultMap,
                     houseHoldId,
-                    initial,
-                    signature,
                     location,
                 )
             }
@@ -147,9 +136,8 @@ class MemberRegistrationViewModel @Inject constructor(
     fun registerMember(
         map: HashMap<String, Any>,
         householdId: Long?,
-        initial: String? = null,
-        signature: String? = null,
         location: Location?,
+        editMemberId: Long? = null,
     ) {
         memberRegistrationLiveData.postLoading()
         try {
@@ -160,31 +148,27 @@ class MemberRegistrationViewModel @Inject constructor(
                 } else {
                     null
                 }
+                // If the live data value is null for some reason, fetch the details again
+                val existingEntity = memberDetailsLiveData.value?.data
+                    ?: editMemberId?.let { id ->
+                        memberRegistrationRepository.getMemberDetails(id)
+                    }
                 val memberId = memberRegistrationRepository.registerMember(
                     map,
                     householdId,
-                    memberDetailsLiveData.value?.data,
+                    existingEntity,
                     isPhuWalkInFlow = isPhuWalkInsFlow,
                     location = location,
                 )
-//                // Only update head phone number if householdId is not null
-//                if (householdId != null) {
-//                    memberRegistrationRepository.updateHeadPhoneNumber(householdId, map)
-//                }
-                if (memberId == null) {
-                    memberRegistrationLiveData.postError()
-                } else {
-                    memberRegistrationLiveData.postSuccess(memberId)
-                }
+                memberRegistrationLiveData.postSuccess(memberId)
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             memberRegistrationLiveData.postError()
         }
     }
 
     fun addNewMember(
         map: HashMap<String, Any>?,
-        formGenerator: FormGenerator,
         location: Location?,
     ) {
         if (map == null) return
@@ -208,15 +192,10 @@ class MemberRegistrationViewModel @Inject constructor(
             }
         }
         viewModelScope.launch(dispatcherIO) {
-            addnewMemberReq.postLoading()
-            addnewMemberReq.postValue(houseHoldRepository.addNewMember(addMemberRegRequest))
+            addNewMemberReq.postLoading()
+            addNewMemberReq.postValue(houseHoldRepository.addNewMember(addMemberRegRequest))
         }
     }
-
-    fun getHouseholdMembers(householdId: Long) =
-        viewModelScope.launch(dispatcherIO) {
-            householdMembersLiveData.postValue(houseHoldRepository.getAllHouseHoldMembersLiveData(householdId).value)
-        }
 
     /**
      * Fetches all National IDs from the database and updates [nationalIdsSet].

@@ -221,6 +221,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                         }
                     }
                 }
+
                 else -> {
                     // Invoked if response state is not success
                 }
@@ -255,6 +256,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                         }
                     }
                 }
+
                 else -> {
                     // Invoked if response state is not success
                 }
@@ -288,6 +290,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                         }
                     }
                 }
+
                 else -> {
                     // Invoked if response state is not success
                 }
@@ -326,6 +329,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                         }
                     }
                 }
+
                 else -> {
                     // Invoked if response state is not success
                 }
@@ -373,8 +377,10 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                                     // FO/PO keep the Kormi-driven cascade with the Union hidden.
                                     SHASTHYA_KORMI_ID ->
                                         field.visibility = if (isChcp) FormDefinedParams.GONE else FormDefinedParams.VISIBLE
+
                                     SHASTHYA_SHEBIKA_ID ->
                                         if (isChcp) field.visibility = FormDefinedParams.GONE
+
                                     VILLAGE_ID ->
                                         if (isChcp) field.visibility = FormDefinedParams.VISIBLE
                                 }
@@ -402,13 +408,19 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
 
         memberRegistrationViewModel.memberDetailsLiveData.observe(viewLifecycleOwner) { resourceState ->
             when (resourceState.state) {
+                ResourceState.LOADING -> {
+                    (activity as BaseActivity?)?.showLoading()
+                }
+
                 ResourceState.SUCCESS -> {
+                    (activity as BaseActivity?)?.hideLoading()
                     resourceState.data?.let { data ->
                         autoPopulateDetails(data)
                     }
                 }
-                else -> {
-                    // no-op
+
+                ResourceState.ERROR -> {
+                    (activity as BaseActivity?)?.hideLoading()
                 }
             }
         }
@@ -424,6 +436,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                         }
                     }
                 }
+
                 else -> {}
             }
         }
@@ -648,11 +661,13 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                     onChcpUnionSelected(selectedId)
                 }
             }
+
             SHASTHYA_KORMI_ID -> {
                 if (CommonUtils.isFoPoOrChcp()) {
                     formGenerator.getResultMap().remove(CHIEFDOM_ID)
                 }
             }
+
             SHASTHYA_SHEBIKA_ID -> {
                 if (CommonUtils.isFoPoOrChcp()) {
                     formGenerator.getResultMap().remove(CHIEFDOM_ID)
@@ -671,6 +686,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                     }
                 }
             }
+
             SUB_VILLAGE_ID -> {
                 // CHCP selects the Union directly, so the Union/Chiefdom is already resolved.
                 if (!CommonUtils.isCHCP()) {
@@ -690,22 +706,26 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                 VILLAGE_ID -> {
                     householdRegistrationViewModel.loadDataCacheByType(id, localDataCache)
                 }
+
                 SHASTHYA_KORMI_ID -> {
                     // CHCP hides the Kormi cascade entirely.
                     if (CommonUtils.isFoOrPo()) {
                         householdRegistrationViewModel.loadAllShasthyaKormis()
                     }
                 }
+
                 SHASTHYA_SHEBIKA_ID -> {
                     when {
                         CommonUtils.isFoOrPo() && selectedParent != null -> {
                             householdRegistrationViewModel.loadShasthyaShebikaForKormiId(selectedParent)
                         }
+
                         !CommonUtils.isFoPoOrChcp() -> {
                             householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType()
                         }
                     }
                 }
+
                 SUB_VILLAGE_ID -> {
                     selectedParent?.let {
                         if (CommonUtils.isCHCP()) {
@@ -863,6 +883,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                 map,
                 householdId = null, // External members have no household
                 location = location,
+                editMemberId = editMemberId.takeIf { it != -1L },
             )
         }
     }
