@@ -42,8 +42,8 @@ internal object ServiceMemberCountQueryBuilder {
             args += pattern
         }
         if (!qrCode.isNullOrBlank()) {
-            whereConditions += "hhm.qr_code LIKE ?"
-            args += "%${qrCode.trim()}%"
+            whereConditions += "hhm.qr_code = ?"
+            args += qrCode
         }
         val whereClause =
             if (whereConditions.isEmpty()) "" else "WHERE ${whereConditions.joinToString(" AND ")}"

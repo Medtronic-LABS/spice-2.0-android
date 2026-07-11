@@ -83,8 +83,8 @@ internal object ServiceMemberQueryBuilder {
         }
 
         if (!qrCode.isNullOrBlank()) {
-            conditions += "hhm.qr_code LIKE ?"
-            args += "%${qrCode.trim()}%"
+            conditions += "hhm.qr_code = ?"
+            args += qrCode
         }
 
         when (staticFilter) {
