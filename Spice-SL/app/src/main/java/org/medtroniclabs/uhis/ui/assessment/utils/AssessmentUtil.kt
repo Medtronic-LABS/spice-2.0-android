@@ -43,7 +43,9 @@ import kotlin.text.lastIndexOf
 import kotlin.text.substring
 
 object AssessmentUtil {
-    fun isMedicalReviewVisitService(serviceProvided: String?): Boolean = serviceProvided.equals(MenuConstants.MEDICAL_REVIEW_VISIT_SERVICE, ignoreCase = true)
+    fun isMedicalReviewVisitService(serviceProvided: String?): Boolean =
+        serviceProvided.equals(MenuConstants.MEDICAL_REVIEW_VISIT_SERVICE, ignoreCase = true) ||
+            serviceProvided.equals(MenuConstants.MEDICAL_REVIEW_SERVICE, ignoreCase = true)
 
     fun isEnrollmentService(serviceProvided: String?): Boolean =
         serviceProvided.equals(MenuConstants.MENU_REGISTRATION, ignoreCase = true) ||
@@ -243,6 +245,7 @@ object AssessmentUtil {
         when (service.lowercase()) {
             RMNCH.ANC.lowercase(),
             RMNCH.PNC_MOTHER_MENU.lowercase(),
+            MenuConstants.NCD_MEDICAL_REVIEW_SERVICE.lowercase(),
             -> {
                 followUpDate?.let {
                     DateUtils.convertDateFormat(

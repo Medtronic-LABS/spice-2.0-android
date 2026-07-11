@@ -40,6 +40,7 @@ data class MemberAssessmentHistoryEntity(
     var nextFollowUpDate: String? = null,
     val serviceProvidedByName: String? = null,
     val serviceProvidedByRole: String? = null,
+    val facilityName: String? = null,
     @ColumnInfo(MAH_COLUMN_PRACTITIONER_ID)
     var practitionerId: String? = null,
     val observations: MemberAssessmentObservations? = null,

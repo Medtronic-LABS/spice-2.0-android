@@ -71,6 +71,14 @@ object MemberAssessmentHistoryAdapterUtil {
                 ),
             ),
         )
+        history.facilityName?.takeIf { it.isNotBlank() }?.let { facilityName ->
+            summaryItems.add(
+                SummaryItem(
+                    context.getString(R.string.visit_place),
+                    facilityName,
+                ),
+            )
+        }
         val visitDateMillis = DateUtils.getLastMenstrualDate(history.visitDate ?: "").timeInMillis
         summaryItems.add(
             SummaryItem(
@@ -319,7 +327,6 @@ object MemberAssessmentHistoryAdapterUtil {
             MenuConstants.FP_MENU_ID.lowercase(),
             MenuConstants.MENU_REGISTRATION.lowercase(),
             MenuConstants.ENROLLMENT.lowercase(),
-            MenuConstants.NCD_MEDICAL_REVIEW_SERVICE.lowercase(),
             -> false
 
             else -> true

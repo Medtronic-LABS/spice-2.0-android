@@ -98,4 +98,20 @@ object SpiceDatabaseMigration {
             db.execSQL("ALTER TABLE $HOUSEHOLD ADD COLUMN $HH_COLUMN_MONTHLY_INCOME_RANGE TEXT;")
         }
     }
+
+    /**
+     * Database migration from version 7 to 8.
+     *
+     * [MEMBER_ASSESSMENT_HISTORY_ENTITY]: add facilityName — the facility where the service
+     * was provided; shown on the member profile for nurse assessments.
+     *
+     * Clears [SecuredPreference.EnvironmentKey.SERVER_LAST_SYNCED] so assessment history is
+     * refetched from the server and populated with the new facilityName value.
+     */
+    val MIGRATION_7_8 = object : Migration(7, 8) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            SecuredPreference.remove(SecuredPreference.EnvironmentKey.SERVER_LAST_SYNCED)
+            db.execSQL("ALTER TABLE $MEMBER_ASSESSMENT_HISTORY_ENTITY ADD COLUMN facilityName TEXT;")
+        }
+    }
 }

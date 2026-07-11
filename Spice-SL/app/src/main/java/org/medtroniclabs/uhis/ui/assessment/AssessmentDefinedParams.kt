@@ -81,6 +81,7 @@ object AssessmentDefinedParams {
     const val other_compliance: String = "otherCompliance"
     const val Compliance_Type_Diabetes = "Diabetes"
     const val Compliance_Type_Hypertension = "Hypertension"
+    const val Symptom_Type_Ncd = "ncdSymptom"
     const val id = "id"
     const val other_symptom = "otherSymptom"
     const val NoSymptoms = "No symptoms"
