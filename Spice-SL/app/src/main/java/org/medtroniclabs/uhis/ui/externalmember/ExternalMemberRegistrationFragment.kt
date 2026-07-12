@@ -541,7 +541,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
         }
 
         // Lock location selections for external-member edit mode.
-        disableLocationFieldsInEditMode()
+        disableLocationFieldsInEditMode(details)
     }
 
     private fun singleSelectValueOption(
@@ -628,14 +628,26 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
         }
     }
 
-    private fun disableLocationFieldsInEditMode() {
+    private fun disableLocationFieldsInEditMode(details: HouseholdMemberEntity) {
         if (editMemberId == -1L) return
-        formGenerator.getViewByTag(VILLAGE_ID)?.isEnabled = false
-        if (CommonUtils.isFoPoOrChcp()) {
-            formGenerator.getViewByTag(SHASTHYA_KORMI_ID)?.isEnabled = false
+        val villageId = details.villageId
+        val skId = details.shasthyaKormiId
+        val ssId = details.shasthyaShebikaId
+        val subVillageId = details.subVillageId
+        if (villageId != null && villageId > 0) {
+            formGenerator.getViewByTag(VILLAGE_ID)?.isEnabled = false
         }
-        formGenerator.getViewByTag(SHASTHYA_SHEBIKA_ID)?.isEnabled = false
-        formGenerator.getViewByTag(SUB_VILLAGE_ID)?.isEnabled = false
+        if (CommonUtils.isFoPoOrChcp()) {
+            if (skId != null && skId > 0) {
+                formGenerator.getViewByTag(SHASTHYA_KORMI_ID)?.isEnabled = false
+            }
+        }
+        if (ssId != null && ssId > 0) {
+            formGenerator.getViewByTag(SHASTHYA_SHEBIKA_ID)?.isEnabled = false
+        }
+        if (subVillageId != null && subVillageId > 0) {
+            formGenerator.getViewByTag(SUB_VILLAGE_ID)?.isEnabled = false
+        }
     }
 
     override fun onRenderingComplete() {
