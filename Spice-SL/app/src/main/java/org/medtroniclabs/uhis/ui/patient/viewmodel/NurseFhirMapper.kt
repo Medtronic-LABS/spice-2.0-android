@@ -64,7 +64,7 @@ object NurseFhirMapper {
                     // Keep the real encounter id so the selected date can be matched/highlighted
                     // and previous/next navigation can resolve the current position.
                     patientVisitId = item.encounterId?.toLongOrNull() ?: entity.encounterId?.toLongOrNull(),
-                    createdAt = item.prescribedSince ?: entity.dateOfReview ?: "",
+                    createdAt = entity.dateOfReview ?: item.prescribedSince ?: "",
                     prescribedSince = item.prescribedSince,
                     dosageFormName = item.dosageFormName,
                     prescribedDays = item.prescribedDays,
