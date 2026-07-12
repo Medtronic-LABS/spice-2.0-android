@@ -115,9 +115,9 @@ interface MemberAssessmentHistoryDao {
                         WHERE p.memberId = h.memberId
                         AND LOWER(p.serviceProvided) = 'ncd'
                         AND (
-                            date(datetime(p.visitDate, 'localtime')) < date(datetime(h.visitDate, 'localtime'))
+                            p.visitDate < h.visitDate
                             OR (
-                                date(datetime(p.visitDate, 'localtime')) = date(datetime(h.visitDate, 'localtime'))
+                                p.visitDate = h.visitDate
                                 AND p.id < h.id
                             )
                         )
@@ -134,9 +134,9 @@ interface MemberAssessmentHistoryDao {
                         WHERE p.memberId = h.memberId
                         AND LOWER(p.serviceProvided) = 'ncd'
                         AND (
-                            date(datetime(p.visitDate, 'localtime')) < date(datetime(h.visitDate, 'localtime'))
+                            p.visitDate < h.visitDate
                             OR (
-                                date(datetime(p.visitDate, 'localtime')) = date(datetime(h.visitDate, 'localtime'))
+                                p.visitDate = h.visitDate
                                 AND p.id < h.id
                             )
                         )
@@ -190,7 +190,7 @@ interface MemberAssessmentHistoryDao {
                 END
             ) AS patientsReferredForOperationCount,
             (
-                SELECT COUNT(DISTINCT e.memberId)
+                SELECT COUNT(DISTINCT COALESCE(CAST(e.memberId AS TEXT), e.memberFhirId))
                 FROM memberassessmenthistory AS e
                 LEFT JOIN householdmember AS ehm ON ehm.id = e.memberId
                 LEFT JOIN household AS ehh ON ehh.id = ehm.household_id
@@ -214,7 +214,13 @@ interface MemberAssessmentHistoryDao {
                   )
                   AND EXISTS (
                       SELECT 1 FROM memberassessmenthistory AS n
-                      WHERE n.memberId = e.memberId
+                      WHERE (
+                            (e.memberId IS NOT NULL AND n.memberId = e.memberId)
+                            OR (
+                                e.memberFhirId IS NOT NULL AND e.memberFhirId != ''
+                                AND n.memberFhirId = e.memberFhirId
+                            )
+                        )
                         AND (
                             LOWER(n.serviceProvided) = 'ncd'
                             OR (
@@ -223,11 +229,17 @@ interface MemberAssessmentHistoryDao {
                                 AND INSTR(n.customStatus, 'NCD_SERVICE_IN_CATARACT_CAMP') > 0
                             )
                         )
-                        AND date(datetime(n.visitDate, 'localtime')) <= date(datetime(e.visitDate, 'localtime'))
+                        AND n.visitDate <= e.visitDate
                         AND n.practitionerId IS :userId
                         AND NOT EXISTS (
                             SELECT 1 FROM memberassessmenthistory AS n2
-                            WHERE n2.memberId = e.memberId
+                            WHERE (
+                                (e.memberId IS NOT NULL AND n2.memberId = e.memberId)
+                                OR (
+                                    e.memberFhirId IS NOT NULL AND e.memberFhirId != ''
+                                    AND n2.memberFhirId = e.memberFhirId
+                                )
+                              )
                               AND (
                                   LOWER(n2.serviceProvided) = 'ncd'
                                   OR (
@@ -236,11 +248,11 @@ interface MemberAssessmentHistoryDao {
                                       AND INSTR(n2.customStatus, 'NCD_SERVICE_IN_CATARACT_CAMP') > 0
                                   )
                               )
-                              AND date(datetime(n2.visitDate, 'localtime')) <= date(datetime(e.visitDate, 'localtime'))
+                              AND n2.visitDate <= e.visitDate
                               AND (
-                                  date(datetime(n2.visitDate, 'localtime')) > date(datetime(n.visitDate, 'localtime'))
+                                  n2.visitDate > n.visitDate
                                   OR (
-                                      date(datetime(n2.visitDate, 'localtime')) = date(datetime(n.visitDate, 'localtime'))
+                                      n2.visitDate = n.visitDate
                                       AND n2.id > n.id
                                   )
                               )
@@ -429,4 +441,18 @@ interface MemberAssessmentHistoryDao {
         serviceA: String,
         serviceB: String,
     ): MemberAssessmentHistoryEntity?
+
+    @Query(
+        """
+            SELECT CAST(memberFhirId AS INTEGER) FROM memberassessmenthistory
+            WHERE memberFhirId IS NOT NULL AND memberFhirId !=''
+            AND (LOWER(serviceProvided) = 'ncd'
+                            OR (
+                                LOWER(serviceProvided) = 'cataract'
+                                AND customStatus IS NOT NULL
+                                AND INSTR(customStatus, 'NCD_SERVICE_IN_CATARACT_CAMP') > 0
+                            ))
+        """,
+    )
+    suspend fun getMembersFromAssessmentHistoryWhoReceivedNCD(): List<Long>
 }

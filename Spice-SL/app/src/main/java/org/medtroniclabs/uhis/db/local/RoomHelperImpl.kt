@@ -1716,4 +1716,7 @@ class RoomHelperImpl @Inject constructor(
     ) = followUpCallsDao.getFollowupCall(followUpId, callDate, userId)
 
     override suspend fun insertFollowUpCall(followUpCall: FollowUpCall) = followUpCallsDao.insertFollowUpCall(followUpCall)
+
+    override suspend fun getMembersFromAssessmentHistoryWhoReceivedNCD(): List<Long> =
+        memberAssessmentHistoryDao.getMembersFromAssessmentHistoryWhoReceivedNCD()
 }

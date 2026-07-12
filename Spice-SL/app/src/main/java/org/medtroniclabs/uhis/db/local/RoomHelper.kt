@@ -1138,4 +1138,6 @@ interface RoomHelper {
     ): FollowUpCall?
 
     suspend fun insertFollowUpCall(followUpCall: FollowUpCall)
+
+    suspend fun getMembersFromAssessmentHistoryWhoReceivedNCD(): List<Long>
 }

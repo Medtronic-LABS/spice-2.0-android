@@ -292,21 +292,15 @@ class OfflineSyncRepository @Inject constructor(
         val responseInitialDownload = parseSyncedDataResponse(syncedResponse.body()?.string()) ?: return false
 
         val assessmentHistory = if (CommonUtils.isFoPoOrChcp()) {
-            val memberIds = extractSyncedMemberIds(responseInitialDownload.members)
+            val memberIds = mutableSetOf<Long>()
             val history = mutableListOf<MemberAssessmentHistoryEntity>()
-            // First fetch based on member ids
-            if (memberIds.isNotEmpty()) {
-                val assessmentHistoryResponse = fetchMemberAssessmentHistory(
-                    lastSyncedAt = serverLastSyncedAt,
-                    memberIds = memberIds,
-                )
-                if (!assessmentHistoryResponse.isSuccessful) {
-                    return false
-                }
-                history.addAll(assessmentHistoryResponse.body() ?: emptyList())
-            }
 
-            // Now fetch based on practitioner id
+            memberIds.addAll(extractSyncedMemberIds(responseInitialDownload.members))
+
+            // First fetch practitioner based records
+            // and based on those members, we can fetch assessment history to get relevant records
+            // This case arises when a member is not registered by the logged member, but they provided service,
+            // and we are not able to fetch their history to calculate some of dashboard like Link to Care
             val assessmentHistoryResponse = fetchMemberAssessmentHistory(
                 lastSyncedAt = serverLastSyncedAt,
                 practitionerId = SecuredPreference.getUserFhirId(),
@@ -315,6 +309,24 @@ class OfflineSyncRepository @Inject constructor(
                 return false
             }
             history.addAll(assessmentHistoryResponse.body() ?: emptyList())
+
+            // Add member ids from assessment history to fetch relevant records
+            memberIds.addAll(extractAssessmentHistoryMemberIds(history))
+
+            // Add members who received NCD service
+            memberIds.addAll(roomHelper.getMembersFromAssessmentHistoryWhoReceivedNCD())
+
+            // Now fetch based on member ids
+            if (memberIds.isNotEmpty()) {
+                val assessmentHistoryResponse = fetchMemberAssessmentHistory(
+                    lastSyncedAt = serverLastSyncedAt,
+                    memberIds = memberIds.toList(),
+                )
+                if (!assessmentHistoryResponse.isSuccessful) {
+                    return false
+                }
+                history.addAll(assessmentHistoryResponse.body() ?: emptyList())
+            }
 
             history
         } else {
@@ -347,6 +359,9 @@ class OfflineSyncRepository @Inject constructor(
     }
 
     private fun extractSyncedMemberIds(members: List<HouseHoldMember>?): List<Long> = members.orEmpty().mapNotNull { it.id?.toLongOrNull() }
+
+    private fun extractAssessmentHistoryMemberIds(history: List<MemberAssessmentHistoryEntity>): List<Long> =
+        history.mapNotNull { it.memberFhirId?.toLongOrNull() }
 
     suspend fun fetchAndSaveMemberDetails(memberId: String): SavedMemberDetails? {
         val response = apiHelper.getMemberDetails(RequestMemberDetails(memberId))
