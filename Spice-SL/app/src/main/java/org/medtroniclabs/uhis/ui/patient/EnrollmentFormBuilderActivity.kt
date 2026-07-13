@@ -84,12 +84,7 @@ class EnrollmentFormBuilderActivity : BaseActivity() {
         } else {
             showErrorDialogue(getString(R.string.alert), getString(R.string.exit_reason), isNegativeButtonNeed = true) {
                 if (it) {
-                    startAsNewActivity(
-                        Intent(
-                            this@EnrollmentFormBuilderActivity,
-                            LandingActivity::class.java,
-                        ),
-                    )
+                    finish()
                 }
             }
         }

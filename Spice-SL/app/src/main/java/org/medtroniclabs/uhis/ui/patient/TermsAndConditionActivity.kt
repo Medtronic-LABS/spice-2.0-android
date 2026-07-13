@@ -1,6 +1,6 @@
 package org.medtroniclabs.uhis.ui.patient
 
-import android.content.Context
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.http.SslError
@@ -25,7 +25,6 @@ import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
 import org.medtroniclabs.uhis.ui.landing.LandingActivity
 import org.medtroniclabs.uhis.ui.patient.viewmodel.TermsAndConditionViewModel
-import kotlin.getValue
 
 @AndroidEntryPoint
 class TermsAndConditionActivity : BaseActivity(), View.OnClickListener {
@@ -74,6 +73,7 @@ class TermsAndConditionActivity : BaseActivity(), View.OnClickListener {
         binding.termsConditionWebView.loadDataWithBaseURL(null, url, "text/html", "utf-8", null)
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private fun initializeView() {
         viewModel.isFromScreening =
             intent.getBooleanExtra(IntentConstants.INTENT_SCREENING, false)
@@ -106,7 +106,7 @@ class TermsAndConditionActivity : BaseActivity(), View.OnClickListener {
                         try {
                             startActivity(Intent(Intent.ACTION_VIEW, emailUri))
                             return true
-                        } catch (e: Exception) {
+                        } catch (_: Exception) {
                             return false
                         }
                     } else {
@@ -198,6 +198,7 @@ class TermsAndConditionActivity : BaseActivity(), View.OnClickListener {
                             )
                         },
                     )
+                    finish()
                 }
                 binding.btnAccept.isEnabled = true
             }
@@ -236,12 +237,4 @@ class TermsAndConditionActivity : BaseActivity(), View.OnClickListener {
             }
         }
     }
-
-    private fun isWebViewAvailable(context: Context): Boolean =
-        try {
-            WebView(context)
-            true
-        } catch (e: Exception) {
-            false
-        }
 }

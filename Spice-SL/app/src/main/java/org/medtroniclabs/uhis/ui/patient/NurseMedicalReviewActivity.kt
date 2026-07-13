@@ -91,7 +91,7 @@ class NurseMedicalReviewActivity : BaseActivity(), View.OnClickListener {
             isNegativeButtonNeed = true,
         ) { isPositive ->
             if (isPositive) {
-                startAsNewActivity(Intent(this, LandingActivity::class.java))
+                finish()
             }
         }
     }
