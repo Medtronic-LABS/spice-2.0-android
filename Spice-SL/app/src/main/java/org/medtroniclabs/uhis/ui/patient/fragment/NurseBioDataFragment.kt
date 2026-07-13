@@ -35,8 +35,6 @@ import org.medtroniclabs.uhis.ui.patient.viewmodel.MedicalReviewBaseViewModel
 import org.medtroniclabs.uhis.ui.patient.viewmodel.NurseBioDataViewModel
 import org.medtroniclabs.uhis.ui.patient.viewmodel.NurseMedicalReviewViewModel
 import org.medtroniclabs.uhis.ui.patientEdit.NCDPatientEditActivity
-import java.util.ArrayList
-import kotlin.getValue
 import org.medtroniclabs.uhis.common.DefinedParams as CommonDefinedParams
 
 class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
@@ -263,13 +261,14 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
             tvMobileNumber.text = data.phoneNumber ?: getString(
                 R.string.hyphen_symbol,
             )
-            tvDateOfRegistration.text = data.enrollmentAt?.let {
-                DateUtils.convertDateTimeToDate(
-                    it,
-                    DateUtils.DATE_FORMAT_yyyyMMddHHmmss,
-                    DateUtils.DATE_DD_MMM_YYYY,
-                )
-            } ?: getString(R.string.hyphen_symbol)
+            tvDateOfRegistration.text = data.enrollmentAt
+                ?.takeIf {
+                    it.isNotBlank()
+                }?.let {
+                    val enrollmentAt = if (it.endsWith("+00:00")) it else "$it+00:00"
+                    val visitDateMillis = DateUtils.getLastMenstrualDate(enrollmentAt).timeInMillis
+                    DateUtils.formatDateToDisplayFormat(visitDateMillis, DateUtils.DATE_DD_MMM_YYYY) ?: ""
+                } ?: getString(R.string.hyphen_symbol)
 
             tvProgramId.text = data.programId.toString().takeIf { data.programId != null }
                 ?: getString(R.string.hyphen_symbol)
@@ -278,13 +277,13 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
 
             confirmedDiagnosis(diagnosesToShow)
 
-            nextFollowupDate.text = data.nextMedicalReviewDate?.let {
-                DateUtils.convertDateTimeToDate(
-                    it,
-                    DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
-                    DateUtils.DATE_DD_MMM_YYYY,
-                )
-            } ?: getString(R.string.hyphen_symbol)
+            nextFollowupDate.text = data.nextMedicalReviewDate
+                ?.takeIf {
+                    it.isNotBlank()
+                }?.let { nextMedicalReviewDate ->
+                    val visitDateMillis = DateUtils.getLastMenstrualDate(nextMedicalReviewDate).timeInMillis
+                    DateUtils.formatDateToDisplayFormat(visitDateMillis, DateUtils.DATE_DD_MMM_YYYY) ?: ""
+                } ?: getString(R.string.hyphen_symbol)
 
             tvCvdRisk.text = data.cvdRiskScore?.let {
                 StringConverter.appendTexts(
@@ -310,13 +309,13 @@ class NurseBioDataFragment : BaseFragment(), View.OnClickListener {
                 ),
             )
 
-            tvDateOfLastVisit.text = data.lastReviewDate?.let {
-                DateUtils.convertDateTimeToDate(
-                    it,
-                    DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
-                    DateUtils.DATE_DD_MMM_YYYY,
-                )
-            } ?: getString(R.string.hyphen_symbol)
+            tvDateOfLastVisit.text = data.lastReviewDate
+                ?.takeIf {
+                    it.isNotBlank()
+                }?.let { lastReviewDate ->
+                    val visitDateMillis = DateUtils.getLastMenstrualDate(lastReviewDate).timeInMillis
+                    DateUtils.formatDateToDisplayFormat(visitDateMillis, DateUtils.DATE_DD_MMM_YYYY) ?: ""
+                } ?: getString(R.string.hyphen_symbol)
 
             val textColor =
                 data.cvdRiskScore?.let { CommonUtils.cvdRiskColorCode(it, requireContext()) }
