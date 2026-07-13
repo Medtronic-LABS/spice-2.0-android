@@ -1208,6 +1208,26 @@ object DateUtils {
         }
     }
 
+    /**
+     * Formats a given time in millis to the given [displayFormat] Format
+     *
+     * @param date : Time in millis
+     * @param displayFormat : Display format to which we want to convert
+     */
+    fun formatDateToDisplayFormat(
+        date: Long,
+        displayFormat: String,
+    ): String? {
+        return try {
+            val calendar = Calendar.getInstance()
+            calendar.timeInMillis = date
+            val format = SimpleDateFormat(displayFormat, Locale.getDefault())
+            return format.format(calendar.time)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
     fun formatDate(date: Long): String? {
         return try {
             val calendar = Calendar.getInstance()

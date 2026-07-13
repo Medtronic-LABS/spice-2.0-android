@@ -48,7 +48,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:constraint_referenced_ids="tvViewMore,ivDownArrow"/>
+                app:constraint_referenced_ids="tvViewMore,ivDownArrow" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/ivLogo"
@@ -60,16 +60,16 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvPreviousBp"
-                android:text="@string/previous_bp_reading"
                 android:layout_width="@dimen/_0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_10sdp"
                 android:fontFamily="@font/inter_medium"
+                android:text="@string/previous_bp_reading"
                 android:textColor="@color/bg_title"
                 android:textSize="@dimen/_18ssp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toEndOf="@+id/ivLogo"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent" />
 
             <LinearLayout
                 android:id="@+id/llBpReading"
@@ -77,7 +77,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_8sdp"
                 android:orientation="vertical"
-                app:layout_constraintTop_toBottomOf="@+id/tvPreviousBp"/>
+                app:layout_constraintTop_toBottomOf="@+id/tvPreviousBp" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvViewMore"
@@ -123,11 +123,14 @@
                 android:layout_marginEnd="@dimen/_20sdp"
                 android:contentDescription="@string/view_more"
                 android:padding="@dimen/_12sdp"
-                android:src="@drawable/ic_arrow_up"
+                android:rotation="180"
+                android:src="@drawable/ic_arrow_blue"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="@+id/tvViewLess"
                 app:layout_constraintStart_toEndOf="@+id/tvViewLess"
-                app:layout_constraintTop_toTopOf="@+id/tvViewLess" />
+                app:layout_constraintTop_toTopOf="@+id/tvViewLess"
+                app:tint="#B3B3B3"
+                tools:visibility="visible" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -185,8 +188,8 @@
                 android:text="@string/add_today_bp"
                 android:textColor="@color/bg_title"
                 android:textSize="@dimen/_18ssp"
-                app:fontFamily="@font/inter_medium"
                 android:textStyle="bold"
+                app:fontFamily="@font/inter_medium"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 

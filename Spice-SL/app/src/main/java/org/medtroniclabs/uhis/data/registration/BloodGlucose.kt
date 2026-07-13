@@ -18,5 +18,4 @@ data class BloodGlucose(
     val ogtt: Double? = null,
     val ogttUnit: String? = null,
     val ogttDateTime: String? = null,
-    val investigationDate: String? = null,
 ) : Serializable

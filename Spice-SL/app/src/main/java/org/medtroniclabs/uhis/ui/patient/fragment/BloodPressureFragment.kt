@@ -1,6 +1,7 @@
 package org.medtroniclabs.uhis.ui.patient.fragment
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +15,6 @@ import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_ddMMMyyyy
-import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMdd
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.medicalreview.ReqBPBGLogList
 import org.medtroniclabs.uhis.data.registration.BPResponse
@@ -48,10 +48,10 @@ class BloodPressureFragment : BaseFragment(), View.OnClickListener {
 
         private const val MIN_VALUE = 30
         private const val MAX_VALUE = 300
+        private const val VISIBLE_ITEM_COUNT = 5
     }
 
     private var bpReadings: List<Triple<String, String, Boolean>> = listOf()
-    private val visibleItemCount = 5
     private var isExpanded = false
 
     override fun onCreateView(
@@ -89,7 +89,7 @@ class BloodPressureFragment : BaseFragment(), View.OnClickListener {
 
         binding.tvViewLess.safeClickListener {
             if (isExpanded) {
-                renderItems(bpReadings.take(visibleItemCount))
+                renderItems(bpReadings.take(VISIBLE_ITEM_COUNT))
                 toggleView(false)
             }
         }
@@ -264,20 +264,23 @@ class BloodPressureFragment : BaseFragment(), View.OnClickListener {
             binding.clBPReadingHistory.visibility = View.VISIBLE
             binding.gViewMoreLess.visibility = View.VISIBLE
             this.bpReadings = processBPResponse(bpResponses)
-            renderItems(bpReadings.take(visibleItemCount))
+            renderItems(bpReadings.take(VISIBLE_ITEM_COUNT))
         } else {
             binding.clBPReadingHistory.visibility = View.GONE
         }
     }
 
     private fun processBPResponse(bpResponses: List<BPResponse>): List<Triple<String, String, Boolean>> =
-        bpResponses.map { response ->
-            val formattedDate = response.bpTakenOn.split("T").first()
-            val bpReading = "${response.avgSystolic.toInt()}/${response.avgDiastolic.toInt()}"
-            val isHighBP =
-                response.avgSystolic > UpperLimitSystolic || response.avgDiastolic > UpperLimitDiastolic
-            Triple(bpReading, formattedDate, isHighBP)
-        }
+        bpResponses
+            .sortedByDescending {
+                DateUtils.getLastMenstrualDate(it.bpTakenOn ?: "").timeInMillis
+            }.map { response ->
+                val formattedDate = response.bpTakenOn
+                val bpReading = "${response.avgSystolic.toInt()}/${response.avgDiastolic.toInt()}"
+                val isHighBP =
+                    response.avgSystolic > UpperLimitSystolic || response.avgDiastolic > UpperLimitDiastolic
+                Triple(bpReading, formattedDate, isHighBP)
+            }
 
     private fun renderItems(items: List<Triple<String, String, Boolean>>) {
         binding.llBpReading.removeAllViews()
@@ -289,6 +292,7 @@ class BloodPressureFragment : BaseFragment(), View.OnClickListener {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                 )
+                setVerticalGravity(Gravity.CENTER_VERTICAL)
             }
 
             val imageView = ImageView(requireContext()).apply {
@@ -324,12 +328,9 @@ class BloodPressureFragment : BaseFragment(), View.OnClickListener {
             }
 
             val textViewDate = TextView(requireContext()).apply {
-                val convertedDateFormat = DateUtils.convertDateTimeToDate(
-                    item.second,
-                    DATE_FORMAT_yyyyMMdd,
-                    DATE_FORMAT_ddMMMyyyy,
-                )
-                text = convertedDateFormat
+                val visitDateMillis = DateUtils.getLastMenstrualDate(item.second ?: "").timeInMillis
+                val displayDate = DateUtils.formatDateToDisplayFormat(visitDateMillis, DATE_FORMAT_ddMMMyyyy) ?: ""
+                text = displayDate
                 textSize = 16f
                 setTextColor(requireContext().getColor(R.color.secondary_black))
                 layoutParams =

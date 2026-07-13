@@ -2,6 +2,7 @@ package org.medtroniclabs.uhis.ui.patient.fragment
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +15,6 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_ddMMMyyyy
-import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMdd
 import org.medtroniclabs.uhis.common.DateUtils.convertToIsoFormat
 import org.medtroniclabs.uhis.data.medicalreview.ReqBPBGLogList
 import org.medtroniclabs.uhis.data.registration.BloodGlucose
@@ -29,6 +29,12 @@ import org.medtroniclabs.uhis.formgeneration.ui.SingleSelectionCustomView
 import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseFragment
+import org.medtroniclabs.uhis.ui.patient.fragment.BloodGlucoseFragment.Companion.GLUCOSE_MAX_VALUE
+import org.medtroniclabs.uhis.ui.patient.fragment.BloodGlucoseFragment.Companion.GLUCOSE_MIN_VALUE
+import org.medtroniclabs.uhis.ui.patient.fragment.BloodGlucoseFragment.Companion.HB1AC_MAX_VALUE
+import org.medtroniclabs.uhis.ui.patient.fragment.BloodGlucoseFragment.Companion.HB1AC_MIN_VALUE
+import org.medtroniclabs.uhis.ui.patient.fragment.BloodGlucoseFragment.Companion.OGTT_MAX_VALUE
+import org.medtroniclabs.uhis.ui.patient.fragment.BloodGlucoseFragment.Companion.OGTT_MIN_VALUE
 import org.medtroniclabs.uhis.ui.patient.util.ViewUtil
 import org.medtroniclabs.uhis.ui.patient.viewmodel.MedicalReviewBaseViewModel
 import org.medtroniclabs.uhis.ui.patient.viewmodel.NurseMedicalReviewViewModel
@@ -57,10 +63,10 @@ class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
 
         private const val GLUCOSE_MIN_VALUE = 0.6
         private const val GLUCOSE_MAX_VALUE = 33.0
+        private const val VISIBLE_ITEM_COUNT = 5
     }
 
     private var bgReadings: List<Triple<String, String?, Boolean>> = listOf()
-    private val visibleItemCount = 5
     private var isExpanded = false
 
     override fun onCreateView(
@@ -94,7 +100,7 @@ class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
         }
         binding.tvViewLess.safeClickListener {
             if (isExpanded) {
-                renderItems(bgReadings.take(visibleItemCount))
+                renderItems(bgReadings.take(VISIBLE_ITEM_COUNT))
                 toggleView(false)
             }
         }
@@ -167,56 +173,59 @@ class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
             binding.clBGReadingHistory.visibility = View.VISIBLE
             binding.gViewMoreLess.visibility = View.VISIBLE
             this.bgReadings = processBloodGlucoseResponse(bloodGlucoses)
-            renderItems(bgReadings.take(visibleItemCount))
+            renderItems(bgReadings.take(VISIBLE_ITEM_COUNT))
         } else {
             binding.clBGReadingHistory.visibility = View.GONE
         }
     }
 
     private fun processBloodGlucoseResponse(glucoseResponses: List<BloodGlucose>): List<Triple<String, String?, Boolean>> =
-        glucoseResponses.map { response ->
-            val formattedDate = response.investigationDate?.split("T")?.first()
-            val isHighGlucose = if (response.glucoseType == DefinedParams.FBS_KEY) {
-                (
-                    response.glucoseValue?.toFloat()
-                        ?: 0f
-                ) > 7.0f ||
+        glucoseResponses
+            .sortedByDescending {
+                DateUtils.getLastMenstrualDate(it.glucoseDateTime ?: "").timeInMillis
+            }.map { response ->
+                val formattedDate = response.glucoseDateTime
+                val isHighGlucose = if (response.glucoseType == DefinedParams.FBS_KEY) {
                     (
-                        response.hba1c?.toFloat()
+                        response.glucoseValue?.toFloat()
                             ?: 0f
-                    ) > 10.0f ||
-                    (response.ogtt?.toFloat() ?: 0f) > 11f
-            } else {
-                (
-                    response.glucoseValue?.toFloat()
-                        ?: 0f
-                ) > 11f ||
+                    ) > 7.0f ||
+                        (
+                            response.hba1c?.toFloat()
+                                ?: 0f
+                        ) > 10.0f ||
+                        (response.ogtt?.toFloat() ?: 0f) > 11f
+                } else {
                     (
-                        response.hba1c?.toFloat()
+                        response.glucoseValue?.toFloat()
                             ?: 0f
-                    ) > 10.0f ||
-                    (response.ogtt?.toFloat() ?: 0f) > 11f
-            }
-            val result = StringBuilder()
-
-            response.glucoseType?.let { glucoseType ->
-                response.glucoseValue?.let { glucoseValue ->
-                    result.append("${glucoseType.uppercase(Locale.ROOT)} - $glucoseValue ${response.glucoseUnit ?: ""}")
+                    ) > 11f ||
+                        (
+                            response.hba1c?.toFloat()
+                                ?: 0f
+                        ) > 10.0f ||
+                        (response.ogtt?.toFloat() ?: 0f) > 11f
                 }
-            }
+                val result = StringBuilder()
 
-            response.hba1c?.let { hba1c ->
-                if (result.isNotEmpty()) result.append(", ") // Add separator if there are previous values
-                result.append("${getString(R.string.glucose_hba1c)} - $hba1c ${response.hba1cUnit ?: ""}")
-            }
+                response.glucoseType?.let { glucoseType ->
+                    response.glucoseValue?.let { glucoseValue ->
+                        result.append("${glucoseType.uppercase(Locale.ROOT)} - $glucoseValue ${response.glucoseUnit ?: ""}")
+                    }
+                }
 
-            response.ogtt?.let { ogtt ->
-                if (result.isNotEmpty()) result.append(", ") // Add separator if there are previous values
-                result.append("${getString(R.string.ogtt)} - $ogtt ${response.ogttUnit ?: ""}")
+                response.hba1c?.let { hba1c ->
+                    if (result.isNotEmpty()) result.append(", ") // Add separator if there are previous values
+                    result.append("${getString(R.string.glucose_hba1c)} - $hba1c ${response.hba1cUnit ?: ""}")
+                }
+
+                response.ogtt?.let { ogtt ->
+                    if (result.isNotEmpty()) result.append(", ") // Add separator if there are previous values
+                    result.append("${getString(R.string.ogtt)} - $ogtt ${response.ogttUnit ?: ""}")
+                }
+                val glucoseInfo = result.toString()
+                Triple(glucoseInfo, formattedDate, isHighGlucose)
             }
-            val glucoseInfo = result.toString()
-            Triple(glucoseInfo, formattedDate, isHighGlucose)
-        }
 
     private fun renderItems(items: List<Triple<String, String?, Boolean>>) {
         binding.llBgReading.removeAllViews()
@@ -228,6 +237,7 @@ class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                 )
+                setVerticalGravity(Gravity.CENTER_VERTICAL)
             }
 
             val imageView = ImageView(requireContext()).apply {
@@ -272,12 +282,9 @@ class BloodGlucoseFragment : BaseFragment(), View.OnClickListener {
 
             if (item.second != null) {
                 val textViewDate = TextView(requireContext()).apply {
-                    val convertedDateFormat = DateUtils.convertDateTimeToDate(
-                        item.second,
-                        DATE_FORMAT_yyyyMMdd,
-                        DATE_FORMAT_ddMMMyyyy,
-                    )
-                    text = convertedDateFormat
+                    val visitDateMillis = DateUtils.getLastMenstrualDate(item.second ?: "").timeInMillis
+                    val displayDate = DateUtils.formatDateToDisplayFormat(visitDateMillis, DATE_FORMAT_ddMMMyyyy) ?: ""
+                    text = displayDate
                     textSize = 16f
                     setTextColor(requireContext().getColor(R.color.secondary_black))
                     layoutParams =

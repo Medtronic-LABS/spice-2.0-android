@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     app:cardCornerRadius="@dimen/_8sdp"
     app:cardElevation="@dimen/_2sdp"
     app:cardUseCompatPadding="true">
@@ -30,28 +30,28 @@
             android:id="@+id/clBpReading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_20sdp"
             android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginBottom="@dimen/_20sdp"
-            android:layout_marginHorizontal="@dimen/_20sdp"
             android:paddingBottom="@dimen/_15sdp"
             app:layout_constraintTop_toBottomOf="@+id/bioDataCardTitle">
 
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/clBGReadingHistory"
-                android:visibility="visible"
                 android:layout_width="match_parent"
-                android:layout_marginTop="@dimen/_10sdp"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                android:layout_marginTop="@dimen/_10sdp"
+                android:visibility="visible"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <androidx.constraintlayout.widget.Group
                     android:id="@+id/gLogoPreviousBpHeading"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:visibility="visible"
-                    app:constraint_referenced_ids="tvViewMore,ivDownArrow"/>
+                    app:constraint_referenced_ids="tvViewMore,ivDownArrow" />
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/ivLogo"
@@ -90,7 +90,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:visibility="visible"
-                    app:constraint_referenced_ids="tvViewMore,ivDownArrow"/>
+                    app:constraint_referenced_ids="tvViewMore,ivDownArrow" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvViewMore"
@@ -135,11 +135,14 @@
                     android:layout_marginEnd="@dimen/_20sdp"
                     android:contentDescription="@string/view_less"
                     android:padding="@dimen/_12sdp"
-                    android:src="@drawable/ic_arrow_up"
+                    android:rotation="180"
+                    android:src="@drawable/ic_arrow_blue"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="@+id/tvViewLess"
                     app:layout_constraintStart_toEndOf="@+id/tvViewLess"
-                    app:layout_constraintTop_toTopOf="@+id/tvViewLess" />
+                    app:layout_constraintTop_toTopOf="@+id/tvViewLess"
+                    app:tint="#B3B3B3"
+                    tools:visibility="visible" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -148,11 +151,11 @@
                 android:id="@+id/tvAddBpTittle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:text="@string/add_today_bg"
                 android:textColor="@color/bg_title"
                 android:textSize="@dimen/_18ssp"
                 android:textStyle="bold"
-                android:layout_marginTop="@dimen/_10sdp"
                 app:fontFamily="@font/inter_medium"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/clBGReadingHistory" />
@@ -179,13 +182,14 @@
                     app:fontFamily="@font/inter_regular"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvSelectErrorMessage"
                     style="@style/TextStyle_Error_14"
-                    android:visibility="gone"
                     android:layout_marginTop="@dimen/_8sdp"
-                    app:layout_constraintStart_toStartOf="parent"
                     android:text="@string/please_enter_details"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvSelect" />
 
                 <LinearLayout
@@ -196,15 +200,15 @@
                     android:orientation="horizontal"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tvSelectErrorMessage"/>
+                    app:layout_constraintTop_toBottomOf="@+id/tvSelectErrorMessage" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvInvestigationSpinnerErrorMessage"
                     style="@style/TextStyle_Error_14"
-                    android:visibility="gone"
                     android:layout_marginTop="@dimen/_8sdp"
-                    app:layout_constraintStart_toStartOf="parent"
                     android:text="@string/error_message_spinner"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/etInvestigationSelect" />
 
 
@@ -226,10 +230,10 @@
                     style="@style/Form_BP_Input_Box_Style"
                     android:layout_width="@dimen/_0dp"
                     android:layout_marginTop="@dimen/_8sdp"
-                    android:hint="@string/enter_reading"
-                    android:maxLines="1"
                     android:gravity="start"
+                    android:hint="@string/enter_reading"
                     android:inputType="numberDecimal"
+                    android:maxLines="1"
                     android:padding="@dimen/_10sdp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_weight="1.2"
@@ -239,10 +243,10 @@
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvReadingValueErrorMessage"
                     style="@style/TextStyle_Error_14"
-                    android:visibility="gone"
                     android:layout_marginTop="@dimen/_8sdp"
-                    app:layout_constraintStart_toStartOf="parent"
                     android:text="@string/please_enter_details"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/etReadingValue" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -263,10 +267,10 @@
                     style="@style/Form_BP_Input_Box_Style"
                     android:layout_width="@dimen/_0dp"
                     android:layout_marginTop="@dimen/_8sdp"
-                    android:hint="@string/enter_reading"
-                    android:maxLines="1"
                     android:gravity="start"
+                    android:hint="@string/enter_reading"
                     android:inputType="numberDecimal"
+                    android:maxLines="1"
                     android:padding="@dimen/_10sdp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_weight="1.2"
@@ -276,10 +280,10 @@
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvHBA1cReadingValueErrorMessage"
                     style="@style/TextStyle_Error_14"
-                    android:visibility="gone"
                     android:layout_marginTop="@dimen/_8sdp"
-                    app:layout_constraintStart_toStartOf="parent"
                     android:text="@string/please_enter_details"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/etHbA1cReadingValue" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -300,11 +304,11 @@
                     style="@style/Form_BP_Input_Box_Style"
                     android:layout_width="@dimen/_0dp"
                     android:layout_marginTop="@dimen/_8sdp"
-                    android:hint="@string/enter_reading"
-                    android:maxLines="1"
                     android:gravity="start"
-                    android:padding="@dimen/_10sdp"
+                    android:hint="@string/enter_reading"
                     android:inputType="numberDecimal"
+                    android:maxLines="1"
+                    android:padding="@dimen/_10sdp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_weight="1.2"
                     app:layout_constraintStart_toStartOf="parent"
@@ -313,10 +317,10 @@
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvOgttReadingValueErrorMessage"
                     style="@style/TextStyle_Error_14"
-                    android:visibility="gone"
                     android:layout_marginTop="@dimen/_8sdp"
-                    app:layout_constraintStart_toStartOf="parent"
                     android:text="@string/please_enter_details"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/etOgttReadingValue" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -346,34 +350,35 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tvInvestigationDate" />
+
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvInvestigationDateErrorMessage"
                     style="@style/TextStyle_Error_14"
-                    android:visibility="gone"
                     android:layout_marginTop="@dimen/_8sdp"
-                    app:layout_constraintStart_toStartOf="parent"
                     android:text="@string/please_enter_details"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/etInvestigationDate" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/btnAddNewReading"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_8sdp"
+                    android:layout_marginStart="@dimen/_24sdp"
                     android:background="@drawable/button_white_background"
                     android:drawableStart="@drawable/ic_add_reading"
                     android:drawablePadding="@dimen/_8sdp"
                     android:fontFamily="@font/inter_medium"
                     android:gravity="center"
+                    android:paddingHorizontal="@dimen/_16sdp"
+                    android:paddingVertical="@dimen/_8sdp"
                     android:text="@string/add_new_reading"
                     android:textColor="@color/cobalt_blue"
                     android:textSize="@dimen/_14ssp"
-                    android:layout_marginStart="@dimen/_24sdp"
-                    android:layout_marginVertical="@dimen/_8sdp"
-                    android:paddingHorizontal="@dimen/_16sdp"
-                    android:paddingVertical="@dimen/_8sdp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tvInvestigationDateErrorMessage"  />
+                    app:layout_constraintTop_toBottomOf="@id/tvInvestigationDateErrorMessage" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
@@ -384,18 +389,18 @@
                 android:text="@string/blood_glucose"
                 android:textColor="@color/bg_title"
                 android:textSize="@dimen/_18ssp"
-                android:visibility="gone"
                 android:textStyle="bold"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/titleHolder"
-                />
+                app:layout_constraintTop_toBottomOf="@+id/titleHolder" />
+
             <LinearLayout
                 android:id="@+id/llAddNewReadingList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginStart="@dimen/_10sdp"
                 android:layout_marginBottom="@dimen/_20sdp"
+                android:orientation="vertical"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/addReadingTitle" />
 
