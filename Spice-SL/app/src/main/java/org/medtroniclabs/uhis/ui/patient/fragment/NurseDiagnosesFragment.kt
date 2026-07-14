@@ -156,6 +156,7 @@ class NurseDiagnosesFragment : BaseFragment() {
 
     fun resetSelection() {
         medicalReviewBaseViewModel.selfCareSelection.clear()
+        if (!::binding.isInitialized) return
         addCustomView(
             getData(),
             DefinedParams.SELF_CARE,

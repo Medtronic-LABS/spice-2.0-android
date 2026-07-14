@@ -439,6 +439,7 @@ class SymptomsAdherenceFragment : BaseFragment() {
 
     fun resetSelection() {
         nurseMedicalReviewViewModel.worseningSymptomsSelections.clear()
+        if (!::binding.isInitialized) return
         addCustomView(
             getData(),
             DefinedParams.WORSENING_SYMPTOMS,
