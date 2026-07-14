@@ -142,7 +142,7 @@ object MemberAssessmentHistoryAdapterUtil {
                 )
             }
 
-            MenuConstants.NCD_MENU_ID.lowercase(), MenuConstants.CATARACT_MENU_ID.lowercase() -> {
+            MenuConstants.NCD_MENU_ID.lowercase(), MenuConstants.CATARACT_MENU_ID.lowercase(), MenuConstants.NCD_MEDICAL_REVIEW_SERVICE.lowercase() -> {
                 summaryItems.add(
                     SummaryItem(
                         context.getString(R.string.blood_pressure),
@@ -309,6 +309,7 @@ object MemberAssessmentHistoryAdapterUtil {
             MenuConstants.FP_MENU_ID.lowercase(),
             MenuConstants.MENU_REGISTRATION.lowercase(),
             MenuConstants.ENROLLMENT.lowercase(),
+            MenuConstants.NCD_MEDICAL_REVIEW_SERVICE.lowercase(),
             -> false
 
             else -> true
