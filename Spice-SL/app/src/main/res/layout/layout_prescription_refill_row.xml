@@ -111,6 +111,7 @@
             android:gravity="center"
             android:hint="Days"
             android:inputType="number"
+            android:maxLength="3"
             android:padding="@dimen/_4sdp"
             android:paddingHorizontal="@dimen/_8sdp"
             android:textColor="@color/black"

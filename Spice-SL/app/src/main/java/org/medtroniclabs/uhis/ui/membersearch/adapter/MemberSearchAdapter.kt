@@ -26,6 +26,7 @@ import org.medtroniclabs.uhis.data.model.PatientListResModel
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberWithTb
 import org.medtroniclabs.uhis.databinding.MembersSummaryListItemBinding
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
 import org.medtroniclabs.uhis.formgeneration.extension.capitalizeFirstChar
 import org.medtroniclabs.uhis.formgeneration.extension.px
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
@@ -182,13 +183,20 @@ class MemberSearchAdapter(
         holder.binding.tvRecentServiceDateSeparator.gone()
         holder.binding.tvRecentServiceDateValue.gone()
 
-        holder.binding.tvDiagnosis.visible()
-        holder.binding.tvDiagnosisSeparator.visible()
-        holder.binding.tvDiagnosisStatus.visible()
-        holder.binding.tvDiagnosis.setText(R.string.national_id)
-        holder.binding.tvDiagnosisStatus.text =
-            item.resolvedNationalId() ?: context.getString(R.string.separator_double_hyphen)
-        holder.binding.tvDiagnosisStatus.setTextColor(ContextCompat.getColor(context, R.color.grey_black))
+        val identityLabel = getIdentityLabel(context, item.identityType)
+        if (identityLabel != null) {
+            holder.binding.tvDiagnosis.visible()
+            holder.binding.tvDiagnosisSeparator.visible()
+            holder.binding.tvDiagnosisStatus.visible()
+            holder.binding.tvDiagnosis.text = identityLabel
+            holder.binding.tvDiagnosisStatus.text =
+                item.resolvedNationalId() ?: context.getString(R.string.separator_double_hyphen)
+            holder.binding.tvDiagnosisStatus.setTextColor(ContextCompat.getColor(context, R.color.grey_black))
+        } else {
+            holder.binding.tvDiagnosis.gone()
+            holder.binding.tvDiagnosisSeparator.gone()
+            holder.binding.tvDiagnosisStatus.gone()
+        }
 
         val name = item.name ?: context.getString(R.string.separator_hyphen)
         val gender = item.gender?.lowercase()?.capitalizeFirstChar()
@@ -287,6 +295,23 @@ class MemberSearchAdapter(
                 getGenderText(item.gender, context),
             ),
         )
+
+    private fun getIdentityLabel(
+        context: Context,
+        identityType: String?,
+    ): String? {
+        if (identityType.isNullOrBlank() || identityType.equals(DefinedParams.NA, ignoreCase = true)) {
+            return null
+        }
+        return CommonUtils
+            .getIdentityDisplayName(identityType)
+            .takeIf { it.isNotBlank() }
+            ?: when (identityType.lowercase()) {
+                DefinedParams.IDENTITY_TYPE_BRN -> context.getString(R.string.brn)
+                DefinedParams.IDENTITY_TYPE_NID -> context.getString(R.string.national_id)
+                else -> context.getString(R.string.national_id)
+            }
+    }
 
     private companion object {
         const val VIEW_TYPE_LOCAL = 0
