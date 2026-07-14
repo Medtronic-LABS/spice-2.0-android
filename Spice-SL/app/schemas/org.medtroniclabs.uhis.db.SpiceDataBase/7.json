@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "74941ff18c182b9515bad1abc99d4515",
+    "identityHash": "80525828f547d93d64a11f68261856ec",
     "entities": [
       {
         "tableName": "Household",
@@ -3521,7 +3521,7 @@
       },
       {
         "tableName": "MemberAssessmentHistory",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `memberFhirId` TEXT, `memberId` INTEGER, `visitDate` TEXT, `serviceProvided` TEXT, `encounterId` TEXT, `customStatus` TEXT, `latestVisit` INTEGER NOT NULL, `referralStatus` TEXT, `referralFacilityType` TEXT, `referralReason` TEXT, `nextFollowUpDate` TEXT, `serviceProvidedByName` TEXT, `serviceProvidedByRole` TEXT, `practitionerId` TEXT, `observations` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `memberFhirId` TEXT, `memberId` INTEGER, `visitDate` TEXT, `serviceProvided` TEXT, `encounterId` TEXT, `customStatus` TEXT, `latestVisit` INTEGER NOT NULL, `referralStatus` TEXT, `referralFacilityType` TEXT, `referralReason` TEXT, `nextFollowUpDate` TEXT, `serviceProvidedByName` TEXT, `serviceProvidedByRole` TEXT, `facilityName` TEXT, `practitionerId` TEXT, `observations` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -3593,6 +3593,11 @@
           {
             "fieldPath": "serviceProvidedByRole",
             "columnName": "serviceProvidedByRole",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "facilityName",
+            "columnName": "facilityName",
             "affinity": "TEXT"
           },
           {
@@ -4202,7 +4207,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '74941ff18c182b9515bad1abc99d4515')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '80525828f547d93d64a11f68261856ec')"
     ]
   }
 }
