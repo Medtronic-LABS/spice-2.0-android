@@ -28,8 +28,8 @@ android {
         applicationId = "org.medtroniclabs.uhis"
         minSdk = 23
         targetSdk = 36
-        versionCode = 32
-        versionName = "1.2.2"
+        versionCode = 33
+        versionName = "1.2.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
         resValue("color", "toolbar_color", "#2514BE")
