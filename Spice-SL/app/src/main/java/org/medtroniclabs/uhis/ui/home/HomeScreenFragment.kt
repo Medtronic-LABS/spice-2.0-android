@@ -27,7 +27,6 @@ import com.medtroniclabs.microcoaching.Language
 import com.medtroniclabs.microcoaching.MicroCoachingSDK
 import com.medtroniclabs.microcoaching.ui.chat.CoachingChatBottomSheet
 import com.medtroniclabs.microcoaching.ui.components.ChatFab
-import com.medtroniclabs.microcoaching.ui.components.LearnCard
 import com.medtroniclabs.microcoaching.ui.components.MorningCard
 import com.medtroniclabs.microcoaching.ui.flow.CoachingFlowActivity
 import com.medtroniclabs.microcoaching.ui.learn.modules.QuickLearnViewModel
@@ -108,7 +107,7 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
 
     /**
      * Wire up the MicroCoaching SDK surfaces on the home screen:
-     *   1. LearnCard banner pinned above the menu grid — shows the gap-prioritised
+     *   1. MorningCard banner pinned above the menu grid — shows the gap-prioritised
      *      morning module with Start / Skip actions.
      *   2. CHW AI chat FAB at bottom-right (opens chat in a bottom sheet).
      *
@@ -138,9 +137,10 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
         // wiring needed; the tile observes the count internally.
 
         // ── MorningCard banner (above grid) ───────────────────────────────
-        // Uses MorningCard (W6) for all modules — shows card count + quiz count.
-        // Start always launches the full lesson → quiz flow (cards-first per decision doc).
-        // Legacy LearnCard kept as fallback for modules without card content.
+        // Uses MorningCard (W6) for ALL refreshers — including quiz-only modules
+        // (cardCount == 0), where its eyebrow renders "Quiz". Start always launches
+        // the cards-first flow; RefresherContent skips straight to the quiz when the
+        // module ships no lesson cards, so a card-less module is handled gracefully.
         binding.coachingCardBanner.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
@@ -174,7 +174,6 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
                         }
                         // Effective question count: wrong answers if any; total otherwise.
                         val effectiveQuestionCount = if (wrongCount > 0) wrongCount else current.questionCount
-                        val hasCards = current.cardCount > 0
 
                         val onSkip: () -> Unit = {
                             // Skip = advance: mark this refresher skipped → the store
@@ -197,26 +196,15 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
                             )
                         }
 
-                        if (hasCards) {
-                            MorningCard(
-                                moduleTitle = title,
-                                cardCount = current.cardCount,
-                                questionCount = effectiveQuestionCount,
-                                estimatedMinutes = current.estimatedMinutes,
-                                onStart = onStart,
-                                onSkip = onSkip,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                            )
-                        } else {
-                            LearnCard(
-                                moduleTitle = title,
-                                questionCount = effectiveQuestionCount,
-                                estimatedMinutes = current.estimatedMinutes,
-                                onStart = onStart,
-                                onSkip = onSkip,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                            )
-                        }
+                        MorningCard(
+                            moduleTitle = title,
+                            cardCount = current.cardCount,
+                            questionCount = effectiveQuestionCount,
+                            estimatedMinutes = current.estimatedMinutes,
+                            onStart = onStart,
+                            onSkip = onSkip,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        )
                     }
                 }
             }
