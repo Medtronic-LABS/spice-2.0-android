@@ -41,10 +41,16 @@ import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.ktx.requestAppUpdateInfo
+import com.medtroniclabs.microcoaching.MicroCoachingSDK
+import com.medtroniclabs.microcoaching.ModelDownloadStrategy
+import com.medtroniclabs.microcoaching.ai.model.ModelProvider
+import com.medtroniclabs.microcoaching.domain.decision.CoachingMode
+import com.medtroniclabs.microcoaching.sherpa.SherpaOnnxStt
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import org.medtroniclabs.uhis.BuildConfig
 import org.medtroniclabs.uhis.R
+import org.medtroniclabs.uhis.SpiceBaseApplication
 import org.medtroniclabs.uhis.app.analytics.model.UserDetail
 import org.medtroniclabs.uhis.app.analytics.upload.UploadWorker
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
@@ -67,6 +73,7 @@ import org.medtroniclabs.uhis.common.DefinedParams.REFRESH_FRAGMENT
 import org.medtroniclabs.uhis.common.GeneralErrorDialog
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.TransferStatusEnum
+import org.medtroniclabs.uhis.common.resolveCoachingPersona
 import org.medtroniclabs.uhis.databinding.ActivityLandingBinding
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.model.CultureLocaleModel
@@ -203,6 +210,11 @@ class LandingActivity :
         UserDetail.updateUserIdIfEmpty(SecuredPreference.getUserId().toString())
         UserDetail.getAppVersion(BuildConfig.VERSION_NAME)
         attachObserver()
+
+        // Re-build the MicroCoaching SDK with the freshly issued JWT (it was
+        // initialised with an empty token in SpiceBaseApplication before login).
+        reinitCoachingSdkWithToken()
+
         runAppVersionCheck()
         // Deeplink for directly goes to Search patient
         patientSearchDeepLink()
@@ -1116,6 +1128,57 @@ class LandingActivity :
         super.onResume()
         doRefreshForDataUpdate()
         resumeInProgressAppUpdateIfAny()
+        notifyCoachingSdkOnConnectivityRestored()
+    }
+
+    /**
+     * Re-build the MicroCoaching SDK so its authToken, language, persona and model
+     * path reflect the post-login state. Called from [onCreate] after auth is
+     * confirmed. No-op if the token is missing or the SDK was not initialised in
+     * the Application class.
+     */
+    private fun reinitCoachingSdkWithToken() {
+        val token = SecuredPreference.getString(SecuredPreference.EnvironmentKey.TOKEN.name)
+        if (token.isNullOrEmpty() || !MicroCoachingSDK.isInitialized()) return
+        val modelDir = getExternalFilesDir(null)
+        val existingModel = modelDir
+            ?.listFiles()
+            ?.firstOrNull { it.extension == "task" || it.extension == "litertlm" }
+        val downloadStrategy = if (existingModel != null) {
+            ModelDownloadStrategy.PROVIDED
+        } else {
+            ModelDownloadStrategy.ON_FIRST_USE
+        }
+        MicroCoachingSDK
+            .Builder(applicationContext)
+            .language(SpiceBaseApplication.spiceLanguageToSdkLanguage(SecuredPreference.getCultureName()))
+            .backendUrl(BuildConfig.COACHING_BACKEND_URL)
+            .authToken(token)
+            .persona(resolveCoachingPersona())
+            .enableTelemetry(BuildConfig.ENABLE_COACHING_TELEMETRY)
+            .enableChat(true)
+            .enableLearnModule(true)
+            .enableApplyModule(true)
+            .enableVoice(true)
+            .offlineSttEngineFactory(SherpaOnnxStt.factory)
+            .modelDownloadStrategy(downloadStrategy)
+            .modelProviders(listOf(ModelProvider.HuggingFace))
+            .modelPath(existingModel?.absolutePath ?: "")
+            .huggingFaceToken(BuildConfig.HF_TOKEN)
+            .wifiOnlyModelDownload(false)
+            .forceMode(CoachingMode.EDGE)
+            .build()
+    }
+
+    /**
+     * Forward connectivity-restored events to the MicroCoaching SDK so it can flush
+     * pending telemetry and trigger an immediate sync. Idempotent on the SDK side.
+     */
+    private fun notifyCoachingSdkOnConnectivityRestored() {
+        if (!MicroCoachingSDK.isInitialized()) return
+        if (connectivityManager.isNetworkAvailable()) {
+            MicroCoachingSDK.getInstance().onConnectivityRestored()
+        }
     }
 
     /**

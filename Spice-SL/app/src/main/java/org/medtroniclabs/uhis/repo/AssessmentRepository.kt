@@ -213,6 +213,9 @@ class AssessmentRepository @Inject constructor(
                     DefinedParams.ID to healthFacilityEntity.fhirId.toString(),
                     DefinedParams.IS_DEFAULT to healthFacilityEntity.isDefault,
                     DefinedParams.PHONE_NUMBER to (healthFacilityEntity.phoneNumber ?: ""),
+                    // Facility tier → captured at PHU selection as actual.destinationTier
+                    // for the referral_location_* compliance gaps (may be "" pre-resync).
+                    AssessmentDefinedParams.PICKED_FACILITY_TYPE to (healthFacilityEntity.type ?: ""),
                 ),
             )
         }

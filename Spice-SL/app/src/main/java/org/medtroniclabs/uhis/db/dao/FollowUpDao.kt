@@ -9,6 +9,7 @@ import androidx.room.Transaction
 import org.medtroniclabs.uhis.data.FollowUpPatientModel
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineSyncStatus
 import org.medtroniclabs.uhis.db.entity.FollowUp
+import org.medtroniclabs.uhis.microcoaching.TodaysVisitRow
 import org.medtroniclabs.uhis.model.followup.FollowUpSortOrder
 import org.medtroniclabs.uhis.ui.followup.FollowUpDefinedParams
 
@@ -97,6 +98,31 @@ interface FollowUpDao {
 
     @Query("SELECT * FROM FollowUp WHERE syncStatus IN (:syncStatus)")
     suspend fun getAllFollowUps(syncStatus: List<String> = listOf(OfflineSyncStatus.NotSynced.name, OfflineSyncStatus.NetworkError.name)): List<FollowUp>
+
+    /**
+     * Minimal, PII-free projection of follow-ups due on [today] (`yyyy-MM-dd`)
+     * that aren't completed — the MicroCoaching SDK's today's-visit refresher
+     * source. The local DB only holds this CHW's villages' follow-ups, so no CHW/
+     * village filter is needed; `date(nextVisitDate)` mirrors the existing
+     * follow-up "today" filters above.
+     *
+     * `isPregnant` is a derived flag (1 when the member has an open pregnancy episode
+     * — an ANC visit recorded and no delivery date yet), via a correlated EXISTS so
+     * a member with multiple pregnancy rows never multiplies the visit. Used to match
+     * the trigger's `is_pregnant` predicate; no other patient data is exposed.
+     */
+    @Query(
+        "SELECT fu.type AS type, fu.encounterType AS encounterType, " +
+            "fu.nextVisitDate AS nextVisitDate, fu.villageId AS villageId, " +
+            "CASE WHEN EXISTS (" +
+            "  SELECT 1 FROM PregnancyDetail pd " +
+            "  JOIN HouseholdMember hhm ON pd.householdMemberLocalId = hhm.id " +
+            "  WHERE hhm.fhir_id = fu.memberId AND pd.ancVisitNo IS NOT NULL AND pd.dateOfDelivery IS NULL" +
+            ") THEN 1 ELSE 0 END AS isPregnant " +
+            "FROM FollowUp fu " +
+            "WHERE fu.isCompleted = 0 AND fu.nextVisitDate IS NOT NULL AND date(fu.nextVisitDate) = :today",
+    )
+    suspend fun getVisitsDueOn(today: String): List<TodaysVisitRow>
 
     @Query("SELECT COUNT(referenceId) FROM FollowUp where syncStatus IN (:syncStatus)")
     suspend fun getUnSyncedCount(syncStatus: List<String> = listOf(OfflineSyncStatus.NotSynced.name, OfflineSyncStatus.NetworkError.name)): Int

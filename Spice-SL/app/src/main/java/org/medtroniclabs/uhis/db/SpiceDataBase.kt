@@ -119,12 +119,15 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentNCDEntity
         ComplicationEntity::class, CurrentMedicationEntity::class, PhysicalExaminationEntity::class, ComplaintsEntity::class,
         SymptomEntity::class, ShasthyaKormiEntity::class, ShasthyaKormiLinkedVillageEntity::class,
     ],
-    version = 7,
+    version = 8,
     autoMigrations = [
         AutoMigration(1, 2),
         AutoMigration(2, 3),
         AutoMigration(4, 5),
         AutoMigration(6, 7),
+        // v8: nullable HealthFacilityEntity.type (facility tier) for the MicroCoaching
+        // compliance location gaps. Nullable add → auto-migratable.
+        AutoMigration(7, 8),
     ],
 )
 @TypeConverters(OfflineStatusTypeConverter::class)

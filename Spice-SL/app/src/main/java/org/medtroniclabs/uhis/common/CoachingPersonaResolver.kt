@@ -20,7 +20,7 @@ fun resolveCoachingPersona(): CoachingPersona =
 fun coachingPersonaForRoleName(roleName: String?): CoachingPersona =
     when {
         roleName == null -> CoachingPersona.UNKNOWN
-        roleName == RoleConstant.PROGRAM_OFFICER -> CoachingPersona.PO
+        roleName == RoleConstant.PO -> CoachingPersona.PO
         roleName in RoleConstant.CHWs -> CoachingPersona.SK
         else -> CoachingPersona.UNKNOWN
     }

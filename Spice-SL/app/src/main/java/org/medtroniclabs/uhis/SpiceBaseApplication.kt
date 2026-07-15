@@ -118,7 +118,7 @@ class SpiceBaseApplication : Application(), Configuration.Provider {
         fun spiceLanguageToSdkLanguage(cultureName: String?): Language {
             // cultureName may be the bare "বাংলা" or the full "বাংলা (Bangla)" display string —
             // use contains (case-insensitive) to match either form, consistent with CommonUtils.
-            val resolvedLanguage = if (cultureName?.contains(DefinedParams.BN_Locale, ignoreCase = true) == true) {
+            val resolvedLanguage = if (cultureName?.contains(DefinedParams.BN_LOCALE, ignoreCase = true) == true) {
                 Language.BANGLA
             } else {
                 Language.ENGLISH

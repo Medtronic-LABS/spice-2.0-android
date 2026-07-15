@@ -42,12 +42,6 @@
             />
 
         <item
-            android:id="@+id/chwAssistant"
-            android:icon="@drawable/ic_chw_assistant"
-            android:title="@string/chw_assistant"
-            android:visible="false" />
-
-        <item
             android:id="@+id/support"
             android:icon="@drawable/ic_mail"
             android:title="@string/support_" />

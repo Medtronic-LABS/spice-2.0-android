@@ -1971,4 +1971,10 @@
         <item>Assisted Delivery</item>
         <item>Cesarean Section</item>
     </string-array>
+
+    <!-- MicroCoaching SDK — on-device model download prompt (home chat FAB) -->
+    <string name="coaching_model_download_title">AI Model Required</string>
+    <string name="coaching_model_download_message">The AI model needs to be downloaded (~%1$s). Download now?</string>
+    <string name="coaching_model_download_message_metered">The AI model needs to be downloaded (~%1$s) and you\'re on mobile data. About %1$s will be used. Continue?</string>
+    <string name="coaching_download_started">Download started. The chat will open once the model is ready.</string>
 </resources>

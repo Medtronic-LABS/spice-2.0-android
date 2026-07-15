@@ -1894,4 +1894,10 @@
         <item>প্রসবে সহায়তা নিয়ে প্রসব করাতে হয়েছে (ভ্যাকুয়াম কাপ বা ফোরসেপ ব্যবহার করে প্রসব)</item>
         <item>সিজারিয়ান</item>
     </string-array>
+
+    <!-- MicroCoaching SDK — on-device model download prompt (home chat FAB) -->
+    <string name="coaching_model_download_title">AI মডেল প্রয়োজন</string>
+    <string name="coaching_model_download_message">AI মডেল ডাউনলোড করতে হবে (~%1$s)। এখন ডাউনলোড করবেন?</string>
+    <string name="coaching_model_download_message_metered">AI মডেল ডাউনলোড করতে হবে (~%1$s) এবং আপনি মোবাইল ডেটায় আছেন। প্রায় %1$s ব্যবহার হবে। চালিয়ে যাবেন?</string>
+    <string name="coaching_download_started">ডাউনলোড শুরু হয়েছে। মডেল প্রস্তুত হলে চ্যাট খুলবে।</string>
 </resources>

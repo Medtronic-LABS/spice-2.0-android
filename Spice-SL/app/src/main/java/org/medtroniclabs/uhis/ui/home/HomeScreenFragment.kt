@@ -1,21 +1,48 @@
 package org.medtroniclabs.uhis.ui.home
 
 import android.content.Intent
+import android.net.NetworkCapabilities
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
+import com.medtroniclabs.microcoaching.Language
+import com.medtroniclabs.microcoaching.MicroCoachingSDK
+import com.medtroniclabs.microcoaching.ui.chat.CoachingChatBottomSheet
+import com.medtroniclabs.microcoaching.ui.components.ChatFab
+import com.medtroniclabs.microcoaching.ui.components.MorningCard
+import com.medtroniclabs.microcoaching.ui.flow.CoachingFlowActivity
+import com.medtroniclabs.microcoaching.ui.learn.modules.QuickLearnViewModel
+import com.medtroniclabs.microcoaching.ui.learn.modules.bottomsheet.RefresherBottomSheet
+import com.medtroniclabs.microcoaching.ui.theme.MicroCoachingTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
+import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.databinding.FragmentHomeScreenBinding
+import org.medtroniclabs.uhis.db.dao.FollowUpDao
 import org.medtroniclabs.uhis.db.entity.MenuEntity
+import org.medtroniclabs.uhis.microcoaching.toTodaysVisit
 import org.medtroniclabs.uhis.ncd.followup.activity.NCDFollowUpActivity
 import org.medtroniclabs.uhis.ncd.screening.ui.ScreeningActivity
 import org.medtroniclabs.uhis.network.resource.ResourceState
@@ -35,6 +62,9 @@ import org.medtroniclabs.uhis.ui.patient.NurseDashboardActivity
 import org.medtroniclabs.uhis.ui.patient.UIConstants
 import org.medtroniclabs.uhis.ui.peersupervisor.PerformanceMonitoringActivity
 import org.medtroniclabs.uhis.ui.services.ServicesActivity
+import java.time.LocalDate
+import javax.inject.Inject
+import android.net.ConnectivityManager as AndroidConnectivityManager
 
 @AndroidEntryPoint
 class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
@@ -42,8 +72,20 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
 
     private val viewModel: LandingViewModel by activityViewModels()
 
+    @Inject
+    lateinit var followUpDao: FollowUpDao
+
+    private val chwId: String
+        get() = runCatching { SecuredPreference.getUserId().toString() }.getOrDefault("")
+
     companion object {
         const val TAG = "HomeScreenFragment"
+
+        /**
+         * How long the pull-to-refresh spinner lingers after [MicroCoachingSDK.refreshRefreshers]
+         * (which is fire-and-forget; the MorningCard updates reactively). Purely cosmetic feedback.
+         */
+        private const val COACHING_REFRESH_SPINNER_MS = 1200L
 
         fun newInstance(): HomeScreenFragment = HomeScreenFragment()
     }
@@ -64,6 +106,194 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
         super.onViewCreated(view, savedInstanceState)
         attachObservers()
         viewModel.getMenus()
+        setupCoachingSurfaces()
+    }
+
+    /**
+     * Wire up the MicroCoaching SDK surfaces on the home screen:
+     *   1. MorningCard banner pinned above the menu grid — the gap-prioritised
+     *      morning module with Start / Skip actions (collapses when empty).
+     *   2. CHW AI chat FAB at bottom-right (opens the chat bottom sheet).
+     */
+    private fun setupCoachingSurfaces() {
+        if (!MicroCoachingSDK.isInitialized()) return
+        val sdk = MicroCoachingSDK.getInstance()
+
+        sdk.onHomeScreenShown(chwId)
+        pushTodaysVisits(sdk)
+
+        // Pull-to-refresh → re-fetch the morning refreshers (backend re-runs its gap
+        // algorithm + on-device re-evaluation). refreshRefreshers() is fire-and-forget;
+        // the MorningCard updates reactively, so stop the spinner after a short delay.
+        binding.coachingSwipeRefresh.setOnRefreshListener {
+            sdk.refreshRefreshers()
+            val swipeRefresh = binding.coachingSwipeRefresh
+            swipeRefresh.postDelayed({ swipeRefresh.isRefreshing = false }, COACHING_REFRESH_SPINNER_MS)
+        }
+        // The Coaching grid tile + its skipped-refresher badge are rendered by the
+        // SDK's CoachingGridTile (see DashboardMenuItemsAdapter) — no host wiring needed.
+
+        // ── MorningCard banner (above grid) ───────────────────────────────
+        binding.coachingCardBanner.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MicroCoachingTheme {
+                    // Featured refresher from the shared store (the SAME pick the modules
+                    // screen shows). Collected as state so the card advances live when the
+                    // CHW skips/finishes, and hides when every refresher is skipped.
+                    val top by sdk.selectedMorningModule.collectAsState()
+
+                    val morningVm: QuickLearnViewModel = viewModel(
+                        factory = QuickLearnViewModel.factory(
+                            androidx.compose.ui.platform.LocalContext.current.applicationContext,
+                            chwId,
+                        ),
+                    )
+                    val wrongCount by morningVm.wrongQuestionCount.collectAsState()
+
+                    LaunchedEffect(top?.moduleId) {
+                        morningVm.computeWrongQuestionCount()
+                    }
+
+                    val current = top
+                    if (current != null) {
+                        val title = if (sdk.config.language == Language.ENGLISH) {
+                            current.titleEn ?: current.titleBn
+                        } else {
+                            current.titleBn
+                        }
+                        // Effective question count: wrong answers if any; total otherwise.
+                        val effectiveQuestionCount = if (wrongCount > 0) wrongCount else current.questionCount
+
+                        val onSkip: () -> Unit = {
+                            // Skip = advance: mark this refresher skipped → the store
+                            // promotes the next pending refresher (card re-renders) or
+                            // hides when none remain. Also feeds the Coaching tile badge.
+                            sdk.markRefresherSkipped(current.moduleFamilyId)
+                        }
+                        val onStart: () -> Unit = {
+                            RefresherBottomSheet.show(
+                                parentFragmentManager,
+                                chwId,
+                                fromHomeScreen = true,
+                                entryMode = RefresherBottomSheet.EntryMode.CARDS_FIRST,
+                                targetModuleFamilyId = current.moduleFamilyId,
+                            )
+                        }
+
+                        MorningCard(
+                            moduleTitle = title,
+                            cardCount = current.cardCount,
+                            questionCount = effectiveQuestionCount,
+                            estimatedMinutes = current.estimatedMinutes,
+                            onStart = onStart,
+                            onSkip = onSkip,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        )
+                    }
+                }
+            }
+        }
+
+        // ── Chat FAB (bottom-right) ────────────────────────────────────────
+        binding.chatFab.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MicroCoachingTheme {
+                    ChatFab(
+                        onClick = { launchCoachingChatSheet() },
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Push the CHW's patient visits due today into the coaching SDK so it can surface
+     * visit-relevant refreshers at cold-start. Only the clinical-type signal is sent —
+     * no patient identifiers (see [org.medtroniclabs.uhis.microcoaching.TodaysVisitRow]).
+     * Best-effort, off the main thread; failures are non-fatal.
+     */
+    private fun pushTodaysVisits(sdk: MicroCoachingSDK) {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            runCatching {
+                val today = LocalDate.now().toString() // yyyy-MM-dd, device-local
+                val visits = followUpDao.getVisitsDueOn(today).map { it.toTodaysVisit() }
+                sdk.onTodaysVisitsUpdated(visits)
+                Log.d(TAG, "MicroCoaching: pushed ${visits.size} visit(s) due today")
+            }.onFailure { Log.w(TAG, "MicroCoaching: failed to push today's visits", it) }
+        }
+    }
+
+    /**
+     * Open [CoachingChatBottomSheet] if the on-device LLM model is staged; otherwise
+     * prompt the CHW to download it. Low-end devices (< 3 GB RAM) run retrieval-only,
+     * so no model download is needed.
+     */
+    private fun launchCoachingChatSheet() {
+        if (!MicroCoachingSDK.isInitialized()) return
+        val sdk = MicroCoachingSDK.getInstance()
+        if (sdk.isLowEndDevice || sdk.modelManager.isModelPresent()) {
+            CoachingChatBottomSheet.show(parentFragmentManager)
+        } else {
+            showCoachingModelDownloadPrompt()
+        }
+    }
+
+    /**
+     * Single-dialog model-download confirmation. The metered-network hint is baked
+     * into the message so the user gives one explicit yes; the download size is read
+     * live from the SDK's configured model variant (not a hard-coded value).
+     */
+    private fun showCoachingModelDownloadPrompt() {
+        val activity = (activity as? BaseActivity) ?: return
+        val metered = isOnMeteredNetwork()
+        val messageRes = if (metered) {
+            R.string.coaching_model_download_message_metered
+        } else {
+            R.string.coaching_model_download_message
+        }
+        val sizeLabel = runCatching {
+            android.text.format.Formatter.formatShortFileSize(
+                requireContext(),
+                MicroCoachingSDK.getInstance().selectedModelVariant().sizeInBytes,
+            )
+        }.getOrDefault("")
+        activity.showErrorDialogue(
+            title = getString(R.string.coaching_model_download_title),
+            message = getString(messageRes, sizeLabel),
+            isNegativeButtonNeed = true,
+            positiveButtonName = getString(R.string.yes),
+            cancelBtnName = getString(R.string.no),
+        ) { isPositive ->
+            Log.i(TAG, "ModelDownloadPrompt dismissed — positive=$isPositive metered=$metered")
+            if (isPositive) triggerCoachingModelDownload()
+        }
+    }
+
+    private fun triggerCoachingModelDownload() {
+        Log.i(TAG, "triggerCoachingModelDownload — calling modelManager.triggerDownload()")
+        runCatching { MicroCoachingSDK.getInstance().modelManager.triggerDownload() }
+            .onFailure { Log.e(TAG, "modelManager.triggerDownload threw", it) }
+        Toast
+            .makeText(
+                requireContext(),
+                getString(R.string.coaching_download_started),
+                Toast.LENGTH_LONG,
+            ).show()
+        // Open the chat sheet so the CHW lands on a screen showing live download progress.
+        runCatching { CoachingChatBottomSheet.show(parentFragmentManager) }
+            .onFailure { Log.e(TAG, "CoachingChatBottomSheet.show threw", it) }
+    }
+
+    /**
+     * Default to `true` (assume metered) when the connectivity manager or the active
+     * network is null — a transient null read shouldn't bypass the user's consent step.
+     */
+    private fun isOnMeteredNetwork(): Boolean {
+        val cm = requireContext().getSystemService(AndroidConnectivityManager::class.java) ?: return true
+        val caps = cm.getNetworkCapabilities(cm.activeNetwork) ?: return true
+        return !caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
     }
 
     override fun onResume() {
@@ -103,7 +333,21 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
             val layoutManager = GridLayoutManager(context, 2)
             binding.rvActivitiesList.layoutManager = layoutManager
         }
-        binding.rvActivitiesList.adapter = DashboardMenuItemsAdapter(menuEntity, this)
+        val items = if (MicroCoachingSDK.isInitialized() &&
+            menuEntity.none { it.menuId.equals(MenuConstants.COACHING_MENU_ID, ignoreCase = true) }
+        ) {
+            val isBangla = MicroCoachingSDK.getInstance().config.language == Language.BANGLA
+            menuEntity + MenuEntity(
+                id = -1L,
+                menuId = MenuConstants.COACHING_MENU_ID,
+                name = "Coaching",
+                displayValue = if (isBangla) "কোচিং" else null,
+                displayOrder = menuEntity.size,
+            )
+        } else {
+            menuEntity
+        }
+        binding.rvActivitiesList.adapter = DashboardMenuItemsAdapter(items, this)
     }
 
     override fun onMenuSelected(
@@ -269,6 +513,12 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
                     intent.putExtras(bundle)
                     startActivity(intent)
                 })
+            }
+
+            MenuConstants.COACHING_MENU_ID -> {
+                if (MicroCoachingSDK.isInitialized()) {
+                    CoachingFlowActivity.launchLearn(requireContext(), chwId)
+                }
             }
         }
     }
