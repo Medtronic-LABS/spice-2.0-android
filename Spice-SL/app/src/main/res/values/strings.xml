@@ -44,6 +44,7 @@
     <string name="household_name_no">Household Name / No</string>
     <string name="diagnoses">Diagnoses</string>
     <string name="confirm_diagnoses">Confirm Diagnoses</string>
+    <string name="confirm_diagnosis">Confirm Diagnosis</string>
     <string name="edit_diagnosis">Edit Diagnoses</string>
     <string name="patient_status">Patient Status</string>
     <string name="child_status">Child Status</string>
@@ -122,8 +123,8 @@
     <string name="age">Age</string>
     <string name="seperator_hyphen" translatable="false">-</string>
     <string name="household_empty_text">No Household found.</string>
-    <string name="household_name_or_no">Name / No / Phone</string>
-    <string name="member_name_or_phone">Member Name / Phone</string>
+    <string name="household_name_or_no">Name / No / National ID or BRN / Phone</string>
+    <string name="member_name_or_phone">Member Name / National ID or BRN / Phone</string>
     <string name="add_external_member">Add External Member</string>
     <string name="member_deceased">Member Deceased</string>
     <string name="male_prefix">M</string>
@@ -133,6 +134,7 @@
     <string name="rmnch">RMNCH</string>
     <string name="tb">TB</string>
     <string name="national_id">National ID</string>
+    <string name="brn">BRN</string>
     <string name="bio_data">Bio Data</string>
     <string name="name">Name</string>
     <string name="gender">Gender</string>
@@ -190,7 +192,7 @@
     <string name="registration_status">Registration Status</string>
     <string name="pending">Pending</string>
     <string name="finished">Finished</string>
-    <string name="apply">Apply</string>\
+    <string name="apply">Apply</string>
     <string name="filter_count">Filter (%1$s)</string>
     <string name="sort_count">Sort (%1$s)</string>
     <string name="villages">Villages</string>
@@ -219,9 +221,35 @@
     <string name="highrisk_pregnant_women">Highrisk pregnant women</string>
     <string name="child_visit">Under-2 children counselled</string>
     <string name="child_health">Child Health</string>
+    <plurals name="child_health_next_visit_unavailable">
+        <item quantity="one">Next Child Health service will be available %d day after the last visit.</item>
+        <item quantity="other">Next Child Health service will be available %d days after the last visit.</item>
+    </plurals>
     <string name="household_registered">Households Registered</string>
     <string name="pregnancy_outcome_dashboard">Pregnancy Outcome</string>
     <string name="family_planning_dashboard">Family planning counselled</string>
+    <string name="dashboard_ncd_screening">NCD screening</string>
+    <string name="dashboard_ncd_referred_followup">NCD referred</string>
+    <string name="dashboard_ncd_follow_up_assessment">NCD follow-up assessment</string>
+    <string name="dashboard_total_ncd_services">Total NCD services</string>
+    <string name="dashboard_total_eye_screening">Total eye screening</string>
+    <string name="dashboard_cataract_screening">Cataract screening</string>
+    <string name="dashboard_ncd_in_cataract_camp">NCD services in cataract camp</string>
+    <string name="dashboard_referred_for_operation">Patients referred for operation</string>
+    <string name="dashboard_glasses_sold">Glasses sold</string>
+    <string name="assessment_status_ncd_service_cataract_camp">NCD in Cataract Camp</string>
+    <string name="assessment_status_referred_for_operation">Referred for operation</string>
+    <string name="assessment_status_glasses_sold">Glasses sold</string>
+    <string name="assessment_status_eye_problem">Eye Problem - %1$s</string>
+    <string name="assessment_status_glass_power">Power - %1$s</string>
+    <string name="assessment_status_cataracts">Cataracts</string>
+    <string name="assessment_status_lacrimal_tear_duct_problem">Lacrimal (Tear Duct) Problem</string>
+    <string name="assessment_status_pterygium">Pterygium</string>
+    <string name="assessment_status_glaucoma">Glaucoma</string>
+    <string name="assessment_status_myopia">Myopia</string>
+    <string name="assessment_status_presbyopia">Presbyopia</string>
+    <string name="assessment_status_other_eye_problem">Other Problem</string>
+    <string name="assessment_status_no_eye_problem">No Problem</string>
     <string name="tb_assessment">TB Assessment</string>
     <string name="tb_contact_tracing">TB Contact Tracing</string>
     <string name="eye_care">Eye Care</string>
@@ -438,8 +466,9 @@
     <string name="Select_Date">please select from date</string>
     <string name="medical_review">Medical Review Visit</string>
     <string name="hh_visit">HH Visit</string>
+    <string name="scheduled_visit">Scheduled Visit</string>
     <string name="no_patient_found">No Patient found.</string>
-    <string name="patient_count">%1$d Patients</string>
+    <string name="patient_count">%1$s Patients</string>
     <string name="reason">Reason</string>
     <string name="start_date">Start Date</string>
     <string name="hh_name">HH Name</string>
@@ -753,6 +782,7 @@
     </plurals>
     <string name="open_play_store">Open Play Store</string>
     <string name="please_check_if_play_store_available">Please check if Google Play Store is installed in the device</string>
+    <string name="please_update_the_app">A new version of the app is available. Please update to continue.</string>
 
     <!-- Registration -->
     <string name="register">Register</string>
@@ -892,6 +922,8 @@
     <string name="enter_number">Enter Number</string>
     <string name="maternal_outcomes">Maternal Outcomes</string>
     <string name="ncd">NCD</string>
+    <string name="ncd_enrollment">NCD Enrollment</string>
+    <string name="ncd_follow_up">NCD Follow up</string>
     <string name="pregnancy_diagnosis">Have you ever been diagnosed with any of the following?</string>
     <string name="eclampsia">Eclampsia</string>
     <string name="pre_eclampsia">Pre-Eclampsia</string>
@@ -1650,6 +1682,7 @@
     <string name="regimen_line" translatable="false">Regimen Line</string>
     <string name="men_having_sex_with_men_msm">Men Having Sex with Men (MSM)</string>
     <string name="ss_name">SS Name</string>
+    <string name="shasthya_kormi_sk">Shasthya Kormi (SK)</string>
 
     <string name="lmp_last_menstrual_period">LMP (Last Menstrual Period)</string>
     <string name="edd_estimated_delivery_date">👶 EDD (Expected Date of Delivery)</string>
@@ -1701,7 +1734,9 @@
     <string name="service_history_not_found">There are no service history</string>
     <string name="service_name">Service Name</string>
     <string name="service_date">Service Date</string>
+    <string name="service_provided_by">Service Provided By</string>
     <string name="referral_status">Referral Status</string>
+    <string name="referred_location">Referred Location</string>
     <string name="error_person_name">Please enter valid name</string>
     <string name="emergency_referral">⚠️ Emergency referral</string>
     <string name="non_emergency_referral">ⓘ Non-Emergency referral</string>
@@ -1731,14 +1766,209 @@
     <string name="follow_up_visit">Follow up Visit</string>
     <string name="disabled_account">Disabled Account</string>
     <string name="account_locked_multiple_attempts">Account locked due to multiple invalid login attempts.</string>
-    <string name="string_slash_string" translatable="false">%1$s/%2$s</string>
+    <string name="treatment_plan_success_message">Treatment plan submitted successfully</string>
+    <string name="gestational_diabetes_gdm">Gestational Diabetes(GDM)</string>
+    <string name="scan_qr">Scan QR Code</string>
+    <string name="scan_new_qr">Scan New QR Code?</string>
+    <string name="linking_qr_code_is_mandatory">Linking QR code is mandatory</string>
+    <string name="qr_code_scanned">QR code linked successfully</string>
 
-    <!-- MicroCoaching SDK — CHW Assistant -->
-    <string name="chw_assistant">CHW Assistant</string>
-    <string name="coaching_model_download_title">AI Model Required</string>
-    <string name="coaching_model_download_message">The AI model needs to be downloaded (~%1$s). Download now?</string>
-    <string name="coaching_model_download_message_metered">The AI model needs to be downloaded (~%1$s) and you\'re on mobile data. About %1$s will be used. Continue?</string>
-    <string name="coaching_metered_network_title">Mobile Data Warning</string>
-    <string name="coaching_metered_network_message">You are on mobile data. About %1$s will be used. Continue?</string>
-    <string name="coaching_download_started">Download started. The chat will open once the model is ready.</string>
+    <string name="missed_visit">Missed Visit</string>
+    <string name="ltf">LTF</string>
+    <string name="enter_patient_search">Enter Name / ID / Mobile Number</string>
+    <string name="overdue_days">%1$s days overdue</string>
+    <string name="referred_to">Referred to %1$s</string>
+    <string name="high_bg">High(BG)</string>
+    <string name="high_bp">High(BP)</string>
+    <string name="high_both">High(BG), High(BP)</string>
+    <string name="days_due_at_mr">%1$s days due</string>
+    <string name="day_due_at_mr">%1$s day due</string>
+    <string name="day_due_at">%1$s day due at %2$s</string>
+    <string name="days_due_at">%1$s days due at %2$s</string>
+    <string name="one_patient_found">1 Patient Found</string>
+    <string name="sort_with_count">Sort%1$s</string>
+    <string name="filter_with_count">Filter%1$s</string>
+    <string name="patient_already_enrolled">The patient is already enrolled</string>
+    <string name="patient_already_enrolled_with_program_id">The patient is already enrolled with Program ID&#160;</string>
+   <string name="terms_condition"><![CDATA[Terms & Condition]]></string>
+    <string name="gps_enabled">Your GPS seems to be disabled, do you want to enable it?</string>
+    <string name="invalid_qr">Invalid QR</string>
+    <string name="scan_valid_qr">Please scan a valid QR</string>
+    <string name="duplicate_record_found">Duplicate Record Found</string>
+
+    <string name="symptoms_adherence">Symptoms &amp; Adherence</string>
+    <string name="worsening_symptoms">Has the patient had any new or worsening symptoms?</string>
+    <string name="taking_medication">Are you taking medication regularly?</string>
+    <string name="taken_medication">In last 30 days how many days you have taken medicines?</string>
+
+    //BG
+    <string name="add_today_bg">Add Today\'s BG Reading</string>
+    <string name="previous_bg_reading">Previous Blood Glucose Readings</string>
+
+    <string name="select_investigation">Select Investigation</string>
+    <string name="investigation_date">Investigation Date</string>
+    <string name="ddMmYyyy">dd/mm/yyyy</string>
+    <string name="enter_reading">Enter Reading</string>
+
+    //prescription
+    <string name="previous_prescription_history">Previous Prescription History</string>
+    <string name="today_prescription">Today\'s Prescription</string>
+    <string name="recommended_medication">Recommended Medication</string>
+    <string name="search_medication">Search Medication</string>
+    <string name="prescribe_medication">Prescribe Medication</string>
+    <string name="repeat_prescription">Repeat Same Prescription Today ?</string>
+    <string name="duration_caps">DURATION</string>
+    <string name="duration">Duration</string>
+
+    <string name="new_ncd">Is there a development of new NCD?</string>
+    <string name="_1_symptom_selected">1 Symptom Selected</string>
+    <string name="program_id">Program ID</string>
+    <string name="health_history">Health History</string>
+    <string name="family_history">Family History</string>
+    <string name="controlled">Controlled</string>
+    <string name="un_controlled">Uncontrolled</string>
+
+    //bp
+    <string name="systolicMmhg">Systolic (mmHg)</string>
+    <string name="diastolicMmhg">Diastolic (mmHg)</string>
+    <string name="expand" translatable="false">expand</string>
+    <string name="add_today_bp">Add Today\'s BP Reading</string>
+    <string name="previous_bp_reading">Previous Blood Pressure Readings</string>
+    <string name="view_less">View Less Readings</string>
+    <string name="view_more">View More Readings</string>
+    <string name="while_messauring">While measuring blood pressure</string>
+
+    <string name="blood_glucode_mmol_l">Blood Glucose (mmol/L)</string>
+    <string name="hba1c_percentage">HBA1c (%)</string>
+    <string name="ogtt_mmol" translatable="false">OGTT (mmol/L) </string>
+    <string name="ogtt" translatable="false">OGTT </string>
+    <string name="medication_prescribed_colon">Medication Prescribed :</string>
+
+    <string name="please_enter_details_prefix">"Please enter a valid value for"</string>
+    <string name="instructions_caps">INSTRUCTIONS</string>
+    <string name="referred_on">Ordered Date</string>
+    <string name="referred_by">Ordered by</string>
+    <string name="value">Value Entered By</string>
+    <string name="previous_investingation_history">Previous Investigation History</string>
+    <string name="recommended_investigation">Recommended Investigation</string>
+    <string name="today_s_investigation">Today’s Investigation</string>
+    <string name="select_tested_on_date">Please select Tested on date</string>
+
+    <string name="lab_test_saved_successfully">LabTest saved successfully</string>
+    <string name="have_you_observed_to_confirm_the_test_values_and_comments_uploaded_by_the_lab_technician">Have you observed to confirm the test values and comments uploaded by the lab technician?</string>
+
+    <string name="lifestyle_modification">Lifestyle Modification</string>
+    <string name="self_care">Counselling on lifestyle modification and self care done?</string>
+    <string name="next_follow_up">Next Follow Up</string>
+    <string name="decrease" translatable="false"> Decrease the days</string>
+    <string name="increase" translatable="false"> Increase the days</string>
+    <string name="next_follow_up_day">After %d day</string>
+    <string name="next_follow_up_days">After %d days</string>
+    <string name="follow_up_date_manually">Select Follow Up Date Manually</string>
+    <string name="days_error">Day should not be less than one day</string>
+    <string name="years_error" >Follow up days should be less than 2 years</string>
+    <string name="community_clinic">Community Clinic</string>
+    <string name="medication_prescribed_">Medication\nPrescribed</string>
+    <string name="start_treatment">Start Treatment</string>
+    <string name="prescribed_quantity">Prescribed Days</string>
+    <string name="reason_for_qulaipharm">Qualipharm Response</string>
+    <string name="village_town_city_name">Village/Town/City Name</string>
+    <string name="invalid_qr_message">Invalid QR Code. The scanned QR Code is already associated with a different individual.</string>
+
+    <string name="string_slash_string" translatable="false">%1$s/%2$s</string>
+    <string name="upcoming_in_days">Upcoming in %1$s days</string>
+    <string name="day_overdue">%1$s day, Overdue</string>
+    <string name="days_overdue">%1$s days, Overdue</string>
+    <string name="health_condition">Health Condition</string>
+    <string name="both_lower_case">Both</string>
+    <string name="union">Union/Ward</string>
+    <string name="union_village">Union</string>
+    <string name="linked_to_care">Linked to Care</string>
+    <string name="both">Both</string>
+    <string name="upazila">Upazila</string>
+    <string name="upazilla_health_complex">Upazila Health Complex</string>
+    <string name="unsuccessful">Unsuccessful</string>
+    <string name="willing_to_visit_uhc">Willing to visit UHC?</string>
+    <string name="other_reasons">Other Reasons</string>
+    <string-array name="call_failure_reason_for_sk">
+        <item>--Select--</item>
+        <item>Treatment from other facility</item>
+        <item>No Medicine</item>
+        <item>Long Distance</item>
+        <item>Transportation and unsupplied medicine cost</item>
+        <item>Long waiting queue</item>
+        <item>Migrated to other places</item>
+        <item>Died</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="call_unsuccessful_reasons">
+        <item>--Select--</item>
+        <item>Wrong Number</item>
+        <item>Unreachable</item>
+    </string-array>
+    <string name="complications_during_delivery">Complications during delivery</string>
+    <string name="present">Present</string>
+    <string name="pnc_status">PNC Status</string>
+    <string name="fp_status">FP Status</string>
+    <string name="desire_for_children">Desire for children in future</string>
+    <string name="delivery_mode">Delivery Mode</string>
+    <string name="family">Family</string>
+    <string-array name="desire_for_children_options">
+        <item>Yes  within 2 yrs</item>
+        <item>Yes after 2 yrs</item>
+        <item>No</item>
+        <item>Unsure</item>
+    </string-array>
+    <string-array name="family_planning_methods">
+        <item>Pills</item>
+        <item>Injectables</item>
+        <item>Implant</item>
+        <item>IUD</item>
+        <item>Condoms</item>
+        <item>Sterilization (F)</item>
+        <item>Sterilization (M)</item>
+        <item>None</item>
+    </string-array>
+    <string name="patient_record">Patient Record</string>
+    <string name="call_date">Call Date</string>
+    <string name="call_information">Call Information</string>
+    <string name="called_by">Called By</string>
+    <string name="call_category">Call Category</string>
+    <string name="agreed_to_visit">Agreed to visit</string>
+    <string name="call_status">Call Status</string>
+    <string name="mm_HG" translatable="false">mmHg</string>
+    <string name="days_due_string">Days Due</string>
+    <string name="anc_received">ANC received</string>
+    <string name="anc_received_value">From BRAC (%1$s) / Total (%2$s)</string>
+    <string name="household_brac_service_members_value">(%1$s / %2$s)</string>
+    <string name="live_birth_s">Live Births (%1$s)</string>
+    <string name="still_birth_s">Still Birth (%1$s)</string>
+    <string name="newborn_death_s">Newborn Death (%1$s)</string>
+    <string name="no_of_living_children">Number of Living Children</string>
+    <string name="share">Share</string>
+    <string name="screened_date">Screened Date</string>
+    <string name="screened_by">Screened By</string>
+    <string name="address">Address</string>
+    <string name="enrolled_date">Enrolled Date</string>
+    <string name="cvd_risk_bmi">CVD Risk, BMI</string>
+    <string name="co_morbidity">Co-Morbidity</string>
+    <string name="visit_date">Visit Date</string>
+    <string name="visit_place">Visit Place</string>
+    <string name="bg_fbs">BG (FBS)</string>
+    <string name="medication">Medication</string>
+    <string name="referred_to_cc">Referred to CC</string>
+    <string name="performed_by">Performed By</string>
+    <string name="clinical_information">Clinical Information</string>
+    <string name="latest_medical_review_due_date">Latest Medical Review Date</string>
+    <string name="oldest_medical_review_due_date">Oldest Medical Review Date</string>
+    <string name="latest_next_review_date">Latest Next Review Date</string>
+    <string name="oldest_next_review_date">Oldest Next Review Date</string>
+    <string name="reason_referral">Reason for referral</string>
+    <string name="division">Division</string>
+    <string name="district">District</string>
+    <string-array name="mode_of_delivery">
+        <item>Normal Delivery</item>
+        <item>Assisted Delivery</item>
+        <item>Cesarean Section</item>
+    </string-array>
 </resources>

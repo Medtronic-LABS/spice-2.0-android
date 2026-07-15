@@ -150,8 +150,8 @@ class ScreeningSummaryFragment : BaseFragment(), View.OnClickListener {
     private fun loadSiteDetails(data: ArrayList<HealthFacilityEntity>?) {
         val list = arrayListOf<Map<String, Any>>(
             hashMapOf(
-                DefinedParams.NAME to DefinedParams.DefaultIDLabel,
-                DefinedParams.ID to DefinedParams.DefaultSelectID,
+                DefinedParams.NAME to DefinedParams.DEFAULT_ID_LABEL,
+                DefinedParams.ID to DefinedParams.DEFAULT_SELECT_ID,
             ),
         )
         var defaultPosition = 0
@@ -160,7 +160,7 @@ class ScreeningSummaryFragment : BaseFragment(), View.OnClickListener {
                 hashMapOf(
                     DefinedParams.ID to site.id,
                     DefinedParams.NAME to site.name,
-                    DefinedParams.TenantId to site.tenantId,
+                    DefinedParams.TENANT_ID to site.tenantId,
                     DefinedParams.FhirId to (site.fhirId ?: 0),
                 ).also {
                     if (generalDetailsViewModel.siteDetail.siteId == site.fhirId?.toLongOrNull()) {
@@ -214,7 +214,7 @@ class ScreeningSummaryFragment : BaseFragment(), View.OnClickListener {
                         val summaryValue = ArrayList<HivSummaryModel>()
                         for ((key, value) in map) {
                             value?.let { result ->
-                                if (result is String && result.equals(DefinedParams.yes, true) && key is String) {
+                                if (result is String && result.equals(DefinedParams.YES_SMALL, true) && key is String) {
                                     serverData.filter { it.id == key }[0].let { listForm ->
                                         listForm.orderId?.let { orderIndex ->
                                             summaryValue.add(
@@ -546,7 +546,7 @@ class ScreeningSummaryFragment : BaseFragment(), View.OnClickListener {
         generalDetailsViewModel.siteDetail.apply {
             siteName = map[DefinedParams.NAME] as? String ?: ""
             siteId = map[DefinedParams.FhirId]?.toString()?.toLongOrNull() ?: -1L
-            tenantId = map[DefinedParams.TenantId]?.toString()?.toLongOrNull() ?: -1L
+            tenantId = map[DefinedParams.TENANT_ID]?.toString()?.toLongOrNull() ?: -1L
         }
     }
 

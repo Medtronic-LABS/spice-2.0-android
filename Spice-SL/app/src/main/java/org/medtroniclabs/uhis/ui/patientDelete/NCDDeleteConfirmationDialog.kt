@@ -98,7 +98,7 @@ class NCDDeleteConfirmationDialog() : DialogFragment(), View.OnClickListener {
             binding.cgDeleteReason,
             otherCallBack = { selectedName, isChecked ->
                 if (selectedName.startsWith(
-                        DefinedParams.Other.lowercase(),
+                        DefinedParams.OTHER.lowercase(),
                         ignoreCase = true,
                     )
                 ) {
@@ -187,7 +187,7 @@ class NCDDeleteConfirmationDialog() : DialogFragment(), View.OnClickListener {
 
         if (reasonListCustomView.getSelectedTags().isNotEmpty()) {
             val selectedReason = getChipValue(reasonListCustomView.getSelectedTags()[0])
-            if (selectedReason.contains(DefinedParams.Other)) {
+            if (selectedReason.contains(DefinedParams.OTHER)) {
                 if (binding.etOtherReason.text.isNullOrBlank()) {
                     isValid = false
                     binding.tvReasonErrorMessage.text = getString(R.string.valid_reason)

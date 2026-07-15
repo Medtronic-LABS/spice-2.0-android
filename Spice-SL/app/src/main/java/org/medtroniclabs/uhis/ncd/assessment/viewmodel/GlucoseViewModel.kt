@@ -40,14 +40,14 @@ class GlucoseViewModel @Inject constructor(
             with(patientDetails) {
                 NCDMRUtil.getBioDataBioMetrics(hashMap, this, isGlucose = true)
                 id?.let { requestRelatedPersonFhirId ->
-                    put(DefinedParams.RelatedPersonFhirId, requestRelatedPersonFhirId)
+                    put(DefinedParams.RELATED_PERSON_FHIR_ID, requestRelatedPersonFhirId)
                 }
                 patientId?.let { requestPatientId ->
                     put(DefinedParams.PATIENT_ID, requestPatientId)
                 }
             }
             put(AssessmentDefinedParams.assessmentProcessType, CommonUtils.requestFrom())
-            put(DefinedParams.AssessmentOrganizationId, SecuredPreference.getOrganizationFhirId())
+            put(DefinedParams.ASSESSMENT_ORGANIZATION_ID, SecuredPreference.getOrganizationFhirId())
             put(DefinedParams.Provenance, ProvanceDto())
         }
         viewModelScope.launch(dispatcherIO) {

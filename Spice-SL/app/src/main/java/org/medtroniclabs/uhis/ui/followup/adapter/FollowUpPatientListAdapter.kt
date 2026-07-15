@@ -8,7 +8,7 @@ import org.medtroniclabs.uhis.ui.followup.fragment.FollowUpPatientListFragment
 
 class FollowUpPatientListAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle) :
     FragmentStateAdapter(fragmentManager, lifecycle) {
-    override fun getItemCount(): Int = 3
+    override fun getItemCount(): Int = 2
 
     override fun createFragment(p0: Int): Fragment = FollowUpPatientListFragment()
 }

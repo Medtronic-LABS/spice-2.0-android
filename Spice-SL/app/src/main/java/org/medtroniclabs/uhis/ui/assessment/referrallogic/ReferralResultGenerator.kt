@@ -6,7 +6,7 @@ import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams.CBS_Referral
 import org.medtroniclabs.uhis.common.DefinedParams.Referred_NCD
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.NoSymptoms
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.NO_SYMPTOMS
 import org.medtroniclabs.uhis.mappingkey.Screening
 import org.medtroniclabs.uhis.model.assessment.AssessmentMemberDetails
 import org.medtroniclabs.uhis.ncd.screening.utils.ReferredReason
@@ -18,18 +18,24 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.Dispensed
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.DryMouthOrTongue
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FACILITY_TYPE_COMMUNITY_CLINIC
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FACILITY_TYPE_UPAZILA
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FBS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FBS_MAXIMUM_MGDL_VALUE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FBS_MAXIMUM_VALUE_BD
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FB_MAX_BREATHING
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FB_MAX_MONTH
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FB_MIN_BREATHING
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FB_MIN_MONTH
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FOLLOW_UP_FBS_MAXIMUM_MGDL_VALUE
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FOLLOW_UP_FBS_MAXIMUM_VALUE_BD
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FOLLOW_UP_RBS_MAXIMUM_MGDL_VALUE
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FOLLOW_UP_RBS_MAXIMUM_VALUE_BD
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HasCoughLastedLonger
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HasNightSweatsTB
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HasWeightLoss
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.LittleOrNoUrine
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.MGDL
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NoTearsWhenCrying
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.RBS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.RBS_MAXIMUM_MGDL_VALUE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.RBS_MAXIMUM_VALUE_BD
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.REFERRAL_FACILITY_TYPE
@@ -132,7 +138,7 @@ class ReferralResultGenerator {
             updateVisitCount(map, RMNCH.ANC)
         } else if (map.containsKey(RMNCH.ChildHoodVisit)) {
             val childVisitMap = map[RMNCH.ChildHoodVisit] as Map<String, Any>
-            if (CommonDefinedParams.yes
+            if (CommonDefinedParams.YES_SMALL
                     .equals(childVisitMap[AssessmentDefinedParams.ID_CHILD_REFERRAL] as? String, true)
             ) {
                 addResultMap(ReferralReasons.aliasOf(ReferralReasons.childhoodVisitSigns), ReferralStatus.Referred.name)
@@ -565,7 +571,7 @@ class ReferralResultGenerator {
                 }
             }
         }
-        if (!selectedSignsList.contains(NoSymptoms.lowercase())) {
+        if (!selectedSignsList.contains(NO_SYMPTOMS.lowercase())) {
             addResultMap(referralKey, ReferralStatus.Referred.name)
             addReferralReason(referedReason)
         }
@@ -633,54 +639,36 @@ class ReferralResultGenerator {
         bpResult: Pair<Int, Int>,
         bgResult: Triple<String?, String?, Double?>,
         symptomList: List<String>,
+        isFollowUpVisit: Boolean = false,
+        useNcdRiskAlgorithm: Boolean = false,
     ): Pair<String, ArrayList<String>>? {
+        if (isFollowUpVisit && useNcdRiskAlgorithm) {
+            return computeNcdFollowUpReferralResult(map, bpResult, bgResult, symptomList)
+        }
+
         val referredReasonList = ArrayList<String>()
 
-        // Referral Logic for Symptoms
-//        if (symptomList.isNotEmpty()) {
-//            referredReasonList.add(ReferredReason.SYMPTOMS)
-//        }
+        if (symptomList.isNotEmpty()) {
+            referredReasonList.add(ReferredReason.SYMPTOMS)
+        }
 
-        // Referral Logic for BP
         if (bpResult.first >= UpperLimitSystolic ||
             bpResult.second >= UpperLimitDiastolic
         ) {
             referredReasonList.add(ReferredReason.bloodPressure)
         }
 
-        // Referral Logic for BG
-        bgResult.first?.let { unit ->
-            bgResult.third?.let { bgValue ->
-                if (unit == MGDL &&
-                    (bgValue > RBS_MAXIMUM_MGDL_VALUE || bgValue > FBS_MAXIMUM_MGDL_VALUE)
-                ) {
-                    referredReasonList.add(ReferredReason.bloodGlucose)
-                } else {
-                    if (bgValue > RBS_MAXIMUM_VALUE_BD || bgValue > FBS_MAXIMUM_VALUE_BD) {
-                        referredReasonList.add(ReferredReason.bloodGlucose)
-                    } else {
-                    }
-                }
-            }
+        if (isBloodGlucoseReferralRequired(bgResult, isFollowUpVisit)) {
+            referredReasonList.add(ReferredReason.bloodGlucose)
         }
 
-        // Add Referred Facility Type
         if (referredReasonList.isNotEmpty()) {
-            val hasBpOrBgReason = ReferredReason.bloodPressure in referredReasonList ||
-                ReferredReason.bloodGlucose in referredReasonList
-
-            val shouldReferUpazila = hasBpOrBgReason &&
-                (
-                    isBPReferredForUpazila(bpResult.first, bpResult.second) ||
-                        isBGReferredForUpazila(bgResult.third)
-                )
-
-            map[REFERRAL_FACILITY_TYPE] =
-                if (shouldReferUpazila) {
-                    FACILITY_TYPE_UPAZILA
-                } else {
-                    FACILITY_TYPE_COMMUNITY_CLINIC
-                }
+            map[REFERRAL_FACILITY_TYPE] = resolveReferralFacilityType(
+                referredReasonList = referredReasonList,
+                bpResult = bpResult,
+                bgResult = bgResult,
+                isFollowUpVisit = isFollowUpVisit,
+            )
         }
 
         return if (referredReasonList.isNotEmpty()) {
@@ -690,6 +678,113 @@ class ReferralResultGenerator {
         }
     }
 
+    private fun computeNcdFollowUpReferralResult(
+        map: HashMap<String, Any>,
+        bpResult: Pair<Int, Int>,
+        bgResult: Triple<String?, String?, Double?>,
+        symptomList: List<String>,
+    ): Pair<String, ArrayList<String>>? {
+        val input = buildNcdEvaluatorInput(bpResult, bgResult, symptomList)
+        if (!NCDReferralColorEvaluator.isReferralRequired(input)) {
+            return null
+        }
+
+        val referredReasonList = NCDReferralColorEvaluator.referralReasons(input)
+        map[REFERRAL_FACILITY_TYPE] = FACILITY_TYPE_UPAZILA
+        return Pair(ReferralStatus.Referred.name, referredReasonList)
+    }
+
+    private fun buildNcdEvaluatorInput(
+        bpResult: Pair<Int, Int>,
+        bgResult: Triple<String?, String?, Double?>,
+        symptomList: List<String>,
+    ) = NCDReferralColorEvaluator.Input(
+        systolic = bpResult.first.takeIf { it > 0 },
+        diastolic = bpResult.second.takeIf { it > 0 },
+        glucoseUnit = bgResult.first,
+        glucoseType = bgResult.second,
+        glucoseValue = bgResult.third,
+        hasSymptoms = symptomList.isNotEmpty(),
+    )
+
+    private fun resolveReferralFacilityType(
+        referredReasonList: ArrayList<String>,
+        bpResult: Pair<Int, Int>,
+        bgResult: Triple<String?, String?, Double?>,
+        isFollowUpVisit: Boolean,
+    ): String {
+        if (isFollowUpVisit || CommonUtils.isFoPoOrChcp()) {
+            return FACILITY_TYPE_UPAZILA
+        }
+        val hasBpOrBgReason = ReferredReason.bloodPressure in referredReasonList ||
+            ReferredReason.bloodGlucose in referredReasonList
+        val shouldReferUpazila = hasBpOrBgReason &&
+            (
+                isBPReferredForUpazila(bpResult.first, bpResult.second) ||
+                    isBGReferredForUpazila(bgResult.third)
+            )
+        return if (shouldReferUpazila) {
+            FACILITY_TYPE_UPAZILA
+        } else {
+            FACILITY_TYPE_COMMUNITY_CLINIC
+        }
+    }
+
+    private fun isBloodGlucoseReferralRequired(
+        bgResult: Triple<String?, String?, Double?>,
+        isFollowUpVisit: Boolean,
+    ): Boolean {
+        val unit = bgResult.first ?: return false
+        val glucoseType = bgResult.second
+        val bgValue = bgResult.third ?: return false
+
+        if (unit == MGDL) {
+            return if (isFollowUpVisit) {
+                isGlucoseAtOrAboveThreshold(
+                    glucoseType,
+                    bgValue,
+                    FOLLOW_UP_FBS_MAXIMUM_MGDL_VALUE.toDouble(),
+                    FOLLOW_UP_RBS_MAXIMUM_MGDL_VALUE.toDouble(),
+                )
+            } else {
+                isGlucoseAtOrAboveThreshold(
+                    glucoseType,
+                    bgValue,
+                    FBS_MAXIMUM_MGDL_VALUE.toDouble(),
+                    RBS_MAXIMUM_MGDL_VALUE.toDouble(),
+                )
+            }
+        }
+
+        return if (isFollowUpVisit) {
+            isGlucoseAtOrAboveThreshold(
+                glucoseType,
+                bgValue,
+                FOLLOW_UP_FBS_MAXIMUM_VALUE_BD,
+                FOLLOW_UP_RBS_MAXIMUM_VALUE_BD,
+            )
+        } else {
+            isGlucoseAtOrAboveThreshold(
+                glucoseType,
+                bgValue,
+                FBS_MAXIMUM_VALUE_BD,
+                RBS_MAXIMUM_VALUE_BD,
+            )
+        }
+    }
+
+    private fun isGlucoseAtOrAboveThreshold(
+        glucoseType: String?,
+        bgValue: Double,
+        fbsThreshold: Double,
+        rbsThreshold: Double,
+    ): Boolean =
+        when (glucoseType?.lowercase()) {
+            FBS -> bgValue >= fbsThreshold
+            RBS -> bgValue >= rbsThreshold
+            else -> bgValue >= fbsThreshold || bgValue >= rbsThreshold
+        }
+
     private fun isBPReferredForUpazila(
         avgSys: Int,
         avgDia: Int,
@@ -697,5 +792,5 @@ class ReferralResultGenerator {
         avgSys >= UPAZILA_UPPER_LIMIT_SYSTOLIC ||
             avgDia >= UPAZILA_UPPER_LIMIT_DIASTOLIC
 
-    private fun isBGReferredForUpazila(bg: Double?): Boolean = bg != null && bg >= UPAZILA_FBS_RBS_MAXIMUM_VALUE_BD
+    private fun isBGReferredForUpazila(bg: Double?): Boolean = bg != null && bg > UPAZILA_FBS_RBS_MAXIMUM_VALUE_BD
 }

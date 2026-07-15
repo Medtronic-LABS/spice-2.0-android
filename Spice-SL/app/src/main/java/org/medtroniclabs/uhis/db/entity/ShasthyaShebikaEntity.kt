@@ -15,4 +15,5 @@ data class ShasthyaShebikaEntity(
     val phoneNumber: String? = null,
     val ssId: String? = null,
     val shasthyaKormiId: Long? = null,
+    val isActive: Boolean? = null,
 )

@@ -44,6 +44,7 @@
     <string name="household_name_no">খানার নাম / নম্বর</string>
     <string name="diagnoses">রোগনির্ণয়</string>
     <string name="confirm_diagnoses">রোগনির্ণয় নিশ্চিত করুন</string>
+    <string name="confirm_diagnosis">রোগ নিশ্চিতকরণ (নিবন্ধিত রোগী)</string>
     <string name="edit_diagnosis">রোগনির্ণয় এডিট করুন</string>
     <string name="patient_status">রোগীর অবস্থা</string>
     <string name="child_status">শিশুর অবস্থা</string>
@@ -119,7 +120,7 @@
     <string name="age">বয়স</string>
     <string name="seperator_hyphen" translatable="false">-</string>
     <string name="household_empty_text">কোন খানা পাওয়া যায়নি।</string>
-    <string name="household_name_or_no">নাম / নম্বর / ফোন</string>
+    <string name="household_name_or_no">নাম / নম্বর / জাতীয় পরিচয় পত্র (NID) বা জন্ম নিবন্ধন নম্বর (BRN) / ফোন</string>
     <string name="member_deceased">মৃত্যু নিবন্ধন</string>
     <string name="male_prefix">M</string>
     <string name="female_prefix">F</string>
@@ -127,6 +128,7 @@
     <string name="rmnch">RMNCH</string>
     <string name="tb">TB</string>
     <string name="national_id">জাতীয় আইডি</string>
+    <string name="brn">জন্ম নিবন্ধন নম্বর</string>
     <string name="bio_data">বায়োডাটা</string>
     <string name="name">নাম</string>
     <string name="gender">লিঙ্গ</string>
@@ -184,7 +186,7 @@
     <string name="registration_status">নিবন্ধন অবস্থা</string>
     <string name="pending">বিচারাধীন</string>
     <string name="finished">সম্পন্ন</string>
-    <string name="apply">প্রয়োগ করুন</string>
+    <string name="apply">সাবমিট</string>
     <string name="filter_count">ফিল্টার (%1$s)</string>
     <string name="sort_count">সর্ট বাই (%1$s)</string>
     <string name="villages">গ্রাম</string>
@@ -213,9 +215,35 @@
     <string name="anc_3_plus_services">গর্ভকালীন সময়ে একই মাকে ৩ অথবা ৩+ ANC সেবা</string>
     <string name="highrisk_pregnant_women">উচ্চ ঝুঁকিপূর্ণ গর্ভবতী মা</string>
     <string name="child_visit">0–24 মাস বয়সী শিশু কাউন্সেলিং</string>
+    <plurals name="child_health_next_visit_unavailable">
+        <item quantity="one">পরবর্তী শিশু স্বাস্থ্য সেবা শেষ ভিজিটের %d দিন পর উপলব্ধ হবে।</item>
+        <item quantity="other">পরবর্তী শিশু স্বাস্থ্য সেবা শেষ ভিজিটের %d দিন পর উপলব্ধ হবে।</item>
+    </plurals>
     <string name="household_registered">খানা নিবন্ধন</string>
     <string name="pregnancy_outcome_dashboard">ডেলিভারি রেজিস্ট্রেশন</string>
     <string name="family_planning_dashboard">পরিবার পরিকল্পনা কাউন্সেলিংয়ের সংখ্যা</string>
+    <string name="dashboard_ncd_screening">এনসিডি স্ক্রিনিং</string>
+    <string name="dashboard_ncd_referred_followup">এনসিডি এর জন্য রেফার </string>
+    <string name="dashboard_ncd_follow_up_assessment">এনসিডি মূল্যায়ন</string>
+    <string name="dashboard_total_ncd_services">সর্বমোট এনসিডি সেবা</string>
+    <string name="dashboard_total_eye_screening">সর্বমোট চক্ষু পরীক্ষা</string>
+    <string name="dashboard_cataract_screening">ক্যাটারেক্ট স্ক্রিনিং</string>
+    <string name="dashboard_ncd_in_cataract_camp">ক্যাটারেক্ট ক্যাম্পে এনসিডি সেবা</string>
+    <string name="dashboard_referred_for_operation">অপারেশনের জন্য রেফার</string>
+    <string name="dashboard_glasses_sold">চশমা বিক্রয়</string>
+    <string name="assessment_status_ncd_service_cataract_camp">ক্যাটারেক্ট ক্যাম্পে এনসিডি সেবা</string>
+    <string name="assessment_status_referred_for_operation">অপারেশনের জন্য রেফার</string>
+    <string name="assessment_status_glasses_sold">চশমা বিক্রয়</string>
+    <string name="assessment_status_eye_problem">চোখের সমস্যা - %1$s</string>
+    <string name="assessment_status_glass_power">পাওয়ার - %1$s</string>
+    <string name="assessment_status_cataracts">ছানি</string>
+    <string name="assessment_status_lacrimal_tear_duct_problem">নেত্রনালীর সমস্যা</string>
+    <string name="assessment_status_pterygium">টেরিজিয়াম/মাংসবৃদ্ধি</string>
+    <string name="assessment_status_glaucoma">গ্লুকোমা</string>
+    <string name="assessment_status_myopia">দূরদৃষ্টি সমস্যা</string>
+    <string name="assessment_status_presbyopia">প্রেসবায়োপিয়া বা নিকট দৃষ্টি সমস্যা</string>
+    <string name="assessment_status_other_eye_problem">অন্যান্য সমস্যা</string>
+    <string name="assessment_status_no_eye_problem">সমস্যা নেই</string>
     <string name="child_hood_visit">শিশু ফলোআপ</string>
     <string name="other_value" translatable="false">%1$s - %2$s</string>
     <string name="gps_disabled_title">লোকেশন সেবা বন্ধ!</string>
@@ -427,15 +455,16 @@
     <string name="on_treatment">চিকিৎসাধীন</string>
     <string name="recovered">সুস্থ</string>
     <string name="data_range">তারিখ পরিসীমা</string>
-    <string name="from">থেকে</string>
-    <string name="to">প্রতি</string>
+    <string name="from">হতে</string>
+    <string name="to">পর্যন্ত</string>
     <string name="un_reachable">পৌঁছানো যায় না</string>
     <string name="wrong_number">ভুল নম্বর</string>
     <string name="Select_Date">অনুগ্রহ করে তারিখ থেকে নির্বাচন করুন</string>
     <string name="medical_review">চিকিৎসা পর্যালোচনা সাক্ষাৎ</string>
     <string name="hh_visit">খানা ভিজিট</string>
+    <string name="scheduled_visit">নির্ধারিত পরিদর্শন</string>
     <string name="no_patient_found">কোন রোগী পাওয়া যায়নি।</string>
-    <string name="patient_count">%1$d জন রোগী</string>
+    <string name="patient_count">%1$s জন রোগী</string>
     <string name="reason">কারণ</string>
     <string name="start_date">শুরুর তারিখ</string>
     <string name="hh_name">খানার নাম</string>
@@ -737,6 +766,7 @@
     </plurals>
     <string name="open_play_store">প্লে স্টোর খুলুন</string>
     <string name="please_check_if_play_store_available">অনুগ্রহ করে যাচাই করুন মোবাইলে Google Play Store ইনস্টল আছে কিনা</string>
+    <string name="please_update_the_app">অ্যাপের একটি নতুন সংস্করণ উপলব্ধ। চালিয়ে যেতে অনুগ্রহ করে আপডেট করুন।</string>
     <string name="register">নিবন্ধন</string>
     <string name="registration">নিবন্ধন</string>
     <string name="registered">নিবন্ধিত</string>
@@ -867,6 +897,8 @@
     <string name="enter_number">সংখ্যা লিখুন</string>
     <string name="maternal_outcomes">মাতৃ ফলাফল</string>
     <string name="ncd">এনসিডি</string>
+    <string name="ncd_enrollment">এনসিডি নিবন্ধন</string>
+    <string name="ncd_follow_up">এনসিডি ফলোআপ</string>
     <string name="pregnancy_diagnosis">আপনার কি নিচের কোনো রোগ আগে নির্ণয় করা হয়েছে?</string>
     <string name="eclampsia">এক্লাম্পসিয়া</string>
     <string name="pre_eclampsia">প্রি-এক্লাম্পসিয়া</string>
@@ -944,7 +976,7 @@
     <string name="other_allergies">Comments on allergies</string>
     <string name="other_medication">Other Medication</string>
     <string name="comment_current_medication">Comments on current medication</string>
-    <string name="enroll">Enroll</string>
+    <string name="enroll">নথিভুক্ত করুন</string>
     <string name="previous">previous</string>
     <string name="pharmacist_title">Pharmacist</string>
     <string name="freq">Freq.</string>
@@ -1184,7 +1216,7 @@
     <string name="yes_i_confirm">Yes, I Confirm</string>
     <string name="test_review_confirmation_message">Have you observed to confirm the test values and comments uploaded by the Lab Technician?</string>
     <string name="label_with_text" translatable="false">%1$s  :  %2$s</string>
-    <string name="follow_up">Follow-up</string>
+    <string name="follow_up">ফলো-আপ</string>
     <string name="follow_ups">%1$s ফলো-আপ কল ফলাফল আপলোডের জন্য অপেক্ষায় আছে।</string>
     <string name="follow_up_one">1 follow-up call result is waiting to upload.</string>
     <string name="no_follow_up">No follow-up call result found to upload.</string>
@@ -1567,6 +1599,7 @@
     <string name="regimen_line" translatable="false">Regimen Line</string>
     <string name="men_having_sex_with_men_msm">পুরুষ যারা পুরুষদের সাথে যৌন সম্পর্ক করে (MSM)</string>
     <string name="ss_name">SS নাম</string>
+    <string name="shasthya_kormi_sk">স্বাস্থ্য কর্মী (SK)</string>
 
     <string name="lmp_last_menstrual_period">এলএমপি (শেষ মাসিকের তারিখ)</string>
     <string name="edd_estimated_delivery_date">👶 ইডিডি (প্রসবের সম্ভাব্য তারিখ)</string>
@@ -1593,7 +1626,7 @@
     <string name="gaps_in_anc">এএনসি সেবায় ঘাটতি</string>
     <string name="gaps_in_pnc">পিএনসি সময়ে / প্রসবের পর মায়ের জন্য প্রয়োজনীয় সেবায় ঘাটতি</string>
     <string name="counseling_education"><![CDATA[পরামর্শ]]></string>
-    <string name="service_recipient_list"><![CDATA[সেবা গ্রহণকারীর তালিকা]]></string>
+    <string name="service_recipient_list"><![CDATA[সেবা গ্রহীতার তালিকা]]></string>
     <string name="no_members_found"><![CDATA[কোনো সদস্য পাওয়া যায়নি]]></string>
     <plurals name="plural_member">
         <item quantity="zero">%1$s জন সদস্য</item>
@@ -1613,26 +1646,51 @@
     <string name="referred_for_nfurther_assessment_Upazila">আরও মূল্যায়নের জন্য নিকটস্থ উপজেলা স্বাস্থ্য কমপ্লেক্সে রেফার করুণ</string>
     <string name="services">সেবা প্রদান করুন</string>
 
-    <string name="eye_care">চোখের যত্ন</string>
-    <string name="cataract">ছানি</string>
+    <string name="eye_care">চক্ষু পরীক্ষা</string>
+    <string name="cataract">ক্যাটারাক্ট</string>
     <string name="services_provided">প্রদানকৃত সেবাসমূহ</string>
     <string name="recent_status">সর্বশেষ সেবা</string>
     <string name="service_history">সেবার ইতিহাস</string>
     <string name="service_history_not_found">সেবার কোনো ইতিহাস নেই</string>
     <string name="service_name">সেবার নাম</string>
     <string name="service_date">সেবার তারিখ</string>
+    <string name="service_provided_by">সেবা প্রদানকারী</string>
     <string name="referral_status">রেফারেলের অবস্থা</string>
+    <string name="referred_location">রেফারেলের স্থান</string>
     <string name="error_person_name">অনুগ্রহ করে সঠিক নাম লিখুন</string>
     <string name="emergency_referral">⚠️ জরুরি ভিত্তিতে রেফার করুন</string>
     <string name="non_emergency_referral">ⓘ নিয়মিত চেকআপের পরামর্শ</string>
     <string name="assessment_result">মূল্যায়নের ফলাফল</string>
+    <string name="missed_visit">মিসড ভিজিট</string>
+    <string name="ltf">লস্ট টু ফলোআপ</string>
+    <string name="enter_patient_search">নাম/আইডি/মোবাইল নম্বর লিখুন</string>
+    <string name="overdue_days">%1$s দিন অতিবাহিত হয়েছে</string>
+    <string name="referred_to">রেফার হয়েছে %1$s</string>
+    <string name="high_bg">উচ্চ (বিজি)</string>
+    <string name="high_bp">উচ্চ (বিপি)</string>
+    <string name="high_both">উচ্চ (বিজি), উচ্চ (বিপি)</string>
+    <string name="days_due_at_mr">%1$s দিন বাকী</string>
+    <string name="day_due_at_mr">%1$s দিন বাকী</string>
+    <string name="day_due_at">%2$s এ যাওয়ার %1$s দিন বাকি হয়ে গেছে</string>
+    <string name="days_due_at">%2$s এ যাওয়ার %1$s দিন বাকি হয়ে গেছে</string>
+    <string name="one_patient_found">1 রোগী পাওয়া গেছে</string>
+    <string name="sort_with_count">সাজান%1$s</string>
+    <string name="filter_with_count">ফিল্টার%1$s</string>
+    <string name="patient_already_enrolled">রোগী ইতিমধ্যে নথিভুক্ত করা হয়েছে</string>
+    <string name="patient_already_enrolled_with_program_id">রোগী ইতিমধ্যেই প্রোগ্রাম আইডি দিয়ে নথিভুক্ত হয়েছে&#160;</string>
+    <string name="terms_condition"><![CDATA[শর্তাবলী]]></string>
+
+    <string name="gps_enabled">আপনার জিপিএস বন্ধ হয়ে গেছে বলে মনে হচ্ছে, আপনি কি এটি শুরু করতে চান?</string>
+    <string name="invalid_qr">ভুল কিউআর কোড</string>
+    <string name="scan_valid_qr">একটি সঠিক কিউআর কোড স্ক্যান করুন</string>
+    <string name="duplicate_record_found">ডুপ্লিকেট রেকর্ড পাওয়া গেছে</string>
 
     <string name="external_member">বহিরাগত সদস্য</string>
     <string name="external_member_registration">বহিরাগত সদস্য নিবন্ধন</string>
     <string name="add_external_member">বহিরাগত সদস্য যোগ করুন </string>
     <string name="child_health">শিশু ফলোআপ</string>
     <string name="gender_other_prefix" translatable="false">O</string>
-    <string name="member_name_or_phone">সদস্যের নাম / ফোন</string>
+    <string name="member_name_or_phone">সদস্যের নাম / জাতীয় পরিচয় পত্র (NID) বা জন্ম নিবন্ধন নম্বর (BRN) / ফোন</string>
     <string name="pregnant_women_profile">গর্ভবতী রেজিস্ট্রেশন</string>
     <string name="preterm_birth">সময়ের আগে প্রসব</string>
     <string name="tb_assessment">টিবি মূল্যায়ন</string>
@@ -1650,7 +1708,7 @@
     <string name="normal_delivery">স্বাভাবিক</string>
     <string name="abortion">গর্ভপাত</string>
     <string name="normal_pregnancy">স্বাভাবিক গর্ভাবস্থা</string>
-    <string name="high_risk_pw">উচ্চ ঝুঁকিপূর্ণ গর্ভবতী মা</string>
+    <string name="high_risk_pw">উচ্চ ঝুঁকিপূর্ণ</string>
     <string name="using_modern_family_planning_methods">আধুনিক পরিবার পরিকল্পনা পদ্ধতি ব্যবহার করে</string>
     <string name="not_using_modern_family_planning_methods">আধুনিক পরিবার পরিকল্পনা পদ্ধতি ব্যবহার না করা</string>
     <string name="high_risk_pnc">উচ্চ ঝুঁকিপূর্ণ প্রসব-পরবর্তী সেবা</string>
@@ -1662,13 +1720,178 @@
     <string name="follow_up_visit">ফলো-আপ ভিজিট</string>
     <string name="disabled_account">অ্যাকাউন্টটি নিষ্ক্রিয় করা হয়েছে</string>
     <string name="account_locked_multiple_attempts">একাধিকবার ভুল লগইন চেষ্টার কারণে অ্যাকাউন্টটি সাময়িকভাবে লক করা হয়েছে।</string>
+    <string name="upcoming_in_days">%1$s দিনের মধ্যে আসছে</string>
+    <string name="day_overdue">%1$s দিন, বকেয়া</string>
+    <string name="days_overdue">%1$s দিন, মেয়াদোত্তীর্ণ</string>
+    <string name="treatment_plan_success_message">চিকিত্সা পরিকল্পনা সফলভাবে জমা দেওয়া হয়েছে৷</string>
+    <string name="gestational_diabetes_gdm">জেস্টেশনাল ডাবেটিস</string>
+    <string name="scan_qr">QR কোড স্ক্যান করুন</string>
+    <string name="scan_new_qr">নতুন QR কোড স্ক্যান করুন?</string>
+    <string name="linking_qr_code_is_mandatory">QR কোড লিঙ্ক করা বাধ্যতামূলক</string>
+    <string name="qr_code_scanned">QR কোড সফলভাবে লিঙ্ক করা হয়েছে৷</string>
 
-    <!-- MicroCoaching SDK — CHW Assistant -->
-    <string name="chw_assistant">সিএইচডব্লিউ সহকারী</string>
-    <string name="coaching_model_download_title">AI মডেল প্রয়োজন</string>
-    <string name="coaching_model_download_message">AI মডেল ডাউনলোড করতে হবে (~%1$s)। এখন ডাউনলোড করবেন?</string>
-    <string name="coaching_model_download_message_metered">AI মডেল ডাউনলোড করতে হবে (~%1$s) এবং আপনি মোবাইল ডেটায় আছেন। প্রায় %1$s ব্যবহার হবে। চালিয়ে যাবেন?</string>
-    <string name="coaching_metered_network_title">মোবাইল ডেটা সতর্কতা</string>
-    <string name="coaching_metered_network_message">আপনি মোবাইল ডেটায় আছেন। প্রায় %1$s ডেটা ব্যবহার হবে। চালিয়ে যাবেন?</string>
-    <string name="coaching_download_started">ডাউনলোড শুরু হয়েছে। মডেল প্রস্তুত হলে চ্যাট খুলবে।</string>
+    <string name="symptoms_adherence">লক্ষণ এবং আনুগত্য</string>
+    <string name="worsening_symptoms">রোগীর কি কোনও নতুন বা খারাপ লক্ষণ দেখা দিয়েছে?</string>
+    <string name="taking_medication">আপনি কি নিয়মিত ঔষধ খাচ্ছেন?</string>
+    <string name="taken_medication">গত ৩০ দিনে আপনি কত দিন ঔষধ গ্রহণ করেছেন?</string>
+
+    //BG
+    <string name="add_today_bg">আজকের BG এর তথ্য যোগ করুন</string>
+    <string name="previous_bg_reading">পূর্ববর্তী BG রিডিং</string>
+
+
+    <string name="select_investigation">পরীক্ষা নির্বাচন করুন</string>
+    <string name="investigation_date">পরীক্ষার তারিখ</string>
+    <string name="ddMmYyyy">dd/mm/yyyy</string>
+    <string name="enter_reading">মান লিখুন</string>
+
+    //prescription
+    <string name="previous_prescription_history">পূর্বের প্রেসক্রিপশনের তথ্য</string>
+    <string name="today_prescription">আজকের প্রেসক্রিপশন</string>
+    <string name="recommended_medication">প্রস্তাবিত ঔষধ</string>
+    <string name="search_medication">ঔষধ খুঁজুন</string>
+    <string name="prescribe_medication">ঔষধ লিখুন</string>
+    <string name="repeat_prescription"> একই প্রেসক্রিপশন আবারো দিন</string>
+    <string name="duration_caps">দিন</string>
+    <string name="duration">দিন</string>
+    <string name="new_ncd">নতুন কোন অসংক্রামক রোগ হয়েছে কিনা?</string>
+    <string name="_1_symptom_selected">১টি লক্ষণ নির্বাচিত</string>
+    <string name="program_id">প্রোগ্রাম আইডি</string>
+    <string name="health_history">স্বাস্থ্য তথ্য</string>
+    <string name="family_history">পরিবারের তথ্য</string>
+    <string name="controlled">নিয়ন্ত্রিত</string>
+    <string name="un_controlled">অনিয়ন্ত্রিত</string>
+
+    <string name="systolicMmhg">সিস্টোলিক (mmHg)</string>
+    <string name="diastolicMmhg">ডায়াস্টোলিক (mmHg)</string>
+    <string name="add_today_bp">আজকের BP রিডিং যোগ করুন</string>
+    <string name="previous_bp_reading">পূর্ববর্তী রক্তচাপ রিডিং</string>
+    <string name="view_less">কম রিডিং দেখুন</string>
+    <string name="view_more">আরো তথ্য দেখুন</string>
+    <string name="while_messauring">রক্তচাপ পরিমাপ করার সময়</string>
+    <string name="blood_glucode_mmol_l">ব্লাড গ্লুকোজ (mmol/L)</string>
+    <string name="hba1c_percentage">এইচ বি এ ১সি (%)</string>
+    <string name="medication_prescribed_colon">নির্ধারিত ওষুধ:</string>
+    <string name="instructions_caps">নির্দেশনা</string>
+    <string name="referred_on">কবে করতে বলা হয়েছে</string>
+    <string name="referred_by">ডাক্তার বা নার্সের নাম</string>
+    <string name="value">মান সন্নিবেশিত</string>
+    <string name="please_enter_details_prefix">এর জন্য একটি বৈধ মান লিখুন দয়া করে</string>
+    <string name="previous_investingation_history">পূর্ববর্তী পরীক্ষার তথ্য</string>
+    <string name="recommended_investigation">প্রস্তাবিত পরীক্ষা সমূহ</string>
+    <string name="today_s_investigation">আজকের টেস্টের তালিকা</string>
+    <string name="select_tested_on_date">তারিখে পরীক্ষিত নির্বাচন করুন</string>
+
+    <string name="lab_test_saved_successfully">ল্যাবটেস্ট সফলভাবে সংরক্ষিত হয়েছে৷</string>
+    <string name="have_you_observed_to_confirm_the_test_values_and_comments_uploaded_by_the_lab_technician">আপনি ল্যাব টেকনিশিয়ান দ্বারা আপলোড করা পরীক্ষার মান এবং মন্তব্য নিশ্চিত করতে পর্যবেক্ষণ করেছেন?</string>
+
+    <string name="lifestyle_modification">জীবন আচরণ পরিবর্তন</string>
+    <string name="self_care">জীবনধারা পরিবর্তন এবং স্ব-যত্ন সম্পর্কে পরামর্শ দেয়া হয়েছে কি?</string>
+    <string name="next_follow_up">পরবর্তী অনুসরণ করুন</string>
+    <string name="next_follow_up_day">%d দিন পরে</string>
+    <string name="next_follow_up_days">%d দিন পরে</string>
+    <string name="follow_up_date_manually">অন্য কোন ফলোআপের তারিখ নির্বাচন করুন</string>
+    <string name="days_error">দিনের সংখ্যা ন্যূনতম ১ দিন হতে হবে</string>
+    <string name="years_error">ফলোআপের সময়সীমা ২ বছরের কম হতে হবে</string>
+    <string name="community_clinic">কমিউনিটি ক্লিনিক</string>
+    <string name="medication_prescribed_">ঔষধ\nনির্ধারিত</string>
+    <string name="prescribed_quantity">নির্ধারিত দিন</string>
+    <string name="reason_for_qulaipharm">কোয়ালিফার্ম রেসপন্স</string>
+    <string name="start_treatment">ট্রিটমেন্ট শুরু করুন</string>
+    <string name="village_town_city_name">গ্রাম/শহর/শহরের নাম</string>
+
+    <string name="invalid_qr_message">অবৈধ QR কোড। স্ক্যান করা QR কোডটি ইতোমধ্যে অন্য একজন ব্যক্তির সাথে সংযুক্ত রয়েছে।</string>
+
+    <string name="linked_to_care">লিংক টু কেয়ার</string>
+
+    <string name="health_condition">রোগীর অবস্থা</string>
+    <string name="both_lower_case">উভয়</string>
+    <string name="union">ইউনিয়ন/ওয়ার্ড</string>
+
+    <string name="both">উভয়</string>
+    <string name="upazila">উপজেলা</string>
+    <string name="upazilla_health_complex">উপজেলা স্বাস্থ্য কমপ্লেক্স</string>
+    <string name="unsuccessful">ব্যার্থ</string>
+    <string name="willing_to_visit_uhc">উপজেলা স্বাস্থ্য কমপ্লেক্সে যেতে রাজি কিনা?</string>
+    <string name="other_reasons">Other Reasons</string>
+    <string-array name="call_failure_reason_for_sk">
+        <item>--Select--</item>
+        <item>অন্য কোন স্বাস্থ্যকেন্দ্র থেকে চিকিৎসা নেন</item>
+        <item>ওষুধ নাই</item>
+        <item>অনেক দূরত্ব</item>
+        <item>যাতায়াত ও ওষুধ ক্রয়ের অতিরিক্ত খরচ</item>
+        <item>দীর্ঘ সময় লাইনে দাঁড়িয়ে থাকা</item>
+        <item>অন্যত্র চলে গিয়েছেন</item>
+        <item>মারা গিয়েছেন</item>
+        <item>অন্যান্য </item>
+    </string-array>
+    <string-array name="call_unsuccessful_reasons">
+        <item>--Select--</item>
+        <item>ভুল নাম্বার</item>
+        <item>সংযোগ স্থাপন করা সম্ভব হয়নি</item>
+    </string-array>
+    <string name="complications_during_delivery">প্রসবকালীন জটিলতা</string>
+    <string name="present">হাজির</string>
+    <string name="pnc_status">প্রসবোত্তর অবস্থা</string>
+    <string name="fp_status">পরিবার পরিকল্পনা অবস্থা</string>
+    <string name="desire_for_children">আপনার কি ভবিষ্যতে সন্তান নেওয়ার ইচ্ছা আছে?</string>
+    <string name="delivery_mode">ডেলিভারির পদ্ধতি</string>
+    <string name="family">পরিবার</string>
+    <string-array name="desire_for_children_options">
+        <item>হ্যাঁ, ২ বছরের মধ্যে</item>
+        <item>হ্যাঁ, ২ বছরের পরে</item>
+        <item>না</item>
+        <item>সিদ্ধান্ত নেয়নি</item>
+    </string-array>
+    <string-array name="family_planning_methods">
+        <item>পিল</item>
+        <item>ইঞ্জেকশান</item>
+        <item>নরপ্লান্ট</item>
+        <item>আই ইউ ডি  (গর্ভনিরোধক যন্ত্র)</item>
+        <item>কনডম</item>
+        <item>মহিলা বন্ধ্যাকরণ</item>
+        <item>পুরুষ বন্ধ্যাকরণ</item>
+        <item>কোনোটি নয়</item>
+    </string-array>
+    <string name="patient_record">রোগীর তথ্য</string>
+    <string name="call_date">কল প্রদানের তারিখ</string>
+    <string name="call_information">কলের তথ্য</string>
+    <string name="called_by">কল প্রদানকারীর নাম</string>
+    <string name="call_category">কলের ধরণ</string>
+    <string name="agreed_to_visit">যেতে রাজি হয়েছে</string>
+    <string name="call_status">কলের তথ্য</string>
+    <string name="days_due_string">দিন বাকী</string>
+    <string name="anc_received">এএনসি সেবা গ্রহণ করা হয়েছে</string>
+    <string name="anc_received_value">BRAC (%1$s) থেকে / মোট (%2$s)</string>
+    <string name="household_brac_service_members_value">(%1$s / %2$s)</string>
+    <string name="live_birth_s">জীবিত জন্ম (%1$s)</string>
+    <string name="still_birth_s">মৃত জন্ম (%1$s)</string>
+    <string name="newborn_death_s">নবজাতকের মৃত্যু (%1$s)</string>
+    <string name="no_of_living_children">জীবিত সন্তান সংখ্যা</string>
+    <string name="share">শেয়ার করুন</string>
+    <string name="screened_date">স্ক্রিনিং করা হয়েছে তারিখ</string>
+    <string name="screened_by">এর মাধ্যমে যাচাইকৃত</string>
+    <string name="address">ঠিকানা</string>
+    <string name="enrolled_date">নিবন্ধণের তারিখ</string>
+    <string name="cvd_risk_bmi">সিভিডি ঝুঁকি , বি এম আই </string>
+    <string name="co_morbidity">অন্যান্য রোগের তথ্য</string>
+    <string name="visit_date">ভিজিটের তারিখ</string>
+    <string name="visit_place">ভিজিটের স্থান</string>
+    <string name="bg_fbs">ব্লাড গ্লুকোজ (খালি পেটে)</string>
+    <string name="medication">ঔষধের তালিকা</string>
+    <string name="referred_to_cc">নিকটবর্তী কমিউনিটি ক্লিনিকে রেফার করা হয়েছে</string>
+    <string name="performed_by">সেবা প্র্রদানকারী</string>
+    <string name="clinical_information">রোগ/চিকিৎসা সংক্রান্ত তথ্য</string>
+    <string name="latest_medical_review_due_date">সর্বশেষ ফলোআপ তারিখ</string>
+    <string name="oldest_medical_review_due_date">সর্বপ্রথম ফলোআপ তারিখ</string>
+    <string name="latest_next_review_date">পরবর্তী ভিজিটের তারিখ অনুসারে (নতুন থেকে পুরাতন)</string>
+    <string name="oldest_next_review_date">পরবর্তী ভিজিটের তারিখ অনুসারে (পুরাতন থেকে নতুন)</string>
+    <string name="reason_referral">রেফারের কারণ</string>
+    <string name="division">বিভাগ</string>
+    <string name="district">জেলা</string>
+    <string-array name="mode_of_delivery">
+        <item>স্বাভাবিক</item>
+        <item>প্রসবে সহায়তা নিয়ে প্রসব করাতে হয়েছে (ভ্যাকুয়াম কাপ বা ফোরসেপ ব্যবহার করে প্রসব)</item>
+        <item>সিজারিয়ান</item>
+    </string-array>
 </resources>

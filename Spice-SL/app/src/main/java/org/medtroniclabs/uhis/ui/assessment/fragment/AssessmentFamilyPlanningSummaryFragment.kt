@@ -17,6 +17,7 @@ import org.medtroniclabs.uhis.ui.BaseFragment
 import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
+import org.medtroniclabs.uhis.ui.assessment.FamilyPlanning
 import org.medtroniclabs.uhis.ui.assessment.viewmodel.AssessmentViewModel
 
 class AssessmentFamilyPlanningSummaryFragment : BaseFragment(), View.OnClickListener {
@@ -72,15 +73,15 @@ class AssessmentFamilyPlanningSummaryFragment : BaseFragment(), View.OnClickList
             binding.emptyErrorMessage.gone()
             val fpMap = convertedMap[MenuConstants.FP_MENU_ID.lowercase()] as Map<*, *>
             val assessmentMap = fpMap[AssessmentDefinedParams.FamilyPlanningDetails] as Map<*, *>
-            val noOfChildren = CommonUtils.getInteger(assessmentMap[AssessmentDefinedParams.NumberOfLivingChildren])
-            val desireForChildren = assessmentMap[AssessmentDefinedParams.DesireForChildrenInFuture] as? String
+            val noOfChildren = CommonUtils.getInteger(assessmentMap[AssessmentDefinedParams.NUMBER_OF_LIVING_CHILDREN])
+            val desireForChildren = assessmentMap[AssessmentDefinedParams.DESIRE_FOR_CHILDREN_IN_FUTURE] as? String
             val familyPlanningMethod = assessmentMap[AssessmentDefinedParams.FamilyPlanningMethods] as? List<*>
             // No of children
             val noOfChildrenForm =
                 viewModel.formLayoutsLiveData.value
                     ?.data
                     ?.formLayout
-                    ?.firstOrNull { it.id.equals(AssessmentDefinedParams.NumberOfLivingChildren, true) }
+                    ?.firstOrNull { it.id.equals(AssessmentDefinedParams.NUMBER_OF_LIVING_CHILDREN, true) }
             noOfChildrenForm?.let {
                 bindSummaryView(
                     noOfChildrenForm.getSummaryTitle(isTranslationEnabled),
@@ -93,7 +94,7 @@ class AssessmentFamilyPlanningSummaryFragment : BaseFragment(), View.OnClickList
                 viewModel.formLayoutsLiveData.value
                     ?.data
                     ?.formLayout
-                    ?.firstOrNull { it.id.equals(AssessmentDefinedParams.DesireForChildrenInFuture, true) }
+                    ?.firstOrNull { it.id.equals(AssessmentDefinedParams.DESIRE_FOR_CHILDREN_IN_FUTURE, true) }
             desireForChildrenForm?.let {
                 val option = desireForChildrenForm.optionsList?.firstOrNull { it[DefinedParams.ID] == desireForChildren }
                 bindSummaryView(
@@ -116,28 +117,15 @@ class AssessmentFamilyPlanningSummaryFragment : BaseFragment(), View.OnClickList
                 )
             }
 
-            if (AssessmentDefinedParams.FP_METHOD_STERILIZATION_MALE.equals(familyPlanningMethod?.firstOrNull()?.toString(), true) ||
-                AssessmentDefinedParams.FP_METHOD_STERILIZATION_FEMALE.equals(familyPlanningMethod?.firstOrNull()?.toString(), true)
-            ) {
-                // Early return to not show any counselling message
-                return
-            }
-            when {
-                AssessmentDefinedParams.DesireYesWithin2Yrs.equals(desireForChildren, true) ||
-                    (AssessmentDefinedParams.DesireUnsure.equals(desireForChildren, true) && noOfChildren == 0) -> {
-                    bindSummaryView(getString(R.string.recommended_method), getString(R.string.short_acting_message))
+            FamilyPlanning
+                .getRecommendedFamilyPlanningMethod(
+                    requireContext(),
+                    desireForChildren,
+                    noOfChildren,
+                    familyPlanningMethod?.firstOrNull()?.toString(),
+                )?.let {
+                    bindSummaryView(getString(R.string.recommended_method), it)
                 }
-
-                AssessmentDefinedParams.DesireNoMore.equals(desireForChildren, true) ||
-                    (AssessmentDefinedParams.DesireUnsure.equals(desireForChildren, true) && noOfChildren >= 2) -> {
-                    bindSummaryView(getString(R.string.recommended_method), getString(R.string.permanent_acting_message))
-                }
-
-                AssessmentDefinedParams.DesireYesAfter2Yrs.equals(desireForChildren, true) ||
-                    (AssessmentDefinedParams.DesireUnsure.equals(desireForChildren, true) && noOfChildren >= 1) -> {
-                    bindSummaryView(getString(R.string.recommended_method), getString(R.string.long_acting_message))
-                }
-            }
         }
     }
 

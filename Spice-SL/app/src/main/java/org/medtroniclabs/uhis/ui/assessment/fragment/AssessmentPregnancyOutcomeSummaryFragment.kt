@@ -31,6 +31,7 @@ import org.medtroniclabs.uhis.model.AssessmentSummaryModel
 import org.medtroniclabs.uhis.ui.BaseFragment
 import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils
+import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils.getSpinnerDisplayValue
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
 import org.medtroniclabs.uhis.ui.assessment.viewmodel.AssessmentViewModel
@@ -207,7 +208,14 @@ class AssessmentPregnancyOutcomeSummaryFragment : BaseFragment(), View.OnClickLi
                             checkAndDisplayPretermBirth(formattedDate, value)
                         } else {
                             // Convert ID to display name for SingleSelectionView/Spinner fields
-                            getSpinnerDisplayValue(item.id.toString(), value, isTranslationEnabled) ?: value
+                            getSpinnerDisplayValue(
+                                item.id.toString(),
+                                value,
+                                isTranslationEnabled,
+                                viewModel.formLayoutsLiveData.value
+                                    ?.data
+                                    ?.formLayout,
+                            ) ?: value
                         }
                         if (item.id != AssessmentDefinedParams.DATE_OF_DELIVERY) {
                             bindSummaryView(displayTitle, displayValue.toString())
@@ -218,43 +226,19 @@ class AssessmentPregnancyOutcomeSummaryFragment : BaseFragment(), View.OnClickLi
                 else -> {
                     // Other isSummary fields: show normally
                     // Convert ID to display name for SingleSelectionView/Spinner fields
-                    val displayValue = getSpinnerDisplayValue(item.id.toString(), item.value, isTranslationEnabled) ?: item.value
+                    val displayValue =
+                        getSpinnerDisplayValue(
+                            item.id.toString(),
+                            item.value,
+                            isTranslationEnabled,
+                            viewModel.formLayoutsLiveData.value
+                                ?.data
+                                ?.formLayout,
+                        ) ?: item.value
                     bindSummaryView(displayTitle, displayValue)
                 }
             }
         }
-    }
-
-    /**
-     * Converts spinner/SingleSelectionView field ID to display name using optionsList from formLayout
-     */
-    private fun getSpinnerDisplayValue(
-        fieldId: String,
-        valueId: String?,
-        isTranslationEnabled: Boolean,
-    ): String? {
-        if (valueId.isNullOrBlank()) return null
-
-        val formLayout = viewModel.formLayoutsLiveData.value?.data?.formLayout?.find {
-            it.id == fieldId
-        } ?: return null
-
-        val optionsList = formLayout.optionsList ?: return null
-        optionsList.forEach { option ->
-            val optionId = option[DefinedParams.ID] as? String
-                ?: option[DefinedParams.id] as? String
-            if (optionId == valueId) {
-                // Return cultureValue if translation is enabled, otherwise return name
-                return if (isTranslationEnabled) {
-                    option[DefinedParams.CULTURE_VALUE] as? String
-                        ?: option[DefinedParams.NAME] as? String
-                } else {
-                    option[DefinedParams.NAME] as? String
-                }
-            }
-        }
-
-        return null
     }
 
     /**
@@ -615,10 +599,10 @@ class AssessmentPregnancyOutcomeSummaryFragment : BaseFragment(), View.OnClickLi
         val maternalDeath = currentMapData?.get(AssessmentDefinedParams.MATERNAL_DEATH) as? Map<String, Any?>
         val timeOfDeath = maternalDeath?.get(AssessmentDefinedParams.TIME_OF_DEATH)
         val hasTimeOfDeath = when (timeOfDeath) {
-            is String -> timeOfDeath.isNotBlank() && timeOfDeath != DefinedParams.DefaultID
+            is String -> timeOfDeath.isNotBlank() && timeOfDeath != DefinedParams.DEFAULT_ID
             is Map<*, *> -> {
                 val timeOfDeathId = timeOfDeath[DefinedParams.ID]?.toString()
-                !timeOfDeathId.isNullOrBlank() && timeOfDeathId != DefinedParams.DefaultID
+                !timeOfDeathId.isNullOrBlank() && timeOfDeathId != DefinedParams.DEFAULT_ID
             }
 
             else -> false

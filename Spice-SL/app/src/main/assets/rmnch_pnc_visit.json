@@ -99,8 +99,8 @@
             "isEnabled": true,
             "isMandatory": true,
             "orderId": 1,
-            "minValue": 30,
-            "maxValue": 200,
+            "minValue": 20,
+            "maxValue": 150,
             "maxLength": 3,
             "title": "Pulse",
             "titleCulture": "নাড়ির গতি (প্রতি মিনিটে)",
@@ -123,7 +123,7 @@
             "minValue": 10,
             "maxValue": 250,
             "naValue": 0,
-            "maxLength": 5,
+            "maxLength": 6,
             "orderId": 2,
             "title": "Weight",
             "titleCulture": "ওজন(কেজি)",
@@ -201,7 +201,7 @@
             "title": "On treatment for HTN/ Pre-eclampsia/ Eclampsia",
             "titleCulture": "উচ্চ রক্তচাপের /  প্রি-এক্ল্যাম্পসিয়া / এক্ল্যাম্পসিয়া চিকিৎসা নিচ্ছেন কি না?",
             "viewType": "RadioGroup",
-            "visibility": "visible"
+            "visibility": "gone"
         },
         {
             "family": "maternalHealthAssessment",
@@ -434,7 +434,7 @@
             "title": "On treatment for DM/GDM",
             "titleCulture": "ডায়াবেটিস / গর্ভকালীন ডায়াবেটিসের চিকিৎসা নিচ্ছেন কি না?",
             "viewType": "RadioGroup",
-            "visibility": "visible"
+            "visibility": "gone"
         },
         {
             "condition":
@@ -642,6 +642,7 @@
             "isEnabled": true,
             "isMandatory": true,
             "minValue": 0,
+            "maxValue": "90",
             "maxLength": 2,
             "orderId": 22,
             "title": "Total Consumed till now",
@@ -659,6 +660,7 @@
             "isMandatory": true,
             "minValue": 0,
             "maxLength": 2,
+            "maxValue": "90",
             "orderId": 23,
             "title": "Provided",
             "titleCulture": "এই ভিজিটে ব্র্যাক হতে প্রদানকৃত আয়রণ বড়ির সংখ্যা",
@@ -684,6 +686,7 @@
             "isEnabled": true,
             "isMandatory": true,
             "minValue": 0,
+            "maxValue": "90",
             "maxLength": 2,
             "orderId": 25,
             "title": "Total Consumed till now",
@@ -701,6 +704,7 @@
             "isMandatory": true,
             "minValue": 0,
             "maxLength": 2,
+            "maxValue": "90",
             "orderId": 26,
             "title": "Provided",
             "titleCulture": "এই ভিজিটে ব্র্যাক হতে প্রদানকৃত ক্যালসিয়াম বড়ির সংখ্যা",

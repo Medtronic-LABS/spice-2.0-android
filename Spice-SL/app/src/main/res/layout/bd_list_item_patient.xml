@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:clickable="false"
+    android:focusable="false">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardPatient"
+        style="@style/CardView_Style"
+        android:layout_width="match_parent"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardCornerRadius="@dimen/_16sdp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clPatientRoot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/default_color_bg"
+            android:padding="@dimen/_20sdp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCardPatientName"
+                style="@style/TextStyle_Bold_16_NoBG"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:textColor="@color/secondary_black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLabelNationalID"
+                style="@style/TextStyle_Regular_12"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/national_id"
+                android:textColor="@color/charcoal_grey"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvCardPatientName" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCardNationalID"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/secondary_black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvLabelNationalID" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvLabelPatientID"
+                style="@style/TextStyle_Regular_12"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/patient_id"
+                android:textColor="@color/charcoal_grey"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvCardNationalID" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvCardPatientID"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/secondary_black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvLabelPatientID" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrier_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="tvCardNationalID,tvCardPatientID" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvBPStatus"
+                style="@style/TextStyle_Regular_16_Blue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:paddingStart="@dimen/_5sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:textColor="@color/secondary_black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/barrier_id"
+                tools:text="@string/high_risk"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/dueDateContainer"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/callContainer"
+                app:layout_constraintTop_toBottomOf="@+id/tvBPStatus" >
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvDueDate"
+                    android:text="hjghjg"
+                    style="@style/TextStyle_Regular_16_Blue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/_8sdp"
+                    android:background="@drawable/due_date_bg"
+                    android:textAlignment="center"
+                    android:textStyle="bold"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:textColor="@color/card_color"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/callContainer"
+                android:layout_width="@dimen/_50sdp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/call_button_selector"
+                app:layout_constraintTop_toTopOf="@+id/dueDateContainer"
+                android:padding="@dimen/_5sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                app:layout_constraintStart_toEndOf="@id/dueDateContainer"
+                app:layout_constraintBottom_toBottomOf="@+id/dueDateContainer"
+                app:layout_constraintTop_toBottomOf="@+id/tvBPStatus"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvCallBtn"
+                    style="@style/TextStyle_Regular_16_Blue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/secondary_black"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:background="@drawable/call_icon"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/ivRecentAttemptCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_notification_dot"
+                android:gravity="center"
+                android:padding="@dimen/_4sdp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10ssp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@+id/callContainer"
+                app:layout_constraintEnd_toEndOf="@id/callContainer"
+                app:layout_constraintStart_toEndOf="@+id/callContainer"
+                app:layout_constraintTop_toTopOf="@id/callContainer" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/patientFollowupGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids="tvBPStatus, dueDateContainer, callContainer" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

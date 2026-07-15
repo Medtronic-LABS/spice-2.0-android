@@ -5,10 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.common.CVDRiskCalculator
-import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
 import org.medtroniclabs.uhis.databinding.FragmentAssessmentBinding
 import org.medtroniclabs.uhis.formgeneration.FormGenerator
@@ -20,6 +21,8 @@ import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseFragment
 import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.CATARACT
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NCD_SERVICE_PROVIDED
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.YES
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.ReferralResultGenerator
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 import org.medtroniclabs.uhis.ui.assessment.viewmodel.AssessmentViewModel
@@ -59,7 +62,6 @@ class BDCataractAssessmentFragment() : BaseFragment(), FormEventListener {
 
     private fun getFormDataForWorkflow() {
         viewModel.getFormData(MenuConstants.CATARACT_MENU_ID)
-        viewModel.getRiskEntityList()
         viewModel.getNearestHealthFacility()
     }
 
@@ -74,7 +76,7 @@ class BDCataractAssessmentFragment() : BaseFragment(), FormEventListener {
             binding.llForm,
             this,
             binding.scrollView,
-            translate = SecuredPreference.getIsTranslationEnabled(),
+            translate = isTranslationEnabled,
         ) { map, id ->
             when (id) {
                 Screening.Weight, Screening.Height -> {
@@ -140,7 +142,6 @@ class BDCataractAssessmentFragment() : BaseFragment(), FormEventListener {
         serverData: List<FormLayout>?,
     ) {
         resultMap?.let { details ->
-            // val referralResult = ReferralResultGenerator().calculateNCDStatus(requireContext(), details)
             val result = serverData?.let {
                 FormResultComposer().groupValues(
                     serverData = it,
@@ -150,18 +151,32 @@ class BDCataractAssessmentFragment() : BaseFragment(), FormEventListener {
             }
 
             viewModel.memberDetailsLiveData.value?.data?.let { memberDetail ->
-                result?.second?.let {
-                    val ncdMap = it[CATARACT] as HashMap<String, Any>
-                    val bpResult = AssessmentUtil.calculateAverageBloodPressure(ncdMap)
-                    val bgResult = AssessmentUtil.addDateAndTimeForGlucose(ncdMap)
+                result?.second?.let { assessmentMap ->
+                    lifecycleScope.launch {
+                        val ncdMap = assessmentMap[CATARACT] as HashMap<String, Any>
+                        val bpResult = AssessmentUtil.calculateAverageBloodPressure(ncdMap)
+                        val bgResult = AssessmentUtil.addDateAndTimeForGlucose(ncdMap)
 
-                    // Compute Referral Logic
-                    val referralResult = ReferralResultGenerator().computeReferralResultForBDNCD(ncdMap, bpResult, bgResult, listOf())
+                        viewModel.isFollowupVisit = viewModel.getLastServiceHistory(MenuConstants.CATARACT_MENU_ID) != null
+                        val referralResult =
+                            ReferralResultGenerator().computeReferralResultForBDNCD(
+                                ncdMap,
+                                bpResult,
+                                bgResult,
+                                AssessmentUtil.getSymptomsList(ncdMap),
+                                viewModel.isFollowupVisit,
+                            )
 
-                    // Compute CVD Risk
-                    CVDRiskCalculator.calculateCVDRiskFactor(ncdMap, viewModel.riskClassificationModels, memberDetail.dateOfBirth, memberDetail.gender)
-                    viewModel.setUserJourney(AnalyticsDefinedParams.SUBMITBUTTONTRIGGERED)
-                    viewModel.saveAssessment(serverData, it, referralResult, viewModel.menuId)
+                        val riskModels = viewModel.loadRiskClassificationModels()
+                        CVDRiskCalculator.calculateCVDRiskFactor(
+                            ncdMap,
+                            riskModels,
+                            memberDetail.dateOfBirth,
+                            memberDetail.gender,
+                        )
+                        viewModel.setUserJourney(AnalyticsDefinedParams.SUBMITBUTTONTRIGGERED)
+                        viewModel.saveAssessment(serverData, assessmentMap, referralResult, viewModel.menuId)
+                    }
                 }
             }
         }
@@ -170,12 +185,31 @@ class BDCataractAssessmentFragment() : BaseFragment(), FormEventListener {
     fun getCurrentAnsweredStatus(): Boolean = formGenerator.getResultMap().isNotEmpty()
 
     override fun onRenderingComplete() {
+        lifecycleScope.launch {
+            prefillHeightAndWeightFromObservations()
+        }
     }
 
     override fun onUpdateInstruction(
         id: String,
         selectedId: Any?,
     ) {
+        if (id == NCD_SERVICE_PROVIDED && YES.equals(selectedId?.toString(), true)) {
+            lifecycleScope.launch {
+                prefillHeightAndWeightFromObservations()
+            }
+        }
+    }
+
+    private suspend fun prefillHeightAndWeightFromObservations() {
+        val (height, weight) = viewModel.getLatestHeightWeightFromServiceHistory() ?: return
+        AssessmentUtil.prefillHeightAndWeight(
+            formGenerator,
+            height,
+            weight,
+            isHeightReadOnly = height != null,
+        )
+        viewModel.renderBMIValue(requireContext(), formGenerator, formGenerator.getResultMap())
     }
 
     override fun onInformationHandling(
@@ -197,5 +231,8 @@ class BDCataractAssessmentFragment() : BaseFragment(), FormEventListener {
         serverData: List<FormLayout>?,
         resultHashMap: HashMap<String, Any>,
     ) {
+    }
+
+    override fun onQRScanRequested() {
     }
 }

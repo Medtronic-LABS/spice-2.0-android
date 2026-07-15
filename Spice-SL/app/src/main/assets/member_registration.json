@@ -9,6 +9,23 @@
             "viewType": "CardView"
         },
         {
+            "family": "bioData",
+            "fieldName": "Name",
+            "hint": "Enter Name",
+            "hintCulture": "নাম লিখুন",
+            "id": "name",
+            "inputType": 60,
+            "isEnabled": true,
+            "isMandatory": true,
+            "isNeededDefault": true,
+            "orderId": 0,
+            "title": "Name",
+            "titleCulture": "নাম",
+            "optionType": "personName",
+            "viewType": "EditText",
+            "visibility": "visible"
+        },
+        {
             "condition":
             [
                 {
@@ -51,7 +68,7 @@
             ],
             "title": "ID Type",
             "titleCulture": "আইডির ধরন",
-            "orderId": 0,
+            "orderId": 1,
             "viewType": "Spinner",
             "visibility": "visible"
         },
@@ -65,27 +82,49 @@
             "isEnabled": true,
             "isMandatory": true,
             "isNeededDefault": true,
-            "orderId": 1,
+            "orderId": 2,
             "title": "National ID",
             "titleCulture": "জাতীয় পরিচয়পত্র (NID) (≥১৮ বছর)",
             "viewType": "EditText",
             "visibility": "gone"
         },
         {
+            "errorMessage": "Please select mobile number category",
+            "cultureErrorMessage": "অনুগ্রহ করে মোবাইল নম্বরের ধরন নির্বাচন করুন",
             "family": "bioData",
-            "fieldName": "Name",
-            "hint": "Enter Name",
-            "hintCulture": "নাম লিখুন",
-            "id": "name",
-            "inputType": 60,
+            "fieldName": "phone_number_category",
+            "id": "phone_number_category",
+            "isEditable": true,
             "isEnabled": true,
             "isMandatory": true,
             "isNeededDefault": true,
-            "orderId": 2,
-            "title": "Name",
-            "titleCulture": "নাম",
-            "optionType": "personName",
-            "viewType": "EditText",
+            "optionsList":
+            [
+                {
+                    "id": "personal",
+                    "name": "Personal (Self)",
+                    "cultureValue": "ব্যাক্তিগত (নিজস্ব)"
+                },
+                {
+                    "id": "household_head",
+                    "name": "Head of Household",
+                    "cultureValue": "খানা প্রধান"
+                },
+                {
+                    "id": "family",
+                    "name": "Family Member",
+                    "cultureValue": "পরিবারের সদস্য"
+                },
+                {
+                    "id": "friend",
+                    "name": "Friend",
+                    "cultureValue": "প্রতিবেশী/বন্ধু"
+                }
+            ],
+            "title": "Mobile number category",
+            "titleCulture": "মোবাইল নম্বরের ধরন",
+            "orderId": 3,
+            "viewType": "Spinner",
             "visibility": "visible"
         },
         {
@@ -109,7 +148,7 @@
             "naValue": 0,
             "isMandatory": true,
             "isNeededDefault": true,
-            "orderId": 3,
+            "orderId": 4,
             "title": "Mobile Number",
             "titleCulture": "মোবাইল নম্বর",
             "viewType": "EditText",
@@ -119,40 +158,6 @@
             [
                 "01"
             ]
-        },
-        {
-            "errorMessage": "Please select mobile number category",
-            "cultureErrorMessage": "অনুগ্রহ করে মোবাইল নম্বরের ধরন নির্বাচন করুন",
-            "family": "bioData",
-            "fieldName": "phone_number_category",
-            "id": "phone_number_category",
-            "isEditable": true,
-            "isEnabled": true,
-            "isMandatory": true,
-            "isNeededDefault": true,
-            "optionsList":
-            [
-                {
-                    "id": "personal",
-                    "name": "Personal (Self)",
-                    "cultureValue": "ব্যাক্তিগত (নিজস্ব)"
-                },
-                {
-                    "id": "family",
-                    "name": "Family Member",
-                    "cultureValue": "পরিবারের সদস্য"
-                },
-                {
-                    "id": "friend",
-                    "name": "Friend",
-                    "cultureValue": "প্রতিবেশী/বন্ধু"
-                }
-            ],
-            "title": "Mobile number category",
-            "titleCulture": "মোবাইল নম্বরের ধরন",
-            "orderId": 4,
-            "viewType": "Spinner",
-            "visibility": "visible"
         },
         {
             "disableFutureDate": true,
@@ -301,6 +306,22 @@
             "titleCulture": "খানা প্রধান কিনা",
             "viewType": "CheckBox",
             "visibility": "gone"
+        },
+        {
+            "familyOrder": 5.0,
+            "viewType": "CardView",
+            "id": "qrCard",
+            "title": "Scan QR Code",
+            "titleCulture": "QR কোড স্ক্যান করুন"
+        },
+        {
+            "isEditable": true,
+            "viewType": "QRView",
+            "id": "qrCode",
+            "family": "qrCard",
+            "title": "Scan QR Code",
+            "isMandatory": false,
+            "titleCulture": "QR কোড স্ক্যান করুন"
         }
     ]
 }

@@ -2,17 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- MicroCoaching SDK + :sdk-android-sherpa are minSdk 23 (matching this app).
-         The SDK declares its own tools:overrideLibrary for com.google.mediapipe.tasks.genai
-         in its manifest, so no override is needed here. Listed defensively in case a
-         future SDK version raises its minSdk again. -->
-    <uses-sdk tools:overrideLibrary="com.google.mediapipe.tasks.genai" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name=".SpiceBaseApplication"
@@ -24,12 +23,6 @@
         android:theme="@style/Theme.Spice_sl_mobile"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-
-        <activity
-            android:name=".ui.coaching.CoachingAssistantActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".ui.medicalreview.hiv.activity.HivImrAndCmrActivity"
@@ -96,7 +89,6 @@
             android:name=".ui.patientEdit.NCDPatientEditActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="false"
-            android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.medicalreview.labTechnician.NCDLabTestListActivity"
@@ -226,6 +218,11 @@
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
+            android:name=".ui.membersearch.MemberSearchActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
             android:name=".ui.assessment.AssessmentActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="false"
@@ -236,6 +233,49 @@
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="false"
             tools:ignore="LockedOrientationActivity" />
+
+        <activity
+            android:name=".ui.patient.AdvancedSearchActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".ui.patient.NurseDashboardActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".ui.patient.TermsAndConditionActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".ui.patient.EnrollmentFormBuilderActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".ui.patient.NurseMedicalReviewActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".ui.patient.NurseMedicalReviewSummaryActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".ui.patient.PrescriptionRefillActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
+
         <activity
             android:name=".ui.home.AssessmentToolsActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
@@ -306,6 +346,11 @@
             android:exported="false"
             android:windowSoftInputMode="adjustPan" />
         <activity
+            android:name=".common.qrscanner.QRScannerActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="false"
+            android:permission="${applicationId}.permission.INTERNAL_ACTIVITY" />
+        <activity
             android:name=".ui.followup.FollowUpMyPatientActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="false" />
@@ -364,6 +409,17 @@
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustPan" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
     </application>
 
 </manifest>

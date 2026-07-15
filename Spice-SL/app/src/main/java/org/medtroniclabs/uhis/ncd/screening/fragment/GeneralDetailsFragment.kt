@@ -12,7 +12,7 @@ import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.isVisible
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.Other
+import org.medtroniclabs.uhis.common.DefinedParams.OTHER
 import org.medtroniclabs.uhis.databinding.FragmentGeneralDetailsBinding
 import org.medtroniclabs.uhis.db.entity.HealthFacilityEntity
 import org.medtroniclabs.uhis.formgeneration.extension.markMandatory
@@ -92,7 +92,7 @@ class GeneralDetailsFragment : BaseFragment(), View.OnClickListener {
             outpatient -> binding.rbTypeBtn2.isChecked = true
             inpatient -> binding.rbTypeBtn3.isChecked = true
             Pharmacy -> binding.rbTypeBtn4.isChecked = true
-            Other -> {
+            OTHER -> {
                 binding.rbTypeBtn5.isChecked = true
                 binding.etOthers.visible()
                 binding.etOthers.setText(viewModel.siteDetail.otherType)
@@ -123,8 +123,8 @@ class GeneralDetailsFragment : BaseFragment(), View.OnClickListener {
         }
         val list = arrayListOf<Map<String, Any>>(
             hashMapOf(
-                DefinedParams.NAME to DefinedParams.DefaultIDLabel,
-                DefinedParams.ID to DefinedParams.DefaultSelectID,
+                DefinedParams.NAME to DefinedParams.DEFAULT_ID_LABEL,
+                DefinedParams.ID to DefinedParams.DEFAULT_SELECT_ID,
             ),
         )
         var defaultPosition = 0
@@ -133,7 +133,7 @@ class GeneralDetailsFragment : BaseFragment(), View.OnClickListener {
                 hashMapOf(
                     DefinedParams.ID to site.id,
                     DefinedParams.NAME to site.name,
-                    DefinedParams.TenantId to site.tenantId,
+                    DefinedParams.TENANT_ID to site.tenantId,
                     DefinedParams.FhirId to (site.fhirId ?: 0),
                 ).also {
                     if (viewModel.siteDetail.siteId == site.id) {
@@ -172,7 +172,7 @@ class GeneralDetailsFragment : BaseFragment(), View.OnClickListener {
         viewModel.siteDetail.apply {
             siteName = map[DefinedParams.NAME] as? String ?: ""
             siteId = map[DefinedParams.FhirId]?.toString()?.toLongOrNull() ?: -1L
-            tenantId = map[DefinedParams.TenantId]?.toString()?.toLongOrNull() ?: -1L
+            tenantId = map[DefinedParams.TENANT_ID]?.toString()?.toLongOrNull() ?: -1L
         }
     }
 
@@ -288,12 +288,12 @@ class GeneralDetailsFragment : BaseFragment(), View.OnClickListener {
             R.id.rbTypeBtn5 -> {
                 binding.etOthers.visible()
                 viewModel.siteDetail.categoryDisplayType = getString(R.string.Other)
-                viewModel.siteDetail.categoryType = Other
+                viewModel.siteDetail.categoryType = OTHER
             }
             R.id.rbTypeBtn6 -> configureCategoryType(R.string.door_to_door, DoorToDoor)
             R.id.rbTypeBtn7 -> configureCategoryType(R.string.camp, Camp)
             else -> {
-                val facilityList = listOf(Other, OPDTriage, outpatient, inpatient, Pharmacy)
+                val facilityList = listOf(OTHER, OPDTriage, outpatient, inpatient, Pharmacy)
                 val communityList = listOf(DoorToDoor, Camp)
                 if (viewModel.siteDetail.category == Community &&
                     (
@@ -332,7 +332,7 @@ class GeneralDetailsFragment : BaseFragment(), View.OnClickListener {
     private fun validateToEnableNext() {
         val categorySelected = binding.rgCategoryRow.checkedRadioButtonId != -1
         var typeSelected = binding.rgType.checkedRadioButtonId != -1
-        if (viewModel.siteDetail.categoryType.equals(Other, true)) {
+        if (viewModel.siteDetail.categoryType.equals(OTHER, true)) {
             typeSelected = !binding.etOthers.text
                 ?.trim()
                 .isNullOrBlank()

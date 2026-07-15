@@ -234,7 +234,7 @@ class AssessmentNCDFragment : BaseFragment(), FormEventListener, View.OnClickLis
             complianceList.add(
                 0,
                 MedicalComplianceEntity(
-                    id = DefinedParams.DefaultID.toLong(),
+                    id = DefinedParams.DEFAULT_ID.toLong(),
                     name = getString(R.string.please_select),
                 ),
             )
@@ -373,7 +373,7 @@ class AssessmentNCDFragment : BaseFragment(), FormEventListener, View.OnClickLis
         screeningDetailsModel?.gender?.let { gender ->
             binding.gender.tvValue.text = gender.replaceFirstChar(Char::titlecase)
             viewModel.bioMetric?.apply {
-                this[DefinedParams.Gender] = gender
+                this[DefinedParams.GENDER] = gender
             }
             if (gender.equals(Screening.Female, true) && screeningDetailsModel.isPregnant == true) {
                 autoPopulatePregnancyAnc(screeningDetailsModel)
@@ -387,7 +387,7 @@ class AssessmentNCDFragment : BaseFragment(), FormEventListener, View.OnClickLis
         screeningDetailsModel?.age?.let { age ->
             binding.dobAge.tvValue.text = CommonUtils.getDecimalFormatted(age)
             viewModel.bioMetric?.apply {
-                this[Screening.Age] = age.toString()
+                this[Screening.AGE] = age.toString()
             }
         }
         screeningDetailsModel?.height?.let { height ->
@@ -499,7 +499,7 @@ class AssessmentNCDFragment : BaseFragment(), FormEventListener, View.OnClickLis
 
     private fun getSelectedSymptomsText(selectedSymptoms: List<SymptomModel>): String {
         val otherSelected =
-            selectedSymptoms.filter { it.symptom.startsWith(DefinedParams.Other, true) }
+            selectedSymptoms.filter { it.symptom.startsWith(DefinedParams.OTHER, true) }
         val noSymptomsCount =
             selectedSymptoms
                 .filter {
@@ -677,14 +677,14 @@ class AssessmentNCDFragment : BaseFragment(), FormEventListener, View.OnClickLis
         }
 
         complianceRadioGroup.setOnCheckedChangeListener { _, id ->
-            if (id > DefinedParams.DefaultID.toLong()) {
+            if (id > DefinedParams.DEFAULT_ID.toLong()) {
                 val selectedModel = list[id]
                 if (parent == 1) {
                     showOrHideCompliances(selectedModel)
                     binding.symptomCard.otherComplianceReason.setText(getString(R.string.empty))
                     binding.symptomCard.otherComplianceReason.gone()
                 } else if (parent == 2) {
-                    if (selectedModel.name.equals(DefinedParams.Other, true)) {
+                    if (selectedModel.name.equals(DefinedParams.OTHER, true)) {
                         binding.symptomCard.otherComplianceReason.visible()
                     } else {
                         binding.symptomCard.otherComplianceReason.setText(getString(R.string.empty))
@@ -883,7 +883,7 @@ class AssessmentNCDFragment : BaseFragment(), FormEventListener, View.OnClickLis
                 if (!selectedSymptom.isNullOrEmpty()) {
                     val other = selectedSymptom.filter {
                         it.symptom.startsWith(
-                            DefinedParams.Other,
+                            DefinedParams.OTHER,
                             true,
                         )
                     }
@@ -1002,7 +1002,7 @@ class AssessmentNCDFragment : BaseFragment(), FormEventListener, View.OnClickLis
                         complianceList
                             .find { data ->
                                 (data[DefinedParams.NAME] as? String)?.equals(
-                                    DefinedParams.Other,
+                                    DefinedParams.OTHER,
                                     ignoreCase = true,
                                 ) == true
                             }?.put(AssessmentDefinedParams.other_compliance, reason)
@@ -1122,10 +1122,10 @@ class AssessmentNCDFragment : BaseFragment(), FormEventListener, View.OnClickLis
                 map[Screening.DateOfBirth] = dateOfBirth
             }
             searchResponse.isRegularSmoker?.let { isRegularSmoker ->
-                map[Screening.is_regular_smoker] = isRegularSmoker
+                map[Screening.IS_REGULAR_SMOKER] = isRegularSmoker
             }
             searchResponse.gender?.let { gender ->
-                map[DefinedParams.Gender] = gender
+                map[DefinedParams.GENDER] = gender
             }
         }
         map[AssessmentDefinedParams.assessmentType] = NON_COMMUNITY
@@ -1274,8 +1274,8 @@ class AssessmentNCDFragment : BaseFragment(), FormEventListener, View.OnClickLis
             result?.second?.apply {
                 this[AssessmentDefinedParams.encounter] = provenance
                 this[AssessmentDefinedParams.assessmentType] = NON_COMMUNITY
-                remove(DefinedParams.Gender)
-                remove(Screening.is_regular_smoker)
+                remove(DefinedParams.GENDER)
+                remove(Screening.IS_REGULAR_SMOKER)
                 remove(Screening.DateOfBirth)
                 remove(Screening.referredReasons)
             }
@@ -1449,6 +1449,9 @@ class AssessmentNCDFragment : BaseFragment(), FormEventListener, View.OnClickLis
         /*
        Never used
          */
+    }
+
+    override fun onQRScanRequested() {
     }
 
     private fun proceedFormSubmission(v: View) {

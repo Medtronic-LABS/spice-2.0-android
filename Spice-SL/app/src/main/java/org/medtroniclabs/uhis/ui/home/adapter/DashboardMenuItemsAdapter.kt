@@ -5,19 +5,12 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.runtime.Recomposer
-import androidx.compose.ui.platform.AndroidUiDispatcher
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.medtroniclabs.microcoaching.ui.components.CoachingGridTile
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.databinding.RowActivitiesBinding
-import org.medtroniclabs.uhis.databinding.RowCoachingTileBinding
 import org.medtroniclabs.uhis.db.entity.MenuEntity
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.ui.MenuConstants
@@ -28,116 +21,35 @@ class DashboardMenuItemsAdapter(
     private val roleBasedActivitiesList: List<MenuEntity>,
     private val listener: MenuSelectionListener,
 ) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    /** Default menu tile (icon + title), inflated from `row_activities`. */
+    RecyclerView.Adapter<DashboardMenuItemsAdapter.ActivitiesViewHolder>() {
     class ActivitiesViewHolder(val binding: RowActivitiesBinding) :
         RecyclerView.ViewHolder(binding.root) {
         val context: Context = binding.root.context
     }
 
-    /**
-     * Coaching tile — the whole tile (and its skipped-refresher badge) is owned
-     * by the MicroCoaching SDK's [CoachingGridTile] Composable, so the host just
-     * forwards the click.
-     */
-    class CoachingViewHolder(val binding: RowCoachingTileBinding) :
-        RecyclerView.ViewHolder(binding.root)
-
-    /**
-     * Parent composition context for the coaching tile's [ComposeView].
-     *
-     * On tablets this RecyclerView uses FlexboxLayoutManager, which measures item
-     * views inside `calculateFlexLines` BEFORE attaching them to the window.
-     * `AbstractComposeView.onMeasure` unconditionally creates its composition, and
-     * with no explicit parent context it resolves one from the window recomposer —
-     * which doesn't exist while the view is detached, so it throws
-     * "Cannot locate windowRecomposer ... not attached to a window" (crash seen on
-     * tablets; phones use GridLayoutManager, which attaches before measuring, so
-     * they never hit it).
-     *
-     * Supplying an explicit, lifecycle-scoped [Recomposer] via
-     * `setParentCompositionContext` short-circuits that window lookup, so the tile
-     * composes safely even when measured detached. Created when the adapter is
-     * attached to the RecyclerView and cancelled when it detaches.
-     */
-    private var recomposer: Recomposer? = null
-    private var recomposeScope: CoroutineScope? = null
-
-    override fun getItemViewType(position: Int): Int =
-        if (roleBasedActivitiesList[position]
-                .menuId
-                .equals(MenuConstants.COACHING_MENU_ID, ignoreCase = true)
-        ) {
-            VIEW_TYPE_COACHING
-        } else {
-            VIEW_TYPE_DEFAULT
-        }
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        // AndroidUiDispatcher.CurrentThread supplies a Choreographer-backed frame
-        // clock; the Recomposer drives the coaching tile's composition off it.
-        // Created on the main thread (RecyclerView callbacks are main-thread).
-        val dispatcher = AndroidUiDispatcher.CurrentThread
-        val scope = CoroutineScope(dispatcher)
-        val newRecomposer = Recomposer(dispatcher)
-        recomposeScope = scope
-        recomposer = newRecomposer
-        scope.launch { newRecomposer.runRecomposeAndApplyChanges() }
-    }
-
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        recomposer?.cancel()
-        recomposer = null
-        recomposeScope = null
-    }
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): RecyclerView.ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        return if (viewType == VIEW_TYPE_COACHING) {
-            CoachingViewHolder(RowCoachingTileBinding.inflate(inflater, parent, false)).also {
-                it.binding.coachingTileComposeView.apply {
-                    // Explicit parent context — see [recomposer]. Must be set before
-                    // the first onMeasure (which is why it's here, not at bind).
-                    setParentCompositionContext(recomposer)
-                    setViewCompositionStrategy(
-                        ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool,
-                    )
-                }
-            }
-        } else {
-            ActivitiesViewHolder(RowActivitiesBinding.inflate(inflater, parent, false))
-        }
-    }
+    ): ActivitiesViewHolder =
+        ActivitiesViewHolder(
+            RowActivitiesBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false,
+            ),
+        )
 
     override fun onBindViewHolder(
-        holder: RecyclerView.ViewHolder,
+        holder: ActivitiesViewHolder,
         position: Int,
     ) {
         val model = roleBasedActivitiesList[position]
-        when (holder) {
-            is CoachingViewHolder -> holder.binding.coachingTileComposeView.setContent {
-                CoachingGridTile(
-                    onClick = { listener.onMenuSelected(model.menuId, model.subModule) },
-                )
+        holder.binding.tvTitle.text =
+            if (CommonUtils.parseUserLocale() == DefinedParams.EN) {
+                model.name
+            } else {
+                model.displayValue ?: model.name
             }
-            is ActivitiesViewHolder -> bindActivityTile(holder, model)
-        }
-    }
-
-    private fun bindActivityTile(
-        holder: ActivitiesViewHolder,
-        model: MenuEntity,
-    ) {
-        holder.binding.tvTitle.text = if (CommonUtils.parseUserLocale() == DefinedParams.EN) {
-            model.name
-        } else {
-            model.displayValue ?: model.name
-        }
 
         val imageModel = getResourceActivityId(
             model.menuId,
@@ -191,9 +103,14 @@ class DashboardMenuItemsAdapter(
                 R.drawable.ic_household,
             )
 
-            MenuConstants.MY_PATIENTS_MENU_ID, MenuConstants.SERVICE_RECIPIENT -> ContextCompat.getDrawable(
+            MenuConstants.MY_PATIENTS_MENU_ID -> ContextCompat.getDrawable(
                 context,
                 R.drawable.ic_my_patient,
+            )
+
+            MenuConstants.SERVICE_RECIPIENT -> ContextCompat.getDrawable(
+                context,
+                R.drawable.ic_service_recipient,
             )
 
             MenuConstants.SCREENER_MENU_ID -> ContextCompat.getDrawable(
@@ -314,7 +231,7 @@ class DashboardMenuItemsAdapter(
                 R.drawable.ic_screening,
             )
 
-            MenuConstants.REGISTRATION -> ContextCompat.getDrawable(
+            MenuConstants.REGISTRATION, MenuConstants.CONFIRM_DIAGNOSIS -> ContextCompat.getDrawable(
                 context,
                 R.drawable.ic_registration,
             )
@@ -349,7 +266,9 @@ class DashboardMenuItemsAdapter(
                 R.drawable.ic_dispense,
             )
 
-            MenuConstants.FOLLOW_UP -> ContextCompat.getDrawable(
+            MenuConstants.FOLLOW_UP,
+            MenuConstants.TELE_SUPPORT,
+            -> ContextCompat.getDrawable(
                 context,
                 R.drawable.ic_follow_up,
             )
@@ -379,16 +298,8 @@ class DashboardMenuItemsAdapter(
                 R.drawable.ic_hiv,
             )
 
-            // COACHING_MENU_ID is rendered by the SDK CoachingGridTile (own
-            // view type) — no host drawable needed.
-
             else -> null
         }
 
     override fun getItemCount(): Int = roleBasedActivitiesList.size
-
-    companion object {
-        private const val VIEW_TYPE_DEFAULT = 0
-        private const val VIEW_TYPE_COACHING = 1
-    }
 }

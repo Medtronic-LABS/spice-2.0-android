@@ -112,4 +112,13 @@ class ScreeningRepository @Inject constructor(
         } catch (_: Exception) {
             Resource(state = ResourceState.ERROR)
         }
+
+    suspend fun getScreeningRecordById(id: Long): ScreeningEntity = roomHelper.getScreeningRecordById(id)
+
+    suspend fun getAccountSiteList(userId: Long) = roomHelper.getAccountSiteList(userId)
+
+    suspend fun getAccountSiteListByLevel(
+        userId: Long,
+        level: String,
+    ) = roomHelper.getAccountSiteListByLevel(userId, level)
 }

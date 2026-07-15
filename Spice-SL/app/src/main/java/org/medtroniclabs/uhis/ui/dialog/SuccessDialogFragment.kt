@@ -59,7 +59,7 @@ class SuccessDialogFragment : DialogFragment(), View.OnClickListener {
             bundle.putBoolean(IS_HOUSEHOLD_MEMBER, isMember)
             bundle.putBoolean(IS_PHU_WALK_INS_FLOW, isPhuLink)
             if (!descText.isNullOrBlank()) {
-                bundle.putString(DefinedParams.label, descText)
+                bundle.putString(DefinedParams.LABEL, descText)
             }
             val fragment = SuccessDialogFragment()
             fragment.arguments = bundle
@@ -90,8 +90,8 @@ class SuccessDialogFragment : DialogFragment(), View.OnClickListener {
 
     private fun attachObserver() {
         binding.householdNo.invisible()
-        if (!arguments?.getString(DefinedParams.label).isNullOrBlank()) {
-            binding.successMessage.text = arguments?.getString(DefinedParams.label)
+        if (!arguments?.getString(DefinedParams.LABEL).isNullOrBlank()) {
+            binding.successMessage.text = arguments?.getString(DefinedParams.LABEL)
         }
         if (arguments?.getBoolean(IS_HOUSEHOLD) == true) {
             viewModel.setUserJourney(AnalyticsDefinedParams.HouseHoldRegistrationSuccess)

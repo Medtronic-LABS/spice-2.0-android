@@ -37,6 +37,14 @@ class DashboardLocalRepository @Inject constructor(
             pwIdentifiedFirst4MonthsWithAncCount = row.pwIdentifiedFirst4MonthsWithAncCount ?: 0,
             anc3PlusCount = row.anc3PlusCount ?: 0,
             highRiskPregnantWomenCount = row.highRiskPregnantWomenCount ?: 0,
+            totalNcdServicesCount = row.totalNcdServicesCount ?: 0,
+            ncdScreeningFirstServiceCount = row.ncdScreeningFirstServiceCount ?: 0,
+            ncdFollowUpAssessmentCount = row.ncdFollowUpAssessmentCount ?: 0,
+            ncdFollowUpReferralCount = row.ncdFollowUpReferralCount ?: 0,
+            glassesSoldCustomStatusCount = row.glassesSoldCustomStatusCount ?: 0,
+            ncdServicesInCataractCampCount = row.ncdServicesInCataractCampCount ?: 0,
+            patientsReferredForOperationCount = row.patientsReferredForOperationCount ?: 0,
+            linkedToCareCount = row.linkedToCareCount ?: 0,
         )
     }
 

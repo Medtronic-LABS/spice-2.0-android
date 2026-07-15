@@ -7,6 +7,7 @@ import org.medtroniclabs.uhis.common.CommonUtils.getStringOrEmptyString
 import org.medtroniclabs.uhis.common.DefinedParams.CHIEF_DOM_CODE_LENGTH
 import org.medtroniclabs.uhis.common.DefinedParams.PATIENT_NUMBER_LENGTH
 import org.medtroniclabs.uhis.common.DefinedParams.VILLAGE_CODE_LENGTH
+import org.medtroniclabs.uhis.common.RoleConstant
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberFhirId
 import org.medtroniclabs.uhis.data.offlinesync.model.UnAssignedHouseholdMemberDetail
@@ -22,7 +23,6 @@ import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration
 import org.medtroniclabs.uhis.mappingkey.MemberRegistration
 import org.medtroniclabs.uhis.mappingkey.MemberRegistration.ID_MARITAL_STATUS
 import org.medtroniclabs.uhis.model.assessment.AssessmentMemberDetails
-import org.medtroniclabs.uhis.model.services.ServiceMemberCounts
 import org.medtroniclabs.uhis.model.services.ServiceStaticFilter
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.resource.ResourceState
@@ -41,21 +41,38 @@ class HouseholdMemberRepository @Inject constructor(
         isPhuWalkInFlow: Boolean? = null,
         location: Location?,
     ): Long {
+        val beforeMember = if (entity != null) roomHelper.getMemberDetailsByID(entity.id) else null
+
         val memberEntity = createOrUpdateHouseHoldMemberEntity(map, householdId, entity, parentReferenceId, location)
 //         if (memberEntity.patientId == null) {
 //             return  null
 //         }
 
         // If updating a member and isHouseholdHead is not explicitly set in the map, preserve the old value
-        if (entity != null && !map.containsKey(MemberRegistration.IS_HOUSEHOLD_HEAD)) {
-            val oldMemberEntity = roomHelper.getMemberDetailsByID(memberEntity.id)
-            memberEntity.isHouseholdHead = oldMemberEntity.isHouseholdHead
+        if (entity != null && beforeMember != null && !map.containsKey(MemberRegistration.IS_HOUSEHOLD_HEAD)) {
+            memberEntity.isHouseholdHead = beforeMember.isHouseholdHead
+        }
+
+        if (entity != null && beforeMember != null && !hasMeaningfulMemberChanges(beforeMember, memberEntity)) {
+            return entity.id
         }
 
         val memberId = roomHelper.registerMember(memberEntity)
 
         // Only perform household-related operations if householdId is not null
         if (householdId != null) {
+            // Keep members using the Household Head's phone number in sync when it changes.
+            if (
+                memberEntity.isHouseholdHead &&
+                (beforeMember == null || beforeMember.phoneNumber != memberEntity.phoneNumber)
+            ) {
+                roomHelper.updatePhoneNumberForMembersByCategory(
+                    householdId,
+                    memberEntity.phoneNumber,
+                    MemberRegistration.PhoneNumberCategory.HOUSEHOLD_HEAD.value,
+                )
+            }
+
             // If updating a member who is household head, update household name with member's name
             if (entity != null && memberEntity.isHouseholdHead && memberEntity.name.isNotEmpty()) {
                 val householdEntity = roomHelper.getHouseHoldDetailsById(householdId)
@@ -104,6 +121,34 @@ class HouseholdMemberRepository @Inject constructor(
                 null, // phoneNumberCategory parameter kept for interface compatibility
             )
         }
+    }
+
+    /**
+     * Returns true when any compared business field differs.
+     */
+    private fun hasMeaningfulMemberChanges(
+        before: HouseholdMemberEntity,
+        after: HouseholdMemberEntity,
+    ): Boolean {
+        if (before.name != after.name) return true
+        if (before.phoneNumber != after.phoneNumber) return true
+        if (before.phoneNumberCategory != after.phoneNumberCategory) return true
+        if (before.dateOfBirth != after.dateOfBirth) return true
+        if (before.gender != after.gender) return true
+        if (before.householdId != after.householdId) return true
+        if (before.villageId != after.villageId) return true
+        if (before.shasthyaShebikaId != after.shasthyaShebikaId) return true
+        if (before.shasthyaKormiId != after.shasthyaKormiId) return true
+        if (before.subVillageId != after.subVillageId) return true
+        if (before.motherReferenceId != after.motherReferenceId) return true
+        if (before.idType != after.idType) return true
+        if (before.nationalId != after.nationalId) return true
+        if (before.isHouseholdHead != after.isHouseholdHead) return true
+        if (before.guardianId != after.guardianId) return true
+        if (before.maritalStatus != after.maritalStatus) return true
+        if (before.disability != after.disability) return true
+        if (before.qrCode != after.qrCode)return true
+        return false
     }
 
     private suspend fun createOrUpdateHouseHoldMemberEntity(
@@ -158,6 +203,15 @@ class HouseholdMemberRepository @Inject constructor(
 
         householdMemberEntity.householdId = householdId
 
+        // Ensure the member carries its household's FHIR id so it can be linked on the
+        // backend when uploaded standalone (i.e. added to an already-synced household).
+        if (householdMemberEntity.householdFhirId.isNullOrEmpty() && householdId != null) {
+            val householdFhir = runCatching { roomHelper.getHouseHoldDetailsById(householdId) }.getOrNull()?.fhirId
+            if (!householdFhir.isNullOrEmpty()) {
+                householdMemberEntity.householdFhirId = householdFhir
+            }
+        }
+
         val maritalStatus = map[ID_MARITAL_STATUS]
         if (maritalStatus != null && maritalStatus is String) {
             householdMemberEntity.maritalStatus = maritalStatus
@@ -166,6 +220,11 @@ class HouseholdMemberRepository @Inject constructor(
         val disability = map[MemberRegistration.ID_DISABILITY]
         if (disability != null && disability is String) {
             householdMemberEntity.disability = disability
+        }
+
+        val qrCode = map[MemberRegistration.QR_CODE]
+        if (qrCode != null && qrCode is String) {
+            householdMemberEntity.qrCode = qrCode
         }
 
         val guardianId = CommonUtils.getLongOrNull(map[MemberRegistration.ID_GUARDIAN])
@@ -178,6 +237,7 @@ class HouseholdMemberRepository @Inject constructor(
         val currentTime = System.currentTimeMillis()
 
         if (entity == null) {
+            householdMemberEntity.createdByRoleName = SecuredPreference.getRole().takeIf { it.isNotBlank() }
             // If householdId is null, get location fields from form map
             if (householdId == null) {
                 val villageIdFromMap = CommonUtils.getLongOrNull(map[HouseHoldRegistration.VILLAGE_ID])
@@ -215,6 +275,9 @@ class HouseholdMemberRepository @Inject constructor(
             }
         } else {
             householdMemberEntity.sync_status = OfflineSyncStatus.NotSynced
+            if (householdId == null) {
+                applyLocationFromMap(householdMemberEntity, map)
+            }
         }
         householdMemberEntity.updatedAt = currentTime
         location?.let {
@@ -222,8 +285,44 @@ class HouseholdMemberRepository @Inject constructor(
             householdMemberEntity.longitude = it.longitude
         }
 
+        applyShasthyaKormiId(householdMemberEntity)
+
         return householdMemberEntity
     }
+
+    private suspend fun applyShasthyaKormiId(member: HouseholdMemberEntity) {
+        if (isValidShasthyaKormiId(member.shasthyaKormiId)) return
+
+        member.shasthyaShebikaId?.takeIf { it > 0L }?.let { ssId ->
+            roomHelper
+                .getShasthyaShebikaById(ssId)
+                ?.shasthyaKormiId
+                ?.takeIf { isValidShasthyaKormiId(it) }
+                ?.let {
+                    member.shasthyaKormiId = it
+                    return
+                }
+        }
+
+        if (shouldApplyLoggedInUserAsKormi()) {
+            val userId = SecuredPreference.getUserId()
+            if (isValidShasthyaKormiId(userId)) {
+                member.shasthyaKormiId = userId
+            }
+        }
+    }
+
+    private suspend fun shouldApplyLoggedInUserAsKormi(): Boolean {
+        if (CommonUtils.isFoPoOrChcp()) return false
+        val userId = SecuredPreference.getUserId()
+        if (!isValidShasthyaKormiId(userId)) return false
+        // SS users share the CHW role; their login id matches ShasthyaShebikaEntity.id.
+        if (roomHelper.getShasthyaShebikaById(userId) != null) return false
+        if (CommonUtils.isSk()) return true
+        return SecuredPreference.getRole() == RoleConstant.COMMUNITY_HEALTH_WORKER
+    }
+
+    private fun isValidShasthyaKormiId(id: Long?): Boolean = id != null && id > 0L
 
     private fun applyLocationFromMap(
         householdMemberEntity: HouseholdMemberEntity,
@@ -242,6 +341,16 @@ class HouseholdMemberRepository @Inject constructor(
         val subVillageIdFromMap = CommonUtils.getLongOrNull(map[HouseHoldRegistration.SUB_VILLAGE_ID])
         if (subVillageIdFromMap != null) {
             householdMemberEntity.subVillageId = subVillageIdFromMap
+        }
+
+        val shasthyaKormiIdFromMap = CommonUtils.getLongOrNull(map[HouseHoldRegistration.SHASTHYA_KORMI_ID])
+        if (isValidShasthyaKormiId(shasthyaKormiIdFromMap)) {
+            householdMemberEntity.shasthyaKormiId = shasthyaKormiIdFromMap
+        }
+
+        val chiefdomIdFromMap = CommonUtils.getLongOrNull(map[HouseHoldRegistration.CHIEFDOM_ID])
+        if (chiefdomIdFromMap != null) {
+            householdMemberEntity.chiefdomId = chiefdomIdFromMap
         }
     }
 
@@ -271,7 +380,7 @@ class HouseholdMemberRepository @Inject constructor(
         try {
             val memberEntity = roomHelper.getMemberDetailsByID(memberId)
             Resource(state = ResourceState.SUCCESS, data = memberEntity)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Resource(state = ResourceState.SUCCESS)
         }
 
@@ -281,7 +390,7 @@ class HouseholdMemberRepository @Inject constructor(
         try {
             val memberEntity = roomHelper.getMemberDetailsByParentId(memberId)
             Resource(state = ResourceState.SUCCESS, data = memberEntity)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Resource(state = ResourceState.ERROR)
         }
 
@@ -289,7 +398,7 @@ class HouseholdMemberRepository @Inject constructor(
         try {
             val memberEntity = roomHelper.getMemberDetailsByPatientId(patientId)
             Resource(state = ResourceState.SUCCESS, data = memberEntity)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Resource(state = ResourceState.ERROR)
         }
 
@@ -297,7 +406,7 @@ class HouseholdMemberRepository @Inject constructor(
         try {
             val memberEntity = roomHelper.getAssessmentMemberDetails(id)
             Resource(state = ResourceState.SUCCESS, data = memberEntity)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Resource(state = ResourceState.ERROR)
         }
 
@@ -353,6 +462,13 @@ class HouseholdMemberRepository @Inject constructor(
 
     suspend fun getHouseholdHeadDob(householdId: Long): String = roomHelper.getHouseholdHeadDob(householdId)
 
+    suspend fun getHouseholdHeadPhoneNumber(householdId: Long): String? =
+        roomHelper
+            .getAllHouseHoldMemberList(householdId)
+            .firstOrNull { it.isHouseholdHead && it.isActive }
+            ?.phoneNumber
+            ?.takeIf { it.isNotBlank() }
+
     suspend fun updatePregnantStatus(
         memberId: Long,
         isPregnant: Boolean,
@@ -406,20 +522,45 @@ class HouseholdMemberRepository @Inject constructor(
     }
 
     fun getServiceMembers(
-        searchInput: String,
+        searchInput: String?,
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
         staticFilter: ServiceStaticFilter,
-    ) = roomHelper.getServiceMembers(searchInput, filterBySs, filterBySubVillages, staticFilter)
+        allowNullHousehold: Boolean = false,
+        qrCode: String? = null,
+        restrictExternalToSkCreator: Boolean = false,
+    ) = roomHelper.getServiceMembers(
+        searchInput,
+        filterBySs,
+        filterBySubVillages,
+        staticFilter,
+        allowNullHousehold,
+        qrCode,
+        restrictExternalToSkCreator,
+    )
 
     /**
-     * Fetches all service static-filter counts using the same dynamic filters as [getServiceMembers].
+     * Fetches counts for the given static filters in a single combined query.
+     * Dynamic filters match [getServiceMembers].
      */
-    suspend fun getAllServiceMemberCounts(
+    suspend fun getServiceMemberCounts(
+        filters: List<ServiceStaticFilter>,
         searchInput: String = "",
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
-    ): ServiceMemberCounts = roomHelper.getAllServiceMemberCounts(searchInput, filterBySs, filterBySubVillages)
+        allowNullHousehold: Boolean = false,
+        qrCode: String? = null,
+        restrictExternalToSkCreator: Boolean = false,
+    ): Map<ServiceStaticFilter, Int> =
+        roomHelper.getServiceMemberCounts(
+            filters = filters,
+            searchInput = searchInput,
+            filterBySs = filterBySs,
+            filterBySubVillages = filterBySubVillages,
+            allowNullHousehold = allowNullHousehold,
+            qrCode = qrCode,
+            restrictExternalToSkCreator = restrictExternalToSkCreator,
+        )
 
     /**
      * Retrieves all National IDs for the specified ID type from the Room database.
@@ -430,4 +571,9 @@ class HouseholdMemberRepository @Inject constructor(
     suspend fun getAllNationalIds(idType: String): List<String> = roomHelper.getAllNationalIds(idType)
 
     suspend fun getPregnancyDetails(id: Long) = roomHelper.getPregnancyDetailByPatientId(id)
+
+    suspend fun getMemberByQRCode(
+        qrCode: String,
+        memberId: Long?,
+    ): List<HouseholdMemberEntity> = roomHelper.getMemberByQRCode(qrCode, memberId)
 }

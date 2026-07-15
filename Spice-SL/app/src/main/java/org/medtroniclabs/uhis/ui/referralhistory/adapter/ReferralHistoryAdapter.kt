@@ -23,14 +23,14 @@ class ReferralHistoryAdapter : RecyclerView.Adapter<ReferralHistoryAdapter.ViewH
         fun bind(data: Map<String, Any?>) {
             val context = binding.root.context
             with(binding) {
-                tvLabel.text = data[DefinedParams.label] as? String
+                tvLabel.text = data[DefinedParams.LABEL] as? String
                     ?: binding.root.context.getString(R.string.hyphen_symbol)
                 val value = data[DefinedParams.Value]
 
                 if (value != null && value is Spannable) {
                     tvValue.text = value
                 } else {
-                    tvValue.text = processMapValue(value, data[DefinedParams.label] as? String)
+                    tvValue.text = processMapValue(value, data[DefinedParams.LABEL] as? String)
                     val color = data[DefinedParams.valueColor] as? Int
                     color?.let {
                         tvValue.setTextColor(ContextCompat.getColor(context, color))

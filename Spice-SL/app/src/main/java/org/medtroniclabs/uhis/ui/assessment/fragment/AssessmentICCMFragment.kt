@@ -21,16 +21,16 @@ import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
 import org.medtroniclabs.uhis.common.DateUtils.getYearMonthAndWeek
 import org.medtroniclabs.uhis.common.DefinedParams.CbsNotifiableCondition
-import org.medtroniclabs.uhis.common.DefinedParams.DefaultID
-import org.medtroniclabs.uhis.common.DefinedParams.IccmDiarrheaNotifiableCondition
-import org.medtroniclabs.uhis.common.DefinedParams.IccmFeverNotifiableCondition
-import org.medtroniclabs.uhis.common.DefinedParams.NotifiableConditions
+import org.medtroniclabs.uhis.common.DefinedParams.DEFAULT_ID
+import org.medtroniclabs.uhis.common.DefinedParams.ICCM_DIARRHEA_NOTIFIABLE_CONDITION
+import org.medtroniclabs.uhis.common.DefinedParams.ICCM_FEVER_NOTIFIABLE_CONDITION
+import org.medtroniclabs.uhis.common.DefinedParams.NOTIFIABLE_CONDITIONS
 import org.medtroniclabs.uhis.common.DefinedParams.RmnchNotifiableCondition
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
 import org.medtroniclabs.uhis.databinding.FragmentAssessmentBinding
 import org.medtroniclabs.uhis.formgeneration.FormGenerator
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.Information
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.INFORMATION
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.VISIBLE
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.formgeneration.listener.FormEventListener
@@ -300,9 +300,9 @@ class AssessmentICCMFragment :
     ) {
         val title = if (setOf(
                 CbsNotifiableCondition,
-                IccmFeverNotifiableCondition,
-                IccmDiarrheaNotifiableCondition,
-                NotifiableConditions,
+                ICCM_FEVER_NOTIFIABLE_CONDITION,
+                ICCM_DIARRHEA_NOTIFIABLE_CONDITION,
+                NOTIFIABLE_CONDITIONS,
                 RmnchNotifiableCondition,
             ).contains(id)
         ) {
@@ -527,7 +527,7 @@ class AssessmentICCMFragment :
         updateOrsConditionBasedOnMuac(id, selectedId)
         when (id) {
             muacCode -> {
-                if (selectedId is String && selectedId != DefaultID) {
+                if (selectedId is String && selectedId != DEFAULT_ID) {
                     formGenerator.getViewByTag(muacStatus + rootSuffix)?.apply {
                         visibility = View.VISIBLE
                     }
@@ -741,6 +741,9 @@ class AssessmentICCMFragment :
          */
     }
 
+    override fun onQRScanRequested() {
+    }
+
     private fun dismissAmoxicillinStatus(resultMap: HashMap<String, Any>?) {
         formGenerator.getViewByTag((Amoxicillin.lowercase()) + rootSuffix)?.apply {
             visibility = View.GONE
@@ -769,7 +772,7 @@ class AssessmentICCMFragment :
         id: String,
         colorCode: Int,
     ) {
-        formGenerator.getViewByTag(id + Information)?.let { view ->
+        formGenerator.getViewByTag(id + INFORMATION)?.let { view ->
             if (view is TextView) {
                 view.setTextColor(colorCode)
             }
@@ -780,7 +783,7 @@ class AssessmentICCMFragment :
         id: String,
         viewVisibility: Int,
     ) {
-        formGenerator.getViewByTag(id + Information)?.apply { visibility = viewVisibility }
+        formGenerator.getViewByTag(id + INFORMATION)?.apply { visibility = viewVisibility }
     }
 
     override fun onClick(view: View) {

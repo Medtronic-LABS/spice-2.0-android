@@ -10,7 +10,6 @@ import org.medtroniclabs.uhis.common.EncryptionUtil
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.ErrorResponse
 import org.medtroniclabs.uhis.data.LoginResponse
-import org.medtroniclabs.uhis.db.local.RoomHelper
 import org.medtroniclabs.uhis.ncd.data.DeviceDetails
 import org.medtroniclabs.uhis.network.ApiHelper
 import org.medtroniclabs.uhis.network.resource.Resource
@@ -19,7 +18,6 @@ import javax.inject.Inject
 
 class LoginRepository @Inject constructor(
     private var apiHelper: ApiHelper,
-    private var roomHelper: RoomHelper,
 ) {
     suspend fun doLogin(
         username: String,
@@ -30,8 +28,8 @@ class LoginRepository @Inject constructor(
             val securePassword = EncryptionUtil.getSecurePassword(password)
             val builder = MultipartBody.Builder()
             builder.setType(MultipartBody.FORM)
-            builder.addFormDataPart(DefinedParams.Username, username)
-            builder.addFormDataPart(DefinedParams.Password, securePassword)
+            builder.addFormDataPart(DefinedParams.USERNAME, username)
+            builder.addFormDataPart(DefinedParams.PASSWORD, securePassword)
             val response = apiHelper.doLogin(builder.build())
             if (response.isSuccessful) {
                 val headers = response.headers().toMultimap()
@@ -123,13 +121,13 @@ class LoginRepository @Inject constructor(
     }
 
     private fun saveTokenInformation(headers: Map<String, List<String>>) {
-        if (headers.containsKey(DefinedParams.Authorization) &&
+        if (headers.containsKey(DefinedParams.AUTHORIZATION) &&
             (
-                headers[DefinedParams.Authorization]?.size
+                headers[DefinedParams.AUTHORIZATION]?.size
                     ?: 0
             ) > 0
         ) {
-            headers[DefinedParams.Authorization]?.get(0)?.let { token ->
+            headers[DefinedParams.AUTHORIZATION]?.get(0)?.let { token ->
                 SecuredPreference.putString(
                     SecuredPreference.EnvironmentKey.TOKEN.name,
                     token,
@@ -137,13 +135,13 @@ class LoginRepository @Inject constructor(
             }
         }
 
-        if (headers.containsKey(DefinedParams.TenantId) &&
+        if (headers.containsKey(DefinedParams.TENANT_ID) &&
             (
-                headers[DefinedParams.TenantId]?.size
+                headers[DefinedParams.TENANT_ID]?.size
                     ?: 0
             ) > 0
         ) {
-            headers[DefinedParams.TenantId]?.get(0)?.let { token ->
+            headers[DefinedParams.TENANT_ID]?.get(0)?.let { token ->
                 SecuredPreference.putString(
                     SecuredPreference.EnvironmentKey.TENANT_ID.name,
                     token,

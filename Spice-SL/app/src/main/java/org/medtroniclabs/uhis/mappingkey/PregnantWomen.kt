@@ -41,6 +41,12 @@ object PregnantWomen {
      */
     const val ID_PREGNANCY_TEST = "pregnancyTest"
 
+    /** Pregnancy Test is shown only up to exactly this many gestational weeks (inclusive). */
+    const val PREGNANCY_TEST_MAX_GESTATIONAL_WEEK = 16
+
+    /** Maximum total gestational days for Pregnancy Test visibility (16 weeks × 7 days). */
+    const val PREGNANCY_TEST_MAX_GESTATIONAL_DAYS = PREGNANCY_TEST_MAX_GESTATIONAL_WEEK * 7
+
     /**
      * Edit : Gravida
      */

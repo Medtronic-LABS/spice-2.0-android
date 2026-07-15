@@ -1,9 +1,12 @@
 package org.medtroniclabs.uhis.db.local
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.map
 import androidx.room.Transaction
 import androidx.sqlite.db.SimpleSQLiteQuery
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.CulturesEntity
@@ -63,8 +66,13 @@ import org.medtroniclabs.uhis.db.entity.ChiefDomEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowConditionEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowEntity
 import org.medtroniclabs.uhis.db.entity.CommunityProfile
+import org.medtroniclabs.uhis.db.entity.ComorbidityEntity
+import org.medtroniclabs.uhis.db.entity.ComplaintsEntity
+import org.medtroniclabs.uhis.db.entity.ComplicationEntity
 import org.medtroniclabs.uhis.db.entity.ConsentEntity
 import org.medtroniclabs.uhis.db.entity.ConsentForm
+import org.medtroniclabs.uhis.db.entity.CurrentMedicationEntity
+import org.medtroniclabs.uhis.db.entity.DiagnosisEntity
 import org.medtroniclabs.uhis.db.entity.DistrictEntity
 import org.medtroniclabs.uhis.db.entity.DosageDurationEntity
 import org.medtroniclabs.uhis.db.entity.EntitiesName
@@ -89,15 +97,20 @@ import org.medtroniclabs.uhis.db.entity.NCDDiagnosisEntity
 import org.medtroniclabs.uhis.db.entity.NCDFollowUp
 import org.medtroniclabs.uhis.db.entity.NCDMedicalReviewMetaEntity
 import org.medtroniclabs.uhis.db.entity.NCDPatientDetailsEntity
+import org.medtroniclabs.uhis.db.entity.PhysicalExaminationEntity
 import org.medtroniclabs.uhis.db.entity.PregnancyDetail
 import org.medtroniclabs.uhis.db.entity.RiskFactorEntity
 import org.medtroniclabs.uhis.db.entity.RxBuddyDetails
 import org.medtroniclabs.uhis.db.entity.RxBuddyFollowUpEntity
 import org.medtroniclabs.uhis.db.entity.ScreeningEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
+import org.medtroniclabs.uhis.db.entity.SiteEntity
 import org.medtroniclabs.uhis.db.entity.SubVillageEntity
+import org.medtroniclabs.uhis.db.entity.SymptomEntity
 import org.medtroniclabs.uhis.db.entity.TreatmentDetailsEntity
 import org.medtroniclabs.uhis.db.entity.TreatmentPlanEntity
 import org.medtroniclabs.uhis.db.entity.UserProfileEntity
@@ -109,7 +122,7 @@ import org.medtroniclabs.uhis.db.response.MemberAssessmentHistoryResponse
 import org.medtroniclabs.uhis.model.MemberDobGenderModel
 import org.medtroniclabs.uhis.model.assessment.AssessmentDetails
 import org.medtroniclabs.uhis.model.assessment.AssessmentMemberDetails
-import org.medtroniclabs.uhis.model.services.ServiceMemberCounts
+import org.medtroniclabs.uhis.model.followup.FollowUpSortOrder
 import org.medtroniclabs.uhis.model.services.ServiceStaticFilter
 import org.medtroniclabs.uhis.ui.assessment.AssessmentNCDEntity
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
@@ -234,6 +247,66 @@ class RoomHelperImpl @Inject constructor(
     override suspend fun getShasthyaShebikaByShasthyaKormiId(shasthyaKormiId: Long): List<ShasthyaShebikaEntity> =
         metaDataDAO.getShasthyaShebikaByShasthyaKormiId(shasthyaKormiId)
 
+    override suspend fun getShasthyaShebikaById(id: Long): ShasthyaShebikaEntity? = metaDataDAO.getShasthyaShebikaById(id)
+
+    override suspend fun saveChiefdoms(chiefdomEntityList: List<ChiefDomEntity>) {
+        metaDataDAO.insertChiefDoms(chiefdomEntityList)
+    }
+
+    override suspend fun deleteAllChiefdoms() {
+        metaDataDAO.deleteChiefDoms()
+    }
+
+    override suspend fun getChiefdomByVillageId(villageId: Long): List<ChiefDomEntity> = metaDataDAO.getChiefdomByVillageId(villageId)
+
+    override suspend fun getAllChiefdoms(): List<ChiefDomEntity> = metaDataDAO.getAllChiefdoms()
+
+    override suspend fun getChiefdomByShasthyaKormiId(shasthyaKormiId: Long): List<ChiefDomEntity> = metaDataDAO.getChiefdomByShasthyaKormiId(shasthyaKormiId)
+
+    override suspend fun getChiefdomByShasthyaKormiIds(shasthyaKormiIds: List<Long>): List<ChiefDomEntity> =
+        if (shasthyaKormiIds.isEmpty()) {
+            emptyList()
+        } else {
+            metaDataDAO.getChiefdomByShasthyaKormiIds(shasthyaKormiIds)
+        }
+
+    override suspend fun getChiefdomById(chiefdomId: Long): ChiefDomEntity? = metaDataDAO.getChiefdomById(chiefdomId)
+
+    override suspend fun saveShasthyaKormis(shasthyaKormiEntityList: List<ShasthyaKormiEntity>) {
+        metaDataDAO.insertShasthyaKormis(shasthyaKormiEntityList)
+    }
+
+    override suspend fun deleteAllShasthyaKormis() {
+        metaDataDAO.deleteAllShasthyaKormis()
+    }
+
+    override suspend fun getShasthyaKormiByVillageId(villageId: Long): List<ShasthyaKormiEntity> = metaDataDAO.getShasthyaKormiByVillageId(villageId)
+
+    override suspend fun getAllShasthyaKormis(): List<ShasthyaKormiEntity> = metaDataDAO.getAllShasthyaKormis()
+
+    override suspend fun insertShasthyaKormiLinkedVillages(linkedVillages: List<ShasthyaKormiLinkedVillageEntity>) {
+        metaDataDAO.insertShasthyaKormiLinkedVillages(linkedVillages)
+    }
+
+    override suspend fun deleteAllShasthyaKormiLinkedVillages() {
+        metaDataDAO.deleteAllShasthyaKormiLinkedVillages()
+    }
+
+    override suspend fun getSubVillagesByShasthyaKormiId(shasthyaKormiId: Long): List<SubVillageEntity> =
+        metaDataDAO.getSubVillagesByShasthyaKormiId(shasthyaKormiId)
+
+    override suspend fun getSubVillagesByShasthyaKormiIds(shasthyaKormiIds: List<Long>): List<SubVillageEntity> =
+        if (shasthyaKormiIds.isEmpty()) {
+            emptyList()
+        } else {
+            metaDataDAO.getSubVillagesByShasthyaKormiIds(shasthyaKormiIds)
+        }
+
+    override suspend fun getVillagesForShasthyaKormiAndChiefdom(
+        shasthyaKormiId: Long,
+        chiefdomId: Long,
+    ): List<VillageEntity> = metaDataDAO.getVillagesForShasthyaKormiAndChiefdom(shasthyaKormiId, chiefdomId)
+
     override suspend fun insertShasthyaShebikaLinkedVillages(linkedVillages: List<ShasthyaShebikaLinkedVillageEntity>) {
         metaDataDAO.insertShasthyaShebikaLinkedVillages(linkedVillages)
     }
@@ -335,6 +408,19 @@ class RoomHelperImpl @Inject constructor(
                 }
             }
 
+            EntitiesName.HOUSEHOLD_MEMBER,
+            EntitiesName.HOUSEHOLD,
+            -> {
+                val query =
+                    "UPDATE $tableName SET fhir_id = ?, sync_status = CASE WHEN sync_status = 'InProgress' THEN ? WHEN sync_status = 'NetworkError' THEN ? ELSE sync_status END WHERE id = ?"
+                householdDAO.updateFhirId(
+                    SimpleSQLiteQuery(
+                        query,
+                        arrayOf(fhirId, status, status, id),
+                    ),
+                )
+            }
+
             else -> {
                 val updatedAt = System.currentTimeMillis()
                 val query =
@@ -342,7 +428,7 @@ class RoomHelperImpl @Inject constructor(
                 householdDAO.updateFhirId(
                     SimpleSQLiteQuery(
                         query,
-                        arrayOf(fhirId, updatedAt, status, status, id),
+                        arrayOf<Any?>(fhirId, updatedAt, status, status, id),
                     ),
                 )
             }
@@ -467,6 +553,8 @@ class RoomHelperImpl @Inject constructor(
 
     override suspend fun getDiagnosisList(diagnosisType: String): List<DiseaseCategoryItems> = diagnosisDAO.getDiagnosisList(diagnosisType)
 
+    override suspend fun getDiagnosisList(): List<DiagnosisEntity> = metaDataDAO.getDiagnosisList()
+
     override suspend fun insertFollowUp(followUp: FollowUp): Long = followUpDao.insertFollowUp(followUp)
 
     override suspend fun deleteAllFollowUps() {
@@ -488,25 +576,55 @@ class RoomHelperImpl @Inject constructor(
     override fun getFollowUpPatientListLiveData(
         type: String,
         search: String?,
+        shashthyaShebikaIds: List<Long>,
+        shashthyaShebikaIdsSize: Int,
         villageIds: List<Long>,
+        villageIdsSize: Int,
+        selectedReferralReasonTypes: List<String>,
+        selectedReferralReasonTypesSize: Int,
+        ncdSelectedReason: String?,
+        ncdSelectedReferralTo: String?,
         fromDate: String,
         toDate: String,
+        screeningRetryAttempts: Int,
+        remainingAttempt: Int?,
+        callStatus: String?,
+        sortOrder: FollowUpSortOrder,
     ): LiveData<List<FollowUpPatientModel>> {
         if (type == FollowUpDefinedParams.FU_TYPE_REFERRED) {
             return followUpDao.getReferredFollowUpPatientListLiveData(
                 type = type,
                 search = search,
+                shashthyaShebikaIds = shashthyaShebikaIds,
+                shashthyaShebikaIdsSize = shashthyaShebikaIdsSize,
                 villageIds = villageIds,
+                villageIdsSize = villageIdsSize,
+                selectedReferralReasonTypes = selectedReferralReasonTypes,
+                selectedReferralReasonTypesSize = selectedReferralReasonTypesSize,
+                ncdSelectedReason = ncdSelectedReason,
+                ncdSelectedReferralTo = ncdSelectedReferralTo,
                 fromDate = fromDate,
                 toDate = toDate,
+                screeningRetryAttempts = screeningRetryAttempts,
+                remainingAttempt = remainingAttempt,
+                callStatus = callStatus,
+                sortOrder = sortOrder,
             )
         } else {
             return followUpDao.getOtherFollowUpPatientListLiveData(
                 type = type,
                 search = search,
+                shashthyaShebikaIds = shashthyaShebikaIds,
+                shashthyaShebikaIdsSize = shashthyaShebikaIdsSize,
                 villageIds = villageIds,
+                villageIdsSize = villageIdsSize,
+                selectedReferralReasonTypes = selectedReferralReasonTypes,
+                selectedReferralReasonTypesSize = selectedReferralReasonTypesSize,
+                ncdSelectedReason = ncdSelectedReason,
+                ncdSelectedReferralTo = ncdSelectedReferralTo,
                 fromDate = fromDate,
                 toDate = toDate,
+                screeningRetryAttempts = screeningRetryAttempts,
             )
         }
     }
@@ -528,15 +646,11 @@ class RoomHelperImpl @Inject constructor(
     }
 
     override suspend fun addCallHistory(
-        oldFollowUp: FollowUp,
+        followUp: FollowUp,
         history: FollowUpCall,
-        newFollowUp: FollowUp?,
     ) {
-        followUpCallsDao.insertFollowUpCall(history)
-        followUpDao.insertFollowUp(oldFollowUp)
-        newFollowUp?.let {
-            followUpDao.insertFollowUp(it)
-        }
+        insertFollowUpCall(history)
+        followUpDao.insertFollowUp(followUp)
     }
 
     override suspend fun getAllFollowUpRequests(): List<FollowUp> = followUpDao.getAllFollowUps()
@@ -687,6 +801,8 @@ class RoomHelperImpl @Inject constructor(
 
     override fun getConsent(formType: String): LiveData<String> = metaDataDAO.getConsent(formType)
 
+    override suspend fun getConsentString(formType: String): String = metaDataDAO.getConsentString(formType)
+
     override suspend fun deleteConsent() = metaDataDAO.deleteConsent()
 
     override suspend fun saveModelQuestions(mentalHealthEntity: List<MentalHealthEntity>) = metaDataDAO.insertModelQuestions(mentalHealthEntity)
@@ -748,6 +864,12 @@ class RoomHelperImpl @Inject constructor(
         phoneNumber: String?,
         phoneNumberCategory: String?,
     ) = memberDAO.updatePhoneNumberForHouseholdHead(id, phoneNumber)
+
+    override suspend fun updatePhoneNumberForMembersByCategory(
+        householdId: Long,
+        phoneNumber: String?,
+        category: String,
+    ) = memberDAO.updatePhoneNumberForMembersByCategory(householdId, phoneNumber, category)
 
     override suspend fun insertLinkHouseholdMembers(insertList: List<LinkHouseholdMember>) {
         linkHouseholdMemberDao.insert(insertList)
@@ -881,6 +1003,8 @@ class RoomHelperImpl @Inject constructor(
     override suspend fun insertLifestyle(items: List<LifestyleEntity>) = ncdMedicalReviewDao.insertLifestyle(items)
 
     override fun getLifeStyle(): LiveData<List<LifestyleEntity>> = ncdMedicalReviewDao.getLifeStyle()
+
+    override suspend fun getLifeStyleList(): List<LifestyleEntity> = ncdMedicalReviewDao.getLifeStyleList()
 
     override fun getAssessmentFormData(
         formTypes: List<String>,
@@ -1229,20 +1353,43 @@ class RoomHelperImpl @Inject constructor(
     override suspend fun updateUndercountedDisabilityHouseholds(): Int = householdDAO.updateUndercountedDisabilityHouseholds()
 
     override fun getServiceMembers(
-        searchInput: String,
+        searchInput: String?,
         filterBySs: List<Long>,
         filterBySubVillages: List<Long>,
         staticFilter: ServiceStaticFilter,
-    ) = memberDAO.getServiceMembers(searchInput, filterBySs, filterBySubVillages, staticFilter)
+        allowNullHousehold: Boolean,
+        qrCode: String?,
+        restrictExternalToSkCreator: Boolean,
+    ) = memberDAO.getServiceMembers(
+        searchInput,
+        filterBySs,
+        filterBySubVillages,
+        staticFilter,
+        allowNullHousehold,
+        qrCode,
+        restrictExternalToSkCreator,
+    )
 
-    /**
-     * Delegates service-member count aggregation to [MemberDAO].
-     */
-    override suspend fun getAllServiceMemberCounts(
+    override suspend fun getServiceMemberCounts(
+        filters: List<ServiceStaticFilter>,
         searchInput: String,
         filterBySs: List<Long>,
         filterBySubVillages: List<Long>,
-    ): ServiceMemberCounts = memberDAO.getAllServiceMemberCounts(searchInput, filterBySs, filterBySubVillages)
+        allowNullHousehold: Boolean,
+        qrCode: String?,
+        restrictExternalToSkCreator: Boolean,
+    ): Map<ServiceStaticFilter, Int> =
+        withContext(Dispatchers.IO) {
+            memberDAO.getServiceMemberCounts(
+                filters = filters,
+                searchInput = searchInput,
+                filterBySs = filterBySs,
+                filterBySubVillages = filterBySubVillages,
+                allowNullHousehold = allowNullHousehold,
+                qrCode = qrCode,
+                restrictExternalToSkCreator = restrictExternalToSkCreator,
+            )
+        }
 
     override suspend fun getMemberAssessmentHistory(
         memberFhirId: String?,
@@ -1251,20 +1398,75 @@ class RoomHelperImpl @Inject constructor(
         serviceProvided: String?,
     ): MemberAssessmentHistoryEntity? = memberAssessmentHistoryDao.getAssessmentHistory(memberFhirId, memberId, visitDate, serviceProvided)
 
+    override suspend fun getMemberAssessmentHistoryByEncounterId(encounterId: String): MemberAssessmentHistoryEntity? =
+        memberAssessmentHistoryDao.getAssessmentHistoryByEncounterId(encounterId)
+
     override suspend fun insertMemberAssessmentHistory(historyList: List<MemberAssessmentHistoryEntity>) =
         memberAssessmentHistoryDao.insertMemberAssessmentHistory(historyList)
 
     override suspend fun deleteAllMemberAssessmentHistory() = memberAssessmentHistoryDao.deleteMemberAssessmentHistory()
 
-    override fun getMemberWithAssessmentHistory(memberId: Long): LiveData<MemberAssessmentHistoryResponse?> =
-        memberDAO.getMemberWithAssessmentHistory(memberId).map { result ->
-            if (!result.isNullOrEmpty()) {
-                val entry = result.entries.first()
+    override fun getMemberWithAssessmentHistory(memberId: Long): LiveData<MemberAssessmentHistoryResponse?> {
+        val result = MediatorLiveData<MemberAssessmentHistoryResponse?>()
+        var latestResponse: MemberAssessmentHistoryResponse? = null
+        var latestPregnancy: List<PregnancyDetail>? = null
+        var latestHouseholdHeadName: String? = null
+        var householdHeadNameSource: LiveData<String?>? = null
+
+        fun emit() {
+            result.value = latestResponse?.copy(
+                memberPregnancyDetails = latestPregnancy,
+                householdHeadName = latestHouseholdHeadName,
+            )
+        }
+
+        fun updateHouseholdHeadNameSource(householdId: Long?) {
+            householdHeadNameSource?.let { result.removeSource(it) }
+            householdHeadNameSource = null
+            latestHouseholdHeadName = null
+            if (householdId == null) {
+                if (latestResponse != null) {
+                    emit()
+                }
+                return
+            }
+            val source = householdDAO.observeHouseholdHeadName(householdId)
+            householdHeadNameSource = source
+            result.addSource(source) { headName ->
+                latestHouseholdHeadName = headName
+                if (latestResponse != null) {
+                    emit()
+                }
+            }
+        }
+
+        val memberSource = memberDAO.getMemberWithAssessmentHistory(memberId).map { mapResult ->
+            if (!mapResult.isNullOrEmpty()) {
+                val entry = mapResult.entries.first()
                 MemberAssessmentHistoryResponse(entry.key, entry.value)
             } else {
                 null
             }
         }
+
+        result.addSource(memberSource) { response ->
+            latestResponse = response
+            if (response == null) {
+                updateHouseholdHeadNameSource(null)
+                result.value = null
+            } else {
+                updateHouseholdHeadNameSource(response.member.householdId)
+                emit()
+            }
+        }
+        result.addSource(pregnancyDetailDao.observePregnancyDetails(memberId)) { pregnancy ->
+            latestPregnancy = pregnancy
+            if (latestResponse != null) {
+                emit()
+            }
+        }
+        return result
+    }
 
     override suspend fun getDashboardCounts(
         startDate: String?,
@@ -1300,7 +1502,6 @@ class RoomHelperImpl @Inject constructor(
             householdRegisteredCount = hhCount,
             pwIdentifiedFirst4MonthsWithAncCount = maternal?.pwIdentifiedFirst4MonthsWithAncCount ?: 0,
             anc3PlusCount = maternal?.anc3PlusCount ?: 0,
-            highRiskPregnantWomenCount = maternal?.highRiskPregnantWomenCount ?: 0,
         ) ?: DashboardCountsRow(
             screened = 0,
             referred = 0,
@@ -1323,7 +1524,14 @@ class RoomHelperImpl @Inject constructor(
             householdRegisteredCount = hhCount,
             pwIdentifiedFirst4MonthsWithAncCount = maternal?.pwIdentifiedFirst4MonthsWithAncCount ?: 0,
             anc3PlusCount = maternal?.anc3PlusCount ?: 0,
-            highRiskPregnantWomenCount = maternal?.highRiskPregnantWomenCount ?: 0,
+            highRiskPregnantWomenCount = 0,
+            totalNcdServicesCount = 0,
+            ncdScreeningFirstServiceCount = 0,
+            ncdFollowUpAssessmentCount = 0,
+            ncdFollowUpReferralCount = 0,
+            glassesSoldCustomStatusCount = 0,
+            ncdServicesInCataractCampCount = 0,
+            patientsReferredForOperationCount = 0,
         )
     }
 
@@ -1342,4 +1550,173 @@ class RoomHelperImpl @Inject constructor(
         memberId: Long,
         noOfDays: Int,
     ) = memberAssessmentHistoryDao.decrementDateByDays(memberId, noOfDays)
+
+    override suspend fun deleteDuplicateAssessmentHistory(date: String) {
+        memberAssessmentHistoryDao.deleteDuplicateRecords(date)
+    }
+
+    override suspend fun getFormBasedOnType(
+        formTypeOne: String,
+        formTypeTwo: String,
+    ): List<FormEntity> = metaDataDAO.getFormBasedOnType(formTypeOne, formTypeTwo)
+
+    override suspend fun getVillageList(selectedParent: Long): List<VillageEntity> = metaDataDAO.getVillagesByChiefDom(selectedParent)
+
+    override suspend fun getOtherVillage(): VillageEntity = metaDataDAO.getOtherVillage()
+
+    override suspend fun getProgramList(site: String): Any = metaDataDAO.getProgramList()
+
+    override suspend fun getProgramList(
+        selectedParent: Long,
+        site: String,
+    ): Any = metaDataDAO.getProgramList(selectedParent)
+
+    override suspend fun getUpazilaListByDistrict(districtID: Long): List<SiteEntity> = metaDataDAO.getUpazilaListByDistrict(districtID)
+
+    override suspend fun getUpazilaList(): Any = metaDataDAO.getUpazilaList()
+
+    override suspend fun updateSequenceCode(
+        villageId: Long,
+        newSequenceCode: Long,
+    ) {
+    }
+
+    override suspend fun getScreeningRecordById(id: Long): ScreeningEntity = screeningDAO.getScreeningById(id)
+
+    override suspend fun getAccountSiteList(userId: Long): List<SiteEntity> = metaDataDAO.getAccountSiteList(userId)
+
+    override suspend fun getAccountSiteListByLevel(
+        userId: Long,
+        level: String,
+    ): List<SiteEntity> = metaDataDAO.getAccountSiteListByLevel(userId, level)
+
+    override suspend fun getUpazilaListEyeCareOnly(): Any = metaDataDAO.getUpazilaListEyeCareOnly()
+
+    override suspend fun getUpazilaListCataractOnly(): Any = metaDataDAO.getUpazilaListCataractOnly()
+
+    override suspend fun getSiteEntity(
+        userSite: Boolean,
+        userId: Long,
+    ): List<SiteEntity> = metaDataDAO.getSiteEntityList(userSite, userId)
+
+    override suspend fun getUpazilaById(upazilaId: Long): SiteEntity = metaDataDAO.getUpazilaById(upazilaId)
+
+    override suspend fun getVillageById(villageId: Long): VillageEntity = metaDataDAO.getVillageById(villageId)
+
+    override suspend fun getTreatmentPlanData(): List<TreatmentPlanEntity> = metaDataDAO.getTreatmentPlanData()
+
+    override suspend fun getShortageReason(type: String): List<ShortageReasonEntity> = metaDataDAO.getShortageEntries(type)
+
+    override suspend fun getComorbidityBasedOnWorkflow(workflowList: ArrayList<String>): List<ComorbidityEntity> =
+        metaDataDAO.getComorbidityBasedOnWorkflow(workflowList)
+
+    override suspend fun saveComorbidity(list: ArrayList<ComorbidityEntity>) {
+        metaDataDAO.saveComorbidity(list)
+    }
+
+    override suspend fun getComorbidity(): List<ComorbidityEntity> = metaDataDAO.getComorbidity()
+
+    override suspend fun deleteComorbidity() {
+        metaDataDAO.deleteComorbidity()
+    }
+
+    override suspend fun saveComplication(list: ArrayList<ComplicationEntity>) {
+        metaDataDAO.saveComplication(list)
+    }
+
+    override suspend fun deleteComplication() {
+        metaDataDAO.deleteComplication()
+    }
+
+    override suspend fun getComplication(): List<ComplicationEntity> = metaDataDAO.getComplication()
+
+    override suspend fun saveCurrentMedication(list: ArrayList<CurrentMedicationEntity>) {
+        metaDataDAO.saveCurrentMedication(list)
+    }
+
+    override suspend fun deleteCurrentMedication() {
+        metaDataDAO.deleteCurrentMedication()
+    }
+
+    override suspend fun getCurrentMedicationList(): List<CurrentMedicationEntity> = metaDataDAO.getCurrentMedicationList()
+
+    override suspend fun getCurrentMedicationList(type: String): List<CurrentMedicationEntity> = metaDataDAO.getCurrentMedicationList(type)
+
+    override suspend fun savePhysicalExamination(list: ArrayList<PhysicalExaminationEntity>) {
+        metaDataDAO.savePhysicalExamination(list)
+    }
+
+    override suspend fun deletePhysicalExamination() {
+        metaDataDAO.deletePhysicalExamination()
+    }
+
+    override suspend fun getPhysicalExaminationList(workFlowList: ArrayList<String>): List<PhysicalExaminationEntity> =
+        metaDataDAO.getPhysicalExaminationList(workFlowList)
+
+    override suspend fun saveCompliants(list: ArrayList<ComplaintsEntity>) {
+        metaDataDAO.saveComplaints(list)
+    }
+
+    override suspend fun deleteCompliants() {
+        metaDataDAO.deleteComplaints()
+    }
+
+    override suspend fun getChiefComplaints(workflowList: ArrayList<String>): List<ComplaintsEntity> = metaDataDAO.getChiefComplaints(workflowList)
+
+    override suspend fun getDiagnosis(
+        gender: ArrayList<String>,
+        type: ArrayList<String>,
+    ): List<DiagnosisEntity> = metaDataDAO.getDiagnosis(gender, type)
+
+    override suspend fun saveSymptomList(symptoms: List<SymptomEntity>) {
+        metaDataDAO.insertSymptomsList(symptoms)
+    }
+
+    override suspend fun deleteSymptoms() {
+        metaDataDAO.deleteSymptomList()
+    }
+
+    override suspend fun getSymptomsList(): List<SymptomEntity> = metaDataDAO.getSymptomList()
+
+    override suspend fun getSymptomsListByType(type: String): List<SymptomEntity> = metaDataDAO.getSymptomsListByType(type)
+
+    override suspend fun getOperatingUnitSites(): List<SiteEntity> = metaDataDAO.getOperatingUnitSites()
+
+    override suspend fun saveDiagnosis(diseaseEntityList: ArrayList<DiagnosisEntity>) {
+        metaDataDAO.saveDiagnosis(diseaseEntityList)
+    }
+
+    override suspend fun deleteDiagnosisList() {
+        metaDataDAO.deleteDiagnosisList()
+    }
+
+    override suspend fun deleteAllSiteCache() = metaDataDAO.deleteSiteList()
+
+    override suspend fun saveSiteList(siteEntity: List<SiteEntity>) = metaDataDAO.insertSiteDetails(siteEntity)
+
+    override suspend fun getAllChiefDoms(): List<ChiefDomEntity> = metaDataDAO.getAllChiefDoms()
+
+    override suspend fun getSubVillage(villageId: Long): List<SubVillageEntity> = metaDataDAO.getSubVillage(villageId)
+
+    override suspend fun getMemberByQRCode(
+        qrCode: String,
+        memberId: Long?,
+    ): List<HouseholdMemberEntity> = memberDAO.getMemberByQRCode(qrCode, memberId)
+
+    override suspend fun getLatestMemberServiceBAfterServiceA(
+        memberId: Long,
+        serviceA: String,
+        serviceB: String,
+    ) = memberAssessmentHistoryDao.getLatestMemberServiceBAfterServiceA(memberId, serviceA, serviceB)
+
+    override suspend fun getFollowupCall(
+        followUpId: Long,
+        callDate: String,
+        userId: String,
+    ) = followUpCallsDao.getFollowupCall(followUpId, callDate, userId)
+
+    override suspend fun insertFollowUpCall(followUpCall: FollowUpCall) = followUpCallsDao.insertFollowUpCall(followUpCall)
+
+    override suspend fun getMembersFromAssessmentHistoryWhoReceivedNCD(): List<Long> =
+        memberAssessmentHistoryDao.getMembersFromAssessmentHistoryWhoReceivedNCD()
 }

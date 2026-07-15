@@ -10,10 +10,13 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.view.GravityCompat
 import androidx.core.widget.PopupWindowCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
 import dagger.hilt.android.AndroidEntryPoint
 import org.medtroniclabs.uhis.R
+import org.medtroniclabs.uhis.appextensions.adjustHeightToView
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.navigateToNext
 import org.medtroniclabs.uhis.appextensions.navigateToPrevious
@@ -40,7 +43,9 @@ import org.medtroniclabs.uhis.ui.household.viewmodel.MemberSummaryViewModel
 class MemberSummaryActivity : BaseActivity(), View.OnClickListener {
     private lateinit var binding: ActivityMemberSummaryBinding
 
-    private lateinit var helper: SnapHelper
+    private lateinit var pagerHelper: SnapHelper
+
+    private lateinit var layoutManager: LinearLayoutManager
 
     private lateinit var adapter: MemberAssessmentHistoryAdapter
 
@@ -54,6 +59,7 @@ class MemberSummaryActivity : BaseActivity(), View.OnClickListener {
         setMainContentView(
             binding.root,
             isToolbarVisible = true,
+            homeAndBackVisibility = true to true,
         )
         memberSummaryViewModel.initialize(intent)
         showLoading()
@@ -62,13 +68,20 @@ class MemberSummaryActivity : BaseActivity(), View.OnClickListener {
         attachObservers()
     }
 
+    override fun onDestroy() {
+        binding.rvServiceHistory.removeOnScrollListener(scrollListener)
+        super.onDestroy()
+    }
+
     private fun initializeView() {
         supportFragmentManager
             .beginTransaction()
             .add(binding.fragmentContainer.id, MemberDetailsFragment())
             .commit()
-        helper = PagerSnapHelper()
-        helper.attachToRecyclerView(binding.rvServiceHistory)
+        layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
+        binding.rvServiceHistory.layoutManager = layoutManager
+        pagerHelper = PagerSnapHelper()
+        pagerHelper.attachToRecyclerView(binding.rvServiceHistory)
     }
 
     private fun attachObservers() {
@@ -81,7 +94,7 @@ class MemberSummaryActivity : BaseActivity(), View.OnClickListener {
             } else {
                 binding.rvServiceHistory.visible()
                 binding.emptyErrorMessage.gone()
-                adapter = MemberAssessmentHistoryAdapter(history)
+                adapter = MemberAssessmentHistoryAdapter(history, it.memberPregnancyDetails)
                 binding.rvServiceHistory.adapter = adapter
                 if (history.size > 1) {
                     binding.ivLeftArrow.visible()
@@ -89,6 +102,7 @@ class MemberSummaryActivity : BaseActivity(), View.OnClickListener {
                     binding.ivRightArrow.visible()
                     binding.ivLeftArrow.isEnabled = false
                 }
+                binding.rvServiceHistory.addOnScrollListener(scrollListener)
             }
             it?.member?.let { member ->
                 setTitle(getMemberInfoText(member))
@@ -125,6 +139,25 @@ class MemberSummaryActivity : BaseActivity(), View.OnClickListener {
                     memberSummaryViewModel.decrementAssessmentHistoryDate(14)
                 },
             )
+        }
+    }
+
+    /**
+     * Updates service history list height after scrolling settles so the snapped card
+     * is fully visible and the RecyclerView wraps that card's measured height.
+     */
+    private val scrollListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrollStateChanged(
+            recyclerView: RecyclerView,
+            newState: Int,
+        ) {
+            super.onScrollStateChanged(recyclerView, newState)
+            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                val centerView = pagerHelper.findSnapView(layoutManager)
+                if (centerView != null) {
+                    binding.rvServiceHistory.adjustHeightToView(centerView)
+                }
+            }
         }
     }
 

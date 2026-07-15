@@ -360,8 +360,8 @@ class PregnancyDetailsFragment : BaseFragment(), View.OnClickListener {
         val dropDownList = ArrayList<Map<String, Any>>()
         dropDownList.add(
             hashMapOf<String, Any>(
-                DefinedParams.NAME to DefinedParams.DefaultIDLabel,
-                DefinedParams.id to DefinedParams.DefaultID,
+                DefinedParams.NAME to DefinedParams.DEFAULT_ID_LABEL,
+                DefinedParams.ID to DefinedParams.DEFAULT_ID,
             ),
         )
         dropDownList.addAll(complaintList)
@@ -378,9 +378,9 @@ class PregnancyDetailsFragment : BaseFragment(), View.OnClickListener {
                 ) {
                     val selectedItem = adapter?.getData(position = pos)
                     selectedItem?.let {
-                        val selectedId = it[DefinedParams.id] as String?
+                        val selectedId = it[DefinedParams.ID] as String?
                         val selectedBloodGroup = it[DefinedParams.NAME] as String?
-                        if (selectedId != DefinedParams.DefaultID) {
+                        if (selectedId != DefinedParams.DEFAULT_ID) {
                             pregnancyDetailsViewModel.pregnancyDetailsModel.patientBloodGroup =
                                 selectedBloodGroup
                         } else {

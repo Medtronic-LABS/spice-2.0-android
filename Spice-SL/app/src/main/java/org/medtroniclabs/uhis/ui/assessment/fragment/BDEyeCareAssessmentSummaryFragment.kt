@@ -12,8 +12,9 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
+import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.DefaultID
+import org.medtroniclabs.uhis.common.DefinedParams.DEFAULT_ID
 import org.medtroniclabs.uhis.common.DefinedParams.ID
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.databinding.FragmentBdNcdSummaryBinding
@@ -23,6 +24,7 @@ import org.medtroniclabs.uhis.model.AssessmentSummaryModel
 import org.medtroniclabs.uhis.ui.BaseFragment
 import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils
 import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils.findValueByKey
+import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils.getSpinnerDisplayValue
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.CULTURE_VALUE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.EYE_TEST_OUTCOME
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FACILITY_TYPE_UPAZILA
@@ -73,7 +75,6 @@ class BDEyeCareAssessmentSummaryFragment : BaseFragment() {
 
     private fun attachObservers() {
         viewModel.assessmentStringLiveData.value?.let {
-            val isTranslationEnabled = SecuredPreference.getIsTranslationEnabled()
             val json = JSONObject(it)
             updateStatusBar(json)
             val items = createNCDSummaryData(json, isTranslationEnabled)
@@ -96,7 +97,16 @@ class BDEyeCareAssessmentSummaryFragment : BaseFragment() {
             }
 
             summaryData.forEach { item ->
-                bindSummaryView(if (isTranslationEnabled) item.cultureValue else item.title, item.value)
+                val displayValue =
+                    getSpinnerDisplayValue(
+                        item.id.toString(),
+                        item.value,
+                        isTranslationEnabled,
+                        viewModel.formLayoutsLiveData.value
+                            ?.data
+                            ?.formLayout,
+                    ) ?: item.value
+                bindSummaryView(if (isTranslationEnabled) item.cultureValue else item.title, displayValue)
             }
         }
     }
@@ -116,11 +126,16 @@ class BDEyeCareAssessmentSummaryFragment : BaseFragment() {
             ReferralStatus.Referred.name -> {
                 val referralTypeSite = findValueByKey(json, REFERRAL_FACILITY_TYPE) as String
 
-                viewModel.nearestFacilityLiveData.value?.data?.let { siteList ->
-                    loadPhuSitesList(siteList)
+                if (CommonUtils.isFoOrPo()) {
+                    binding.labelPhuReferred.gone()
+                    binding.etPhuChange.gone()
+                } else {
+                    viewModel.nearestFacilityLiveData.value?.data?.let { siteList ->
+                        loadPhuSitesList(siteList)
+                    }
+                    binding.labelPhuReferred.visible()
+                    binding.etPhuChange.visible()
                 }
-                binding.labelPhuReferred.visible()
-                binding.etPhuChange.visible()
                 binding.riskResultLayout.backgroundTintList =
                     ContextCompat.getColorStateList(requireContext(), R.color.attention_color)
 
@@ -198,8 +213,8 @@ class BDEyeCareAssessmentSummaryFragment : BaseFragment() {
                 ) {
                     val selectedItem = adapter.getData(position = pos)
                     selectedItem?.let {
-                        val selectedId = it[DefinedParams.id] as String?
-                        if (selectedId != DefaultID) {
+                        val selectedId = it[DefinedParams.ID] as String?
+                        if (selectedId != DEFAULT_ID) {
                             viewModel.otherAssessmentDetails[ReferredPHUSiteID] = selectedId.toString()
                         } else {
                             if (viewModel.otherAssessmentDetails.containsKey(ReferredPHUSiteID)) {

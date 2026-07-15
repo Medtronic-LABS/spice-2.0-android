@@ -1,6 +1,8 @@
 package org.medtroniclabs.uhis.ui.member
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.text.InputFilter
@@ -11,7 +13,11 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.AppCompatSpinner
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.text.isDigitsOnly
 import androidx.core.view.isGone
@@ -39,10 +45,13 @@ import org.medtroniclabs.uhis.common.DefinedParams.GENDER_FEMALE
 import org.medtroniclabs.uhis.common.DefinedParams.GENDER_MALE
 import org.medtroniclabs.uhis.common.DefinedParams.GENDER_OTHER
 import org.medtroniclabs.uhis.common.DefinedParams.HOUSEHOLD_MEMBER_REGISTRATION
+import org.medtroniclabs.uhis.common.DefinedParams.IS_MEMBER_REGISTRATION
 import org.medtroniclabs.uhis.common.DefinedParams.MEMBER_ID
-import org.medtroniclabs.uhis.common.DefinedParams.isMemberRegistration
 import org.medtroniclabs.uhis.common.EntityMapper.getResultSpinnerMapList
 import org.medtroniclabs.uhis.common.SecuredPreference
+import org.medtroniclabs.uhis.common.qrscanner.QRScanContract
+import org.medtroniclabs.uhis.common.qrscanner.QRScanResult
+import org.medtroniclabs.uhis.common.qrscanner.QRScannerActivity
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
 import org.medtroniclabs.uhis.databinding.FragmentMemberRegistrationBinding
 import org.medtroniclabs.uhis.db.entity.HouseholdMemberEntity
@@ -52,7 +61,8 @@ import org.medtroniclabs.uhis.formgeneration.extension.markMandatory
 import org.medtroniclabs.uhis.formgeneration.listener.FormEventListener
 import org.medtroniclabs.uhis.formgeneration.model.FormLayout
 import org.medtroniclabs.uhis.formgeneration.model.FormResponse
-import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.VILLAGE_ID
+import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
+import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration
 import org.medtroniclabs.uhis.mappingkey.MemberRegistration
 import org.medtroniclabs.uhis.mappingkey.MemberRegistration.isValidMinAge
 import org.medtroniclabs.uhis.network.resource.ResourceState
@@ -65,8 +75,10 @@ import org.medtroniclabs.uhis.ui.household.HouseholdDefinedParams
 import org.medtroniclabs.uhis.ui.household.summary.HouseholdSummaryActivity
 import org.medtroniclabs.uhis.ui.household.viewmodel.HouseRegistrationViewModel
 import org.medtroniclabs.uhis.ui.medicalreview.utils.MedicalReviewDefinedParams
+import org.medtroniclabs.uhis.ui.patient.UIConstants
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams as FormDefinedParams
 
 @AndroidEntryPoint
 class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnClickListener {
@@ -109,6 +121,7 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
             }
 
         memberRegistrationViewModel.getHouseholdHeadDob(householdRegistrationViewModel.householdId)
+        memberRegistrationViewModel.loadHouseholdHeadPhone(householdRegistrationViewModel.householdId)
         householdRegistrationViewModel.eventName = eventType
         memberRegistrationViewModel.setUserJourney(eventType)
 
@@ -248,6 +261,7 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
                                     formGenerator.getResultMap()[MemberRegistration.IS_HOUSEHOLD_HEAD] = true
                                 }
                             }
+                            filterPhoneNumberCategoryForHouseholdHead()
                         }
                     }
                 }
@@ -277,7 +291,7 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
             }
         }
 
-        memberRegistrationViewModel.addnewMemberReq.observe(viewLifecycleOwner) { resourceState ->
+        memberRegistrationViewModel.addNewMemberReq.observe(viewLifecycleOwner) { resourceState ->
             when (resourceState.state) {
                 ResourceState.LOADING -> {
                     (activity as BaseActivity?)?.showLoading()
@@ -343,6 +357,21 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
                 }
             }
         }
+
+        memberRegistrationViewModel.isValidQRLiveData.observe(viewLifecycleOwner) { resourceState ->
+            when (resourceState.state) {
+                ResourceState.SUCCESS -> {
+                    resourceState.data?.let {
+                        if (it.first) {
+                            formGenerator.showQRScannedText(it.second, FormDefinedParams.QR_CODE)
+                        } else {
+                            formGenerator.showErrorQRScanned(FormDefinedParams.QR_CODE, getString(R.string.invalid_qr_message))
+                        }
+                    }
+                }
+                else -> {}
+            }
+        }
     }
 
     private fun launchSummaryOrAssessmentPage() {
@@ -353,6 +382,10 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
                 intent.putExtra(MEMBER_ID, it ?: -1)
             }
             intent.putExtra(DOB, memberRegistrationViewModel.memberDob)
+            val householdId = memberRegistrationViewModel.selectedHouseholdId.takeIf { it > 0L }
+                ?: householdRegistrationViewModel.householdId.takeIf { it > 0L }
+                ?: -1L
+            intent.putExtra(DefinedParams.HOUSEHOLD_ID, householdId)
             startActivity(intent)
             (activity as HouseholdActivity).finish()
         } else {
@@ -380,6 +413,7 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
     private fun autoPopulateDetails(details: HouseholdMemberEntity) {
         details.householdId?.let { id ->
             householdRegistrationViewModel.householdId = id
+            memberRegistrationViewModel.loadHouseholdHeadPhone(id)
         }
         formGenerator.getViewByTag(MemberRegistration.NAME)?.let { view ->
             formGenerator.setValueForView(details.name, view)
@@ -388,9 +422,13 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
         formGenerator.getViewByTag(MemberRegistration.PHONE_NUMBER)?.let { view ->
             formGenerator.setValueForView(details.phoneNumber, view)
         }
+        if (details.isHouseholdHead) {
+            filterPhoneNumberCategoryForHouseholdHead()
+        }
         formGenerator.getViewByTag(MemberRegistration.PHONE_NUMBER_CATEGORY)?.let { view ->
             formGenerator.setValueForView(details.phoneNumberCategory, view)
         }
+        handlePhoneNumberCategoryChange(details.phoneNumberCategory)
 
         formGenerator.getViewByTag(MemberRegistration.ID_TYPE)?.let { view ->
             formGenerator.setValueForView(details.idType, view)
@@ -482,6 +520,10 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
                 formGenerator.setValueForView(guardianId, it)
             }
         }
+
+        details.qrCode?.let {
+            formGenerator.showQRScannedText(it, FormDefinedParams.QR_CODE)
+        }
     }
 
     private fun singleSelectValueOption(
@@ -547,7 +589,70 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
             } else if (id == MemberRegistration.NATIONAL_ID) {
                 // This is national id component - hide error (validation handled elsewhere)
                 formGenerator.hideError(id)
+            } else if (id == MemberRegistration.PHONE_NUMBER_CATEGORY) {
+                handlePhoneNumberCategoryChange(map[id])
             }
+        }
+    }
+
+    /**
+     * Determines whether the current member is the Household Head.
+     *
+     * Returns true when:
+     * - Editing an existing Household Head.
+     * - Registering the first member during household creation (who becomes the Household Head).
+     */
+    private fun isHouseholdHeadMember(): Boolean {
+        val isEditingHead =
+            memberRegistrationViewModel.memberDetailsLiveData.value
+                ?.data
+                ?.isHouseholdHead == true
+        val isFirstMember = !householdRegistrationViewModel.isMemberRegistration &&
+            householdRegistrationViewModel.memberID == -1L &&
+            householdRegistrationViewModel.householdEntityDetail != null &&
+            householdRegistrationViewModel.householdId == -1L
+        return isEditingHead || isFirstMember
+    }
+
+    /**
+     * Removes the "Head of Household" category when the current member is the Household Head.
+     */
+    private fun filterPhoneNumberCategoryForHouseholdHead() {
+        if (!isHouseholdHeadMember()) return
+
+        val spinner =
+            formGenerator.getViewByTag(MemberRegistration.PHONE_NUMBER_CATEGORY) as? AppCompatSpinner ?: return
+        val adapter = spinner.adapter as? CustomSpinnerAdapter ?: return
+        adapter.removeItemById(MemberRegistration.PhoneNumberCategory.HOUSEHOLD_HEAD.value)
+        adapter.notifyDataSetChanged()
+
+        val selectedCategory =
+            formGenerator.getResultMap()[MemberRegistration.PHONE_NUMBER_CATEGORY]?.toString()
+        if (selectedCategory == MemberRegistration.PhoneNumberCategory.HOUSEHOLD_HEAD.value) {
+            spinner.setSelection(0)
+            formGenerator.getResultMap().remove(MemberRegistration.PHONE_NUMBER_CATEGORY)
+            handlePhoneNumberCategoryChange(null)
+        }
+    }
+
+    /**
+     * Autofills and locks the phone number when "Head of Household" is selected;
+     * otherwise, enables the field for manual entry.
+     */
+    private fun handlePhoneNumberCategoryChange(selectedCategory: Any?) {
+        val phoneView = formGenerator.getViewByTag(MemberRegistration.PHONE_NUMBER) ?: return
+        val category = selectedCategory?.toString().orEmpty()
+
+        if (category == MemberRegistration.PhoneNumberCategory.HOUSEHOLD_HEAD.value &&
+            !isHouseholdHeadMember()
+        ) {
+            memberRegistrationViewModel.householdHeadPhoneNumber?.let {
+                formGenerator.setValueForView(it, phoneView)
+            }
+            formGenerator.disableView(phoneView)
+        } else {
+            phoneView.isEnabled = true
+            phoneView.setBackgroundResource(R.drawable.edittext_background)
         }
     }
 
@@ -593,7 +698,7 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
                 if (householdRegistrationViewModel.householdId != -1L) {
                     val intent =
                         Intent(requireActivity(), HouseholdActivity::class.java)
-                    intent.putExtra(isMemberRegistration, true)
+                    intent.putExtra(IS_MEMBER_REGISTRATION, true)
                     intent.putExtra(DefinedParams.householdId, householdRegistrationViewModel.householdId)
                     startActivity(intent)
                     requireActivity().finish()
@@ -683,7 +788,6 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
             if (memberRegistrationViewModel.medicalReviewFlow) {
                 memberRegistrationViewModel.addNewMember(
                     map,
-                    formGenerator,
                     location = householdRegistrationViewModel.getCurrentLocation(),
                 )
                 return
@@ -711,6 +815,7 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
                     map,
                     householdRegistrationViewModel.householdId,
                     location = location,
+                    editMemberId = householdRegistrationViewModel.memberID.takeIf { it != -1L },
                 )
                 return
             }
@@ -740,15 +845,13 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
                     householdEntity,
                     map,
                     householdRegistrationViewModel.getCurrentLocation(),
-                    householdRegistrationViewModel.initialValue,
-                    householdRegistrationViewModel.signatureFilename,
                 )
             }
         }
     }
 
     override fun onRenderingComplete() {
-        val view = formGenerator.getViewByTag(VILLAGE_ID + formGenerator.rootSuffix)
+        val view = formGenerator.getViewByTag(HouseHoldRegistration.VILLAGE_ID + formGenerator.rootSuffix)
         val relationSipView =
             formGenerator.getViewByTag(MedicalReviewDefinedParams.HH_RELATIONSHIP + formGenerator.rootSuffix)
         if (memberRegistrationViewModel.medicalReviewFlow) {
@@ -793,6 +896,46 @@ class MemberRegistrationFragment : BaseFragment(), FormEventListener, View.OnCli
        Never used
          */
     }
+
+    override fun onQRScanRequested() {
+        try {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_DENIED
+            ) {
+                cameraPermission.launch(Manifest.permission.CAMERA)
+            } else {
+                startScanning()
+            }
+        } catch (e: Exception) {
+            // error block
+        }
+    }
+
+    private val cameraPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            startScanning()
+        } else {
+            // Camera permission denied
+        }
+    }
+
+    private fun startScanning() {
+        qrScanLauncher.launch(
+            Intent(requireContext(), QRScannerActivity::class.java).apply {
+                putExtra(QRScanResult.REQUEST_FROM, UIConstants.SCREENING_UNIQUE_ID)
+            },
+        )
+    }
+
+    private val qrScanLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(QRScanContract()) { result ->
+            if (result.resultString != null) {
+                val memberId = memberRegistrationViewModel.memberDetailsLiveData.value
+                    ?.data
+                    ?.id
+                memberRegistrationViewModel.validateQRCodeLocally(result.resultString, memberId)
+            }
+        }
 
     override fun onClick(v: View?) {
         when (v?.id) {

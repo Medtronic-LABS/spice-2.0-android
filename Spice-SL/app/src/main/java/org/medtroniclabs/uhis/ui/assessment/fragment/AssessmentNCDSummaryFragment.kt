@@ -121,19 +121,19 @@ class AssessmentNCDSummaryFragment : BaseFragment(), View.OnClickListener {
                 it.second?.let { onlineResponseMap ->
                     if (onlineResponseMap.containsKey(DefinedParams.RiskLevel) &&
                         onlineResponseMap.containsKey(
-                            DefinedParams.RiskMessage,
+                            DefinedParams.RISK_MESSAGE,
                         )
                     ) {
                         updateRedRiskCodes(
                             onlineResponseMap[DefinedParams.RiskColorCode]?.toString(),
-                            onlineResponseMap[DefinedParams.RiskMessage]?.toString(),
+                            onlineResponseMap[DefinedParams.RISK_MESSAGE]?.toString(),
                         )
                     }
 
-                    if (onlineResponseMap.containsKey(DefinedParams.ProvisionalTreatmentPlan)) {
-                        onlineResponseMap[DefinedParams.ProvisionalTreatmentPlan]?.let { treatmentPlanMap ->
-                            if (treatmentPlanMap is Map<*, *> && treatmentPlanMap.containsKey(DefinedParams.TreatmentPlan)) {
-                                treatmentPlanMap[DefinedParams.TreatmentPlan]?.let { list ->
+                    if (onlineResponseMap.containsKey(DefinedParams.PROVISIONAL_TREATMENT_PLAN)) {
+                        onlineResponseMap[DefinedParams.PROVISIONAL_TREATMENT_PLAN]?.let { treatmentPlanMap ->
+                            if (treatmentPlanMap is Map<*, *> && treatmentPlanMap.containsKey(DefinedParams.TREATMENT_PLAN)) {
+                                treatmentPlanMap[DefinedParams.TREATMENT_PLAN]?.let { list ->
                                     if (list is ArrayList<*>) {
                                         addCardView(list)
                                     }
@@ -159,7 +159,7 @@ class AssessmentNCDSummaryFragment : BaseFragment(), View.OnClickListener {
                 if (it is Map<*, *>) {
                     layout.addView(
                         inflateChildView(
-                            it[DefinedParams.label].toString(),
+                            it[DefinedParams.LABEL].toString(),
                             it[DefinedParams.Value].toString(),
                         ),
                     )
@@ -663,7 +663,7 @@ class AssessmentNCDSummaryFragment : BaseFragment(), View.OnClickListener {
         binding.tvRedRiskStatus.text = riskMessage ?: ""
         riskLevel?.let {
             when (it) {
-                DefinedParams.RedRiskLow -> {
+                DefinedParams.RED_RISK_LOW -> {
                     binding.ivRedRisk.setImageResource(R.drawable.ic_red_risk_green)
                     binding.clRedRisk.background =
                         ContextCompat.getDrawable(requireContext(), R.drawable.bg_red_risk_green)

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/_16sdp"
+    android:background="@android:color/transparent"
+    app:cardCornerRadius="@dimen/_12sdp"
+    app:cardElevation="@dimen/_2sdp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <org.medtroniclabs.uhis.ui.DialogTitleFrameLayout
+                android:id="@+id/labelHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:dialogTitle="@string/filter"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/topDivider"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_1sdp"
+                android:background="@color/edittext_stroke"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/clBody"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_0dp"
+            app:layout_constraintBottom_toTopOf="@id/clFooter"
+            app:layout_constraintTop_toBottomOf="@id/clHeader">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/startGuideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_begin="@dimen/_16sdp" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/endGuideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_end="@dimen/_16sdp" />
+
+                <include
+                    android:id="@+id/lRegistrationDate"
+                    layout="@layout/filter_dialog_registration_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_12sdp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                    app:layout_constraintStart_toEndOf="@id/startGuideline"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <include
+                    android:id="@+id/lHealthCondition"
+                    layout="@layout/filter_dialog_health_condition"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_12sdp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                    app:layout_constraintStart_toEndOf="@id/startGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/lRegistrationDate" />
+
+                <include
+                    android:id="@+id/lUnionVillage"
+                    layout="@layout/filter_dialog_union_village"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_12sdp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toStartOf="@id/endGuideline"
+                    app:layout_constraintStart_toEndOf="@id/startGuideline"
+                    app:layout_constraintTop_toBottomOf="@id/lHealthCondition" />
+
+                <View
+                    android:id="@+id/viewSpace"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_60sdp"
+                    app:layout_constraintTop_toBottomOf="@+id/lUnionVillage" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clFooter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <View
+                android:id="@+id/bottomDivider"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_1sdp"
+                android:background="@color/edittext_stroke"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnReset"
+                style="@style/Button_Style_cancel"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_15sdp"
+                android:background="@drawable/btn_reset_selector"
+                android:enabled="false"
+                android:minWidth="@dimen/_100sdp"
+                android:text="@string/reset"
+                android:textColor="@color/reset_btn_selector"
+                app:layout_constraintEnd_toStartOf="@+id/btnApply"
+                app:layout_constraintTop_toTopOf="@id/btnApply" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnApply"
+                style="@style/Button_Style"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_12sdp"
+                android:layout_marginEnd="@dimen/_20sdp"
+                android:background="@drawable/button_selector_cobalt"
+                android:enabled="false"
+                android:minWidth="@dimen/_100sdp"
+                android:text="@string/apply"
+                app:layout_constraintBottom_toTopOf="@+id/lastView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/bottomDivider" />
+
+
+            <View
+                android:id="@+id/lastView"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_12sdp"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/touchView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -1,26 +1,34 @@
 package org.medtroniclabs.uhis.ui.services
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.text.TextWatcher
 import android.view.View
 import android.widget.AdapterView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import dagger.hilt.android.AndroidEntryPoint
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.hideKeyboard
-import org.medtroniclabs.uhis.appextensions.setTextChangeListener
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.SecuredPreference
+import org.medtroniclabs.uhis.common.qrscanner.QRScanContract
+import org.medtroniclabs.uhis.common.qrscanner.QRScanResult
+import org.medtroniclabs.uhis.common.qrscanner.QRScannerActivity
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberWithTb
 import org.medtroniclabs.uhis.databinding.ActivityServicesBinding
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
-import org.medtroniclabs.uhis.model.services.ServiceMemberCounts
 import org.medtroniclabs.uhis.model.services.ServiceStaticFilter
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
@@ -28,6 +36,7 @@ import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants
 import org.medtroniclabs.uhis.ui.externalmember.ExternalMemberRegistrationActivity
 import org.medtroniclabs.uhis.ui.household.MemberSelectionListener
 import org.medtroniclabs.uhis.ui.household.summary.MemberSummaryActivity
+import org.medtroniclabs.uhis.ui.patient.UIConstants
 import org.medtroniclabs.uhis.ui.services.viewmodel.ServicesViewModel
 import org.medtroniclabs.uhis.common.DefinedParams as CommonDefinedParams
 
@@ -59,23 +68,39 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
 
     private var lastPosition = -1
 
+    private lateinit var searchTextListener: TextWatcher
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityServicesBinding.inflate(layoutInflater)
 
         // Check if this is external member mode
-        isExternalMember = intent.getBooleanExtra("isExternalMember", false)
+        isExternalMember = intent.getBooleanExtra(IS_EXTERNAL_MEMBER, false)
+
+        servicesViewModel.initializeAllowedDropdown(isExternalMember)
+
         preSelectedSsIds = intent.getLongArrayExtra(DashboardConstants.EXTRA_DASHBOARD_SS_IDS) ?: longArrayOf()
         preSelectedSubVillageIds = intent.getLongArrayExtra(DashboardConstants.EXTRA_DASHBOARD_SUB_VILLAGE_IDS) ?: longArrayOf()
         preSelectedStaticFilter = intent.getStringExtra(DashboardConstants.EXTRA_DASHBOARD_STATIC_FILTER)?.let {
             runCatching { ServiceStaticFilter.valueOf(it) }.getOrNull()
         }
-
-        val title = if (isExternalMember) {
-            getString(R.string.external_member)
-        } else {
-            getString(R.string.service_recipient_list)
+        if (servicesViewModel.isFoPo && !isExternalMember) {
+            if (preSelectedStaticFilter != null && preSelectedStaticFilter !in servicesViewModel.getStaticFilters()) {
+                preSelectedStaticFilter = null
+            }
         }
+        servicesViewModel.initializeFilter(
+            isExternalMember = isExternalMember,
+            ssFilter = preSelectedSsIds.map { ChipViewItemModel(id = it, name = "") },
+            subVillagesFilter = preSelectedSubVillageIds.map { ChipViewItemModel(id = it, name = "") },
+            staticFilter = preSelectedStaticFilter,
+        )
+
+        val title =
+            when {
+                isExternalMember -> getString(R.string.external_member)
+                else -> getString(R.string.service_recipient_list)
+            }
 
         setMainContentView(
             binding.root,
@@ -93,6 +118,7 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
     }
 
     private fun initViews() {
+        binding.llExactSearch.clBtnQrSearch.visible()
         binding.llFilter.btnFilter.text = getString(R.string.filter)
 
         // Update search hint for external members
@@ -114,28 +140,16 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
             binding.tvMemberTypes.gone()
             binding.viewMemberTypes.gone()
             binding.bottomNavigationView.visible()
+            binding.btnAddExternalMember.text = getString(R.string.add_external_member)
             binding.btnAddExternalMember.safeClickListener(this)
-            // Set external member filter directly
-            servicesViewModel.setFilterLiveData(staticFilter = ServiceStaticFilter.EXTERNAL_MEMBERS)
+        } else if (servicesViewModel.isFoPo) {
+            binding.bottomNavigationView.visible()
+            binding.btnAddExternalMember.text = getString(R.string.add_new_member_small)
+            binding.btnAddExternalMember.safeClickListener(this)
         } else {
             binding.bottomNavigationView.gone()
         }
-        applyPrefiltersFromDashboard()
-    }
-
-    private fun applyPrefiltersFromDashboard() {
-        if (preSelectedSsIds.isEmpty() && preSelectedSubVillageIds.isEmpty() && preSelectedStaticFilter == null) return
-        val ssFilters = preSelectedSsIds.map {
-            ChipViewItemModel(id = it, name = "")
-        }
-        val subVillageFilters = preSelectedSubVillageIds.map {
-            ChipViewItemModel(id = it, name = "")
-        }
-        servicesViewModel.setFilterLiveData(
-            ssFilter = ssFilters,
-            subVillagesFilter = subVillageFilters,
-            staticFilter = preSelectedStaticFilter,
-        )
+        binding.llExactSearch.btnSearch.gone()
     }
 
     /**
@@ -164,7 +178,7 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
     /**
      * Sets member type spinner data with count for each dropdown element
      */
-    private fun setDropDownData(counts: ServiceMemberCounts) {
+    private fun setDropDownData(counts: Map<ServiceStaticFilter, Int>) {
         // Remove any existing listener, so that the filter won't get triggered
         binding.tvMemberTypes.onItemSelectedListener = null
 
@@ -196,23 +210,9 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
     /**
      * Builds list for member type spinner
      */
-    private fun buildDropDownList(counts: ServiceMemberCounts): ArrayList<Map<String, Any>> {
+    private fun buildDropDownList(counts: Map<ServiceStaticFilter, Int>): ArrayList<Map<String, Any>> {
         val dropdownList = arrayListOf<Map<String, Any>>()
-        val staticFilters = mapOf(
-            ServiceStaticFilter.ALL_MEMBERS to counts.allMembers,
-            ServiceStaticFilter.FAMILY_PLANNING_COUNSELLING_ELIGIBLE to counts.familyPlanning,
-            ServiceStaticFilter.PREGNANT_WOMEN to counts.pregnantWomen,
-            ServiceStaticFilter.HIGH_RISK_PREGNANT_WOMEN to counts.highRiskPregnant,
-            ServiceStaticFilter.POSTNATAL_CARE_MOTHERS to counts.postnatalMothers,
-            ServiceStaticFilter.CHILDREN_UNDER_TWO_YEARS to counts.childrenUnderTwo,
-            ServiceStaticFilter.EXPECTED_DELIVERIES to counts.expectedDeliveries,
-            ServiceStaticFilter.PENDING_DELIVERIES to counts.pendingDeliveries,
-            ServiceStaticFilter.EXTERNAL_MEMBERS to counts.externalMembers,
-            ServiceStaticFilter.EXTERNAL_PREGNANT_WOMEN to counts.externalPregnant,
-        )
-        staticFilters.forEach { filterEntry ->
-            val filter = filterEntry.key
-            val filterCount = filterEntry.value
+        counts.forEach { (filter, filterCount) ->
             dropdownList.add(
                 mapOf(
                     DefinedParams.CULTURE_VALUE to filter.culturalValue + " (${CommonUtils.formatCountForCurrentLocale(filterCount)})",
@@ -225,23 +225,19 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
     }
 
     private fun setListeners() {
-        binding.llExactSearch.btnSearch.safeClickListener(this)
         binding.llFilter.btnFilter.safeClickListener(this)
-        binding.llExactSearch.etSearchTerm.setTextChangeListener {
-            val input = it?.trim().toString()
-            binding.llExactSearch.btnSearch.isEnabled =
-                input.isNotEmpty() &&
-                ((input[0].isLetter() && input.length >= 3) || input[0].isDigit())
-
-            if (input.isEmpty()) {
-                servicesViewModel.setFilterLiveData(search = "")
-            }
+        binding.llExactSearch.btnQrSearch.safeClickListener(this)
+        searchTextListener = binding.llExactSearch.etSearchTerm.doOnTextChanged { text, _, _, _ ->
+            servicesViewModel.onTextChange(text?.toString())
         }
     }
 
     private fun attachObserver() {
         servicesViewModel.getFilterLiveData().observe(this) {
             var count = 0
+            if (it.filterSk != -1L) {
+                count++
+            }
             if (it.filterBySs.isNotEmpty()) {
                 count++
             }
@@ -264,10 +260,11 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
                     hideLoading()
                     // Do Nothing
                 }
+
                 ResourceState.LOADING -> {
-                    hideKeyboard(binding.llExactSearch.etSearchTerm)
                     showLoading()
                 }
+
                 ResourceState.SUCCESS -> {
                     hideLoading()
                     filteredMembersResource.data?.let { filteredMembersUiData ->
@@ -300,31 +297,92 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
         when (view.id) {
             R.id.btnFilter -> {
                 hideKeyboard(view)
-                withLocationCheck({
+                withLocationCheck {
                     FilterBottomSheetDialogFragment
                         .newInstance()
                         .show(supportFragmentManager, FilterBottomSheetDialogFragment.TAG)
-                })
+                }
             }
 
             R.id.btnSearch -> {
-                withLocationCheck({
+                withLocationCheck {
                     servicesViewModel.setUserJourney(AnalyticsDefinedParams.SERVICES_SEARCH_TRIGGERED)
                     val searchTerm = binding.llExactSearch.etSearchTerm.text
                         .toString()
                     servicesViewModel.setFilterLiveData(search = searchTerm)
+                }
+            }
+
+            R.id.btnQrSearch -> {
+                withLocationCheck({
+                    servicesViewModel.setUserJourney(AnalyticsDefinedParams.SERVICES_QR_SEARCH_TRIGGERED)
+                    launchQrScanner()
                 })
             }
 
             R.id.btnAddExternalMember -> {
-                withLocationCheck({
-                    servicesViewModel.setUserJourney("ADD_EXTERNAL_MEMBER_BUTTON_TRIGGERED")
+                withLocationCheck {
+                    servicesViewModel.setUserJourney(
+                        if (isExternalMember) {
+                            "ADD_EXTERNAL_MEMBER_BUTTON_TRIGGERED"
+                        } else {
+                            "ADD_MEMBER_BUTTON_FO_PO"
+                        },
+                    )
                     val intent = Intent(this, ExternalMemberRegistrationActivity::class.java)
                     startActivity(intent)
-                })
+                }
             }
         }
     }
+
+    private fun launchQrScanner() {
+        try {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_DENIED
+            ) {
+                cameraPermission.launch(Manifest.permission.CAMERA)
+            } else {
+                startScanning()
+            }
+        } catch (e: Exception) {
+            // error block
+        }
+    }
+
+    private val cameraPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            startScanning()
+        } else {
+            // Camera permission denied
+        }
+    }
+
+    private fun startScanning() {
+        qrScanLauncher.launch(
+            Intent(this, QRScannerActivity::class.java).apply {
+                putExtra(QRScanResult.REQUEST_FROM, UIConstants.SCREENING_UNIQUE_ID)
+            },
+        )
+    }
+
+    private val qrScanLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(QRScanContract()) { result ->
+            val qrCode = result.resultString?.trim().orEmpty()
+            if (qrCode.isNotBlank()) {
+                servicesViewModel.filterMemberListByQr(qrCode)
+                binding.llExactSearch.etSearchTerm.removeTextChangedListener(searchTextListener)
+                binding.llExactSearch.etSearchTerm.text
+                    ?.clear()
+                binding.llExactSearch.etSearchTerm.addTextChangedListener(searchTextListener)
+            } else {
+                showErrorDialogue(
+                    title = getString(R.string.alert),
+                    message = getString(R.string.invalid_qr),
+                    positiveButtonName = getString(R.string.ok),
+                ) { }
+            }
+        }
 
     override fun onMemberSelected(
         item: Long,
@@ -332,6 +390,7 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
         dateOfBirth: String?,
         isContactTrace: Boolean,
         houseHoldId: Long?,
+        fhirId: String?,
     ) {
         val intent = Intent(this, MemberSummaryActivity::class.java)
         intent.putExtra(CommonDefinedParams.HOUSEHOLD_ID, houseHoldId)
@@ -347,5 +406,6 @@ class ServicesActivity : BaseActivity(), View.OnClickListener, MemberSelectionLi
 
     companion object {
         const val ENTRY_POINT_SERVICES = "Services"
+        const val IS_EXTERNAL_MEMBER = "isExternalMember"
     }
 }

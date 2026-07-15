@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/CardView_Style"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardCornerRadius="@dimen/_8sdp"
+    app:cardElevation="@dimen/_2sdp"
+    app:cardUseCompatPadding="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/_20sdp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/bioDataCardTitle"
+            style="@style/Form_Header_Style"
+            android:layout_width="@dimen/_0dp"
+            android:background="@color/card_background"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/_16sdp"
+            android:paddingVertical="@dimen/_10sdp"
+            android:text="@string/follow_up"
+            android:textSize="@dimen/_16ssp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvNextFollowUpLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_20sdp"
+            android:text="@string/next_follow_up"
+            android:fontFamily="@font/inter_regular"
+            android:textSize="@dimen/_16ssp"
+            android:textColor="@color/table_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bioDataCardTitle" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvNextFollowUpDate"
+            android:layout_width="@dimen/_0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_20sdp"
+            android:fontFamily="@font/inter_regular"
+            android:text="20/12/2022"
+            android:textColor="@color/table_title"
+            android:textSize="@dimen/_16ssp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvNextFollowUpLabel" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clFollowUpDate"
+            android:background="@drawable/philippine_silver_border"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_20sdp"
+            android:padding="@dimen/_8sdp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvNextFollowUpDate">
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/startGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.25" />
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/endGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.70" />
+            <ImageView
+                android:id="@+id/ivMinus"
+                style="@style/CheckBox_Style"
+                android:layout_width="@dimen/_40sdp"
+                android:layout_height="@dimen/_40sdp"
+                android:contentDescription="@string/decrease"
+                android:src="@drawable/ic_minus"
+                app:layout_constraintStart_toEndOf="@+id/startGuideline"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvDaysCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/next_follow_up_day"
+                android:textStyle="bold"
+                android:textSize="@dimen/_18ssp"
+                android:textColor="@color/gray_black"
+                android:fontFamily="@font/inter_medium"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/ivPlus"
+                app:layout_constraintStart_toEndOf="@id/ivMinus"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/ivPlus"
+                style="@style/CheckBox_Style"
+                android:layout_width="@dimen/_40sdp"
+                android:layout_height="@dimen/_40sdp"
+                android:contentDescription="@string/increase"
+                android:src="@drawable/ic_plus"
+                app:layout_constraintStart_toEndOf="@+id/endGuideline"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvErrorMessage"
+            style="@style/TextStyle_Error_16"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_20sdp"
+            android:text="@string/days_error"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/clFollowUpDate" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvDateManually"
+            style="@style/TextStyle_Bold_16_PrimaryMediumBlue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_20sdp"
+            android:padding="@dimen/_16ssp"
+            android:text="@string/follow_up_date_manually"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvErrorMessage" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

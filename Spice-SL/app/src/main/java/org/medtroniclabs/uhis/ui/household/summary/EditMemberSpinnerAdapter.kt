@@ -27,7 +27,7 @@ class EditMemberSpinnerAdapter(context: Context, val translate: Boolean = false)
     override fun getItem(position: Int): String = constructListItem(itemList[position])
 
     private fun constructListItem(itemList: MemberDetailsSpinnerModel): String =
-        if (itemList.id == DefinedParams.DefaultSelectID) {
+        if (itemList.id == DefinedParams.DEFAULT_SELECT_ID) {
             itemList.name
         } else {
             val genderPrefix = itemList.gender

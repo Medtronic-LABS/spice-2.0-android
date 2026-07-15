@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Typeface
 import android.os.Bundle
+import android.text.TextWatcher
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.addTextChangedListener
+import androidx.core.widget.doOnTextChanged
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -26,7 +28,6 @@ import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams.HH_VISI
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams.MYFOLLOWUPPATIENTS
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams.ONMOREBUTTONTRIGGERED
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams.REFERRED_TAB
-import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams.SEARCHBUTTONTRIGGERED
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.startBackgroundOfflineSync
 import org.medtroniclabs.uhis.appextensions.visible
@@ -35,6 +36,7 @@ import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.databinding.ActivityFollowUpMyPatientBinding
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.formgeneration.extension.safePopupMenuClickListener
+import org.medtroniclabs.uhis.model.followup.FollowUpSortOrder
 import org.medtroniclabs.uhis.ncd.followup.NCDFollowUpUtils
 import org.medtroniclabs.uhis.ncd.followup.adapter.NCDFollowUpAdapter
 import org.medtroniclabs.uhis.ncd.followup.fragment.NCDCallResultBottomDialog
@@ -43,15 +45,19 @@ import org.medtroniclabs.uhis.ncd.followup.fragment.NCDFollowUpSortDialog
 import org.medtroniclabs.uhis.ncd.followup.viewmodel.NCDFollowUpViewModel
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
+import org.medtroniclabs.uhis.ui.followup.FollowUpDefinedParams.FU_TYPE_REFERRED
 import org.medtroniclabs.uhis.ui.followup.adapter.FollowUpPatientListAdapter
 import org.medtroniclabs.uhis.ui.followup.viewmodel.FollowUpViewModel
 import org.medtroniclabs.uhis.ui.phuwalkins.activity.PhuWalkInsActivity
 import timber.log.Timber
+import kotlin.time.Duration.Companion.milliseconds
 
 class FollowUpMyPatientActivity : BaseActivity() {
     private lateinit var binding: ActivityFollowUpMyPatientBinding
     private val viewModel: FollowUpViewModel by viewModels()
     private val ncdFollowUpViewModel: NCDFollowUpViewModel by viewModels()
+
+    private lateinit var textChange: TextWatcher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,6 +83,12 @@ class FollowUpMyPatientActivity : BaseActivity() {
             showHideVerticalIcon(false)
         }
         setOrientation()
+    }
+
+    private fun attachTextWatcher() {
+        textChange = binding.llExactSearch.etSearchTerm.doOnTextChanged { text, _, _, _ ->
+            viewModel.onTextChange(text?.toString())
+        }
     }
 
     private fun setOrientation() {
@@ -177,7 +189,7 @@ class FollowUpMyPatientActivity : BaseActivity() {
 
     private fun hideProgressAfterDelay() {
         CoroutineScope(Dispatchers.Main).launch {
-            delay(1500) // Wait for 3 seconds
+            delay(1500.milliseconds) // Wait for 3 seconds
             hideLoading()
         }
     }
@@ -191,9 +203,8 @@ class FollowUpMyPatientActivity : BaseActivity() {
         binding.viewPager.adapter = FollowUpPatientListAdapter(supportFragmentManager, lifecycle)
         TabLayoutMediator(binding.llExactSearch.tabLayout, binding.viewPager) { tab, position ->
             when (position) {
-                0 -> tab.text = getString(R.string.hh_visit)
+                0 -> tab.text = getString(R.string.scheduled_visit)
                 1 -> tab.text = getString(R.string.referred)
-                2 -> tab.text = getString(R.string.tab_counter_referral)
             }
         }.attach()
 
@@ -217,8 +228,13 @@ class FollowUpMyPatientActivity : BaseActivity() {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 tab?.let {
                     viewModel.updateFollowUpFilter(pageType = it.position)
-                    // binding.llExactSearch.etSearchTerm.setText("")
                     binding.viewPager.currentItem = it.position
+                    val tabName = viewModel.getFollowUpType(it.position)
+                    if (tabName == FU_TYPE_REFERRED) {
+                        binding.llFilter.btnSort.visible()
+                    } else {
+                        binding.llFilter.btnSort.gone()
+                    }
                     getTabScreenName(it.position)?.let { tabName ->
                         viewModel.setUserJourney(tabName)
                     }
@@ -254,52 +270,67 @@ class FollowUpMyPatientActivity : BaseActivity() {
 
     private fun initView() {
         with(binding) {
+            llFilter.btnSort.text = getString(R.string.sort)
             llFilter.btnFilter.safeClickListener {
                 FollowUpFilterBottomSheetDialogFragment
                     .newInstance()
                     .show(supportFragmentManager, FollowUpFilterBottomSheetDialogFragment.TAG)
             }
-
-            llExactSearch.etSearchTerm.addTextChangedListener {
-                val search = it?.trim().toString()
-                llExactSearch.btnSearch.isEnabled = search.isNotEmpty()
-                if (search.isEmpty()) {
-                    viewModel.updateFollowUpFilter(search = "")
-                }
+            llFilter.btnSort.safeClickListener {
+                handleFollowUpSortClick()
             }
-
-            llExactSearch.btnSearch.setOnClickListener {
-                viewModel.setUserJourney(SEARCHBUTTONTRIGGERED)
-                viewModel.updateFollowUpFilter(
-                    search = llExactSearch.etSearchTerm.text
-                        ?.trim()
-                        .toString(),
-                )
-            }
+            llExactSearch.btnSearch.gone()
+            tvHPatientCount.text = ""
+            attachTextWatcher()
         }
     }
 
     private fun initObserver() {
         viewModel.followUpPatientListLiveData.observe(this) {
-            binding.tvHPatientCount.text = getString(R.string.patient_count, it.size)
+            binding.tvHPatientCount.text = getString(R.string.patient_count, CommonUtils.formatCountForCurrentLocale(it.size))
         }
 
         viewModel.getFilterDataLiveData().observe(this) {
             var count = 0
+            if (!it.selectedShashtyaShebikas.isNullOrEmpty()) {
+                count++
+            }
             if (!it.selectedVillages.isNullOrEmpty()) {
                 count++
             }
             if (!it.selectedDateRange.isNullOrEmpty()) {
                 count++
             }
-            if (!it.selectedReasons.isNullOrEmpty()) {
+            if (!it.selectedReferralReasons.isNullOrEmpty()) {
                 count++
             }
+            if (!it.ncdSelectedReasons.isNullOrEmpty()) {
+                count++
+            }
+            if (!it.ncdSelectedReferralTo.isNullOrEmpty()) {
+                count++
+            }
+            if (it.type == FU_TYPE_REFERRED) {
+                if (!it.remainingAttempt.isNullOrEmpty()) {
+                    count++
+                }
+                if (!it.callStatus.isNullOrEmpty()) {
+                    count++
+                }
+            }
 
-            if (count > 0) {
-                binding.llFilter.btnFilter.text = this.getString(R.string.filter_count, CommonUtils.formatCountForCurrentLocale(count))
-            } else {
-                binding.llFilter.btnFilter.text = getString(R.string.filter)
+            with(binding.llFilter) {
+                if (count > 0) {
+                    btnFilter.text = getString(R.string.filter_count, CommonUtils.formatCountForCurrentLocale(count))
+                } else {
+                    btnFilter.text = getString(R.string.filter)
+                }
+                val sortCount = if (it.sortOrder == FollowUpSortOrder.DEFAULT) 0 else 1
+                btnSort.text = if (sortCount > 0) {
+                    getString(R.string.sort_count, CommonUtils.formatCountForCurrentLocale(sortCount))
+                } else {
+                    getString(R.string.sort)
+                }
             }
         }
 
@@ -503,6 +534,18 @@ class FollowUpMyPatientActivity : BaseActivity() {
             } else {
                 binding.llFilter.btnFilter.text = getString(R.string.filter)
             }
+        }
+    }
+
+    private fun handleFollowUpSortClick() {
+        val existingFragment =
+            supportFragmentManager.findFragmentByTag(FollowUpSortDialogFragment.TAG) as? FollowUpSortDialogFragment
+        if (existingFragment == null) {
+            FollowUpSortDialogFragment
+                .newInstance()
+                .show(supportFragmentManager, FollowUpSortDialogFragment.TAG)
+        } else {
+            existingFragment.show(supportFragmentManager, FollowUpSortDialogFragment.TAG)
         }
     }
 

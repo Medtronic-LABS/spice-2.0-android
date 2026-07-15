@@ -35,7 +35,7 @@ class HouseholdMemberListAdapter(
     private val isTranslationEnabled: Boolean,
 ) : RecyclerView.Adapter<HouseholdMemberListAdapter.HouseholdListViewHolder>(),
     View.OnClickListener {
-    inner class HouseholdListViewHolder(val binding: MembersSummaryListItemBinding) :
+    class HouseholdListViewHolder(val binding: MembersSummaryListItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         val context: Context = binding.root.context
     }
@@ -75,9 +75,11 @@ class HouseholdMemberListAdapter(
             holder.binding.tvRecentServiceDateSeparator.visible()
             holder.binding.tvRecentServiceDateValue.visible()
 
-            holder.binding.tvRecentServiceValue.text = item.services?.firstOrNull()?.let { recentService ->
-                AssessmentUtil.mapServiceToServiceName(recentService, context)
-            } ?: context.resources.getString(R.string.separator_double_hyphen)
+            holder.binding.tvRecentServiceValue.text = item.assessmentHistory
+                .firstOrNull { !it.serviceProvided.isNullOrBlank() }
+                ?.serviceProvided
+                ?.let { recentService -> AssessmentUtil.mapServiceToServiceName(recentService, context) }
+                ?: context.resources.getString(R.string.separator_double_hyphen)
             holder.binding.tvRecentServiceDateValue.text = item.recentServiceDate?.let {
                 DateUtils.formatDateToDisplayFormat(it)
             } ?: context.resources.getString(R.string.separator_double_hyphen)
@@ -115,12 +117,13 @@ class HouseholdMemberListAdapter(
             },
         )
 
+        val services = item.assessmentHistory.filterNot { it.serviceProvided.isNullOrBlank() }
+
         // If user have received some services, then add their icons beside name
-        if (!item.services.isNullOrEmpty()) {
-            val iconsToShow = item.services
-                .map { service ->
-                    AssessmentUtil.mapServiceToServiceIcon(service)
-                }.filterNot { it == View.NO_ID }
+        if (services.isNotEmpty()) {
+            val iconsToShow = services
+                .map(AssessmentUtil::mapServiceToServiceIcon)
+                .filterNot { it == View.NO_ID }
                 .take(3)
 
             iconsToShow.forEach { iconRes ->
@@ -134,7 +137,7 @@ class HouseholdMemberListAdapter(
                 holder.binding.flexTitle.addView(imageView)
             }
 
-            val remainingCount = item.services.size - iconsToShow.size
+            val remainingCount = services.size - iconsToShow.size
             if (remainingCount > 0) {
                 val textView = TextView(holder.context).apply {
                     layoutParams = ViewGroup.MarginLayoutParams(

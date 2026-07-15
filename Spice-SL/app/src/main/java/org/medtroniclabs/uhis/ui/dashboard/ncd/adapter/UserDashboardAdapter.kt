@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.databinding.ListItemUserDashboardBinding
 
 data class DashboardCardItem(
@@ -18,9 +17,8 @@ class UserDashboardAdapter(
     private val customize: Boolean,
     private val userDashboardLists: ArrayList<DashboardCardItem>,
     private val onCardClick: (DashboardCardItem) -> Unit,
-) :
-    RecyclerView.Adapter<UserDashboardAdapter.UserDashboardViewHolder>() {
-    inner class UserDashboardViewHolder(val binding: ListItemUserDashboardBinding) :
+) : RecyclerView.Adapter<UserDashboardAdapter.UserDashboardViewHolder>() {
+    class UserDashboardViewHolder(val binding: ListItemUserDashboardBinding) :
         RecyclerView.ViewHolder(binding.root) {
         val context: Context = binding.root.context
     }
@@ -44,7 +42,6 @@ class UserDashboardAdapter(
                 root.setOnClickListener {
                     onCardClick(dashboard)
                 }
-                ivActivity.gone()
             }
         }
     }

@@ -11,8 +11,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.DefinedParams.CbsNotifiableCondition
-import org.medtroniclabs.uhis.common.DefinedParams.IccmDiarrheaNotifiableCondition
-import org.medtroniclabs.uhis.common.DefinedParams.IccmFeverNotifiableCondition
+import org.medtroniclabs.uhis.common.DefinedParams.ICCM_DIARRHEA_NOTIFIABLE_CONDITION
+import org.medtroniclabs.uhis.common.DefinedParams.ICCM_FEVER_NOTIFIABLE_CONDITION
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.databinding.CheckboxDialogLayoutBinding
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
@@ -153,7 +153,7 @@ class CbsCheckBoxDialog() : DialogFragment(), View.OnClickListener {
     private fun getRespectiveList(key: String?) {
         key?.let {
             viewModel.getSymptomListByTypes(
-                listOf(IccmDiarrheaNotifiableCondition.lowercase(), IccmFeverNotifiableCondition.lowercase(), CbsNotifiableCondition.lowercase()),
+                listOf(ICCM_DIARRHEA_NOTIFIABLE_CONDITION.lowercase(), ICCM_FEVER_NOTIFIABLE_CONDITION.lowercase(), CbsNotifiableCondition.lowercase()),
             )
         }
     }

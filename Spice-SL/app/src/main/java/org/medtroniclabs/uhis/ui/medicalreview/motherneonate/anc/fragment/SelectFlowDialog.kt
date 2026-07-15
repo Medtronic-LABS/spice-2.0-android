@@ -83,13 +83,13 @@ class SelectFlowDialog : DialogFragment(), View.OnClickListener {
             val bundle = Bundle()
             bundle.putString(DefinedParams.PatientId, patientId)
             bundle.putString(DefinedParams.ID, id)
-            bundle.putString(DefinedParams.ChildPatientId, childPatientId)
+            bundle.putString(DefinedParams.CHILD_PATIENT_ID, childPatientId)
             bundle.putString(DefinedParams.DateOfDelivery, dateOfDelivery)
-            bundle.putString(DefinedParams.NeonateOutcome, neonateOutcome)
+            bundle.putString(DefinedParams.NEONATE_OUTCOME, neonateOutcome)
             bundle.putString(MEMBER_ID, memberId)
             bundle.putBoolean(DefinedParams.EMTCT, isEMTCTFlow == true)
-            bundle.putBoolean(DefinedParams.hivTestedPositive, hivTestedPositive == true)
-            bundle.putBoolean(DefinedParams.isMenutypeHiv, isMenutypeHiv == true)
+            bundle.putBoolean(DefinedParams.HIV_TESTED_POSITIVE, hivTestedPositive == true)
+            bundle.putBoolean(DefinedParams.IS_MENU_TYPE_HIV, isMenutypeHiv == true)
             fragment.arguments = bundle
             return fragment
         }
@@ -162,10 +162,10 @@ class SelectFlowDialog : DialogFragment(), View.OnClickListener {
                 // if hivtestpositive true -> emtct mr
                 // if hivtestpositive false -> isEMtctflow true -> Selection dialog else -> ANC
                 if (arguments?.getBoolean(
-                        DefinedParams.hivTestedPositive,
+                        DefinedParams.HIV_TESTED_POSITIVE,
                         false,
                     ) == true &&
-                    arguments?.getBoolean(DefinedParams.isMenutypeHiv, false) == true
+                    arguments?.getBoolean(DefinedParams.IS_MENU_TYPE_HIV, false) == true
                 ) {
                     val patientId = arguments?.getString(DefinedParams.PatientId, "")
                     val id = arguments?.getString(DefinedParams.ID, "")
@@ -186,7 +186,7 @@ class SelectFlowDialog : DialogFragment(), View.OnClickListener {
                 } else {
                     binding.tvTitle.text = getString(R.string.select_patient_type)
                     binding.tvSubTitle.visible()
-                    if (arguments?.getBoolean(DefinedParams.EMTCT, false) == true && arguments?.getBoolean(DefinedParams.isMenutypeHiv, false) == true) {
+                    if (arguments?.getBoolean(DefinedParams.EMTCT, false) == true && arguments?.getBoolean(DefinedParams.IS_MENU_TYPE_HIV, false) == true) {
                         binding.selectionGroup.removeAllViews()
                         viewModel.isEMTCT = true
                         getPositiveType().let {
@@ -220,8 +220,8 @@ class SelectFlowDialog : DialogFragment(), View.OnClickListener {
             getString(R.string.pnc) -> {
                 val patientId = arguments?.getString(PatientId, "")
                 val id = arguments?.getString(ID, "")
-                val childId = arguments?.getString(DefinedParams.ChildPatientId, null)
-                val neonateOutcome = arguments?.getString(DefinedParams.NeonateOutcome, null)
+                val childId = arguments?.getString(DefinedParams.CHILD_PATIENT_ID, null)
+                val neonateOutcome = arguments?.getString(DefinedParams.NEONATE_OUTCOME, null)
                 val targetActivity = if (!childId.isNullOrEmpty()) {
                     MotherNeonatePncActivity::class.java
                 } else {
@@ -241,7 +241,7 @@ class SelectFlowDialog : DialogFragment(), View.OnClickListener {
                         putExtra(ID, id)
                     }
                     if (targetActivity == LabourDeliveryBaseActivity::class.java) {
-                        putExtra(DefinedParams.DirectPNCFlow, true)
+                        putExtra(DefinedParams.DIRECT_PNC_FLOW, true)
                     }
                 }
                 startActivity(intent)
@@ -367,7 +367,7 @@ class SelectFlowDialog : DialogFragment(), View.OnClickListener {
             ),
         )
         flowList.add(CommonUtils.getOptionMap(getString(R.string.pnc), getString(R.string.pnc)))
-        val id = arguments?.getString(DefinedParams.ChildPatientId, null)
+        val id = arguments?.getString(DefinedParams.CHILD_PATIENT_ID, null)
         val dateOfDelivery = arguments?.getString(DefinedParams.DateOfDelivery, null)
 //        if (!id.isNullOrEmpty()) {
 //        }

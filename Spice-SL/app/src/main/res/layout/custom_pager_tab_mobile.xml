@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:scrollbars="none"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:id="@+id/tabContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/_10sdp"
+        android:paddingTop="@dimen/_15sdp"
+        android:background="@color/primary_medium_blue_bg">
+
+        <TextView
+            android:id="@+id/tvTabStart"
+            style="@style/FollowUpTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/left_mh_view_selector"
+            android:gravity="center"
+            android:padding="@dimen/_12sdp"
+            android:text="Screening"
+            android:textColor="@color/text_color_selector"
+            android:maxLines="1"
+            android:ellipsize="none" />
+
+        <TextView
+            android:id="@+id/tvTabSecond"
+            style="@style/FollowUpTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/mental_health_button_bg"
+            android:gravity="center"
+            android:padding="@dimen/_12sdp"
+            android:text="Overdue"
+            android:textColor="@color/text_color_selector"
+            android:maxLines="1"
+            android:ellipsize="none" />
+
+        <TextView
+            android:id="@+id/tvTabMiddle"
+            style="@style/FollowUpTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/mental_health_button_bg"
+            android:gravity="center"
+            android:padding="@dimen/_12sdp"
+            android:text="Missed Visit"
+            android:textColor="@color/text_color_selector"
+            android:maxLines="1"
+            android:ellipsize="none" />
+
+
+        <TextView
+            android:id="@+id/tvTabFourth"
+            style="@style/FollowUpTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/right_mh_view_selector"
+            android:gravity="center"
+            android:padding="@dimen/_12sdp"
+            android:text="LTF"
+            android:textColor="@color/text_color_selector"
+            android:maxLines="1"
+            android:ellipsize="none" />
+
+    </LinearLayout>
+</HorizontalScrollView>

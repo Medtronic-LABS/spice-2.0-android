@@ -21,7 +21,7 @@ import org.medtroniclabs.uhis.common.CommonUtils.convertListToString
 import org.medtroniclabs.uhis.common.CommonUtils.createInvestigation
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.OtherNotes
+import org.medtroniclabs.uhis.common.DefinedParams.OTHER_NOTES
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.ViewUtils
 import org.medtroniclabs.uhis.data.history.PatientStatus
@@ -69,7 +69,7 @@ class UnderTwoMonthsTreatmentSummaryFragment : BaseFragment(), View.OnClickListe
         ): UnderTwoMonthsTreatmentSummaryFragment {
             val fragment = UnderTwoMonthsTreatmentSummaryFragment()
             val bundle = Bundle()
-            bundle.putString(DefinedParams.EncounterId, encounterId)
+            bundle.putString(DefinedParams.ENCOUNTER_ID, encounterId)
             bundle.putString(DefinedParams.PatientReference, patientReference)
             fragment.arguments = bundle
             return fragment
@@ -91,7 +91,7 @@ class UnderTwoMonthsTreatmentSummaryFragment : BaseFragment(), View.OnClickListe
         binding.tvPatientStatusLabel.markMandatory()
         summaryViewModel.getUnderTwoMonthsSummaryDetails(
             CreateUnderTwoMonthsResponse(
-                encounterId = arguments?.getString(DefinedParams.EncounterId) ?: "",
+                encounterId = arguments?.getString(DefinedParams.ENCOUNTER_ID) ?: "",
                 patientReference = arguments?.getString(DefinedParams.PatientReference) ?: "",
             ),
         )
@@ -135,7 +135,7 @@ class UnderTwoMonthsTreatmentSummaryFragment : BaseFragment(), View.OnClickListe
                         binding.tvDiagnosis.setTextColor(ContextCompat.getColor(requireContext(), R.color.a_red_error))
                     }
                     convertListToString(
-                        ArrayList(list.filter { it.diseaseCategory.lowercase() != OtherNotes.lowercase() }.map { it.diseaseCategory }.distinct()),
+                        ArrayList(list.filter { it.diseaseCategory.lowercase() != OTHER_NOTES.lowercase() }.map { it.diseaseCategory }.distinct()),
                     )
                 } ?: requireContext().getString(R.string.empty__)
 

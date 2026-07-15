@@ -22,8 +22,8 @@ import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils.convertListToString
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.Lactating
-import org.medtroniclabs.uhis.common.DefinedParams.Postpartum
-import org.medtroniclabs.uhis.common.DefinedParams.Pregnant
+import org.medtroniclabs.uhis.common.DefinedParams.POSTPARTUM
+import org.medtroniclabs.uhis.common.DefinedParams.PREGNANT
 import org.medtroniclabs.uhis.data.DiseaseCategoryItems
 import org.medtroniclabs.uhis.data.model.MotherNeonateAncRequest
 import org.medtroniclabs.uhis.databinding.FragmentMedicalReviewPatientDiagnosisBinding
@@ -87,7 +87,7 @@ class MedicalReviewPatientDiagnosisFragment :
             val fragment = MedicalReviewPatientDiagnosisFragment()
             fragment.arguments = Bundle().apply {
                 putBoolean(DefinedParams.PregnancyANC, isAnc)
-                putBoolean(DefinedParams.PregnancyPNC, isPnc)
+                putBoolean(DefinedParams.PREGNANCY_PNC, isPnc)
                 putBoolean(DefinedParams.TB, isTB)
                 putBoolean(DefinedParams.HIV_IMR_CMR, isHivImrCmr)
                 putString(DefinedParams.PatientId, patientId)
@@ -116,7 +116,7 @@ class MedicalReviewPatientDiagnosisFragment :
         arguments?.let {
             if (it.getBoolean(DefinedParams.PregnancyANC)) {
                 MedicalReviewTypeEnums.ANC_REVIEW.name
-            } else if (it.getBoolean(DefinedParams.PregnancyPNC)) {
+            } else if (it.getBoolean(DefinedParams.PREGNANCY_PNC)) {
                 MedicalReviewTypeEnums.PNC_MOTHER_REVIEW.name
             } else if (isTb()) {
                 MedicalReviewTypeEnums.TB.name
@@ -500,7 +500,7 @@ class MedicalReviewPatientDiagnosisFragment :
     private fun handleFlow() {
         with(binding) {
             val isAnc = arguments?.getBoolean(DefinedParams.PregnancyANC, false)
-            val isPnc = arguments?.getBoolean(DefinedParams.PregnancyPNC, false)
+            val isPnc = arguments?.getBoolean(DefinedParams.PREGNANCY_PNC, false)
             if (isAnc == false && isPnc == false) {
                 cardAddWeight.gone()
                 cardBloodPressure.gone()
@@ -1009,11 +1009,11 @@ class MedicalReviewPatientDiagnosisFragment :
         val formattedString = cleanString(status.lowercase())
         return if (diagnosisViewModel.diagnosisType == MedicalReviewTypeEnums.ANC_REVIEW.name) {
             if (formattedString.isEmpty()) {
-                Pregnant
-            } else if (formattedString.contains(Pregnant, ignoreCase = true)) {
+                PREGNANT
+            } else if (formattedString.contains(PREGNANT, ignoreCase = true)) {
                 requireContext().changePatientStatus(formattedString)
             } else {
-                "${requireContext().changePatientStatus(formattedString)}, $Pregnant"
+                "${requireContext().changePatientStatus(formattedString)}, $PREGNANT"
             }
         } else {
             requireContext().changePatientStatus(status)
@@ -1021,7 +1021,7 @@ class MedicalReviewPatientDiagnosisFragment :
     }
 
     private fun cleanString(input: String): String {
-        val toRemove = listOf(Postpartum.lowercase(), Lactating.lowercase())
+        val toRemove = listOf(POSTPARTUM.lowercase(), Lactating.lowercase())
         if (toRemove.any { input.contains(it) }) {
             var cleanedString = input
             for (str in toRemove) {

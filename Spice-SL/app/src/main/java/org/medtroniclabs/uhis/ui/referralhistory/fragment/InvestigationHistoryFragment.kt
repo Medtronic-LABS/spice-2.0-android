@@ -238,7 +238,7 @@ class InvestigationHistoryFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
-    private fun showLoading() {
+    override fun showLoading() {
         binding.clLoaderProgress.visible()
         binding.loaderProgress.visible()
         binding.retryButtonBp.gone()
@@ -268,7 +268,7 @@ class InvestigationHistoryFragment : BaseFragment(), View.OnClickListener {
             adapters.updateList(
                 listOf(
                     mapOf(
-                        label to requireContext().getString(R.string.date_of_investigation),
+                        LABEL to requireContext().getString(R.string.date_of_investigation),
                         this.Value to data.dateOfReview?.let {
                             DateUtils.convertDateFormat(
                                 it,
@@ -278,7 +278,7 @@ class InvestigationHistoryFragment : BaseFragment(), View.OnClickListener {
                         },
                     ),
                     mapOf(
-                        label to requireContext().getString(R.string.investigations_referred),
+                        LABEL to requireContext().getString(R.string.investigations_referred),
                         this.Value to createInvestigationList(data.investigations),
                     ),
                 ),

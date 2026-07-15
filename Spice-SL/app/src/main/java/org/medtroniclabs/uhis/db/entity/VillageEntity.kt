@@ -1,7 +1,9 @@
 package org.medtroniclabs.uhis.db.entity
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "VillageEntity")
 data class VillageEntity(
@@ -16,4 +18,8 @@ data class VillageEntity(
     val chiefdomCode: String? = null,
     val districtCode: String? = null,
     val healthFacilityId: Long? = null,
-)
+) {
+    @Ignore
+    @SerializedName("isDistrictVillage")
+    var isDistrictVillage: Boolean? = false
+}

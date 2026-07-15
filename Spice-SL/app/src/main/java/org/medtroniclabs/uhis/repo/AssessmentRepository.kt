@@ -169,6 +169,12 @@ class AssessmentRepository @Inject constructor(
                     CommonUtils.getStringFromAssets(AssessmentDefinedParams.RMNCH_PNC_FORM + ".json", context.assets)
                 } else if (formType == RMNCH.ChildHoodVisit) {
                     CommonUtils.getStringFromAssets(AssessmentDefinedParams.RMNCH_CHILD_VISIT_FORM + ".json", context.assets)
+                } else if (formType == MenuConstants.NCD_MENU_ID) {
+                    CommonUtils.getStringFromAssets(MenuConstants.NCD_MENU_ID + ".json", context.assets)
+                } else if (formType == MenuConstants.EYE_CARE_MENU_ID) {
+                    CommonUtils.getStringFromAssets(AssessmentDefinedParams.EYE_CARE_FORM + ".json", context.assets)
+                } else if (formType == MenuConstants.CATARACT_MENU_ID) {
+                    CommonUtils.getStringFromAssets(AssessmentDefinedParams.CATARACT_FORM + ".json", context.assets)
                 } else {
                     roomHelper.getFormData(formType)
                 }
@@ -204,12 +210,9 @@ class AssessmentRepository @Inject constructor(
             dropDownList.add(
                 hashMapOf<String, Any>(
                     DefinedParams.NAME to healthFacilityEntity.name,
-                    DefinedParams.id to healthFacilityEntity.fhirId.toString(),
-                    DefinedParams.isDefault to healthFacilityEntity.isDefault,
-                    DefinedParams.phoneNumber to (healthFacilityEntity.phoneNumber ?: ""),
-                    // Facility tier → captured at PHU selection as actual.destinationTier
-                    // for the referral_location_* compliance gaps (may be "" pre-resync).
-                    AssessmentDefinedParams.PICKED_FACILITY_TYPE to (healthFacilityEntity.type ?: ""),
+                    DefinedParams.ID to healthFacilityEntity.fhirId.toString(),
+                    DefinedParams.IS_DEFAULT to healthFacilityEntity.isDefault,
+                    DefinedParams.PHONE_NUMBER to (healthFacilityEntity.phoneNumber ?: ""),
                 ),
             )
         }
@@ -299,4 +302,15 @@ class AssessmentRepository @Inject constructor(
         } catch (_: Exception) {
         }
     }
+
+    suspend fun getLastServiceHistory(
+        memberLocalId: Long,
+        serviceTypeFor: String,
+    ): MemberAssessmentHistoryEntity? = roomHelper.getLastServiceHistory(memberLocalId, serviceTypeFor)
+
+    suspend fun getLatestMemberServiceBAfterServiceA(
+        memberId: Long,
+        serviceA: String,
+        serviceB: String,
+    ) = roomHelper.getLatestMemberServiceBAfterServiceA(memberId, serviceA, serviceB)
 }

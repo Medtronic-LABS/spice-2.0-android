@@ -14,7 +14,7 @@ import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.DefaultID
+import org.medtroniclabs.uhis.common.DefinedParams.DEFAULT_ID
 import org.medtroniclabs.uhis.common.DefinedParams.HouseholdHead
 import org.medtroniclabs.uhis.common.DefinedParams.TB
 import org.medtroniclabs.uhis.common.StringConverter
@@ -268,8 +268,8 @@ class AssessmentTBSummaryFragment : Fragment(), View.OnClickListener {
                 ) {
                     val selectedItem = adapter.getData(position = pos)
                     selectedItem?.let {
-                        val selectedId = it[DefinedParams.id] as String?
-                        if (selectedId != DefaultID) {
+                        val selectedId = it[DefinedParams.ID] as String?
+                        if (selectedId != DEFAULT_ID) {
                             viewModel.otherAssessmentDetails[ReferredPHUSiteID] = selectedId.toString()
                         } else {
                             if (viewModel.otherAssessmentDetails.containsKey(ReferredPHUSiteID)) {

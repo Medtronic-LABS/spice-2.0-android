@@ -12,8 +12,8 @@ import org.medtroniclabs.uhis.appextensions.invisible
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.DefaultID
-import org.medtroniclabs.uhis.common.DefinedParams.DefaultIDLabel
+import org.medtroniclabs.uhis.common.DefinedParams.DEFAULT_ID
+import org.medtroniclabs.uhis.common.DefinedParams.DEFAULT_ID_LABEL
 import org.medtroniclabs.uhis.common.DefinedParams.GREEN_MAX_MUAC
 import org.medtroniclabs.uhis.common.DefinedParams.ID
 import org.medtroniclabs.uhis.common.DefinedParams.NAME
@@ -111,15 +111,15 @@ class ClinicalSummaryUnderFiveYearsFragment : BaseFragment() {
         val dropDownList = ArrayList<Map<String, Any>>()
         dropDownList.add(
             hashMapOf<String, Any>(
-                NAME to DefaultIDLabel,
-                ID to DefaultID,
+                NAME to DEFAULT_ID_LABEL,
+                ID to DEFAULT_ID,
             ),
         )
         for (item in list) {
             dropDownList.add(
                 hashMapOf<String, Any>(
                     NAME to item.name,
-                    DefinedParams.id to item.id.toString(),
+                    DefinedParams.ID to item.id.toString(),
                     Value to (item.value ?: item.name),
                 ),
             )
@@ -144,7 +144,7 @@ class ClinicalSummaryUnderFiveYearsFragment : BaseFragment() {
                     selectedItem?.let {
                         val selectedId = it[ID] as String?
                         val selectedImmunisationStatus = it[DefinedParams.Value] as String?
-                        if (selectedId != DefaultID) {
+                        if (selectedId != DEFAULT_ID) {
                             selectedImmunisationStatus?.let {
                                 viewModel.selectedImmunisationStatus = it
                                 viewModel.updateImmunisationStatus()
@@ -396,11 +396,11 @@ class ClinicalSummaryUnderFiveYearsFragment : BaseFragment() {
         binding.apply {
             etWAZ.isEnabled = false
             etWHZ.isEnabled = false
-            if (arguments?.getInt(DefinedParams.Age)?.toString()?.toInt() in 0..60) {
+            if (arguments?.getInt(DefinedParams.AGE)?.toString()?.toInt() in 0..60) {
                 val onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
                     if (!hasFocus) {
-                        val gender = arguments?.getString(DefinedParams.Gender)
-                        val age = arguments?.getInt(DefinedParams.Age)?.toString()
+                        val gender = arguments?.getString(DefinedParams.GENDER)
+                        val age = arguments?.getInt(DefinedParams.AGE)?.toString()
                         val weight = etWeight.text?.toString()
                         val height = etHeight.text?.toString()
 

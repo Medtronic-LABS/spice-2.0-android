@@ -21,7 +21,7 @@ import org.medtroniclabs.uhis.common.CommonUtils.convertListToString
 import org.medtroniclabs.uhis.common.CommonUtils.createInvestigation
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.OtherNotes
+import org.medtroniclabs.uhis.common.DefinedParams.OTHER_NOTES
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.ViewUtils
 import org.medtroniclabs.uhis.data.history.PatientStatus
@@ -68,7 +68,7 @@ class UnderFiveYearsTreatmentSummaryFragment : BaseFragment(), View.OnClickListe
         ): UnderFiveYearsTreatmentSummaryFragment {
             val fragment = UnderFiveYearsTreatmentSummaryFragment()
             val bundle = Bundle()
-            bundle.putString(DefinedParams.EncounterId, encounterId)
+            bundle.putString(DefinedParams.ENCOUNTER_ID, encounterId)
             bundle.putString(DefinedParams.PatientReference, patientReference)
             fragment.arguments = bundle
             return fragment
@@ -89,7 +89,7 @@ class UnderFiveYearsTreatmentSummaryFragment : BaseFragment(), View.OnClickListe
         summaryViewModel.setMetaPatientStatus(MedicalReviewTypeEnums.patient_status.name)
         summaryViewModel.getUnderFiveYearsSummaryDetails(
             CreateUnderTwoMonthsResponse(
-                encounterId = arguments?.getString(DefinedParams.EncounterId) ?: "",
+                encounterId = arguments?.getString(DefinedParams.ENCOUNTER_ID) ?: "",
                 patientReference = arguments?.getString(DefinedParams.PatientReference) ?: "",
             ),
         )
@@ -167,7 +167,7 @@ class UnderFiveYearsTreatmentSummaryFragment : BaseFragment(), View.OnClickListe
                 convertListToString(
                     ArrayList(
                         list
-                            .filter { it.diseaseCategory.lowercase() != OtherNotes.lowercase() }
+                            .filter { it.diseaseCategory.lowercase() != OTHER_NOTES.lowercase() }
                             .map { it.diseaseCategory }
                             .distinct(),
                     ),

@@ -38,6 +38,7 @@ import org.medtroniclabs.uhis.data.MotherPncResponse
 import org.medtroniclabs.uhis.data.NCDUserDashboardRequest
 import org.medtroniclabs.uhis.data.NCDUserDashboardResponse
 import org.medtroniclabs.uhis.data.NeonatePncResponse
+import org.medtroniclabs.uhis.data.PatientPrescriptionModel
 import org.medtroniclabs.uhis.data.PatientStatusRequest
 import org.medtroniclabs.uhis.data.PatientStatusResponse
 import org.medtroniclabs.uhis.data.PncChildMedicalReview
@@ -50,6 +51,7 @@ import org.medtroniclabs.uhis.data.ReferPatientNameNumber
 import org.medtroniclabs.uhis.data.ReferPatientRequest
 import org.medtroniclabs.uhis.data.ReferPatientResult
 import org.medtroniclabs.uhis.data.RemovePrescriptionRequest
+import org.medtroniclabs.uhis.data.ResponseDataModel
 import org.medtroniclabs.uhis.data.SummaryCreateRequest
 import org.medtroniclabs.uhis.data.TbMetaResponse
 import org.medtroniclabs.uhis.data.UnderFiveYearsMetaResponse
@@ -60,6 +62,8 @@ import org.medtroniclabs.uhis.data.history.BirthDetails
 import org.medtroniclabs.uhis.data.history.HistoryEntity
 import org.medtroniclabs.uhis.data.history.MedicalReviewHistory
 import org.medtroniclabs.uhis.data.history.NCDMedicalReviewHistory
+import org.medtroniclabs.uhis.data.medicalreview.ReqBPBGLogList
+import org.medtroniclabs.uhis.data.medicalreview.ResLabTestRecommendations
 import org.medtroniclabs.uhis.data.model.AboveFiveYearsSubmitRequest
 import org.medtroniclabs.uhis.data.model.BpAndWeightRequestModel
 import org.medtroniclabs.uhis.data.model.BpAndWeightResponse
@@ -75,16 +79,24 @@ import org.medtroniclabs.uhis.data.model.HivScreeningRequest
 import org.medtroniclabs.uhis.data.model.HivScreeningResponse
 import org.medtroniclabs.uhis.data.model.HivSummaryResponse
 import org.medtroniclabs.uhis.data.model.LabourDeliverySummaryDetails
+import org.medtroniclabs.uhis.data.model.MedicalReviewBaseRequest
 import org.medtroniclabs.uhis.data.model.MotherNeonateAncRequest
 import org.medtroniclabs.uhis.data.model.MotherNeonatePncRequest
+import org.medtroniclabs.uhis.data.model.PatientDataModel
+import org.medtroniclabs.uhis.data.model.PatientDetailsFollowUp
 import org.medtroniclabs.uhis.data.model.PatientEncounterResponse
+import org.medtroniclabs.uhis.data.model.PatientListResModel
 import org.medtroniclabs.uhis.data.model.PatientTypeCreateRequest
 import org.medtroniclabs.uhis.data.model.PncSubmitResponse
+import org.medtroniclabs.uhis.data.model.RegisterCallRequest
 import org.medtroniclabs.uhis.data.model.RegistrationResponse
 import org.medtroniclabs.uhis.data.model.RequestChangePassword
+import org.medtroniclabs.uhis.data.model.RequestMemberDetails
 import org.medtroniclabs.uhis.data.model.ResponseChangePassword
+import org.medtroniclabs.uhis.data.model.SiteRoleResponse
 import org.medtroniclabs.uhis.data.model.TbHistory
 import org.medtroniclabs.uhis.data.model.TbMedicalReviewCreateRequest
+import org.medtroniclabs.uhis.data.model.UpdatePatientCallRegister
 import org.medtroniclabs.uhis.data.model.ViralLoadRequest
 import org.medtroniclabs.uhis.data.model.ViralLoadResponse
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseHold
@@ -95,6 +107,56 @@ import org.medtroniclabs.uhis.data.performance.CHWPerformanceMonitoring
 import org.medtroniclabs.uhis.data.performance.ChwVillageFilterModel
 import org.medtroniclabs.uhis.data.performance.FilterPreference
 import org.medtroniclabs.uhis.data.performance.PerformanceReportRequest
+import org.medtroniclabs.uhis.data.registration.AssessmentListRequest
+import org.medtroniclabs.uhis.data.registration.BPLogListResponse
+import org.medtroniclabs.uhis.data.registration.BadgeModel
+import org.medtroniclabs.uhis.data.registration.BadgeResponseModel
+import org.medtroniclabs.uhis.data.registration.BloodGlucoseListResponse
+import org.medtroniclabs.uhis.data.registration.ConfirmDiagnosesRequest
+import org.medtroniclabs.uhis.data.registration.FillMedicineResponse
+import org.medtroniclabs.uhis.data.registration.FillPrescriptionListResponse
+import org.medtroniclabs.uhis.data.registration.FillPrescriptionRequest
+import org.medtroniclabs.uhis.data.registration.FillPrescriptionUpdateRequest
+import org.medtroniclabs.uhis.data.registration.InitialEncounterResponse
+import org.medtroniclabs.uhis.data.registration.InstructionModel
+import org.medtroniclabs.uhis.data.registration.InvestigationNudgesModel
+import org.medtroniclabs.uhis.data.registration.InvestigationReq
+import org.medtroniclabs.uhis.data.registration.LabTestSearchResponse
+import org.medtroniclabs.uhis.data.registration.Lifestyle
+import org.medtroniclabs.uhis.data.registration.MedicationSearchReqModel
+import org.medtroniclabs.uhis.data.registration.NurseCreateResponse
+import org.medtroniclabs.uhis.data.registration.NurseMrRequestModel
+import org.medtroniclabs.uhis.data.registration.PatientCreateResponse
+import org.medtroniclabs.uhis.data.registration.PatientDetailsModel
+import org.medtroniclabs.uhis.data.registration.PatientHistoryRequest
+import org.medtroniclabs.uhis.data.registration.PatientLabTestHistoryResponse
+import org.medtroniclabs.uhis.data.registration.PatientMedicalReviewHistoryResponse
+import org.medtroniclabs.uhis.data.registration.PatientPregnancyModel
+import org.medtroniclabs.uhis.data.registration.PatientPrescriptionHistoryResponse
+import org.medtroniclabs.uhis.data.registration.PatientRemoveRequest
+import org.medtroniclabs.uhis.data.registration.PatientVisit
+import org.medtroniclabs.uhis.data.registration.PregnancyCreateRequest
+import org.medtroniclabs.uhis.data.registration.PregnancyRiskUpdate
+import org.medtroniclabs.uhis.data.registration.PrescriptionModel
+import org.medtroniclabs.uhis.data.registration.PrescriptionPredictionResponse
+import org.medtroniclabs.uhis.data.registration.PrescriptionRefillHistoryResponse
+import org.medtroniclabs.uhis.data.registration.QRCodeRequest
+import org.medtroniclabs.uhis.data.registration.QRCodeResponse
+import org.medtroniclabs.uhis.data.registration.RegionSiteModel
+import org.medtroniclabs.uhis.data.registration.RequestPatientDetail
+import org.medtroniclabs.uhis.data.registration.ResponsePatientDetail
+import org.medtroniclabs.uhis.data.registration.SearchModel
+import org.medtroniclabs.uhis.data.registration.SessionEncounterRequest
+import org.medtroniclabs.uhis.data.registration.SessionGraphModel
+import org.medtroniclabs.uhis.data.registration.SessionHistoryResponse
+import org.medtroniclabs.uhis.data.registration.SessionModelResponse
+import org.medtroniclabs.uhis.data.registration.SingleWindowModel
+import org.medtroniclabs.uhis.data.registration.SiteRoleModel
+import org.medtroniclabs.uhis.data.registration.SummaryResponse
+import org.medtroniclabs.uhis.data.registration.TerminateSessionModel
+import org.medtroniclabs.uhis.data.registration.TransferCreateRequest
+import org.medtroniclabs.uhis.data.registration.UserDashboardRequest
+import org.medtroniclabs.uhis.data.registration.UserDashboardResponse
 import org.medtroniclabs.uhis.data.resource.CD4DetailsRequest
 import org.medtroniclabs.uhis.data.resource.CD4DetailsResponse
 import org.medtroniclabs.uhis.data.resource.LabourDeliverySummaryRequest
@@ -182,6 +244,7 @@ import org.medtroniclabs.uhis.ncd.data.PredictionRequest
 import org.medtroniclabs.uhis.ncd.data.PrescriptionNudgeResponse
 import org.medtroniclabs.uhis.ncd.data.RegionSiteResponse
 import org.medtroniclabs.uhis.ncd.data.RegisterCallResponse
+import org.medtroniclabs.uhis.ncd.data.ScreeningPatientResponse
 import org.medtroniclabs.uhis.ncd.data.TermsAndConditionsModel
 import retrofit2.Response
 import javax.inject.Inject
@@ -217,6 +280,8 @@ class ApiHelperImpl @Inject constructor(
 
     override suspend fun fetchMemberAssessmentHistory(request: RequestAllEntities): Response<List<MemberAssessmentHistoryEntity>> =
         apiService.fetchMemberAssessmentHistory(request)
+
+    override suspend fun getMemberDetails(request: RequestMemberDetails): Response<ResponseBody> = apiService.getMemberDetails(request)
 
     override suspend fun getHouseholdAndMembers(request: RequestAllEntities): Response<APIResponse<List<HouseHold>>> = apiService.getHouseholdDetails(request)
 
@@ -307,6 +372,9 @@ class ApiHelperImpl @Inject constructor(
         apiService.getPrescriptionList(request)
 
     override suspend fun removePrescription(request: RemovePrescriptionRequest): Response<APIResponse<Map<String, Any>>> =
+        apiService.removePrescription(request)
+
+    override suspend fun removePrescription(request: PatientPrescriptionModel): Response<APIResponse<ResponseDataModel>> =
         apiService.removePrescription(request)
 
     override suspend fun removeCommunityPrescription(request: List<RemovePrescriptionRequest>): Response<APIResponse<Map<String, Any>>> =
@@ -410,6 +478,8 @@ class ApiHelperImpl @Inject constructor(
         apiService.ncdPregnancyDetails(request)
 
     override suspend fun createPatientVisit(request: PatientVisitRequest): Response<APIResponse<PatientVisitResponse>> = apiService.createPatientVisit(request)
+
+    override suspend fun createPatientVisit(request: MedicalReviewBaseRequest): Response<APIResponse<PatientVisit>> = apiService.createPatientVisit(request)
 
     override suspend fun createNCDMedicalReview(request: MedicalReviewRequestResponse): Response<APIResponse<MedicalReviewResponse>> =
         apiService.createNCDMedicalReview(request)
@@ -666,4 +736,175 @@ class ApiHelperImpl @Inject constructor(
 
     override suspend fun checkRecommendationInvestigations(request: MotherNeonateAncRequest): Response<APIResponse<HashMap<String, Boolean?>?>> =
         apiService.checkRecommendationInvestigations(request)
+
+    override suspend fun searchPatientById(request: PatientDataModel): APIResponse<ArrayList<PatientListResModel>> {
+        // Removed screeningReferral for search patient for all user
+        request.patientFilter = request.patientFilter?.copy(screeningReferral = null)
+        return apiService.searchPatientById(request)
+    }
+
+    override suspend fun patientFollowUpList(request: PatientDataModel): APIResponse<ArrayList<PatientListResModel>> = apiService.patientFollowUpList(request)
+
+    override suspend fun patientsList(request: PatientDataModel): APIResponse<ArrayList<PatientListResModel>> = apiService.patientList(request)
+
+    override suspend fun validatePatient(request: JsonObject): Response<APIResponse<Boolean>> = apiService.validatePatient(request)
+
+    override suspend fun createPatient(request: JsonObject): Response<APIResponse<PatientCreateResponse>> = apiService.createPatient(request)
+
+    override suspend fun validateQRCodeValidation(qrCodeRequest: QRCodeRequest): Response<QRCodeResponse> = apiService.validateQRCodeValidation(qrCodeRequest)
+
+    override suspend fun createScreeningLog(createRequest: JsonObject): Response<ScreeningPatientResponse> = apiService.createScreeningLog(createRequest)
+
+    override suspend fun validateSession(): Response<ResponseBody> = apiService.validateSession()
+
+    override suspend fun getPatientDetails(request: PatientDetailRequest): Response<APIResponse<PatientDetailsModel>> = apiService.getPatientDetails(request)
+
+    override suspend fun getPatientBPLogList(request: ReqBPBGLogList): Response<APIResponse<BPLogListResponse>> = apiService.getPatientBPLogList(request)
+
+    override suspend fun getPatientBloodGlucoseList(request: ReqBPBGLogList): Response<APIResponse<BloodGlucoseListResponse>> =
+        apiService.getPatientBloodGlucoseList(request)
+
+    override suspend fun getSessionGraph(request: AssessmentListRequest): Response<APIResponse<SessionGraphModel>> = apiService.getSessionGraph(request)
+
+    override suspend fun searchMedication(request: MedicationSearchReqModel): Response<APIResponse<ArrayList<PrescriptionModel>>> =
+        apiService.searchMedication(request)
+
+    override suspend fun createPregnancy(request: PregnancyCreateRequest): Response<APIResponse<HashMap<String, Any>>> = apiService.createPregnancy(request)
+
+    override suspend fun updatePregnancy(request: PregnancyCreateRequest): Response<APIResponse<HashMap<String, Any>>> = apiService.updatePregnancy(request)
+
+    override suspend fun getPatientPregnancyDetails(request: PatientPregnancyModel): Response<APIResponse<PregnancyCreateRequest>> =
+        apiService.getPatientPregnancyDetails(request)
+
+    override suspend fun confirmDiagnosis(request: ConfirmDiagnosesRequest): Response<APIResponse<HashMap<String, Any>>> = apiService.confirmDiagnosis(request)
+
+    override suspend fun getMentalHealthDetails(request: HashMap<String, Any>): Response<APIResponse<HashMap<String, Any>>> =
+        apiService.getMentalHealthDetails(request)
+
+    override suspend fun getPatientMedicalReviewSummary(request: MedicalReviewBaseRequest): Response<APIResponse<SummaryResponse>> =
+        apiService.getPatientMedicalReviewSummary(request)
+
+    override suspend fun updateTreatmentPlan(request: HashMap<String, Any>): Response<APIResponse<HashMap<String, Any>>> =
+        apiService.updateTreatmentPlan(request)
+
+    override suspend fun treatmentPlanDetails(request: HashMap<String, Any>): Response<APIResponse<HashMap<String, Any>>> =
+        apiService.treatmentPlanDetails(request)
+
+    override suspend fun getScreeningDetails(request: RequestPatientDetail): Response<APIResponse<ResponsePatientDetail>> =
+        apiService.getScreeningDetails(request)
+
+    override suspend fun createBpLog(request: HashMap<String, Any>): Response<APIResponse<HashMap<String, Any>>> = apiService.createBpLog(request)
+
+    override suspend fun createGlucoseLog(request: HashMap<String, Any>): Response<APIResponse<HashMap<String, Any>>> = apiService.createGlucoseLog(request)
+
+    override suspend fun patientRemove(request: PatientRemoveRequest): Response<APIResponse<HashMap<String, Any>>> = apiService.patientRemove(request)
+
+    override suspend fun clearRedRisk(request: HashMap<String, Any>): Response<APIResponse<HashMap<String, Any>>> = apiService.clearRedRisk(request)
+
+    override suspend fun getInstructions(): Response<APIResponse<InstructionModel>> = apiService.getInstructions()
+
+    override suspend fun updatePregnancyRisk(request: PregnancyRiskUpdate): Response<APIResponse<Boolean>> = apiService.updatePregnancyRisk(request)
+
+    override suspend fun getSessionQuestions(
+        session: Int,
+        age: Int,
+    ): Response<APIResponse<ArrayList<SessionModelResponse>>> = apiService.getSessionQuestions(session, age)
+
+    override suspend fun getPatientFamilyOtherDetails(data: Lifestyle): Response<APIResponse<HashMap<String, Any>>> =
+        apiService.getPatientFamilyOtherDetails(data)
+
+    override suspend fun postSessionTerminate(request: TerminateSessionModel): Response<APIResponse<HashMap<String, Any>>> =
+        apiService.postSessionTerminate(request)
+
+    override suspend fun medicationList(request: MedicationSearchReqModel): Response<APIResponse<ArrayList<PrescriptionModel>>> =
+        apiService.medicationList(request)
+
+    override suspend fun createSingleWindowMR(request: SingleWindowModel): Response<APIResponse<InitialEncounterResponse>> =
+        apiService.createSingleWindowMR(request)
+
+    override suspend fun getBadgeCount(request: BadgeModel): Response<APIResponse<BadgeResponseModel>> = apiService.getBadgeCount(request)
+
+    override suspend fun searchSite(request: RegionSiteModel): Response<APIResponse<ArrayList<RegionSiteResponse>>> = apiService.searchSite(request)
+
+    override suspend fun searchRoleUser(request: SiteRoleModel): Response<APIResponse<ArrayList<SiteRoleResponse>>> = apiService.searchRoleUser(request)
+
+    override suspend fun createPatientTransfer(request: TransferCreateRequest): Response<APIResponse<HashMap<String, Any>>> =
+        apiService.createPatientTransfer(request)
+
+    override suspend fun validatePatientTransfer(request: FillPrescriptionRequest): Response<APIResponse<HashMap<String, Any>>> =
+        apiService.validatePatientTransfer(request)
+
+    override suspend fun sessionCreate(request: SessionEncounterRequest): Response<APIResponse<InitialEncounterResponse>> = apiService.sessionCreate(request)
+
+    override suspend fun createNurseMedicalReview(request: NurseMrRequestModel): Response<APIResponse<NurseCreateResponse>> =
+        apiService.createNurseMedicalReview(request)
+
+    override suspend fun getNursePrescriptionList(request: PatientPrescriptionModel): Response<APIResponse<ArrayList<PrescriptionModel>>> =
+        apiService.getNursePrescriptionList(request)
+
+    override suspend fun updatePrescription(body: RequestBody): Response<APIResponse<ResponseDataModel>> = apiService.updatePrescription(body)
+
+    override suspend fun getPatientPrescriptionHistoryList(request: PatientHistoryRequest): Response<APIResponse<PatientPrescriptionHistoryResponse>> =
+        apiService.getPatientPrescriptionHistoryList(request)
+
+    override suspend fun getPrescriptionPrediction(map: HashMap<String, Any>): Response<APIResponse<PrescriptionPredictionResponse>> =
+        apiService.prescriptionPrediction(map)
+
+    override suspend fun getPatientLabTestHistory(request: PatientHistoryRequest): Response<APIResponse<PatientLabTestHistoryResponse>> =
+        apiService.getPatientLabTestHistory(request)
+
+    override suspend fun getPatientMedicalReviewHistoryList(request: MedicalReviewBaseRequest): Response<APIResponse<PatientMedicalReviewHistoryResponse>> =
+        apiService.getPatientMedicalReviewHistoryList(request)
+
+    override suspend fun getPatientSessionHistoryList(request: MedicalReviewBaseRequest): Response<APIResponse<SessionHistoryResponse>> =
+        apiService.getPatientSessionHistoryList(request)
+
+    override suspend fun getPatientLabTestRecommendation(request: InvestigationReq): Response<APIResponse<List<ResLabTestRecommendations>>> =
+        apiService.getPatientLabTestRecommendation(request)
+
+    override suspend fun getPatientLabTests(
+        request: HashMap<String, Any?>,
+    ): Response<APIResponse<org.medtroniclabs.uhis.data.registration.LabTestListResponse>> = apiService.getPatientLabTests(request)
+
+    override suspend fun searchLabTest(request: SearchModel): Response<APIResponse<ArrayList<LabTestSearchResponse>>> = apiService.searchLabTest(request)
+
+    override suspend fun getLabTestResult(labTestId: Long): Response<APIResponse<ArrayList<HashMap<String, Any>>>> = apiService.getLabTestResult(labTestId)
+
+    override suspend fun getNudgesList(request: HashMap<String, Any>): Response<APIResponse<InvestigationNudgesModel>> = apiService.getNudgesList(request)
+
+    override suspend fun referLabTest(request: HashMap<String, Any>): Response<APIResponse<HashMap<String, Any>>> = apiService.referLabTest(request)
+
+    override suspend fun createLabTestResult(request: HashMap<String, Any>): Response<APIResponse<HashMap<String, Any>>> =
+        apiService.createLabTestResult(request)
+
+    override suspend fun getLabTestResultDetails(request: HashMap<String, Any>): Response<APIResponse<HashMap<String, Any>>> =
+        apiService.getLabTestResultDetails(request)
+
+    override suspend fun removeLabTest(request: HashMap<String, Any>): Response<APIResponse<HashMap<String, Any>>> = apiService.removeLabTest(request)
+
+    override suspend fun reviewLabTestResult(request: HashMap<String, Any>): Response<APIResponse<HashMap<String, Any>>> =
+        apiService.reviewLabTestResult(request)
+
+    override suspend fun updatePatientType(request: HashMap<String, Any>): Response<APIResponse<Boolean>> = apiService.updatePatientType(request)
+
+    override suspend fun getPatientFillPrescriptionList(request: FillPrescriptionRequest): Response<APIResponse<ArrayList<FillPrescriptionListResponse>>> =
+        apiService.getPatientFillPrescriptionList(request)
+
+    override suspend fun fillPrescriptionUpdate(request: FillPrescriptionUpdateRequest): Response<APIResponse<ArrayList<FillMedicineResponse>>> =
+        apiService.fillPrescriptionUpdate(request)
+
+    override suspend fun getPrescriptionRefillHistory(
+        request: org.medtroniclabs.uhis.data.registration.PatientPrescriptionModel,
+    ): Response<APIResponse<ArrayList<PrescriptionRefillHistoryResponse>>> = apiService.getPrescriptionRefillHistory(request)
+
+    override suspend fun getProviderDashboardDetails(request: UserDashboardRequest): Response<APIResponse<UserDashboardResponse>> =
+        apiService.getProviderDashboardDetails(request)
+
+    override suspend fun getTCPatientRecord(request: PatientDetailsFollowUp) = apiService.getTCPatientRecord(request)
+
+    override suspend fun callRegister(request: RegisterCallRequest) = apiService.callRegister(request)
+
+    override suspend fun getCallRegister() = apiService.getCallRegister()
+
+    override suspend fun updateStatusCallRegister(request: UpdatePatientCallRegister) = apiService.updateStatusCallRegister(request)
 }

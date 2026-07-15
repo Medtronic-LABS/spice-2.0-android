@@ -35,6 +35,7 @@ import org.medtroniclabs.uhis.data.MotherPncResponse
 import org.medtroniclabs.uhis.data.NCDUserDashboardRequest
 import org.medtroniclabs.uhis.data.NCDUserDashboardResponse
 import org.medtroniclabs.uhis.data.NeonatePncResponse
+import org.medtroniclabs.uhis.data.PatientPrescriptionModel
 import org.medtroniclabs.uhis.data.PatientStatusRequest
 import org.medtroniclabs.uhis.data.PatientStatusResponse
 import org.medtroniclabs.uhis.data.PncChildMedicalReview
@@ -47,6 +48,7 @@ import org.medtroniclabs.uhis.data.ReferPatientNameNumber
 import org.medtroniclabs.uhis.data.ReferPatientRequest
 import org.medtroniclabs.uhis.data.ReferPatientResult
 import org.medtroniclabs.uhis.data.RemovePrescriptionRequest
+import org.medtroniclabs.uhis.data.ResponseDataModel
 import org.medtroniclabs.uhis.data.SummaryCreateRequest
 import org.medtroniclabs.uhis.data.TbMetaResponse
 import org.medtroniclabs.uhis.data.UnderFiveYearsMetaResponse
@@ -57,6 +59,8 @@ import org.medtroniclabs.uhis.data.history.BirthDetails
 import org.medtroniclabs.uhis.data.history.HistoryEntity
 import org.medtroniclabs.uhis.data.history.MedicalReviewHistory
 import org.medtroniclabs.uhis.data.history.NCDMedicalReviewHistory
+import org.medtroniclabs.uhis.data.medicalreview.ReqBPBGLogList
+import org.medtroniclabs.uhis.data.medicalreview.ResLabTestRecommendations
 import org.medtroniclabs.uhis.data.model.AboveFiveYearsSubmitRequest
 import org.medtroniclabs.uhis.data.model.BpAndWeightRequestModel
 import org.medtroniclabs.uhis.data.model.BpAndWeightResponse
@@ -72,16 +76,24 @@ import org.medtroniclabs.uhis.data.model.HivScreeningRequest
 import org.medtroniclabs.uhis.data.model.HivScreeningResponse
 import org.medtroniclabs.uhis.data.model.HivSummaryResponse
 import org.medtroniclabs.uhis.data.model.LabourDeliverySummaryDetails
+import org.medtroniclabs.uhis.data.model.MedicalReviewBaseRequest
 import org.medtroniclabs.uhis.data.model.MotherNeonateAncRequest
 import org.medtroniclabs.uhis.data.model.MotherNeonatePncRequest
+import org.medtroniclabs.uhis.data.model.PatientDataModel
+import org.medtroniclabs.uhis.data.model.PatientDetailsFollowUp
 import org.medtroniclabs.uhis.data.model.PatientEncounterResponse
+import org.medtroniclabs.uhis.data.model.PatientListResModel
 import org.medtroniclabs.uhis.data.model.PatientTypeCreateRequest
 import org.medtroniclabs.uhis.data.model.PncSubmitResponse
+import org.medtroniclabs.uhis.data.model.RegisterCallRequest
 import org.medtroniclabs.uhis.data.model.RegistrationResponse
 import org.medtroniclabs.uhis.data.model.RequestChangePassword
+import org.medtroniclabs.uhis.data.model.RequestMemberDetails
 import org.medtroniclabs.uhis.data.model.ResponseChangePassword
+import org.medtroniclabs.uhis.data.model.SiteRoleResponse
 import org.medtroniclabs.uhis.data.model.TbHistory
 import org.medtroniclabs.uhis.data.model.TbMedicalReviewCreateRequest
+import org.medtroniclabs.uhis.data.model.UpdatePatientCallRegister
 import org.medtroniclabs.uhis.data.model.ViralLoadRequest
 import org.medtroniclabs.uhis.data.model.ViralLoadResponse
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseHold
@@ -92,10 +104,61 @@ import org.medtroniclabs.uhis.data.performance.CHWPerformanceMonitoring
 import org.medtroniclabs.uhis.data.performance.ChwVillageFilterModel
 import org.medtroniclabs.uhis.data.performance.FilterPreference
 import org.medtroniclabs.uhis.data.performance.PerformanceReportRequest
+import org.medtroniclabs.uhis.data.registration.AssessmentListRequest
+import org.medtroniclabs.uhis.data.registration.BPLogListResponse
+import org.medtroniclabs.uhis.data.registration.BadgeModel
+import org.medtroniclabs.uhis.data.registration.BadgeResponseModel
+import org.medtroniclabs.uhis.data.registration.BloodGlucoseListResponse
+import org.medtroniclabs.uhis.data.registration.ConfirmDiagnosesRequest
+import org.medtroniclabs.uhis.data.registration.FillMedicineResponse
+import org.medtroniclabs.uhis.data.registration.FillPrescriptionListResponse
+import org.medtroniclabs.uhis.data.registration.FillPrescriptionRequest
+import org.medtroniclabs.uhis.data.registration.FillPrescriptionUpdateRequest
+import org.medtroniclabs.uhis.data.registration.InitialEncounterResponse
+import org.medtroniclabs.uhis.data.registration.InstructionModel
+import org.medtroniclabs.uhis.data.registration.InvestigationNudgesModel
+import org.medtroniclabs.uhis.data.registration.InvestigationReq
+import org.medtroniclabs.uhis.data.registration.LabTestSearchResponse
+import org.medtroniclabs.uhis.data.registration.Lifestyle
+import org.medtroniclabs.uhis.data.registration.MedicationSearchReqModel
+import org.medtroniclabs.uhis.data.registration.NurseCreateResponse
+import org.medtroniclabs.uhis.data.registration.NurseMrRequestModel
+import org.medtroniclabs.uhis.data.registration.PatientCreateResponse
+import org.medtroniclabs.uhis.data.registration.PatientDetailsModel
+import org.medtroniclabs.uhis.data.registration.PatientHistoryRequest
+import org.medtroniclabs.uhis.data.registration.PatientLabTestHistoryResponse
+import org.medtroniclabs.uhis.data.registration.PatientMedicalReviewHistoryResponse
+import org.medtroniclabs.uhis.data.registration.PatientPregnancyModel
+import org.medtroniclabs.uhis.data.registration.PatientPrescriptionHistoryResponse
+import org.medtroniclabs.uhis.data.registration.PatientRemoveRequest
+import org.medtroniclabs.uhis.data.registration.PatientVisit
+import org.medtroniclabs.uhis.data.registration.PregnancyCreateRequest
+import org.medtroniclabs.uhis.data.registration.PregnancyRiskUpdate
+import org.medtroniclabs.uhis.data.registration.PrescriptionModel
+import org.medtroniclabs.uhis.data.registration.PrescriptionPredictionResponse
+import org.medtroniclabs.uhis.data.registration.PrescriptionRefillHistoryResponse
+import org.medtroniclabs.uhis.data.registration.QRCodeRequest
+import org.medtroniclabs.uhis.data.registration.QRCodeResponse
+import org.medtroniclabs.uhis.data.registration.RegionSiteModel
+import org.medtroniclabs.uhis.data.registration.RequestPatientDetail
+import org.medtroniclabs.uhis.data.registration.ResponsePatientDetail
+import org.medtroniclabs.uhis.data.registration.SearchModel
+import org.medtroniclabs.uhis.data.registration.SessionEncounterRequest
+import org.medtroniclabs.uhis.data.registration.SessionGraphModel
+import org.medtroniclabs.uhis.data.registration.SessionHistoryResponse
+import org.medtroniclabs.uhis.data.registration.SessionModelResponse
+import org.medtroniclabs.uhis.data.registration.SingleWindowModel
+import org.medtroniclabs.uhis.data.registration.SiteRoleModel
+import org.medtroniclabs.uhis.data.registration.SummaryResponse
+import org.medtroniclabs.uhis.data.registration.TerminateSessionModel
+import org.medtroniclabs.uhis.data.registration.TransferCreateRequest
+import org.medtroniclabs.uhis.data.registration.UserDashboardRequest
+import org.medtroniclabs.uhis.data.registration.UserDashboardResponse
 import org.medtroniclabs.uhis.data.resource.CD4DetailsRequest
 import org.medtroniclabs.uhis.data.resource.CD4DetailsResponse
 import org.medtroniclabs.uhis.data.resource.LabourDeliverySummaryRequest
 import org.medtroniclabs.uhis.data.resource.RequestAllEntities
+import org.medtroniclabs.uhis.data.telesupport.TCPatientDetailsResponse
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
 import org.medtroniclabs.uhis.model.ARTResponse
 import org.medtroniclabs.uhis.model.ArtRequest
@@ -179,13 +242,17 @@ import org.medtroniclabs.uhis.ncd.data.PredictionRequest
 import org.medtroniclabs.uhis.ncd.data.PrescriptionNudgeResponse
 import org.medtroniclabs.uhis.ncd.data.RegionSiteResponse
 import org.medtroniclabs.uhis.ncd.data.RegisterCallResponse
+import org.medtroniclabs.uhis.ncd.data.ScreeningPatientResponse
 import org.medtroniclabs.uhis.ncd.data.TermsAndConditionsModel
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
+import org.medtroniclabs.uhis.data.model.RegisterCallResponse as ModelRegisterCallResponse
 
 interface ApiService {
     @POST("/auth-service/session")
@@ -1043,4 +1110,344 @@ interface ApiService {
     suspend fun getPatientSummaryDetails(
         @Body request: PregnancySummaryRequest,
     ): Response<APIResponse<PregnancyDetailsModel>>
+
+    @POST("/spice-service/patient/search")
+    suspend fun searchPatientById(
+        @Body request: PatientDataModel,
+    ): APIResponse<ArrayList<PatientListResModel>>
+
+    @POST("/spice-service/patient/member-details")
+    suspend fun getMemberDetails(
+        @Body request: RequestMemberDetails,
+    ): Response<ResponseBody>
+
+    @POST("/spice-service/patient/followup-list")
+    suspend fun patientFollowUpList(
+        @Body request: PatientDataModel,
+    ): APIResponse<ArrayList<PatientListResModel>>
+
+    @POST("/spice-service/patient/list")
+    suspend fun patientList(
+        @Body request: PatientDataModel,
+    ): APIResponse<ArrayList<PatientListResModel>>
+
+    @POST("/spice-service/patient/validate-duplicate-nudge")
+    suspend fun validatePatient(
+        @Body request: JsonObject,
+    ): Response<APIResponse<Boolean>>
+
+    @POST("/spice-service/patient/register")
+    suspend fun createPatient(
+        @Body request: JsonObject,
+    ): Response<APIResponse<PatientCreateResponse>>
+
+    @POST("/spice-service/patient/validate-qr-code")
+    suspend fun validateQRCodeValidation(
+        @Body qrCodeRequest: QRCodeRequest,
+    ): Response<QRCodeResponse>
+
+    @POST("/spice-service/patientvisit/create")
+    suspend fun createPatientVisit(
+        @Body request: MedicalReviewBaseRequest,
+    ): Response<APIResponse<PatientVisit>>
+
+    @POST("/spice-service/screeninglog/create")
+    suspend fun createScreeningLog(
+        @Body createRequest: JsonObject,
+    ): Response<ScreeningPatientResponse>
+
+    @GET("/user-service/user/validate")
+    suspend fun validateSession(): Response<ResponseBody>
+
+    @POST("/spice-service/patient/patientDetails")
+    suspend fun getPatientDetails(
+        @Body request: PatientDetailRequest,
+    ): Response<APIResponse<PatientDetailsModel>>
+
+    @POST("/spice-service/bplog/list")
+    suspend fun getPatientBPLogList(
+        @Body request: ReqBPBGLogList,
+    ): Response<APIResponse<BPLogListResponse>>
+
+    @POST("/spice-service/glucoselog/list")
+    suspend fun getPatientBloodGlucoseList(
+        @Body request: ReqBPBGLogList,
+    ): Response<APIResponse<BloodGlucoseListResponse>>
+
+    @POST("/spice-service/para-counselling/graph-details")
+    suspend fun getSessionGraph(
+        @Body request: AssessmentListRequest,
+    ): Response<APIResponse<SessionGraphModel>>
+
+    @POST("/admin-service/medication/search")
+    suspend fun searchMedication(
+        @Body request: MedicationSearchReqModel,
+    ): Response<APIResponse<ArrayList<PrescriptionModel>>>
+
+    @POST("/spice-service/patient/pregnancy-details/create")
+    suspend fun createPregnancy(
+        @Body request: PregnancyCreateRequest,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @POST("/spice-service/patient/pregnancy-details/update")
+    suspend fun updatePregnancy(
+        @Body request: PregnancyCreateRequest,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @POST("/spice-service/patient/pregnancy-details/info")
+    suspend fun getPatientPregnancyDetails(
+        @Body request: PatientPregnancyModel,
+    ): Response<APIResponse<PregnancyCreateRequest>>
+
+    @PATCH("/spice-service/patient/confirm-diagnosis/update")
+    suspend fun confirmDiagnosis(
+        @Body request: ConfirmDiagnosesRequest,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @POST("/spice-service/mentalhealth/details")
+    suspend fun getMentalHealthDetails(
+        @Body request: HashMap<String, Any>,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @POST("/spice-service/medical-review/summary")
+    suspend fun getPatientMedicalReviewSummary(
+        @Body request: MedicalReviewBaseRequest,
+    ): Response<APIResponse<SummaryResponse>>
+
+    @PUT("/spice-service/patient-treatment-plan/update")
+    suspend fun updateTreatmentPlan(
+        @Body request: HashMap<String, Any>,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @POST("/spice-service/patient-treatment-plan/details")
+    suspend fun treatmentPlanDetails(
+        @Body request: HashMap<String, Any>,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @POST("/spice-service/patient/get-by-id")
+    suspend fun getScreeningDetails(
+        @Body request: RequestPatientDetail,
+    ): Response<APIResponse<ResponsePatientDetail>>
+
+    @POST("/spice-service/assessment/bplog-create")
+    suspend fun createBpLog(
+        @Body request: HashMap<String, Any>,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @POST("/spice-service/assessment/glucoselog-create")
+    suspend fun createGlucoseLog(
+        @Body request: HashMap<String, Any>,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @POST("/spice-service/patient/remove")
+    suspend fun patientRemove(
+        @Body request: PatientRemoveRequest,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @POST("/spice-service/patient/red-risk/update")
+    suspend fun clearRedRisk(
+        @Body request: HashMap<String, Any>,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @GET("/spice-service/medical-review/get-instructions")
+    suspend fun getInstructions(): Response<APIResponse<InstructionModel>>
+
+    @PATCH("/spice-service/patient/pregnancy-anc-risk/update")
+    suspend fun updatePregnancyRisk(
+        @Body request: PregnancyRiskUpdate,
+    ): Response<APIResponse<Boolean>>
+
+    @GET("/spice-service/para-counselling/get-subjective-questions")
+    suspend fun getSessionQuestions(
+        @Query("session") session: Int,
+        @Query("age") age: Int,
+    ): Response<APIResponse<ArrayList<SessionModelResponse>>>
+
+    @POST("/spice-service/patient/family-other-details")
+    suspend fun getPatientFamilyOtherDetails(
+        @Body data: Lifestyle,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @POST("/spice-service/para-counselling/session-terminate")
+    suspend fun postSessionTerminate(
+        @Body request: TerminateSessionModel,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @POST("/admin-service/medication/recommendation")
+    suspend fun medicationList(
+        @Body request: MedicationSearchReqModel,
+    ): Response<APIResponse<ArrayList<PrescriptionModel>>>
+
+    @POST("/spice-service/medical-review/create")
+    suspend fun createSingleWindowMR(
+        @Body request: SingleWindowModel,
+    ): Response<APIResponse<InitialEncounterResponse>>
+
+    @POST("/spice-service/medical-review/count")
+    suspend fun getBadgeCount(
+        @Body request: BadgeModel,
+    ): Response<APIResponse<BadgeResponseModel>>
+
+    @POST("/admin-service/site/country/site-list")
+    suspend fun searchSite(
+        @Body request: RegionSiteModel,
+    ): Response<APIResponse<ArrayList<RegionSiteResponse>>>
+
+    @POST("/user-service/user/role-user-list")
+    suspend fun searchRoleUser(
+        @Body request: SiteRoleModel,
+    ): Response<APIResponse<ArrayList<SiteRoleResponse>>>
+
+    @POST("/spice-service/patient-transfer/create")
+    suspend fun createPatientTransfer(
+        @Body request: TransferCreateRequest,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @POST("/spice-service/patient-transfer/validate")
+    suspend fun validatePatientTransfer(
+        @Body request: FillPrescriptionRequest,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @POST("/spice-service/para-counselling/session-create")
+    suspend fun sessionCreate(
+        @Body request: SessionEncounterRequest,
+    ): Response<APIResponse<InitialEncounterResponse>>
+
+    @POST("/spice-service/medical-review/create")
+    suspend fun createNurseMedicalReview(
+        @Body request: NurseMrRequestModel,
+    ): Response<APIResponse<NurseCreateResponse>>
+
+    @POST("/spice-service/prescription/list")
+    suspend fun getNursePrescriptionList(
+        @Body request: PatientPrescriptionModel,
+    ): Response<APIResponse<ArrayList<PrescriptionModel>>>
+
+    @PUT("/spice-service/prescription/remove")
+    suspend fun removePrescription(
+        @Body request: PatientPrescriptionModel,
+    ): Response<APIResponse<ResponseDataModel>>
+
+    @POST("/spice-service/prescription/update")
+    suspend fun updatePrescription(
+        @Body body: RequestBody,
+    ): Response<APIResponse<ResponseDataModel>>
+
+    @POST("/spice-service/prescription-history/list")
+    suspend fun getPatientPrescriptionHistoryList(
+        @Body request: PatientHistoryRequest,
+    ): Response<APIResponse<PatientPrescriptionHistoryResponse>>
+
+    @POST("/spice-service/prescription/prediction")
+    suspend fun prescriptionPrediction(
+        @Body map: HashMap<String, Any>,
+    ): Response<APIResponse<PrescriptionPredictionResponse>>
+
+    @POST("/spice-service/patient-labtest/list")
+    suspend fun getPatientLabTestHistory(
+        @Body request: PatientHistoryRequest,
+    ): Response<APIResponse<PatientLabTestHistoryResponse>>
+
+    @POST("/spice-service/medical-review/list")
+    suspend fun getPatientMedicalReviewHistoryList(
+        @Body request: MedicalReviewBaseRequest,
+    ): Response<APIResponse<PatientMedicalReviewHistoryResponse>>
+
+    @POST("/spice-service/para-counselling/history")
+    suspend fun getPatientSessionHistoryList(
+        @Body request: MedicalReviewBaseRequest,
+    ): Response<APIResponse<SessionHistoryResponse>>
+
+    @POST("/admin-service/lab-test-customization/recommendation")
+    suspend fun getPatientLabTestRecommendation(
+        @Body countryId: InvestigationReq,
+    ): Response<APIResponse<List<ResLabTestRecommendations>>>
+
+    @POST("/spice-service/patient-labtest/list")
+    suspend fun getPatientLabTests(
+        @Body request: HashMap<String, Any?>,
+    ): Response<APIResponse<org.medtroniclabs.uhis.data.registration.LabTestListResponse>>
+
+    @POST("/spice-service/patient-labtest/search")
+    suspend fun searchLabTest(
+        @Body request: SearchModel,
+    ): Response<APIResponse<ArrayList<LabTestSearchResponse>>>
+
+    @GET("/spice-service/patient-labtest/result/list/{labTestId}")
+    suspend fun getLabTestResult(
+        @Path("labTestId") labTestId: Long,
+    ): Response<APIResponse<ArrayList<HashMap<String, Any>>>>
+
+    @POST("/spice-service/patient-labtest/prediction")
+    suspend fun getNudgesList(
+        @Body request: HashMap<String, Any>,
+    ): Response<APIResponse<InvestigationNudgesModel>>
+
+    @POST("/spice-service/patient-labtest/create")
+    suspend fun referLabTest(
+        @Body request: HashMap<String, Any>,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @POST("/spice-service/patient-labtest/result/create")
+    suspend fun createLabTestResult(
+        @Body request: HashMap<String, Any>,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @POST("/spice-service/patient-labtest/result/details")
+    suspend fun getLabTestResultDetails(
+        @Body request: HashMap<String, Any>,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @POST("/spice-service/patient-labtest/remove")
+    suspend fun removeLabTest(
+        @Body request: HashMap<String, Any>,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @POST("/spice-service/patient-labtest/review")
+    suspend fun reviewLabTestResult(
+        @Body request: HashMap<String, Any>,
+    ): Response<APIResponse<HashMap<String, Any>>>
+
+    @PUT("/spice-service/medical-review/update-prescribed-site")
+    suspend fun updatePatientType(
+        @Body request: HashMap<String, Any>,
+    ): Response<APIResponse<Boolean>>
+
+    @POST("/spice-service/fill-prescription/update")
+    suspend fun fillPrescriptionUpdate(
+        @Body request: FillPrescriptionUpdateRequest,
+    ): Response<APIResponse<ArrayList<FillMedicineResponse>>>
+
+    @POST("/spice-service/fill-prescription/list")
+    suspend fun getPatientFillPrescriptionList(
+        @Body request: FillPrescriptionRequest,
+    ): Response<APIResponse<ArrayList<FillPrescriptionListResponse>>>
+
+    @POST("/spice-service/prescription/refill-history")
+    suspend fun getPrescriptionRefillHistory(
+        @Body request: org.medtroniclabs.uhis.data.registration.PatientPrescriptionModel,
+    ): Response<APIResponse<ArrayList<PrescriptionRefillHistoryResponse>>>
+
+    @POST("/spice-service/screening/dashboard-count")
+    suspend fun getProviderDashboardDetails(
+        @Body request: UserDashboardRequest,
+    ): Response<APIResponse<UserDashboardResponse>>
+
+    @POST("/spice-service/tele-support/patient-record")
+    suspend fun getTCPatientRecord(
+        @Body request: PatientDetailsFollowUp,
+    ): Response<APIResponse<TCPatientDetailsResponse>>
+
+    @POST("spice-service/call-register")
+    suspend fun callRegister(
+        @Body request: RegisterCallRequest,
+    ): Response<APIResponse<ModelRegisterCallResponse>>
+
+    @GET("spice-service/call-register")
+    suspend fun getCallRegister(): Response<APIResponse<ModelRegisterCallResponse>>
+
+    @PUT("spice-service/call-register")
+    suspend fun updateStatusCallRegister(
+        @Body request: UpdatePatientCallRegister,
+    ): Response<APIResponse<UpdatePatientCallRegister>>
 }

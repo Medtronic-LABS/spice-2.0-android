@@ -11,7 +11,7 @@ import androidx.fragment.app.activityViewModels
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.Episiotomy
+import org.medtroniclabs.uhis.common.DefinedParams.EPISIOTOMY
 import org.medtroniclabs.uhis.common.DefinedParams.None
 import org.medtroniclabs.uhis.common.DefinedParams.StateOfPerineum
 import org.medtroniclabs.uhis.common.DefinedParams.Tear
@@ -242,7 +242,7 @@ class MotherFragment : BaseFragment() {
         if (selectedID.toString() == DefinedParams.Tear) {
             binding.groupTear.isVisible = true
             initializeTearLabel()
-        } else if (selectedID.toString() == Episiotomy || selectedID.toString() == None) {
+        } else if (selectedID.toString() == EPISIOTOMY || selectedID.toString() == None) {
             binding.groupTear.isVisible = false
             viewModel.perineumStateMap[Tear] = ""
         } else {

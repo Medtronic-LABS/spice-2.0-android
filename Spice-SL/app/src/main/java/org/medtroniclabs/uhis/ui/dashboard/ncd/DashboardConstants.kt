@@ -27,4 +27,15 @@ object DashboardConstants {
     const val CARD_INVESTIGATED = "investigated"
     const val CARD_LIFESTYLE = "lifestyle"
     const val CARD_PSYCHOLOGICAL = "psychological"
+
+    const val CARD_NCD_SCREENING = "ncd_screening_first_service"
+    const val CARD_NCD_REFERRED_FOLLOWUP = "ncd_referred_followup"
+    const val CARD_NCD_FOLLOW_UP_ASSESSMENT = "ncd_follow_up_assessment"
+    const val CARD_LINKED_TO_CARE = "linked_to_care"
+    const val CARD_TOTAL_NCD_SERVICES = "total_ncd_services"
+    const val CARD_TOTAL_EYE_SCREENING = "total_eye_screening"
+    const val CARD_CATARACT_SCREENING = "cataract_screening"
+    const val CARD_NCD_IN_CATARACT_CAMP = "ncd_in_cataract_camp"
+    const val CARD_REFERRED_FOR_OPERATION = "referred_for_operation"
+    const val CARD_GLASSES_SOLD = "glasses_sold"
 }

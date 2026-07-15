@@ -5,9 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import org.medtroniclabs.uhis.appextensions.gone
+import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CVDRiskCalculator
-import org.medtroniclabs.uhis.common.SecuredPreference
+import org.medtroniclabs.uhis.common.CommonUtils
+import org.medtroniclabs.uhis.common.DateUtils
+import org.medtroniclabs.uhis.common.EntityMapper
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
 import org.medtroniclabs.uhis.databinding.FragmentAssessmentBinding
 import org.medtroniclabs.uhis.formgeneration.FormGenerator
@@ -20,8 +26,15 @@ import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseFragment
 import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ANY_NEW_OR_WORSENING_SYMPTOMS
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.EYE_CARE
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HAS_SYMPTOMS
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_DIAGNOSED_BP
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_DIAGNOSED_GLUCOSE
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ID_NCD_SYMPTOMS_MEDICATION
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.IS_REGULAR_SMOKER
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NAME
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NEW_WORSENING_SYMPTOMS
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.SYMPTOMS_LOG
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ncd
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.rootSuffix
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.ReferralResultGenerator
@@ -30,7 +43,7 @@ import org.medtroniclabs.uhis.ui.assessment.viewmodel.AssessmentViewModel
 import org.medtroniclabs.uhis.ui.common.GeneralInfoDialog
 
 @AndroidEntryPoint
-class BDNCDAssessmentFragment() : BaseFragment(), FormEventListener {
+class BDNCDAssessmentFragment : BaseFragment(), FormEventListener {
     private lateinit var binding: FragmentAssessmentBinding
 
     private lateinit var formGenerator: FormGenerator
@@ -64,7 +77,6 @@ class BDNCDAssessmentFragment() : BaseFragment(), FormEventListener {
 
     private fun getFormDataForWorkflow() {
         viewModel.getFormData(MenuConstants.NCD_MENU_ID)
-        viewModel.getRiskEntityList()
         viewModel.getNearestHealthFacility()
     }
 
@@ -79,7 +91,7 @@ class BDNCDAssessmentFragment() : BaseFragment(), FormEventListener {
             binding.llForm,
             this,
             binding.scrollView,
-            translate = SecuredPreference.getIsTranslationEnabled(),
+            translate = isTranslationEnabled,
         ) { map, id ->
             when (id) {
                 Screening.Weight, Screening.Height -> {
@@ -103,12 +115,14 @@ class BDNCDAssessmentFragment() : BaseFragment(), FormEventListener {
                 ResourceState.LOADING -> {
                     showProgress()
                 }
+
                 ResourceState.SUCCESS -> {
                     hideProgress()
                     resourceState.data?.let { data ->
                         formGenerator.populateViews(data.formLayout)
                     }
                 }
+
                 ResourceState.ERROR -> {
                     hideProgress()
                 }
@@ -131,8 +145,9 @@ class BDNCDAssessmentFragment() : BaseFragment(), FormEventListener {
         formLayout: FormLayout,
         resultMap: Any?,
     ) {
+        val inputData = EntityMapper.mapToSignsAndSymptomsEntity(formLayout.optionsList)
         CheckBoxDialog
-            .newInstance(id, resultMap) { resultMap ->
+            .newInstance(id, resultMap, inputData = inputData) { resultMap ->
                 formGenerator.validateCheckboxDialogue(id, formLayout, resultMap)
                 hideOrShowAnyNewWorseningSymptomView(resultMap)
             }.show(childFragmentManager, CheckBoxDialog.TAG)
@@ -178,25 +193,83 @@ class BDNCDAssessmentFragment() : BaseFragment(), FormEventListener {
             }
 
             viewModel.memberDetailsLiveData.value?.data?.let { memberDetail ->
-                result?.second?.let {
-                    val ncdMap = it[ncd] as HashMap<String, Any>
-                    val bpResult = AssessmentUtil.calculateAverageBloodPressure(ncdMap)
-                    val bgResult = AssessmentUtil.addDateAndTimeForGlucose(ncdMap)
-                    val symptomList = AssessmentUtil.getSymptomsList(ncdMap)
+                result?.second?.let { assessmentMap ->
+                    lifecycleScope.launch {
+                        val ncdMap = assessmentMap[ncd] as HashMap<String, Any>
+                        val bpResult = AssessmentUtil.calculateAverageBloodPressure(ncdMap)
+                        val bgResult = AssessmentUtil.addDateAndTimeForGlucose(ncdMap)
+                        val symptomList = AssessmentUtil.getSymptomsList(ncdMap)
+                        viewModel.isFollowupVisit = viewModel.getLastServiceHistory(MenuConstants.NCD_MENU_ID) != null
 
-                    // Compute Referral Logic
-                    val referralResult = ReferralResultGenerator().computeReferralResultForBDNCD(ncdMap, bpResult, bgResult, symptomList)
+                        val referralResult =
+                            ReferralResultGenerator().computeReferralResultForBDNCD(
+                                ncdMap,
+                                bpResult,
+                                bgResult,
+                                symptomList,
+                                viewModel.isFollowupVisit,
+                                useNcdRiskAlgorithm = viewModel.isFollowupVisit,
+                            )
 
-                    // Compute CVD Risk
-                    CVDRiskCalculator.calculateCVDRiskFactor(ncdMap, viewModel.riskClassificationModels, memberDetail.dateOfBirth, memberDetail.gender)
+                        val riskModels = viewModel.loadRiskClassificationModels()
+                        CVDRiskCalculator.calculateCVDRiskFactor(
+                            ncdMap,
+                            riskModels,
+                            memberDetail.dateOfBirth,
+                            memberDetail.gender,
+                        )
 
-                    viewModel.saveAssessment(serverData, it, referralResult, viewModel.menuId)
+                        viewModel.saveAssessment(serverData, assessmentMap, referralResult, viewModel.menuId)
+                    }
                 }
             }
         }
     }
 
     override fun onRenderingComplete() {
+        handleDateOfBirth()
+        lifecycleScope.launch {
+            if (viewModel.getLastServiceHistory(MenuConstants.NCD_MENU_ID) != null) {
+                formGenerator.getViewByTag(ID_NCD_SYMPTOMS_MEDICATION + rootSuffix)?.visible()
+                formGenerator.getViewByTag(ID_DIAGNOSED_BP + rootSuffix)?.gone()
+                formGenerator.getViewByTag(ID_DIAGNOSED_GLUCOSE + rootSuffix)?.gone()
+                // Smoking history is captured on the first visit only; lock it from the 2nd visit onwards.
+                formGenerator.getViewByTag(IS_REGULAR_SMOKER + rootSuffix)?.gone()
+            } else if (CommonUtils.isFoPoOrChcp()) {
+                // FO/PO and CHCP users see the symptoms question only from the 2nd visit onwards,
+                // so hide the section on the first visit.
+                formGenerator.getViewByTag(SYMPTOMS_LOG + rootSuffix)?.gone()
+                formGenerator.getViewByTag(HAS_SYMPTOMS + rootSuffix)?.gone()
+            }
+            prefillHeightAndWeightFromObservations()
+        }
+    }
+
+    private suspend fun prefillHeightAndWeightFromObservations() {
+        val (height, weight) = viewModel.getLatestHeightWeightFromServiceHistory() ?: return
+        AssessmentUtil.prefillHeightAndWeight(
+            formGenerator,
+            height,
+            weight,
+            isHeightReadOnly = height != null,
+        )
+        viewModel.renderBMIValue(requireContext(), formGenerator, formGenerator.getResultMap())
+    }
+
+    /**
+     * Hide eye care section if the member's age is less than 35 years.
+     * CHCP users never see the eye care section in NCD, regardless of age.
+     */
+    private fun handleDateOfBirth() {
+        val age = DateUtils.calculateAge(viewModel.selectedMemberDob)
+        if (age < 35 || CommonUtils.isCHCP()) {
+            formGenerator.getServerData()?.let { serverData ->
+                formGenerator.getViewByTag(EYE_CARE + rootSuffix)?.gone()
+                serverData.filter { it.family == EYE_CARE }.forEach {
+                    formGenerator.getViewByTag(it.id + rootSuffix)?.gone()
+                }
+            }
+        }
     }
 
     override fun onUpdateInstruction(
@@ -224,5 +297,8 @@ class BDNCDAssessmentFragment() : BaseFragment(), FormEventListener {
         serverData: List<FormLayout>?,
         resultHashMap: HashMap<String, Any>,
     ) {
+    }
+
+    override fun onQRScanRequested() {
     }
 }

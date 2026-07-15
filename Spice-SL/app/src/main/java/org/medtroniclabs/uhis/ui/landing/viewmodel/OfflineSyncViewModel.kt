@@ -1,6 +1,5 @@
 package org.medtroniclabs.uhis.ui.landing.viewmodel
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -8,43 +7,39 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.DateUtils.DATE_TIME_DISPLAY_FORMAT
 import org.medtroniclabs.uhis.common.SecuredPreference
-import org.medtroniclabs.uhis.data.offlinesync.model.UnAssignedHouseholdMemberDetail
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineConstant
 import org.medtroniclabs.uhis.di.IoDispatcher
 import org.medtroniclabs.uhis.model.landing.OfflineSyncEntityDetail
 import org.medtroniclabs.uhis.network.utils.ConnectivityManager
 import org.medtroniclabs.uhis.repo.AssessmentRepository
-// import org.medtroniclabs.uhis.repo.CommunityProfileRepository
-// import org.medtroniclabs.uhis.repo.FollowUpRepository
+import org.medtroniclabs.uhis.repo.FollowUpRepository
 import org.medtroniclabs.uhis.repo.HouseHoldRepository
-import org.medtroniclabs.uhis.repo.HouseholdMemberRepository
 import org.medtroniclabs.uhis.repo.OfflineSyncRepository
-// import org.medtroniclabs.uhis.repo.RxBuddyRepository
-import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.ui.BaseViewModel
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class OfflineSyncViewModel @Inject constructor(
     private val houseHoldRepository: HouseHoldRepository,
     private val assessmentRepository: AssessmentRepository,
-    // private val followUpRepository: FollowUpRepository,
-    private val householdMemberRepository: HouseholdMemberRepository,
+    private val followUpRepository: FollowUpRepository,
     // private val communityProfileRepository: CommunityProfileRepository,
     private val offlineSyncRepository: OfflineSyncRepository,
     // private val rxBuddyRepository: RxBuddyRepository,
-    @IoDispatcher override var dispatcherIO: CoroutineDispatcher,
+    @param:IoDispatcher override var dispatcherIO: CoroutineDispatcher,
 ) : BaseViewModel(dispatcherIO) {
     private val entityList = mutableListOf(
         OfflineSyncEntityDetail(R.string.households, 0),
         OfflineSyncEntityDetail(R.string.household_members, 0),
         OfflineSyncEntityDetail(R.string.assessments, 0),
-        // OfflineSyncEntityDetail("Follow-Up", 0),
+        OfflineSyncEntityDetail(R.string.follow_up, 0),
         // OfflineSyncEntityDetail("Community Profile", 0),
         // OfflineSyncEntityDetail("RxBuddy Register", 0),
         // OfflineSyncEntityDetail("RxBuddy FollowUp", 0),
@@ -60,14 +55,10 @@ class OfflineSyncViewModel @Inject constructor(
     val postRequestIdsLiveData = MutableLiveData<List<String>>()
     val statusLiveData = MutableLiveData<Pair<Boolean, String?>>()
 
-    val unAssignedMembers: LiveData<List<UnAssignedHouseholdMemberDetail>>
-
     private var progressJob: Job? = null
 
     init {
         getLastSyncedAt()
-
-        unAssignedMembers = householdMemberRepository.getUnAssignedHouseholdMember()
 
         unSyncedCountLiveData.value = entityList
         getUnSyncedCount()
@@ -109,7 +100,7 @@ class OfflineSyncViewModel @Inject constructor(
             updateSyncedCount(0, houseHoldRepository.getUnSyncedHouseholdCount())
             updateSyncedCount(1, houseHoldRepository.getUnSyncedHouseholdMemberCount())
             updateSyncedCount(2, assessmentRepository.getUnSyncedAssessmentCount())
-            // updateSyncedCount(3, followUpRepository.getUnSyncedFollowUpCount())
+            updateSyncedCount(3, followUpRepository.getUnSyncedFollowUpCount())
             // updateSyncedCount(4, communityProfileRepository.getUnSyncedCommunityProfileCount())
             // updateSyncedCount(5, rxBuddyRepository.getUnSyncedRxBuddyRegisterCount())
             // updateSyncedCount(6, rxBuddyRepository.getUnSyncedRxBuddyFollowUpCount())
@@ -117,21 +108,18 @@ class OfflineSyncViewModel @Inject constructor(
     }
 
     fun startUploadingData(minutes: Long = 3) {
+        if (isPostOfflineSyncAlreadyRunning()) return
         viewModelScope.launch(dispatcherIO) {
             startProgress(minutes)
             val requestIds = offlineSyncRepository.postOfflineUnSyncedChangesWithMutex(OfflineConstant.SYNC_MODE_MANUAL)
-            if (requestIds != null) {
-                if (requestIds.isNotEmpty()) { // Has some changes in local
-                    SecuredPreference.saveStringArray(
-                        SecuredPreference.EnvironmentKey.OFFLINE_SYNC_REQUEST_ID.name,
-                        requestIds.toTypedArray(),
-                    )
-                    postRequestIdsLiveData.postValue(requestIds!!)
-                } else { // no changes in local. Need to download data from server.
-                    postRequestIdsLiveData.postValue(listOf())
-                }
-            } else { // Post local change api has failed
-                syncCompleted()
+            if (requestIds.isNotEmpty()) { // Has some changes in local
+                SecuredPreference.saveStringArray(
+                    SecuredPreference.EnvironmentKey.OFFLINE_SYNC_REQUEST_ID.name,
+                    requestIds.toTypedArray(),
+                )
+                postRequestIdsLiveData.postValue(requestIds)
+            } else { // no changes in local. Need to download data from server.
+                postRequestIdsLiveData.postValue(listOf())
             }
         }
     }
@@ -142,12 +130,12 @@ class OfflineSyncViewModel @Inject constructor(
         progressJob = viewModelScope.launch(dispatcherIO) {
             repeat(90) {
                 progressLiveData.postValue(it)
-                delay(initialCounterGap)
+                delay(initialCounterGap.milliseconds)
             }
 
             repeat(10) {
                 progressLiveData.postValue(90 + it)
-                delay(retryCounterGap)
+                delay(retryCounterGap.milliseconds)
             }
         }
     }
@@ -161,4 +149,6 @@ class OfflineSyncViewModel @Inject constructor(
         progressJob?.cancel()
         statusLiveData.postValue(Pair(isSuccess, message))
     }
+
+    fun isPostOfflineSyncAlreadyRunning() = offlineSyncRepository.isPostOfflineSyncAlreadyRunning()
 }

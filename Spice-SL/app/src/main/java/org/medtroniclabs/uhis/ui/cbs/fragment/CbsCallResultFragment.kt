@@ -16,8 +16,8 @@ import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.postError
 import org.medtroniclabs.uhis.common.CommonUtils.getOptionMap
 import org.medtroniclabs.uhis.common.DefinedParams
+import org.medtroniclabs.uhis.common.DefinedParams.PEER_SUPERVISOR
 import org.medtroniclabs.uhis.common.DefinedParams.PHU
-import org.medtroniclabs.uhis.common.DefinedParams.PeerSupervisor
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.CbsCallResult
 import org.medtroniclabs.uhis.data.CbsFollowUp
@@ -28,7 +28,6 @@ import org.medtroniclabs.uhis.formgeneration.model.FormLayout
 import org.medtroniclabs.uhis.formgeneration.ui.SingleSelectionCustomView
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.assessment.viewmodel.AssessmentViewModel
-import org.medtroniclabs.uhis.ui.followup.fragment.CallResultDialogFragment
 
 class CbsCallResultFragment : BottomSheetDialogFragment(), View.OnClickListener {
     private lateinit var binding: FragmentBottomCallResultDialogBinding
@@ -95,7 +94,7 @@ class CbsCallResultFragment : BottomSheetDialogFragment(), View.OnClickListener 
 
     private fun initView() {
         val type = arguments?.getString(DefinedParams.type)
-        viewModel.callResultHashMap[DefinedParams.CallResult] =
+        viewModel.callResultHashMap[DefinedParams.CALL_RESULT] =
             if (!type.isNullOrBlank() &&
                 type.equals(
                     DefinedParams.ps,
@@ -108,12 +107,12 @@ class CbsCallResultFragment : BottomSheetDialogFragment(), View.OnClickListener 
             }
         getCallResultData().let {
             val view = SingleSelectionCustomView(binding.root.context)
-            view.tag = CallResultDialogFragment.TAG
+            view.tag = TAG
             view.addViewElements(
                 it,
                 false,
                 viewModel.callResultHashMap,
-                Pair(DefinedParams.CallResult, null),
+                Pair(DefinedParams.CALL_RESULT, null),
                 FormLayout(viewType = "", id = "", title = "", visibility = "", optionsList = null),
                 callResultSelectionCallback,
             )
@@ -138,7 +137,7 @@ class CbsCallResultFragment : BottomSheetDialogFragment(), View.OnClickListener 
     private var callResultSelectionCallback: ((selectedID: Any?, elementId: Pair<String, String?>, formLayout: FormLayout, name: String?) -> Unit)? =
         { selectedID, _, _, _ ->
             val newSelection = selectedID as String
-            viewModel.callResultHashMap[DefinedParams.CallResult] = newSelection
+            viewModel.callResultHashMap[DefinedParams.CALL_RESULT] = newSelection
         }
 
     override fun onClick(v: View?) {
@@ -164,7 +163,7 @@ class CbsCallResultFragment : BottomSheetDialogFragment(), View.OnClickListener 
             val typeValue = arguments?.getString(DefinedParams.type)?.trim()?.lowercase()
             val isPsType = typeValue.equals(DefinedParams.ps, true)
 
-            val selectedResult = viewModel.callResultHashMap[DefinedParams.CallResult] as? String
+            val selectedResult = viewModel.callResultHashMap[DefinedParams.CALL_RESULT] as? String
 
             val followUpStatus = when {
                 !selectedResult.isNullOrBlank() &&
@@ -172,14 +171,14 @@ class CbsCallResultFragment : BottomSheetDialogFragment(), View.OnClickListener 
                         getString(if (isPsType) R.string.informed_ps else R.string.informed_phu),
                         true,
                     ) -> FollowUpCallStatus.SUCCESSFUL
-                else -> FollowUpCallStatus.UNSUCCESSFUL
+                else -> FollowUpCallStatus.UN_SUCCESSFUL
             }
 
-            val psAttempts = callResults.followUpDetails.filter { it.reason == PeerSupervisor }.size + 1
+            val psAttempts = callResults.followUpDetails.filter { it.reason == PEER_SUPERVISOR }.size + 1
             val phuAttempts = callResults.followUpDetails.filter { it.reason == PHU }.size + 1
 
             val followUpReason = if (isPsType) {
-                Pair(PeerSupervisor, psAttempts)
+                Pair(PEER_SUPERVISOR, psAttempts)
             } else {
                 Pair(PHU, phuAttempts)
             }

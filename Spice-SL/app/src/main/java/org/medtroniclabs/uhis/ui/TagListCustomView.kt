@@ -12,7 +12,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.DefinedParams.ENABLED
-import org.medtroniclabs.uhis.common.DefinedParams.Other
+import org.medtroniclabs.uhis.common.DefinedParams.OTHER
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.databinding.CustomLayoutTagviewComponentBinding
@@ -42,7 +42,7 @@ class TagListCustomView(
         chipGroup.removeAllViews()
         chipItemList.forEach { data ->
             getChipText(data)?.let { chipData ->
-                if (!isOtherNotStartWith && chipData.second.startsWith(Other, ignoreCase = true)) {
+                if (!isOtherNotStartWith && chipData.second.startsWith(OTHER, ignoreCase = true)) {
                     otherChipBinding(data, chipData, selectedChipItemList)
                 } else {
                     chipBinding(data, chipData, selectedChipItemList, singleSelectionTypeMap)
@@ -175,7 +175,7 @@ class TagListCustomView(
                 }
             }
         }
-        chipGroup.findViewWithTag<LinearLayout>(Other)?.let { chipLayout ->
+        chipGroup.findViewWithTag<LinearLayout>(OTHER)?.let { chipLayout ->
             chipLayout.getChildAt(1)?.tag?.let {
                 chipLayout.getChildAt(0)?.let { view ->
                     (view as AppCompatTextView).performClick()
@@ -264,7 +264,7 @@ class TagListCustomView(
     }
 
     private fun uncheckOtherChip(chipData: Pair<String?, String>) {
-        chipGroup.findViewWithTag<LinearLayout>(Other)?.let { chipLayout ->
+        chipGroup.findViewWithTag<LinearLayout>(OTHER)?.let { chipLayout ->
             val tvOther = chipLayout.getChildAt(0)
             val tagView = chipLayout.getChildAt(1)
             tagView?.tag?.let {
@@ -281,7 +281,7 @@ class TagListCustomView(
         selectedChipItemList: List<ChipViewItemModel>?,
     ) {
         val binding = OtherChipLayoutBinding.inflate(LayoutInflater.from(context))
-        binding.root.tag = Other
+        binding.root.tag = OTHER
         binding.tvOther.text = getChipViewText(chipData)
         binding.tvOther.tag = data
         binding.tvOther.setOnClickListener {
@@ -298,7 +298,7 @@ class TagListCustomView(
         selectedChipItemList?.let { chipItemList ->
             val dataValue = getChipText(data)
             dataValue?.second?.let { chipItem ->
-                if (!isOtherNotStartWith && chipItem.startsWith(Other)) {
+                if (!isOtherNotStartWith && chipItem.startsWith(OTHER)) {
                     val isAlreadySelected = chipItemList.any { it.name == chipItem }
                     if (isAlreadySelected) {
                         binding.tvOther.performClick()
@@ -343,7 +343,7 @@ class TagListCustomView(
             )
         }
         if (otherCallBack != null) {
-            otherCallBack.invoke(Other, tagView.tag != null)
+            otherCallBack.invoke(OTHER, tagView.tag != null)
         } else {
             callBack?.invoke(chipData.second, chipGroup.checkedChipIds.isEmpty(), tagView.tag != null)
         }
@@ -380,7 +380,7 @@ class TagListCustomView(
                 }
             }
         }
-        chipGroup.findViewWithTag<LinearLayout>(Other)?.let { layout ->
+        chipGroup.findViewWithTag<LinearLayout>(OTHER)?.let { layout ->
             layout.getChildAt(1)?.tag?.let {
                 layout.getChildAt(0)?.tag?.let { tag ->
                     val tagModel = tag as? ChipViewItemModel
@@ -420,5 +420,18 @@ class TagListCustomView(
 
     fun clearOtherChip() {
         onNoneSelected()
+    }
+
+    fun deselectChipByID(
+        chipGroup: ChipGroup,
+        chipText: String,
+    ) {
+        for (i in 0 until chipGroup.childCount) {
+            val chip = chipGroup.getChildAt(i) as? Chip
+            if (chip?.text.toString().equals(chipText, ignoreCase = true)) {
+                chip?.isChecked = false
+                break
+            }
+        }
     }
 }

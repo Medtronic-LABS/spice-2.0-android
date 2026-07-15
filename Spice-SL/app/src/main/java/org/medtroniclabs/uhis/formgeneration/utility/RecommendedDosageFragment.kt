@@ -33,7 +33,7 @@ class RecommendedDosageFragment : DialogFragment(), View.OnClickListener {
             val fragment = RecommendedDosageFragment()
             fragment.arguments = Bundle().apply {
                 putString(DefinedParams.ID, id)
-                putString(DefinedParams.Title, title)
+                putString(DefinedParams.TITLE, title)
             }
             return fragment
         }

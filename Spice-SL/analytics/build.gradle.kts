@@ -25,19 +25,6 @@ android {
         getByName("release") {
             consumerProguardFiles("proguard-rules.pro")
         }
-
-        // Match the app’s extra build types so variants wire correctly
-        create("staging") {
-            initWith(getByName("release"))
-            matchingFallbacks += listOf("release")
-            consumerProguardFiles("proguard-rules.pro")
-        }
-
-        create("training") {
-            initWith(getByName("release"))
-            matchingFallbacks += listOf("release")
-            consumerProguardFiles("proguard-rules.pro")
-        }
     }
 
     lint {

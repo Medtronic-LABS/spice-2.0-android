@@ -1,6 +1,8 @@
 package org.medtroniclabs.uhis.ui.externalmember
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.text.InputFilter
@@ -9,12 +11,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatSpinner
+import androidx.core.content.ContextCompat
 import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.model.UserDetail
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
@@ -30,9 +39,14 @@ import org.medtroniclabs.uhis.common.DefinedParams.EXTERNAL_MEMBER_REGISTRATION
 import org.medtroniclabs.uhis.common.DefinedParams.MEMBER_ID
 import org.medtroniclabs.uhis.common.EntityMapper.getResultSpinnerMapList
 import org.medtroniclabs.uhis.common.SecuredPreference
+import org.medtroniclabs.uhis.common.qrscanner.QRScanContract
+import org.medtroniclabs.uhis.common.qrscanner.QRScanResult
+import org.medtroniclabs.uhis.common.qrscanner.QRScannerActivity
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
 import org.medtroniclabs.uhis.databinding.FragmentExternalMemberRegistrationBinding
 import org.medtroniclabs.uhis.db.entity.HouseholdMemberEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaEntity
 import org.medtroniclabs.uhis.db.entity.SubVillageEntity
 import org.medtroniclabs.uhis.db.entity.VillageEntity
 import org.medtroniclabs.uhis.formgeneration.FormGenerator
@@ -40,6 +54,8 @@ import org.medtroniclabs.uhis.formgeneration.listener.FormEventListener
 import org.medtroniclabs.uhis.formgeneration.model.FormLayout
 import org.medtroniclabs.uhis.formgeneration.model.FormResponse
 import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
+import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.CHIEFDOM_ID
+import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.SHASTHYA_KORMI_ID
 import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.SHASTHYA_SHEBIKA_ID
 import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.SUB_VILLAGE_ID
 import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.VILLAGE_ID
@@ -52,6 +68,7 @@ import org.medtroniclabs.uhis.ui.dialog.SuccessDialogFragment
 import org.medtroniclabs.uhis.ui.home.AssessmentToolsActivity
 import org.medtroniclabs.uhis.ui.household.viewmodel.HouseRegistrationViewModel
 import org.medtroniclabs.uhis.ui.member.MemberRegistrationViewModel
+import org.medtroniclabs.uhis.ui.patient.UIConstants
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams as FormDefinedParams
 
 @AndroidEntryPoint
@@ -63,6 +80,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
     private var editMemberId: Long = -1L
     private var pendingVillageId: Long? = null
     private var pendingSsId: Long? = null
+    private var pendingShasthyaKormiId: Long? = null
     private var pendingSubVillageId: Long? = null
     private var lastSubVillageList: List<SubVillageEntity> = emptyList()
 
@@ -168,7 +186,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                                                     0,
                                                     hashMapOf(
                                                         DefinedParams.NAME to getString(R.string.please_select),
-                                                        DefinedParams.ID to DefinedParams.DefaultID,
+                                                        DefinedParams.ID to DefinedParams.DEFAULT_ID,
                                                     ),
                                                 )
                                             }
@@ -203,6 +221,42 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                         }
                     }
                 }
+
+                else -> {
+                    // Invoked if response state is not success
+                }
+            }
+        }
+
+        householdRegistrationViewModel.shasthyaKormiListResponse.observe(viewLifecycleOwner) { resourceState ->
+            when (resourceState.state) {
+                ResourceState.SUCCESS -> {
+                    resourceState.data?.let { data ->
+                        val mapList = getResultSpinnerMapList(data)
+                        if (mapList.isNotEmpty()) {
+                            formGenerator.spinnerDataInjection(data, mapList)
+                            applyPendingSelectionIfReady(SHASTHYA_KORMI_ID, pendingShasthyaKormiId) {
+                                pendingShasthyaKormiId = null
+                            }
+                            if (CommonUtils.isFoPoOrChcp() &&
+                                data.response is List<*> &&
+                                data.response.size == 1 &&
+                                data.response[0] is ShasthyaKormiEntity
+                            ) {
+                                val mapItem = mapList.firstOrNull()
+                                mapItem?.let { map ->
+                                    val id = map[DefinedParams.ID]
+                                    formGenerator.getViewByTag(SHASTHYA_KORMI_ID)?.let { spinnerView ->
+                                        spinnerView.post {
+                                            formGenerator.setValueForView(id, spinnerView)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 else -> {
                     // Invoked if response state is not success
                 }
@@ -213,13 +267,30 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
             when (resourceState.state) {
                 ResourceState.SUCCESS -> {
                     resourceState.data?.let { data ->
-                        formGenerator.spinnerDataInjection(data, getResultSpinnerMapList(data))
-                        // Apply pending SS selection after data injection
-                        applyPendingSelectionIfReady(SHASTHYA_SHEBIKA_ID, pendingSsId) {
-                            pendingSsId = null
+                        val mapList = getResultSpinnerMapList(data)
+                        if (mapList.isNotEmpty()) {
+                            formGenerator.spinnerDataInjection(data, mapList)
+                            applyPendingSelectionIfReady(SHASTHYA_SHEBIKA_ID, pendingSsId) {
+                                pendingSsId = null
+                            }
+                            if (data.response is List<*> &&
+                                data.response.size == 1 &&
+                                data.response[0] is ShasthyaShebikaEntity
+                            ) {
+                                val mapItem = mapList.firstOrNull()
+                                mapItem?.let { map ->
+                                    val id = map[DefinedParams.ID]
+                                    formGenerator.getViewByTag(SHASTHYA_SHEBIKA_ID)?.let { spinnerView ->
+                                        spinnerView.post {
+                                            formGenerator.setValueForView(id, spinnerView)
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
+
                 else -> {
                     // Invoked if response state is not success
                 }
@@ -258,6 +329,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                         }
                     }
                 }
+
                 else -> {
                     // Invoked if response state is not success
                 }
@@ -293,11 +365,31 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
             when (resources.state) {
                 ResourceState.SUCCESS -> {
                     resources.data?.let { jsonString ->
-                        val formLayout: FormResponse = Gson().fromJson(
+                        val formResponse: FormResponse = Gson().fromJson(
                             jsonString,
                             object : TypeToken<FormResponse>() {}.type,
                         )
-                        formGenerator.populateViews(formLayout.formLayout)
+                        val formLayouts = if (CommonUtils.isFoPoOrChcp()) {
+                            val isChcp = CommonUtils.isCHCP()
+                            formResponse.formLayout.forEach { field ->
+                                when (field.id) {
+                                    // CHCP picks the Union directly, so hide SK/SS and surface Union;
+                                    // FO/PO keep the Kormi-driven cascade with the Union hidden.
+                                    SHASTHYA_KORMI_ID ->
+                                        field.visibility = if (isChcp) FormDefinedParams.GONE else FormDefinedParams.VISIBLE
+
+                                    SHASTHYA_SHEBIKA_ID ->
+                                        if (isChcp) field.visibility = FormDefinedParams.GONE
+
+                                    VILLAGE_ID ->
+                                        if (isChcp) field.visibility = FormDefinedParams.VISIBLE
+                                }
+                            }
+                            formResponse.formLayout.filterNot { it.id == MemberRegistration.ID_MARITAL_STATUS }
+                        } else {
+                            formResponse.formLayout
+                        }
+                        formGenerator.populateViews(formLayouts)
                         if (editMemberId != -1L) {
                             memberRegistrationViewModel.getMemberDetailsByID(editMemberId)
                         }
@@ -316,14 +408,36 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
 
         memberRegistrationViewModel.memberDetailsLiveData.observe(viewLifecycleOwner) { resourceState ->
             when (resourceState.state) {
+                ResourceState.LOADING -> {
+                    (activity as BaseActivity?)?.showLoading()
+                }
+
                 ResourceState.SUCCESS -> {
+                    (activity as BaseActivity?)?.hideLoading()
                     resourceState.data?.let { data ->
                         autoPopulateDetails(data)
                     }
                 }
-                else -> {
-                    // no-op
+
+                ResourceState.ERROR -> {
+                    (activity as BaseActivity?)?.hideLoading()
                 }
+            }
+        }
+
+        memberRegistrationViewModel.isValidQRLiveData.observe(viewLifecycleOwner) { resourceState ->
+            when (resourceState.state) {
+                ResourceState.SUCCESS -> {
+                    resourceState.data?.let {
+                        if (it.first) {
+                            formGenerator.showQRScannedText(it.second, FormDefinedParams.QR_CODE)
+                        } else {
+                            formGenerator.showErrorQRScanned(FormDefinedParams.QR_CODE, getString(R.string.invalid_qr_message))
+                        }
+                    }
+                }
+
+                else -> {}
             }
         }
     }
@@ -400,12 +514,16 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
 
         // Defer spinner cascade selections until data injection observers
         pendingVillageId = details.villageId
+        pendingShasthyaKormiId = details.shasthyaKormiId
         pendingSsId = details.shasthyaShebikaId
         pendingSubVillageId = details.subVillageId
 
         // If dropdown data already loaded before member-details response, apply immediately
         applyPendingSelectionIfReady(VILLAGE_ID, pendingVillageId) {
             pendingVillageId = null
+        }
+        applyPendingSelectionIfReady(SHASTHYA_KORMI_ID, pendingShasthyaKormiId) {
+            pendingShasthyaKormiId = null
         }
         applyPendingSelectionIfReady(SHASTHYA_SHEBIKA_ID, pendingSsId) {
             pendingSsId = null
@@ -414,8 +532,16 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
             pendingSubVillageId = null
         }
 
+        if (CommonUtils.isFoPoOrChcp()) {
+            details.chiefdomId?.let { formGenerator.getResultMap()[CHIEFDOM_ID] = it }
+        }
+
+        details.qrCode?.let {
+            formGenerator.showQRScannedText(it, FormDefinedParams.QR_CODE)
+        }
+
         // Lock location selections for external-member edit mode.
-        disableLocationFieldsInEditMode()
+        disableLocationFieldsInEditMode(details)
     }
 
     private fun singleSelectValueOption(
@@ -429,6 +555,29 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
     }
 
     /**
+     * CHCP picks the Union directly: load its sub-villages, derive the Chiefdom from the Union,
+     * and clear any stale sub-village selection (except while prefilling an edit).
+     */
+    private fun onChcpUnionSelected(selectedId: Any?) {
+        val villageId = CommonUtils.getLongOrNull(selectedId) ?: return
+        if (villageId == 0L) return
+        householdRegistrationViewModel.loadSubVillageByVillageId(villageId)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val village = householdRegistrationViewModel.getVillageEntity(villageId) ?: return@launch
+            withContext(Dispatchers.Main) {
+                village.chiefdomId?.let { chiefdom ->
+                    formGenerator.getResultMap()[CHIEFDOM_ID] = chiefdom
+                }
+            }
+        }
+        if (pendingSubVillageId == null) {
+            formGenerator.getViewByTag(SUB_VILLAGE_ID)?.let { view ->
+                formGenerator.setValueForView(null, view)
+            }
+        }
+    }
+
+    /**
      * Keeps Union ([VILLAGE_ID]) hidden; after user picks sub-village, set parent village id on the hidden Union spinner.
      */
     private fun applyVillageIdFromSubVillageSelection(selectedId: Any?) {
@@ -437,6 +586,15 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
         val parentVillageId = lastSubVillageList.find { it.id == subVillageId }?.villageId ?: return
         formGenerator.getViewByTag(VILLAGE_ID)?.let { view ->
             formGenerator.setValueForView(parentVillageId, view)
+        }
+        if (!CommonUtils.isFoPoOrChcp()) return
+        viewLifecycleOwner.lifecycleScope.launch {
+            val village = householdRegistrationViewModel.getVillageEntity(parentVillageId) ?: return@launch
+            withContext(Dispatchers.Main) {
+                village.chiefdomId?.let { chiefdom ->
+                    formGenerator.getResultMap()[CHIEFDOM_ID] = chiefdom
+                }
+            }
         }
     }
 
@@ -456,7 +614,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                         val hasOnlyDefaultOption =
                             adapterCount == 1 &&
                                 (
-                                    it.getData(0)?.get(FormDefinedParams.ID) == DefinedParams.DefaultID ||
+                                    it.getData(0)?.get(FormDefinedParams.ID) == DefinedParams.DEFAULT_ID ||
                                         it.getData(0)?.get(FormDefinedParams.ID) == "-1"
                                 )
                         if (hasOnlyDefaultOption) return
@@ -470,11 +628,26 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
         }
     }
 
-    private fun disableLocationFieldsInEditMode() {
+    private fun disableLocationFieldsInEditMode(details: HouseholdMemberEntity) {
         if (editMemberId == -1L) return
-        formGenerator.getViewByTag(VILLAGE_ID)?.isEnabled = false
-        formGenerator.getViewByTag(SHASTHYA_SHEBIKA_ID)?.isEnabled = false
-        formGenerator.getViewByTag(SUB_VILLAGE_ID)?.isEnabled = false
+        val villageId = details.villageId
+        val skId = details.shasthyaKormiId
+        val ssId = details.shasthyaShebikaId
+        val subVillageId = details.subVillageId
+        if (villageId != null && villageId > 0) {
+            formGenerator.getViewByTag(VILLAGE_ID)?.isEnabled = false
+        }
+        if (CommonUtils.isFoPoOrChcp()) {
+            if (skId != null && skId > 0) {
+                formGenerator.getViewByTag(SHASTHYA_KORMI_ID)?.isEnabled = false
+            }
+        }
+        if (ssId != null && ssId > 0) {
+            formGenerator.getViewByTag(SHASTHYA_SHEBIKA_ID)?.isEnabled = false
+        }
+        if (subVillageId != null && subVillageId > 0) {
+            formGenerator.getViewByTag(SUB_VILLAGE_ID)?.isEnabled = false
+        }
     }
 
     override fun onRenderingComplete() {
@@ -483,11 +656,11 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
             VILLAGE_ID,
             "",
         )
-        // SS list is scoped to logged-in Kormi user, not to Union selection
-        householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType(
-            SHASTHYA_SHEBIKA_ID,
-            "",
-        )
+        if (!CommonUtils.isFoPoOrChcp()) {
+            // SS list is scoped to logged-in Kormi user, not to Union selection
+            householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType()
+        }
+        // FO/PO: SK list is loaded via [loadLocalCache] when the SK spinner is built; SS loads after SK selection.
     }
 
     override fun onUpdateInstruction(
@@ -495,13 +668,26 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
         selectedId: Any?,
     ) {
         when (id) {
+            VILLAGE_ID -> {
+                if (CommonUtils.isCHCP()) {
+                    onChcpUnionSelected(selectedId)
+                }
+            }
+
+            SHASTHYA_KORMI_ID -> {
+                if (CommonUtils.isFoPoOrChcp()) {
+                    formGenerator.getResultMap().remove(CHIEFDOM_ID)
+                }
+            }
+
             SHASTHYA_SHEBIKA_ID -> {
+                if (CommonUtils.isFoPoOrChcp()) {
+                    formGenerator.getResultMap().remove(CHIEFDOM_ID)
+                }
                 // SS selected - load Village list
                 val shasthyaShebikaIdLong = CommonUtils.getLongOrNull(selectedId) ?: 0L
                 if (shasthyaShebikaIdLong != 0L) {
                     householdRegistrationViewModel.loadSubVillageDataCacheByType(
-                        SUB_VILLAGE_ID,
-                        "",
                         shasthyaShebikaIdLong,
                     )
                     // During edit prefill, preserve pending sub-village and avoid clearing.
@@ -512,8 +698,12 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                     }
                 }
             }
+
             SUB_VILLAGE_ID -> {
-                applyVillageIdFromSubVillageSelection(selectedId)
+                // CHCP selects the Union directly, so the Union/Chiefdom is already resolved.
+                if (!CommonUtils.isCHCP()) {
+                    applyVillageIdFromSubVillageSelection(selectedId)
+                }
             }
         }
     }
@@ -528,12 +718,33 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                 VILLAGE_ID -> {
                     householdRegistrationViewModel.loadDataCacheByType(id, localDataCache)
                 }
-                SHASTHYA_SHEBIKA_ID -> {
-                    householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType(id, localDataCache)
+
+                SHASTHYA_KORMI_ID -> {
+                    // CHCP hides the Kormi cascade entirely.
+                    if (CommonUtils.isFoOrPo()) {
+                        householdRegistrationViewModel.loadAllShasthyaKormis()
+                    }
                 }
+
+                SHASTHYA_SHEBIKA_ID -> {
+                    when {
+                        CommonUtils.isFoOrPo() && selectedParent != null -> {
+                            householdRegistrationViewModel.loadShasthyaShebikaForKormiId(selectedParent)
+                        }
+
+                        !CommonUtils.isFoPoOrChcp() -> {
+                            householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType()
+                        }
+                    }
+                }
+
                 SUB_VILLAGE_ID -> {
                     selectedParent?.let {
-                        householdRegistrationViewModel.loadSubVillageDataCacheByType(id, localDataCache, it)
+                        if (CommonUtils.isCHCP()) {
+                            householdRegistrationViewModel.loadSubVillageByVillageId(it)
+                        } else {
+                            householdRegistrationViewModel.loadSubVillageDataCacheByType(it)
+                        }
                     }
                 }
             }
@@ -580,6 +791,46 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
         resultHashMap: HashMap<String, Any>,
     ) {
     }
+
+    override fun onQRScanRequested() {
+        try {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_DENIED
+            ) {
+                cameraPermission.launch(Manifest.permission.CAMERA)
+            } else {
+                startScanning()
+            }
+        } catch (e: Exception) {
+            // error block
+        }
+    }
+
+    private val cameraPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            startScanning()
+        } else {
+            // Camera permission denied
+        }
+    }
+
+    private fun startScanning() {
+        qrScanLauncher.launch(
+            Intent(requireContext(), QRScannerActivity::class.java).apply {
+                putExtra(QRScanResult.REQUEST_FROM, UIConstants.SCREENING_UNIQUE_ID)
+            },
+        )
+    }
+
+    private val qrScanLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(QRScanContract()) { result ->
+            if (result.resultString != null) {
+                val memberId = memberRegistrationViewModel.memberDetailsLiveData.value
+                    ?.data
+                    ?.id
+                memberRegistrationViewModel.validateQRCodeLocally(result.resultString, memberId)
+            }
+        }
 
     override fun onClick(v: View?) {
         when (v?.id) {
@@ -644,6 +895,7 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                 map,
                 householdId = null, // External members have no household
                 location = location,
+                editMemberId = editMemberId.takeIf { it != -1L },
             )
         }
     }
@@ -656,6 +908,9 @@ class ExternalMemberRegistrationFragment : BaseFragment(), FormEventListener, Vi
                 intent.putExtra(MEMBER_ID, it ?: -1)
             }
             intent.putExtra(DOB, memberRegistrationViewModel.memberDob)
+            requireActivity().intent.getStringExtra(DefinedParams.ENTRY_POINT)?.let { entryPoint ->
+                intent.putExtra(DefinedParams.ENTRY_POINT, entryPoint)
+            }
             startActivity(intent)
             requireActivity().finish()
         } else {

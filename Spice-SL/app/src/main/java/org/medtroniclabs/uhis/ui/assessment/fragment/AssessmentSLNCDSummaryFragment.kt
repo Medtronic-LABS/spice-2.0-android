@@ -167,8 +167,8 @@ class AssessmentSLNCDSummaryFragment : BaseFragment(), View.OnClickListener {
                 ) {
                     val selectedItem = adapter.getData(position = pos)
                     selectedItem?.let {
-                        val selectedId = it[DefinedParams.id] as String?
-                        if (selectedId != DefinedParams.DefaultID) {
+                        val selectedId = it[DefinedParams.ID] as String?
+                        if (selectedId != DefinedParams.DEFAULT_ID) {
                             viewModel.otherAssessmentDetails[AssessmentDefinedParams.ReferredPHUSiteID] = selectedId.toString()
                         } else {
                             if (viewModel.otherAssessmentDetails.containsKey(AssessmentDefinedParams.ReferredPHUSiteID)) {
@@ -272,9 +272,9 @@ class AssessmentSLNCDSummaryFragment : BaseFragment(), View.OnClickListener {
 
             listSummaryData.forEach { assessment ->
                 when (assessment.id) {
-                    DiagnosedWithDiabetes -> if (assessment.value.equals(DefinedParams.Yes, true)) risks.add(getString(R.string.diabetes_or_hypertension))
-                    RegularSmoker -> if (assessment.value.equals(DefinedParams.Yes, true)) risks.add(getString(R.string.tobacco_consumption))
-                    AlcoholConsumption -> if (assessment.value.equals(DefinedParams.Yes, true)) risks.add(getString(R.string.alcohol_consumption))
+                    DiagnosedWithDiabetes -> if (assessment.value.equals(DefinedParams.YES, true)) risks.add(getString(R.string.diabetes_or_hypertension))
+                    RegularSmoker -> if (assessment.value.equals(DefinedParams.YES, true)) risks.add(getString(R.string.tobacco_consumption))
+                    AlcoholConsumption -> if (assessment.value.equals(DefinedParams.YES, true)) risks.add(getString(R.string.alcohol_consumption))
                 }
             }
             riskFactors = true

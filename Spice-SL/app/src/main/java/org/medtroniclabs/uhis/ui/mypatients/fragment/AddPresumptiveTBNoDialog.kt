@@ -47,10 +47,10 @@ class AddPresumptiveTBNoDialog : DialogFragment(), View.OnClickListener {
             val fragment = AddPresumptiveTBNoDialog()
             fragment.arguments = Bundle().apply {
                 putString(Data, text)
-                putString(DefinedParams.Title, title)
-                putString(DefinedParams.Hint, hint)
-                putInt(DefinedParams.Length, length)
-                putInt(DefinedParams.InputType, inputType)
+                putString(DefinedParams.TITLE, title)
+                putString(DefinedParams.HINT, hint)
+                putInt(DefinedParams.LENGTH, length)
+                putInt(DefinedParams.INPUT_TYPE, inputType)
             }
             return fragment
         }
@@ -67,10 +67,10 @@ class AddPresumptiveTBNoDialog : DialogFragment(), View.OnClickListener {
     private fun initView() {
         with(binding) {
             with(arguments) {
-                val title = this?.getString(DefinedParams.Title).orEmpty().ifBlank { getString(R.string.hyphen_symbol) }
-                val hint = this?.getString(DefinedParams.Hint).orEmpty().ifBlank { getString(R.string.hyphen_symbol) }
-                val length = this?.getInt(DefinedParams.Length) ?: 20
-                val inputType = this?.getInt(DefinedParams.InputType) ?: InputType.TYPE_CLASS_NUMBER
+                val title = this?.getString(DefinedParams.TITLE).orEmpty().ifBlank { getString(R.string.hyphen_symbol) }
+                val hint = this?.getString(DefinedParams.HINT).orEmpty().ifBlank { getString(R.string.hyphen_symbol) }
+                val length = this?.getInt(DefinedParams.LENGTH) ?: 20
+                val inputType = this?.getInt(DefinedParams.INPUT_TYPE) ?: InputType.TYPE_CLASS_NUMBER
                 tvTitle.text = title
                 tvWeightLabel.text = title
                 etWeight.hint = hint

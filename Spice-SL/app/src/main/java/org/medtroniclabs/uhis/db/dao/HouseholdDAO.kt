@@ -1,6 +1,7 @@
 package org.medtroniclabs.uhis.db.dao
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -19,6 +20,7 @@ import org.medtroniclabs.uhis.db.entity.HouseholdMemberEntity
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
 import org.medtroniclabs.uhis.db.response.HouseHoldEntityWithLastActivity
 import org.medtroniclabs.uhis.db.response.HouseholdMemberCount
+import org.medtroniclabs.uhis.db.response.MemberAssessmentHistoryWithHouseholdId
 
 @Dao
 interface HouseholdDAO {
@@ -38,6 +40,8 @@ interface HouseholdDAO {
             val entityToInsert = existingEntity?.let { entity.copy(id = it.id) } ?: entity
             entityToInsert.sync_status = existingEntity?.sync_status ?: OfflineSyncStatus.Success
             entityToInsert.fhirId = entity.fhirId
+            entityToInsert.createdAt = entity.createdAt
+            entityToInsert.updatedAt = entity.updatedAt
             return insertHouseHold(entityToInsert)
         } else {
             return existingEntity.id
@@ -116,15 +120,15 @@ interface HouseholdDAO {
             date(datetime(hh.created_at / 1000, 'unixepoch', 'localtime')) <= :endDate
         )
         AND (
-            (:ssIdsSize = 0 AND :subVillageIdsSize = 0)
-            OR (:subVillageIdsSize > 0 AND hh.sub_village_id IN (:subVillageIds))
-            OR ( :ssIdsSize > 0
-                AND hh.sub_village_id IN (
-                    SELECT DISTINCT sslv.subVillageId
-                    FROM ShasthyaShebikaLinkedVillageEntity AS sslv
-                    WHERE sslv.shasthyaShebikaId IN (:ssIds)
-                )
-            )
+            CASE
+                WHEN :subVillageIdsSize > 0
+                THEN hh.sub_village_id IN (:subVillageIds)
+
+                WHEN :ssIdsSize > 0
+                THEN hh.sub_village_id IN (SELECT DISTINCT sslv.subVillageId FROM ShasthyaShebikaLinkedVillageEntity AS sslv WHERE sslv.shasthyaShebikaId IN (:ssIds))
+
+                ELSE 1
+            END
         )
         """,
     )
@@ -143,11 +147,10 @@ interface HouseholdDAO {
     )
     fun getHouseholdCardDetailLiveData(id: Long): LiveData<HouseholdCardDetail>
 
-    @Query("UPDATE HouseHold SET sync_status =:syncStatus, updated_at =:updatedAt WHERE id IN (:householdIds)")
+    @Query("UPDATE HouseHold SET sync_status =:syncStatus WHERE id IN (:householdIds)")
     suspend fun updateInProgress(
         householdIds: List<String>,
         syncStatus: String,
-        updatedAt: Long = System.currentTimeMillis(),
     )
 
     @Query("SELECT hh.*, ve.name as villageName FROM HouseHold as hh INNER JOIN VillageEntity AS ve ON hh.village_id = ve.id INNER JOIN HouseholdMember as hhm ON hh.id = hhm.household_id WHERE hh.fhir_id IS NULL AND hhm.id = :hhmId AND hh.sync_status IN (:status)")
@@ -172,6 +175,19 @@ interface HouseholdDAO {
      */
     @RawQuery(observedEntities = [HouseholdEntity::class, HouseholdMemberEntity::class, AssessmentEntity::class, MemberAssessmentHistoryEntity::class])
     fun getHouseholdsRaw(query: SimpleSQLiteQuery): LiveData<List<HouseHoldEntityWithLastActivity>>
+
+    @Query(
+        """
+        SELECT mah.*, hm.household_id AS household_id
+        FROM MemberAssessmentHistory mah
+        INNER JOIN HouseholdMember hm ON hm.id = mah.memberId
+        WHERE hm.household_id IN (:householdIds)
+        ORDER BY mah.visitDate DESC, mah.id DESC
+        """,
+    )
+    fun getAssessmentHistoryForHouseholds(
+        householdIds: List<Long>,
+    ): LiveData<List<MemberAssessmentHistoryWithHouseholdId>>
 
     /**
      * Returns a live list of households with last-activity info.
@@ -199,8 +215,9 @@ interface HouseholdDAO {
         val conditions = mutableListOf<String>()
 
         if (searchTerm.isNotBlank()) {
-            conditions += "(hh.name LIKE ? OR hh.household_no LIKE ? OR EXISTS (SELECT 1 FROM HouseholdMember hm WHERE hm.household_id = hh.id AND hm.phone_number LIKE ?))"
+            conditions += "(hh.name LIKE ? OR hh.household_no LIKE ? OR EXISTS (SELECT 1 FROM HouseholdMember hm WHERE hm.household_id = hh.id AND (hm.phone_number LIKE ? OR hm.national_id LIKE ?)))"
             val pattern = "%${searchTerm.trim()}%"
+            args += pattern
             args += pattern
             args += pattern
             args += pattern
@@ -216,8 +233,7 @@ interface HouseholdDAO {
                 val placeholders = subVillageIds.joinToString(",") { "?" }
                 subVillageFilterConditions += "hh.sub_village_id IN ($placeholders)"
                 args.addAll(subVillageIds)
-            }
-            if (shasthyaShebikaIds.isNotEmpty()) {
+            } else {
                 val placeholders = shasthyaShebikaIds.joinToString(",") { "?" }
                 subVillageFilterConditions +=
                     """
@@ -244,74 +260,119 @@ interface HouseholdDAO {
         }
 
         val orderByClause = when (sortOrder) {
-            HouseholdSortOrder.HOUSEHOLD_NO -> "hh.household_no DESC"
+            HouseholdSortOrder.HOUSEHOLD_NO -> "fh.household_no DESC"
             HouseholdSortOrder.LAST_VISIT_DATE -> "last_activity_at DESC"
             HouseholdSortOrder.LAST_MEMBER_REGISTRATION -> "last_member_registered_at DESC"
-            HouseholdSortOrder.DEFAULT -> "hh.id DESC"
+            HouseholdSortOrder.DEFAULT -> "fh.id DESC"
         }
 
         val sql =
             """
+            WITH filtered_households AS (
+                SELECT
+                    hh.id,
+                    hh.name,
+                    hh.household_no,
+                    hh.updated_at,
+                    COALESCE(ve.name, '') AS village_name,
+                    COALESCE(ss.name, ss_fallback.name, '') AS shasthya_shebika_name,
+                    COALESCE(ss.ssId, ss_fallback.ssId, '') AS shasthya_shebika_ssId,
+                    COALESCE(sv.name, '') AS sub_village_name
+                FROM Household AS hh
+                -- ve/ss/sv supply display names only; scope is enforced by the WHERE clause. A
+                -- reassigned household keeps its original SS (and possibly village) which may not be
+                -- in this device's tables — INNER joins here wrongly hide those households, so a
+                -- newly-assigned village's households never appear (UHIS-1173). Use LEFT joins.
+                -- Display new ss name based on village where the old ss is not there in the DB.
+                LEFT JOIN VillageEntity AS ve
+                    ON ve.id = hh.village_id
+                LEFT JOIN ShasthyaShebikaEntity AS ss
+                    ON ss.id = hh.shasthya_shebika_id
+                LEFT JOIN SubVillageEntity AS sv
+                    ON sv.id = hh.sub_village_id
+                LEFT JOIN ShasthyaShebikaLinkedVillageEntity AS sslv
+                    ON sslv.subVillageId = hh.sub_village_id
+                    AND EXISTS (
+                        SELECT 1
+                        FROM ShasthyaShebikaEntity AS active_ss
+                        WHERE active_ss.id = sslv.shasthyaShebikaId
+                            AND active_ss.isActive = true
+                    )
+                LEFT JOIN ShasthyaShebikaEntity AS ss_fallback
+                    ON ss_fallback.id = sslv.shasthyaShebikaId
+                $whereClause
+            )
             SELECT
-                hh.id,
-                hh.name,
-                hh.household_no,
-                ve.name                  AS village_name,
-                ss.name                  AS shasthya_shebika_name,
-                sv.name                  AS sub_village_name,
+                fh.id,
+                fh.name,
+                fh.household_no,
+                fh.village_name,
+                fh.shasthya_shebika_name,
+                fh.shasthya_shebika_ssId,
+                fh.sub_village_name,
                 memberAgg.last_member_registered_at,
-                assessmentAgg.services,
+                memberAgg.total_registered_members,
                 MAX(
-                    COALESCE(hh.updated_at, 0),
+                    COALESCE(fh.updated_at, 0),
                     COALESCE(memberAgg.last_member_registered_at, 0),
                     COALESCE(assessmentAgg.last_assessment_at, 0)
                 ) AS last_activity_at
-
-            FROM Household AS hh
-
-            INNER JOIN VillageEntity AS ve
-                ON ve.id = hh.village_id
-
-            INNER JOIN ShasthyaShebikaEntity AS ss
-                ON ss.id = hh.shasthya_shebika_id
-
-            INNER JOIN SubVillageEntity AS sv
-                ON sv.id = hh.sub_village_id
-
+            FROM filtered_households AS fh
             INNER JOIN (
                 SELECT
                     household_id,
+                    COUNT(id) AS total_registered_members,
                     MAX(updated_at) AS last_member_registered_at
                 FROM HouseholdMember
+                WHERE household_id IN (SELECT id FROM filtered_households)
                 GROUP BY household_id
             ) AS memberAgg
-                ON memberAgg.household_id = hh.id
-
+                ON memberAgg.household_id = fh.id
             LEFT JOIN (
                 SELECT
-                    household_id,
-                    MAX(last_assessment_at) AS last_assessment_at,
-                    '[' || GROUP_CONCAT('"' || serviceProvided || '"') || ']' AS services
-                FROM (
-                    SELECT
-                        hm.household_id,
-                        mah.serviceProvided,
-                        MAX(strftime('%s', mah.visitDate) * 1000) AS last_assessment_at
-                    FROM MemberAssessmentHistory mah
-                    INNER JOIN HouseholdMember hm
-                        ON hm.id = mah.memberId
-                    GROUP BY hm.household_id, mah.serviceProvided
-                    ORDER BY last_assessment_at DESC
-                )
-                GROUP BY household_id
+                    hm.household_id,
+                    MAX(strftime('%s', mah.visitDate) * 1000) AS last_assessment_at
+                FROM MemberAssessmentHistory mah
+                INNER JOIN HouseholdMember hm
+                    ON hm.id = mah.memberId
+                WHERE hm.household_id IN (SELECT id FROM filtered_households)
+                GROUP BY hm.household_id
             ) AS assessmentAgg
-                ON assessmentAgg.household_id = hh.id
-
-            $whereClause
+                ON assessmentAgg.household_id = fh.id
             ORDER BY $orderByClause
             """.trimIndent()
 
-        return getHouseholdsRaw(SimpleSQLiteQuery(sql, args.toTypedArray()))
+        val householdsLiveData = getHouseholdsRaw(SimpleSQLiteQuery(sql, args.toTypedArray()))
+        val result = MediatorLiveData<List<HouseHoldEntityWithLastActivity>>()
+        var latestHouseholds: List<HouseHoldEntityWithLastActivity> = emptyList()
+        var historySource: LiveData<List<MemberAssessmentHistoryWithHouseholdId>>? = null
+
+        fun attachAssessmentHistory(history: List<MemberAssessmentHistoryWithHouseholdId>?) {
+            val grouped = history.orEmpty().groupBy(
+                keySelector = { it.householdId },
+                valueTransform = { it.history },
+            )
+            result.value = latestHouseholds.map { household ->
+                household.apply {
+                    assessmentHistory = grouped[household.id] ?: emptyList()
+                }
+            }
+        }
+
+        result.addSource(householdsLiveData) { households ->
+            latestHouseholds = households
+            historySource?.let { result.removeSource(it) }
+            val householdIds = households.map { it.id }
+            if (householdIds.isEmpty()) {
+                result.value = emptyList()
+                return@addSource
+            }
+            val newHistorySource = getAssessmentHistoryForHouseholds(householdIds)
+            historySource = newHistorySource
+            result.addSource(newHistorySource, ::attachAssessmentHistory)
+        }
+
+        return result
     }
 
     @Query(
@@ -393,4 +454,7 @@ interface HouseholdDAO {
         syncStatus: String = OfflineSyncStatus.NotSynced.name,
         updatedAt: Long = System.currentTimeMillis(),
     ): Int
+
+    @Query("SELECT name FROM Household WHERE id = :householdId")
+    fun observeHouseholdHeadName(householdId: Long): LiveData<String?>
 }

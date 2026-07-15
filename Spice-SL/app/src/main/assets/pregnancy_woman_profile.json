@@ -221,9 +221,9 @@
             "hideDob": true,
             "title": "Age of last child",
             "titleCulture": "সবচেয়ে ছোট সন্তানের বয়স কত?",
-            "hint": "[Enter number]\n______ Yrs______Months\nIf child is < 1year old then show in months only (enter as 0 yrs and no.of months)",
-            "hintCulture": "[সংখ্যা লিখুন]\n______ বছর ______ মাস\nশিশুর বয়স ১ বছরের কম হলে শুধুমাত্র মাসে দেখানো হবে (০ বছর এবং মোট মাস লিখুন)।",
-            "viewType": "AgeYMD",
+            "hint": "DD/MM/YYYY",
+            "hintCulture": "দিন/মাস/বছর",
+            "viewType": "AgeOrDob",
             "visibility": "gone"
         }
     ],

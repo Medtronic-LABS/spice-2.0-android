@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/search_background"
+        android:paddingHorizontal="@dimen/_10sdp"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp">
+
+        <LinearLayout
+            android:id="@+id/llFocus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <include
+            android:id="@+id/llExactSearch"
+            layout="@layout/bd_patient_search_layout" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/graph_limit_linecolor"
+        app:layout_constraintTop_toBottomOf="@+id/clHeader" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvPatientCount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:padding="@dimen/_5sdp"
+        android:textColor="@color/navy_blue"
+        android:textSize="@dimen/_18ssp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@id/llSortFilter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/llSortFilter"
+        tools:text="@string/patients_found" />
+
+    <include
+        android:id="@+id/llSortFilter"
+        layout="@layout/sort_filter_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/view" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/filterBarrier"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="llSortFilter,tvPatientCount" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvPatientsList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:nestedScrollingEnabled="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/pbLoadMore"
+        app:layout_constraintTop_toBottomOf="@id/filterBarrier" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvNoPatientsFound"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/_15sdp"
+            android:text="@string/screening_after_search"
+            android:textColor="@color/medium_risk_color"
+            android:textSize="@dimen/_16ssp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnScreening"
+            style="@style/Button_Style"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:paddingHorizontal="@dimen/_22sdp"
+            android:text="@string/start_screening"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/tvNoPatientsFound"
+            app:layout_constraintStart_toStartOf="@id/tvNoPatientsFound"
+            app:layout_constraintTop_toBottomOf="@+id/tvNoPatientsFound" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnEnrol"
+            style="@style/Button_Style"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:paddingHorizontal="@dimen/_22sdp"
+            android:text="@string/enroll"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/tvNoPatientsFound"
+            app:layout_constraintStart_toStartOf="@id/tvNoPatientsFound"
+            app:layout_constraintTop_toBottomOf="@+id/tvNoPatientsFound" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <RelativeLayout
+        android:id="@+id/pbLoadMore"
+        android:layout_width="@dimen/_80sdp"
+        android:layout_height="@dimen/_80sdp"
+        android:padding="@dimen/_15sdp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/spin_kit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/loader_spice" />
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

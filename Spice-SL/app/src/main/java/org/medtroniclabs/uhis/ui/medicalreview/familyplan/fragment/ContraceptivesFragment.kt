@@ -13,8 +13,8 @@ import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.isVisible
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils.getOptionMap
+import org.medtroniclabs.uhis.common.DefinedParams.POST_PARTUM
 import org.medtroniclabs.uhis.common.DefinedParams.Post_Partum
-import org.medtroniclabs.uhis.common.DefinedParams.postPartum
 import org.medtroniclabs.uhis.data.MedicalReviewMetaItems
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.databinding.FragmentContraceptivesBinding
@@ -203,7 +203,7 @@ class ContraceptivesFragment : BaseFragment() {
     private fun getClientTypeResult(): HashMap<String, Any> {
         return patientViewModel.patientCurrentStatus.value?.let {
             return if (it.contains(Post_Partum, true) && !viewModel.resultHashMap.containsKey(ClientType)) {
-                viewModel.resultHashMap[ClientType] = postPartum
+                viewModel.resultHashMap[ClientType] = POST_PARTUM
                 enablePostPartumChipView()
                 resultMapChanged()
                 viewModel.resultHashMap

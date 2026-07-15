@@ -214,7 +214,7 @@ class NCDMentalHealthQuestionDialog(private val callback: ((successDialog: Pair<
                             data[Screening.MentalHealthDetails]?.let {
                                 viewModel.questionarieId =
                                     data[NCDMRUtil.questionnaireId] as? String
-                                viewModel.encounterId = data[DefinedParams.EncounterId] as? String
+                                viewModel.encounterId = data[DefinedParams.ENCOUNTER_ID] as? String
 
                                 prefill.put(getFormattedKey(), it)
                             }
@@ -395,6 +395,9 @@ class NCDMentalHealthQuestionDialog(private val callback: ((successDialog: Pair<
         serverData: List<FormLayout>?,
         resultHashMap: HashMap<String, Any>,
     ) {
+    }
+
+    override fun onQRScanRequested() {
     }
 
     fun showLoading() {

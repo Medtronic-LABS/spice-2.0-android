@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:id="@+id/scrollContainer"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_0dp"
+        android:layout_marginBottom="@dimen/_15sdp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_0dp"
+            android:layout_marginHorizontal="@dimen/_10sdp">
+
+            <LinearLayout
+                android:id="@+id/llRoot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/llRoot">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/findHelpButton"
+                    style="@style/Button_Style_Border"
+                    android:layout_width="@dimen/_200sdp"
+                    android:layout_marginVertical="@dimen/_15sdp"
+                    android:layout_marginEnd="@dimen/_30sdp"
+                    android:layout_weight="1"
+                    android:paddingHorizontal="@dimen/_20sdp"
+                    android:paddingVertical="@dimen/_10sdp"
+                    android:text="@string/find_help"
+                    android:visibility="gone" />
+
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/actionButton"
+                    style="@style/Button_Style"
+                    android:visibility="gone"
+                    android:layout_width="@dimen/_200sdp"
+                    android:layout_marginVertical="@dimen/_15sdp"
+                    android:layout_weight="1"
+                    android:paddingHorizontal="@dimen/_20sdp"
+                    android:paddingVertical="@dimen/_10sdp"
+                    android:text="@string/done" />
+
+            </LinearLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:paddingTop="@dimen/_10sdp"
+        android:paddingBottom="@dimen/_10sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/centerGuideline"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/actionButtonFollowUp"
+            style="@style/Button_Style"
+            android:layout_width="0dp"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/_8sdp"
+            android:layout_weight="1"
+            android:text="@string/done"
+            android:textColor="@color/cobalt_blue"
+            android:background="@drawable/button_white_background"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/centerGuideline"/>
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnFollowUp"
+            style="@style/Button_Style"
+            android:visibility="visible"
+            android:layout_width="0dp"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/_8sdp"
+            android:layout_weight="1"
+            android:text="@string/start_treatment"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/centerGuideline"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

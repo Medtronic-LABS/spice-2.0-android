@@ -5,38 +5,48 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.R
+import org.medtroniclabs.uhis.appextensions.captureAndShare
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
 import org.medtroniclabs.uhis.common.DateUtils.DATE_ddMMyyyy
-import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.ViewUtils
 import org.medtroniclabs.uhis.data.CustomDateModel
-import org.medtroniclabs.uhis.data.NCDUserDashboardRequest
 import org.medtroniclabs.uhis.data.NCDUserDashboardResponse
-import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.databinding.FragmentDashboardBinding
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
-import org.medtroniclabs.uhis.ncd.medicalreview.CommonEnums
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseFragment
-import org.medtroniclabs.uhis.ui.TagListCustomView
+import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_ANC
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_ANC_3_PLUS
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_CATARACT_SCREENING
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_CHILD_VISIT
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_FAMILY_PLANNING
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_GLASSES_SOLD
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_HIGH_RISK_PREGNANT_WOMEN
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_HOUSEHOLD_REGISTERED
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_LINKED_TO_CARE
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_NCD_FOLLOW_UP_ASSESSMENT
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_NCD_IN_CATARACT_CAMP
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_NCD_REFERRED_FOLLOWUP
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_NCD_SCREENING
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_PNC
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_PREGNANCY_OUTCOME
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_PREGNANT_WOMEN_REGISTRATION
 import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_PW_IDENTIFIED_4_MONTHS_ANC
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_REFERRED_FOR_OPERATION
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_TOTAL_EYE_SCREENING
+import org.medtroniclabs.uhis.ui.dashboard.ncd.DashboardConstants.CARD_TOTAL_NCD_SERVICES
 import org.medtroniclabs.uhis.ui.dashboard.ncd.adapter.DashboardCardItem
 import org.medtroniclabs.uhis.ui.dashboard.ncd.adapter.UserDashboardAdapter
 import org.medtroniclabs.uhis.ui.dashboard.ncd.viewmodel.NCDDashBoardViewModel
@@ -45,8 +55,40 @@ import org.medtroniclabs.uhis.ui.dashboard.ncd.viewmodel.NCDDashBoardViewModel
 class DashboardFragment : BaseFragment(), View.OnClickListener {
     private lateinit var binding: FragmentDashboardBinding
     private val viewModel: NCDDashBoardViewModel by activityViewModels()
-    private lateinit var cgCalender: TagListCustomView
     private var dashboardFilterCount: Int = 0
+
+    /** Lowercased clinical workflow slugs from forms sync; gates NCD / eye / cataract tiles. */
+    private var clinicalWorkflowNamesLower: Set<String> = emptySet()
+
+    private fun workflowSlugsContain(vararg slug: String): Boolean = slug.any { candidate -> clinicalWorkflowNamesLower.contains(candidate.lowercase()) }
+
+    private fun hasNcdWorkflow(): Boolean = workflowSlugsContain(MenuConstants.NCD_MENU_ID)
+
+    private fun hasEyeCareWorkflow(): Boolean =
+        CommonUtils.isEyeCareWorkflowEnabledForUser() &&
+            workflowSlugsContain(MenuConstants.EYE_CARE_MENU_ID)
+
+    private fun hasCataractWorkflow(): Boolean =
+        CommonUtils.isCataractWorkflowEnabledForUser() &&
+            workflowSlugsContain(MenuConstants.CATARACT_MENU_ID)
+
+    /** FO/PO dashboard is limited to NCD, eye screening, and cataract KPIs only. */
+    private fun isFoOrPoDashboard(): Boolean = CommonUtils.isFoOrPo()
+
+    private fun shouldShowSkRmnchKpis(): Boolean = CommonUtils.isSk() && !isFoOrPoDashboard()
+
+    private fun shouldShowNcdKpis(): Boolean = isFoOrPoDashboard() || hasNcdWorkflow()
+
+    private fun shouldShowEyeCareKpis(): Boolean = isFoOrPoDashboard() || hasEyeCareWorkflow()
+
+    private fun shouldShowCataractKpis(): Boolean = isFoOrPoDashboard() || hasCataractWorkflow()
+
+    private fun reboundDashboardAfterClinicalWorkflowsLoaded() {
+        val resource = viewModel.userDashboardDetails.value
+        if (resource?.isSuccess() == true) {
+            resource.data?.let { showView(false, it) }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,28 +105,29 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
     ) {
         super.onViewCreated(view, savedInstanceState)
         clickListeners()
+        applyTodayDefaultDatesToFields()
         attachObservers()
         viewModel.getMenus()
+        viewModel.loadDashboardClinicalWorkflowGate()
+        if (CommonUtils.isCHCP()) {
+            binding.llFilter?.root?.gone()
+        }
     }
 
     private fun attachObservers() {
-        viewModel.menuListLiveData.observe(viewLifecycleOwner) { menus ->
-            if (!menus.isNullOrEmpty()) {
-                initializeChipItem()
-            }
+        viewModel.clinicalWorkflowNamesLowerLiveData.observe(viewLifecycleOwner) { names ->
+            clinicalWorkflowNamesLower = names ?: emptySet()
+            reboundDashboardAfterClinicalWorkflowsLoaded()
         }
         viewModel.getFilterLiveData().observe(viewLifecycleOwner) { filter ->
             var count = 0
+            if (CommonUtils.isFoOrPo() && filter.filterSk != -1L) count++
             if (filter.filterBySs.isNotEmpty()) count++
             if (filter.filterBySubVillages.isNotEmpty()) count++
             dashboardFilterCount = count
             updateFilterButtonLabel(dashboardFilterCount)
-            if (::cgCalender.isInitialized) {
-                if (!binding.etFromDate.text.isNullOrEmpty() && !binding.etToDate.text.isNullOrEmpty()) {
-                    getDashboardList(true)
-                } else {
-                    getDashboardList()
-                }
+            if (hasCompleteDateRange()) {
+                loadDashboardWithCustomDateRange()
             }
         }
         viewModel.userDashboardDetails.observe(viewLifecycleOwner) { resourceState ->
@@ -106,13 +149,24 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
                 }
             }
         }
+        viewModel.triggerShareLiveData.observe(viewLifecycleOwner) {
+            if (it) {
+                binding.tvDateRange?.visible()
+                binding.llActivities?.doOnPreDraw {
+                    lifecycleScope.launch {
+                        binding.llActivities?.captureAndShare(requireContext())
+                        viewModel.shareDone()
+                        binding.tvDateRange?.gone()
+                    }
+                }
+            }
+        }
     }
 
     private fun clickListeners() {
         binding.etFromDate.safeClickListener(this)
         binding.etToDate.safeClickListener(this)
         updateFilterButtonLabel(dashboardFilterCount)
-        // Dashboard filter button (after date range row)
         binding.llFilter?.btnFilter?.safeClickListener {
             DashboardFilterBottomSheetDialogFragment
                 .newInstance()
@@ -129,31 +183,29 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
             }
     }
 
-    private fun initializeChipItem() {
-        val chipItemList = getChip()
-        cgCalender = TagListCustomView(
-            requireContext(),
-            binding.cgCalender,
-            isSelectionRequired = true,
-        ) { _, _, isChecked ->
-            if (isChecked) {
-                val isCustomize =
-                    cgCalender.getSelectedTags().any { it.value == CommonEnums.CUSTOMISE.value }
-                if (isCustomize) {
-                    resetCounts()
-                    binding.clDateRange.visible()
-                } else {
-                    binding.clDateRange.gone()
-                    binding.etFromDate.text = getString(R.string.empty)
-                    binding.etToDate.text = getString(R.string.empty)
+    private fun applyTodayDefaultDatesToFields() {
+        val today = DateUtils.getTodayDateDDMMYYYY(DATE_ddMMyyyy)
+        binding.etFromDate.text = today
+        binding.etToDate.text = today
+        binding.tvDateRange?.text = "${binding.etFromDate.text} - ${binding.etToDate.text}"
+    }
 
-                    getDashboardList()
-                }
-            }
-        }
-        val selectedList = ArrayList<ChipViewItemModel>()
-        selectedList.add(chipItemList[0])
-        cgCalender.addChipItemList(chipItemList, selectedList)
+    private fun hasCompleteDateRange(): Boolean =
+        !binding.etFromDate.text.isNullOrEmpty() &&
+            !binding.etToDate.text.isNullOrEmpty()
+
+    /**
+     * Returns true if the from-date is after to-date otherwise false.
+     */
+    private fun shouldResetToDate(newFromDate: String): Boolean {
+        val currentToDate = binding.etToDate.text
+            ?.toString()
+            .orEmpty()
+        if (currentToDate.isBlank()) return false
+
+        val fromDateValue = DateUtils.convertStringToDate(newFromDate, DATE_ddMMyyyy)
+        val toDateValue = DateUtils.convertStringToDate(currentToDate, DATE_ddMMyyyy)
+        return fromDateValue?.after(toDateValue) == true
     }
 
     private fun resetCounts() {
@@ -162,156 +214,180 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
             ?.let { showView(true, it) }
     }
 
-    fun getChip(): ArrayList<ChipViewItemModel> {
-        val chipItemList = ArrayList<ChipViewItemModel>()
-        chipItemList.add(
-            ChipViewItemModel(
-                id = 1,
-                name = CommonEnums.TODAY.title,
-                cultureValue = getString(CommonEnums.TODAY.cultureValue),
-                value = CommonEnums.TODAY.value,
-            ),
-        )
-        chipItemList.add(
-            ChipViewItemModel(
-                id = 3,
-                name = CommonEnums.WEEK.title,
-                cultureValue = getString(CommonEnums.WEEK.cultureValue),
-                value = CommonEnums.WEEK.value,
-            ),
-        )
-        chipItemList.add(
-            ChipViewItemModel(
-                id = 4,
-                name = CommonEnums.MONTH.title,
-                cultureValue = getString(CommonEnums.MONTH.cultureValue),
-                value = CommonEnums.MONTH.value,
-            ),
-        )
-        chipItemList.add(
-            ChipViewItemModel(
-                id = 5,
-                name = CommonEnums.CUSTOMISE.title,
-                cultureValue = getString(CommonEnums.CUSTOMISE.cultureValue),
-                value = CommonEnums.CUSTOMISE.value,
-            ),
-        )
-        return chipItemList
-    }
-
     private fun showView(
         customize: Boolean,
         entity: NCDUserDashboardResponse,
     ) {
         val userDashboardList = ArrayList<DashboardCardItem>()
         entity.let {
-            // Dedicated flow indicators
-            userDashboardList.add(
-                DashboardCardItem(
-                    CARD_PREGNANT_WOMEN_REGISTRATION,
-                    getString(R.string.pregnant_women_registration),
-                    it.pregnantWomenRegistrationCount,
-                    R.drawable.ic_rmnch_tool,
-                ),
-            )
-            userDashboardList.add(
-                DashboardCardItem(
-                    CARD_ANC,
-                    getString(R.string.anc_dashboard),
-                    it.ancCount,
-                    R.drawable.ic_rmnch_tool,
-                ),
-            )
-            userDashboardList.add(
-                DashboardCardItem(
-                    CARD_PW_IDENTIFIED_4_MONTHS_ANC,
-                    getString(R.string.pw_identified_first_4_months_received_anc),
-                    it.pwIdentifiedFirst4MonthsWithAncCount,
-                    R.drawable.ic_rmnch_tool,
-                ),
-            )
-            userDashboardList.add(
-                DashboardCardItem(
-                    CARD_ANC_3_PLUS,
-                    getString(R.string.anc_3_plus_services),
-                    it.anc3PlusCount,
-                    R.drawable.ic_rmnch_tool,
-                ),
-            )
-            userDashboardList.add(
-                DashboardCardItem(
-                    CARD_PREGNANCY_OUTCOME,
-                    getString(R.string.pregnancy_outcome_dashboard),
-                    it.pregnancyOutcomeCount,
-                    R.drawable.ic_rmnch_tool,
-                ),
-            )
-            userDashboardList.add(
-                DashboardCardItem(
-                    CARD_PNC,
-                    getString(R.string.pnc_dashboard),
-                    it.pncCount,
-                    R.drawable.ic_rmnch_tool,
-                ),
-            )
-            userDashboardList.add(
-                DashboardCardItem(
-                    CARD_HIGH_RISK_PREGNANT_WOMEN,
-                    getString(R.string.highrisk_pregnant_women),
-                    it.highRiskPregnantWomenCount,
-                    R.drawable.ic_referred,
-                ),
-            )
-            userDashboardList.add(
-                DashboardCardItem(
-                    CARD_CHILD_VISIT,
-                    getString(R.string.child_visit),
-                    it.childVisitCount,
-                    R.drawable.ic_child_under_5,
-                ),
-            )
-            userDashboardList.add(
-                DashboardCardItem(
-                    CARD_HOUSEHOLD_REGISTERED,
-                    getString(R.string.household_registered),
-                    it.householdRegisteredCount,
-                    R.drawable.ic_registration,
-                ),
-            )
-            userDashboardList.add(
-                DashboardCardItem(
-                    CARD_FAMILY_PLANNING,
-                    getString(R.string.family_planning_dashboard),
-                    it.familyPlanningCount,
-                    R.drawable.ic_family_planning,
-                ),
-            )
-            // userDashboardList.add(DashboardCardItem(CARD_TB_ASSESSMENT, getString(R.string.tb_assessment), it.tbAssessmentCount ?: 0, R.drawable.ic_tb_tool))
-            // userDashboardList.add(DashboardCardItem(CARD_TB_CONTACT_TRACING, getString(R.string.tb_contact_tracing), it.tbContactTracingCount ?: 0, R.drawable.ic_tb_tool))
-            // userDashboardList.add(DashboardCardItem(CARD_EYE_CARE, getString(R.string.eye_care), it.eyeCareCount ?: 0, R.drawable.ic_eye_care))
-            // userDashboardList.add(DashboardCardItem(CARD_CATARACT, getString(R.string.cataract), it.cataractCount ?: 0, R.drawable.ic_cataract))
-            // userDashboardList.add(DashboardCardItem(CARD_SCREENED, getString(R.string.screened), it.screened ?: 0, R.drawable.ic_screening))
-            // userDashboardList.add(DashboardCardItem(CARD_REFERRED, getString(R.string.referred), it.referred ?: 0, R.drawable.ic_referred))
-            // userDashboardList.add(DashboardCardItem(CARD_REGISTERED, getString(R.string.registered), it.registered ?: 0, R.drawable.ic_registration))
-            // userDashboardList.add(DashboardCardItem(CARD_ASSESSED, getString(R.string.assessed), it.assessed ?: 0, R.drawable.ic_assessment))
-            // userDashboardList.add(DashboardCardItem(CARD_DISPENSED, getString(R.string.prescriptions_dispensed), it.dispensed ?: 0, R.drawable.ic_dispense))
-            // userDashboardList.add(
-            //     DashboardCardItem(
-            //         CARD_INVESTIGATED,
-            //         getString(R.string.investigations_conducted),
-            //         it.investigated ?: 0,
-            //         R.drawable.ic_investigation,
-            //     ),
-            // )
-            // userDashboardList.add(DashboardCardItem(CARD_LIFESTYLE, getString(R.string.reviews_conducted), it.nutritionistLifestyleCount ?: 0, R.drawable.ic_lifestyle))
-            // userDashboardList.add(
-            //     DashboardCardItem(
-            //         CARD_PSYCHOLOGICAL,
-            //         getString(R.string.counsellings_conducted),
-            //         it.psychologicalNotesCount ?: 0,
-            //         R.drawable.ic_psycological_menu,
-            //     ),
-            // )
+            if (shouldShowSkRmnchKpis()) {
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_PREGNANT_WOMEN_REGISTRATION,
+                        getString(R.string.pregnant_women_registration),
+                        it.pregnantWomenRegistrationCount,
+                        R.drawable.ic_rmnch_tool,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_ANC,
+                        getString(R.string.anc_dashboard),
+                        it.ancCount,
+                        R.drawable.ic_rmnch_tool,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_PW_IDENTIFIED_4_MONTHS_ANC,
+                        getString(R.string.pw_identified_first_4_months_received_anc),
+                        it.pwIdentifiedFirst4MonthsWithAncCount,
+                        R.drawable.ic_rmnch_tool,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_ANC_3_PLUS,
+                        getString(R.string.anc_3_plus_services),
+                        it.anc3PlusCount,
+                        R.drawable.ic_rmnch_tool,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_PREGNANCY_OUTCOME,
+                        getString(R.string.pregnancy_outcome_dashboard),
+                        it.pregnancyOutcomeCount,
+                        R.drawable.ic_rmnch_tool,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_PNC,
+                        getString(R.string.pnc_dashboard),
+                        it.pncCount,
+                        R.drawable.ic_rmnch_tool,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_HIGH_RISK_PREGNANT_WOMEN,
+                        getString(R.string.highrisk_pregnant_women),
+                        it.highRiskPregnantWomenCount,
+                        R.drawable.ic_referred,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_CHILD_VISIT,
+                        getString(R.string.child_visit),
+                        it.childVisitCount,
+                        R.drawable.ic_child_under_5,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_HOUSEHOLD_REGISTERED,
+                        getString(R.string.household_registered),
+                        it.householdRegisteredCount,
+                        R.drawable.ic_registration,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_FAMILY_PLANNING,
+                        getString(R.string.family_planning_dashboard),
+                        it.familyPlanningCount,
+                        R.drawable.ic_family_planning,
+                    ),
+                )
+            }
+            if (shouldShowNcdKpis()) {
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_NCD_SCREENING,
+                        getString(R.string.dashboard_ncd_screening),
+                        it.ncdScreeningFirstServiceCount,
+                        R.drawable.ic_ncd_tool,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_NCD_REFERRED_FOLLOWUP,
+                        getString(R.string.dashboard_ncd_referred_followup),
+                        it.ncdFollowUpReferralCount,
+                        R.drawable.ic_referred,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_NCD_FOLLOW_UP_ASSESSMENT,
+                        getString(R.string.dashboard_ncd_follow_up_assessment),
+                        it.ncdFollowUpAssessmentCount,
+                        R.drawable.ic_ncd_tool,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_TOTAL_NCD_SERVICES,
+                        getString(R.string.dashboard_total_ncd_services),
+                        it.totalNcdServicesCount,
+                        R.drawable.ic_ncd_tool,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_LINKED_TO_CARE,
+                        getString(R.string.linked_to_care),
+                        it.linkedToCareCount,
+                        R.drawable.ic_referred,
+                    ),
+                )
+            }
+            if (shouldShowEyeCareKpis()) {
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_TOTAL_EYE_SCREENING,
+                        getString(R.string.dashboard_total_eye_screening),
+                        it.eyeCareCount,
+                        R.drawable.ic_eye_care,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_GLASSES_SOLD,
+                        getString(R.string.dashboard_glasses_sold),
+                        it.glassesSoldCustomStatusCount,
+                        R.drawable.ic_eye_care,
+                    ),
+                )
+            }
+            if (shouldShowCataractKpis()) {
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_CATARACT_SCREENING,
+                        getString(R.string.dashboard_cataract_screening),
+                        it.cataractCount,
+                        R.drawable.ic_eye_care,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_NCD_IN_CATARACT_CAMP,
+                        getString(R.string.dashboard_ncd_in_cataract_camp),
+                        it.ncdServicesInCataractCampCount,
+                        R.drawable.ic_ncd_tool,
+                    ),
+                )
+                userDashboardList.add(
+                    DashboardCardItem(
+                        CARD_REFERRED_FOR_OPERATION,
+                        getString(R.string.dashboard_referred_for_operation),
+                        it.patientsReferredForOperationCount,
+                        R.drawable.ic_referred,
+                    ),
+                )
+            }
         }
         binding.rvActivitiesList.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -354,13 +430,15 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
                     if (isFromDate) {
                         resetCounts()
                         binding.etFromDate.text = stringDate
-                        binding.etToDate.text = getString(R.string.empty)
+                        if (shouldResetToDate(stringDate)) {
+                            binding.etToDate.text = getString(R.string.empty)
+                        }
                     } else {
                         binding.etToDate.text = stringDate
                     }
                 }
-            if (!binding.etFromDate.text.isNullOrEmpty() && !binding.etToDate.text.isNullOrEmpty()) {
-                getDashboardList(true)
+            if (hasCompleteDateRange()) {
+                loadDashboardWithCustomDateRange()
             }
         }
         datePickerDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.okay)) { dg, _ ->
@@ -373,80 +451,27 @@ class DashboardFragment : BaseFragment(), View.OnClickListener {
         datePickerDialog.show()
     }
 
-    private fun getDashboardList(fetchDates: Boolean? = false) {
-        if (!::cgCalender.isInitialized) return
-        if (fetchDates == false) {
-            val selectedItem = cgCalender.getSelectedTags()
-            if (selectedItem.isNotEmpty()) {
-                selectedItem[0].let { model ->
-                    if (model.name == getString(R.string.customize)) {
-                        showDatePickers()
-                    } else {
-                        hideDatePicker()
-                        val request = NCDUserDashboardRequest(
-                            sortField = model.value,
-                            userId = SecuredPreference.getUserFhirId(),
-                            filterBySs = viewModel
-                                .getFilterLiveData()
-                                .value
-                                ?.filterBySs
-                                ?.mapNotNull { it.id },
-                            filterBySubVillages = viewModel
-                                .getFilterLiveData()
-                                .value
-                                ?.filterBySubVillages
-                                ?.mapNotNull { it.id },
-                        )
-                        constructRequest(request)
-                    }
-                }
-            }
-        } else {
-            val endDate =
-                DateUtils.convertStringToDate(binding.etToDate.text.toString(), DATE_ddMMyyyy)
-            val request = NCDUserDashboardRequest(
-                customDate = CustomDateModel(
-                    startDate = DateUtils.convertDateTimeToDate(
+    private fun loadDashboardWithCustomDateRange() {
+        binding.tvDateRange?.text = "${binding.etFromDate.text} - ${binding.etToDate.text}"
+        val endDate =
+            DateUtils.convertStringToDate(binding.etToDate.text.toString(), DATE_ddMMyyyy)
+        viewModel.fetchDashboardForDateRange(
+            CustomDateModel(
+                startDate =
+                    DateUtils.convertDateTimeToDate(
                         binding.etFromDate.text.toString(),
                         DATE_ddMMyyyy,
                         DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
                         inUTC = true,
                     ),
-                    endDate = DateUtils.getEndDate(
+                endDate =
+                    DateUtils.getEndDate(
                         endDate,
                         DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
                         inUTC = true,
                     ),
-                ),
-                userId = SecuredPreference.getUserFhirId(),
-                filterBySs = viewModel
-                    .getFilterLiveData()
-                    .value
-                    ?.filterBySs
-                    ?.mapNotNull { it.id },
-                filterBySubVillages = viewModel
-                    .getFilterLiveData()
-                    .value
-                    ?.filterBySubVillages
-                    ?.mapNotNull { it.id },
-            )
-            constructRequest(request)
-        }
-    }
-
-    private fun constructRequest(request: NCDUserDashboardRequest) {
-        // Dashboard is fully offline. Do not gate with network availability.
-        viewModel.getUserDashboardDetails(request)
-    }
-
-    private fun showDatePickers() {
-        binding.clDateRange.visible()
-    }
-
-    private fun hideDatePicker() {
-        binding.clDateRange.gone()
-        binding.etFromDate.text = getString(R.string.empty)
-        binding.etToDate.text = getString(R.string.empty)
+            ),
+        )
     }
 
     override fun onClick(v: View?) {

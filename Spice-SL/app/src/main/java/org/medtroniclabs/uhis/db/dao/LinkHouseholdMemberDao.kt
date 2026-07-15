@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.Assigned
+import org.medtroniclabs.uhis.common.DefinedParams.ASSIGNED
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberFhirId
 import org.medtroniclabs.uhis.data.offlinesync.model.UnAssignedHouseholdMemberDetail
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineSyncStatus
@@ -38,7 +38,7 @@ interface LinkHouseholdMemberDao {
     @Query("UPDATE LinkHouseholdMember SET status = :status, syncStatus = :syncStatus WHERE memberId = :memberId")
     suspend fun updateMemberAsAssigned(
         memberId: String,
-        status: String = Assigned,
+        status: String = ASSIGNED,
         syncStatus: OfflineSyncStatus = OfflineSyncStatus.NotSynced,
     )
 
@@ -57,7 +57,7 @@ interface LinkHouseholdMemberDao {
     @Query("UPDATE LinkHouseholdMember SET status = :status, syncStatus = :syncStatus WHERE memberId in (:memberIds)")
     suspend fun updateMembersAsAssigned(
         memberIds: List<String>,
-        status: String = Assigned,
+        status: String = ASSIGNED,
         syncStatus: OfflineSyncStatus = OfflineSyncStatus.NotSynced,
     )
 }

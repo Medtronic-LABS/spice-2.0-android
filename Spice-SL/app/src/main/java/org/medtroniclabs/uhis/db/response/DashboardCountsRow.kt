@@ -23,4 +23,12 @@ data class DashboardCountsRow(
     val pwIdentifiedFirst4MonthsWithAncCount: Int?,
     val anc3PlusCount: Int?,
     val highRiskPregnantWomenCount: Int?,
+    val totalNcdServicesCount: Int?,
+    val ncdScreeningFirstServiceCount: Int?,
+    val ncdFollowUpAssessmentCount: Int?,
+    val ncdFollowUpReferralCount: Int?,
+    val glassesSoldCustomStatusCount: Int?,
+    val ncdServicesInCataractCampCount: Int?,
+    val patientsReferredForOperationCount: Int?,
+    val linkedToCareCount: Int? = 0,
 )

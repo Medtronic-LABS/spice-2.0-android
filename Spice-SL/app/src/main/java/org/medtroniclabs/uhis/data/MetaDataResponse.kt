@@ -2,20 +2,21 @@ package org.medtroniclabs.uhis.data
 
 import androidx.room.ColumnInfo
 import com.google.gson.annotations.SerializedName
+import org.medtroniclabs.uhis.data.model.ShasthyaKormi
 import org.medtroniclabs.uhis.data.model.ShasthyaShebika
+import org.medtroniclabs.uhis.data.model.SubVillage
 import org.medtroniclabs.uhis.db.entity.ChiefDomEntity
+import org.medtroniclabs.uhis.db.entity.DiagnosisEntity
 import org.medtroniclabs.uhis.db.entity.DistrictEntity
 import org.medtroniclabs.uhis.db.entity.FrequencyEntity
 import org.medtroniclabs.uhis.db.entity.MedicalComplianceEntity
-import org.medtroniclabs.uhis.db.entity.NCDDiagnosisEntity
 import org.medtroniclabs.uhis.db.entity.RiskClassificationModel
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
 import org.medtroniclabs.uhis.db.entity.VillageEntity
 
 data class MetaDataResponse(
     val nearestHealthFacilities: List<HealthFacility>,
-    val villages: List<VillageEntity>,
-    val defaultHealthFacility: HealthFacility,
+    val defaultHealthFacility: HealthFacility?,
     val menu: Menu,
     val userProfile: UserProfile,
     val workflowIds: ArrayList<Long>,
@@ -23,7 +24,12 @@ data class MetaDataResponse(
     val userHealthFacilities: List<HealthFacility>? = null,
     val identityTypes: ArrayList<IdentityType>? = null,
     val districts: ArrayList<DistrictEntity>? = null,
+    // Upazila
     val chiefdoms: ArrayList<ChiefDomEntity>? = null,
+    // Unions
+    val villages: List<VillageEntity>? = null,
+    // Village
+    val subVillages: List<SubVillage>? = null,
     val programs: ArrayList<ProgramEntity>? = null,
     val cultures: ArrayList<CulturesEntity>? = null,
     val appTypes: ArrayList<String>? = null,
@@ -31,6 +37,7 @@ data class MetaDataResponse(
     val consentForm: ConsentFormResponse? = null,
     val medicationInstructions: List<String>? = null,
     val shasthyaShebikas: List<ShasthyaShebika>? = null,
+    val shasthyaKormis: List<ShasthyaKormi>? = null,
 )
 
 data class Designation(
@@ -229,7 +236,7 @@ data class UserSymptomsEntity(
     val symptoms: ArrayList<SignsAndSymptomsEntity>,
     var medicalCompliances: ArrayList<MedicalComplianceEntity>? = null,
     val cvdRiskAlgorithms: RiskFactorResponse? = null,
-    val diagnosis: ArrayList<NCDDiagnosisEntity>? = null,
+    val diagnosis: ArrayList<DiagnosisEntity>? = null,
     val units: ArrayList<UnitMetricEntity>? = null,
     val dosageFrequencies: ArrayList<DosageFrequency>? = null,
     val reasons: ArrayList<ShortageReasonEntity>? = null,
@@ -247,7 +254,7 @@ data class LastCreatedAtAndPatientId(
     val lastPatientId: String?,
 )
 
-data class ConsentFormResponse(val household: String?, val householdCulture: String?, val EPI: String?, val HIV: String?)
+data class ConsentFormResponse(val household: String?, val householdCulture: String?, val enrollmentCulture: String?, val enrollment: String?)
 
 data class RiskFactorResponse(
     @SerializedName("non_lab")

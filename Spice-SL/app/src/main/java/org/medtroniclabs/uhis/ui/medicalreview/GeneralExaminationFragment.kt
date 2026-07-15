@@ -176,7 +176,7 @@ class GeneralExaminationFragment : BaseFragment() {
     fun refreshFragment() {
         examinationsTagView.clearSelection()
         examinationsTagView.clearOtherChip()
-        resetSelectionViews(DefinedParams.BreastCondition)
+        resetSelectionViews(DefinedParams.BREAST_CONDITION)
         resetSelectionViews(DefinedParams.UterusCondition)
         viewModel.breastConditionValue = null
         viewModel.uterusConditionValue = null
@@ -192,19 +192,19 @@ class GeneralExaminationFragment : BaseFragment() {
     private fun initializeBreastCondition() {
         getBreastConditionFlowData().let {
             val view = SingleSelectionCustomView(binding.root.context)
-            view.tag = DefinedParams.BreastCondition
+            view.tag = DefinedParams.BREAST_CONDITION
             view.addViewElements(
                 it,
                 SecuredPreference.getIsTranslationEnabled(),
                 viewModel.breastConditionMap,
-                Pair(DefinedParams.BreastCondition, null),
+                Pair(DefinedParams.BREAST_CONDITION, null),
                 FormLayout(viewType = "", id = "", title = "", visibility = "", optionsList = null),
                 breastConditionSelectionCallback,
             )
             binding.breastConditionSelector.addView(view)
         }
         viewModel.specifyCondition?.let {
-            if (viewModel.breastConditionMap[DefinedParams.BreastCondition] as? String == getString(
+            if (viewModel.breastConditionMap[DefinedParams.BREAST_CONDITION] as? String == getString(
                     R.string.abnormal,
                 )
             ) {
@@ -242,10 +242,10 @@ class GeneralExaminationFragment : BaseFragment() {
 
     private var breastConditionSelectionCallback: ((selectedID: Any?, elementId: Pair<String, String?>, formLayout: FormLayout, name: String?) -> Unit)? =
         { selectedID, _, _, _ ->
-            viewModel.breastConditionMap[DefinedParams.BreastCondition] = selectedID as String
-            resetSelectionViews(DefinedParams.BreastCondition)
+            viewModel.breastConditionMap[DefinedParams.BREAST_CONDITION] = selectedID as String
+            resetSelectionViews(DefinedParams.BREAST_CONDITION)
             val flowValue =
-                viewModel.breastConditionMap[DefinedParams.BreastCondition] as? String
+                viewModel.breastConditionMap[DefinedParams.BREAST_CONDITION] as? String
             viewModel.breastConditionValue = selectedID
             if (selectedID == getString(R.string.abnormal)) {
                 binding.specifyConditionGroup.visible()

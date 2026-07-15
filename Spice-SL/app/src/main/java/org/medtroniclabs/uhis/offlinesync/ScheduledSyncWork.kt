@@ -26,11 +26,10 @@ class ScheduledSyncWork @AssistedInject constructor(
     val rxBuddyRepository: RxBuddyRepository,
     private val followUpRepo: NCDFollowUpRepo,
 ) : CoroutineWorker(context, userParameter) {
-    // For schedule
-    // private val syncDelay = 40 * 1000L // 40 Sec
-
     // For automatic
-    private val syncDelay = 10 * 1000L // 40 Sec
+    private val syncDelay = 10 * 1000L // 10 Sec
+
+    private val fetchDelay = 30 * 1000L // 30 Sec
 
     override suspend fun doWork(): Result {
         val context = applicationContext
@@ -48,6 +47,8 @@ class ScheduledSyncWork @AssistedInject constructor(
                 context.hideNotification()
                 return Result.failure()
             }
+
+            delay(fetchDelay)
 
             // 3. Fetch Sync data with last synced at
             context.hideNotification()

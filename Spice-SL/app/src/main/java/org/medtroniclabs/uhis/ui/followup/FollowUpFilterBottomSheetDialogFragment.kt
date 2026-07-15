@@ -12,21 +12,31 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
+import org.medtroniclabs.uhis.appextensions.gone
+import org.medtroniclabs.uhis.appextensions.visible
+import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.ViewUtils
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
+import org.medtroniclabs.uhis.data.offlinesync.model.FollowUpCallStatus
 import org.medtroniclabs.uhis.databinding.FollowupFilterBottomSheetDialogBinding
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.ui.TagListCustomView
+import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 import org.medtroniclabs.uhis.ui.followup.viewmodel.FollowUpViewModel
 import java.time.LocalDate
 import java.time.ZoneOffset
 
 class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClickListener {
     private lateinit var binding: FollowupFilterBottomSheetDialogBinding
+    private lateinit var ssListTagView: TagListCustomView
     private lateinit var villageListTagView: TagListCustomView
     private lateinit var dataRangesListTagView: TagListCustomView
     private lateinit var referralReasonTagView: TagListCustomView
+    private lateinit var ncdReasonTagView: TagListCustomView
+    private lateinit var ncdReferralToTagView: TagListCustomView
+    private lateinit var remainingAttemptTagView: TagListCustomView
+    private lateinit var callStatusTagView: TagListCustomView
     private var datePickerDialog: DatePickerDialog? = null
     private val viewModel: FollowUpViewModel by activityViewModels()
 
@@ -60,13 +70,14 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
         initView()
         initializeListeners()
         attachObservers()
+        viewModel.getShashtyaShebikas()
     }
 
     private fun enableConfirm() {
         val isCustomizedOptionSelected =
             dataRangesListTagView
                 .getSelectedTags()
-                .any { it.name == FollowUpDefinedParams.FilterCustomize }
+                .any { it.name == FollowUpDefinedParams.FILTER_CUSTOMIZE }
 
         val isDateRangeValid = if (dataRangesListTagView.getSelectedTags().isNotEmpty()) {
             if (isCustomizedOptionSelected) {
@@ -76,6 +87,12 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
             }
         } else {
             false
+        }
+
+        val isSSValid = if (isCustomizedOptionSelected) {
+            isDateRangeValid && ssListTagView.getSelectedTags().isNotEmpty()
+        } else {
+            ssListTagView.getSelectedTags().isNotEmpty()
         }
 
         val isVillageValid = if (isCustomizedOptionSelected) {
@@ -90,7 +107,47 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
             referralReasonTagView.getSelectedTags().isNotEmpty()
         }
 
-        binding.btnApply.isEnabled = isVillageValid || isDateRangeValid || isValidReferralReasons
+        val isValidReason = if (isCustomizedOptionSelected) {
+            isDateRangeValid && ncdReasonTagView.getSelectedTags().isNotEmpty()
+        } else {
+            ncdReasonTagView.getSelectedTags().isNotEmpty()
+        }
+
+        val isValidReferralTo = if (isCustomizedOptionSelected) {
+            isDateRangeValid && ncdReferralToTagView.getSelectedTags().isNotEmpty()
+        } else {
+            ncdReferralToTagView.getSelectedTags().isNotEmpty()
+        }
+
+        val isValidRemainingAttempt = if (isReferredTab()) {
+            if (isCustomizedOptionSelected) {
+                isDateRangeValid && remainingAttemptTagView.getSelectedTags().isNotEmpty()
+            } else {
+                remainingAttemptTagView.getSelectedTags().isNotEmpty()
+            }
+        } else {
+            false
+        }
+
+        val isValidCallStatus = if (isReferredTab()) {
+            if (isCustomizedOptionSelected) {
+                isDateRangeValid && callStatusTagView.getSelectedTags().isNotEmpty()
+            } else {
+                callStatusTagView.getSelectedTags().isNotEmpty()
+            }
+        } else {
+            false
+        }
+
+        binding.btnApply.isEnabled =
+            isSSValid ||
+            isVillageValid ||
+            isDateRangeValid ||
+            isValidReferralReasons ||
+            isValidReason ||
+            isValidReferralTo ||
+            isValidRemainingAttempt ||
+            isValidCallStatus
     }
 
     private fun initializeListeners() {
@@ -99,24 +156,50 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
     }
 
     private fun attachObservers() {
-        val villages = viewModel.getVillages()
-        val chipItemList = ArrayList<ChipViewItemModel>()
-        villages.forEach {
-            chipItemList.add(
-                ChipViewItemModel(
-                    id = it.id,
-                    name = it.name,
-                ),
+        viewModel.shashthyaShebikasLiveData.observe(viewLifecycleOwner) {
+            ssListTagView.addChipItemList(
+                it,
+                viewModel.getFilterData()?.selectedShashtyaShebikas,
             )
         }
-        villageListTagView.addChipItemList(
-            chipItemList,
-            viewModel.getFilterData()?.selectedVillages,
-        )
+        viewModel.subVillagesLiveData.observe(viewLifecycleOwner) {
+            binding.villageChipGroup.clearCheck()
+            if (it.isEmpty()) {
+                hideVillage()
+            } else {
+                binding.tvVillageTitle.visible()
+                binding.villageChipGroup.visible()
+            }
+            villageListTagView.addChipItemList(
+                it,
+                viewModel.getFilterData()?.selectedVillages,
+            )
+        }
     }
 
     private fun initView() {
         viewModel.setUserJourney(AnalyticsDefinedParams.FollowUPFilter)
+        // Hide village(sub-village) initially
+        hideVillage()
+        // Hide NCD reason initially
+        hideReason()
+        // Hide NCD referral to initially
+        hideReferredTo()
+        if (isReferredTab()) {
+            showReferredFilters()
+        } else {
+            hideReferredFilters()
+        }
+
+        ssListTagView = TagListCustomView(binding.root.context, binding.ssChipGroup, true) { _, _, _ ->
+            val selectedTags = ssListTagView.getSelectedTags()
+            if (selectedTags.isEmpty()) {
+                hideVillage()
+            } else {
+                viewModel.onShashtyaShebikaSelected(selectedTags)
+            }
+            enableConfirm()
+        }
 
         villageListTagView =
             TagListCustomView(binding.root.context, binding.villageChipGroup) { _, _, _ ->
@@ -125,13 +208,41 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
 
         referralReasonTagView =
             TagListCustomView(binding.root.context, binding.cgReferralReason) { _, _, _ ->
+                val selectedTags = referralReasonTagView.getSelectedTags()
+                val hasNCD = selectedTags.any { it.type == FollowUpDefinedParams.FILTER_NCD }
+                if (hasNCD) {
+                    binding.tvNcdReason.visible()
+                    binding.cgNcdReason.visible()
+
+                    binding.tvNcdReferral.visible()
+                    binding.cgNcdReferral.visible()
+                } else {
+                    hideReason()
+                    hideReferredTo()
+                }
                 enableConfirm()
             }
+
+        ncdReasonTagView = TagListCustomView(binding.root.context, binding.cgNcdReason, true) { _, _, _ ->
+            enableConfirm()
+        }
+
+        ncdReferralToTagView = TagListCustomView(binding.root.context, binding.cgNcdReferral, true) { _, _, _ ->
+            enableConfirm()
+        }
+
+        remainingAttemptTagView = TagListCustomView(binding.root.context, binding.cgRemainingAttempt, true) { _, _, _ ->
+            enableConfirm()
+        }
+
+        callStatusTagView = TagListCustomView(binding.root.context, binding.cgCallStatus, true) { _, _, _ ->
+            enableConfirm()
+        }
 
         dataRangesListTagView =
             TagListCustomView(
                 binding.root.context,
-                binding.registrationStatusChipGroup,
+                binding.dateRangeChipGroup,
             ) { _, _, _ ->
                 if (dataRangesListTagView.getSelectedTags().isEmpty()) {
                     goneDatePicker()
@@ -139,7 +250,7 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
                     val isCustomized =
                         dataRangesListTagView
                             .getSelectedTags()
-                            .any { it.name == FollowUpDefinedParams.FilterCustomize }
+                            .any { it.name == FollowUpDefinedParams.FILTER_CUSTOMIZE }
                     if (isCustomized) {
                         binding.clDateRange.visibility = View.VISIBLE
                         binding.tvApplyError.visibility = View.GONE
@@ -147,14 +258,57 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
                         goneDatePicker()
                     }
                 }
-
                 enableConfirm()
             }
         composeStatusListChipView()
-        binding.tvRegistrationStatus.text = getString(R.string.data_range)
         binding.etFromDate.safeClickListener(this)
         binding.etToDate.safeClickListener(this)
     }
+
+    /**
+     * Hide village group and clear selection
+     */
+    private fun hideVillage() {
+        binding.tvVillageTitle.gone()
+        binding.villageChipGroup.gone()
+        binding.villageChipGroup.clearCheck()
+    }
+
+    /**
+     * Hide ncd reason and clear selection
+     */
+    private fun hideReason() {
+        binding.tvNcdReason.gone()
+        binding.cgNcdReason.gone()
+        binding.cgNcdReason.clearCheck()
+    }
+
+    /**
+     * Hide ncd referral to and clear selection
+     */
+    private fun hideReferredTo() {
+        binding.tvNcdReferral.gone()
+        binding.cgNcdReferral.gone()
+        binding.cgNcdReferral.clearCheck()
+    }
+
+    private fun showReferredFilters() {
+        binding.tvRemainingAttemptTitle.visible()
+        binding.cgRemainingAttempt.visible()
+        binding.tvCallStatusTitle.visible()
+        binding.cgCallStatus.visible()
+    }
+
+    private fun hideReferredFilters() {
+        binding.tvRemainingAttemptTitle.gone()
+        binding.cgRemainingAttempt.gone()
+        binding.cgRemainingAttempt.clearCheck()
+        binding.tvCallStatusTitle.gone()
+        binding.cgCallStatus.gone()
+        binding.cgCallStatus.clearCheck()
+    }
+
+    private fun isReferredTab(): Boolean = viewModel.getFilterData()?.type == FollowUpDefinedParams.FU_TYPE_REFERRED
 
     private fun goneDatePicker() {
         binding.etFromDate.text = ""
@@ -181,18 +335,48 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
             viewModel.getFilterData()?.selectedDateRange,
         )
 
-        val reasons = viewModel.getReferralReasons()
-        val reasonList = ArrayList<ChipViewItemModel>()
-        reasons.forEach {
-            reasonList.add(
-                ChipViewItemModel(name = it),
+        val referralReasonList = viewModel.getReferralReasons().map {
+            ChipViewItemModel(
+                name = AssessmentUtil.mapServiceToServiceName(it, requireContext()),
+                type = it,
             )
         }
-
         referralReasonTagView.addChipItemList(
-            reasonList,
-            viewModel.getFilterData()?.selectedReasons,
+            referralReasonList,
+            viewModel.getFilterData()?.selectedReferralReasons,
         )
+
+        ncdReasonTagView.addChipItemList(
+            viewModel.getNCDReason(),
+            viewModel.getFilterData()?.ncdSelectedReasons,
+        )
+
+        ncdReferralToTagView.addChipItemList(
+            viewModel.getNcdReferralFacility(),
+            viewModel.getFilterData()?.ncdSelectedReferralTo,
+        )
+
+        if (isReferredTab()) {
+            val remainingAttemptItems = (1..viewModel.screeningRetryAttempts).map { attempt ->
+                ChipViewItemModel(
+                    id = attempt.toLong(),
+                    name = CommonUtils.formatCountForCurrentLocale(attempt),
+                )
+            }
+            remainingAttemptTagView.addChipItemList(remainingAttemptItems, viewModel.getFilterData()?.remainingAttempt)
+
+            val callStatusItems = listOf(
+                ChipViewItemModel(
+                    name = getString(R.string.successful),
+                    type = FollowUpCallStatus.SUCCESSFUL.name,
+                ),
+                ChipViewItemModel(
+                    name = getString(R.string.unsuccessful),
+                    type = FollowUpCallStatus.UNSUCCESSFUL.name,
+                ),
+            )
+            callStatusTagView.addChipItemList(callStatusItems, viewModel.getFilterData()?.callStatus)
+        }
     }
 
     override fun onClick(view: View) {
@@ -223,15 +407,27 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
             R.id.btnCancel -> {
                 viewModel.setUserJourney(AnalyticsDefinedParams.CANCELBUTTONTRIGGERED)
                 viewModel.updateFollowUpFilter(
+                    selectedShashthyaShebikas = listOf(),
                     selectedVillages = listOf(),
                     selectedDateRange = listOf(),
-                    selectedReasons = listOf(),
+                    selectedReferralReasons = listOf(),
+                    ncdSelectedReason = listOf(),
+                    ncdSelectedReferralTo = listOf(),
                     fromDate = "",
                     toDate = "",
+                    remainingAttempt = null,
+                    callStatus = null,
+                    updateRemainingAttempt = true,
+                    updateCallStatus = true,
                 )
+                ssListTagView.clearSelection()
                 villageListTagView.clearSelection()
                 dataRangesListTagView.clearSelection()
                 referralReasonTagView.clearSelection()
+                ncdReasonTagView.clearSelection()
+                ncdReferralToTagView.clearSelection()
+                remainingAttemptTagView.clearSelection()
+                callStatusTagView.clearSelection()
                 dismiss()
             }
         }
@@ -239,11 +435,18 @@ class FollowUpFilterBottomSheetDialogFragment : BottomSheetDialogFragment(), Vie
 
     private fun applyFilter() {
         viewModel.updateFollowUpFilter(
+            selectedShashthyaShebikas = ssListTagView.getSelectedTags(),
             selectedVillages = villageListTagView.getSelectedTags(),
             selectedDateRange = dataRangesListTagView.getSelectedTags(),
-            selectedReasons = referralReasonTagView.getSelectedTags(),
+            selectedReferralReasons = referralReasonTagView.getSelectedTags(),
+            ncdSelectedReason = ncdReasonTagView.getSelectedTags(),
+            ncdSelectedReferralTo = ncdReferralToTagView.getSelectedTags(),
             fromDate = binding.etFromDate.text.toString(),
             toDate = binding.etToDate.text.toString(),
+            remainingAttempt = remainingAttemptTagView.getSelectedTags(),
+            callStatus = callStatusTagView.getSelectedTags(),
+            updateRemainingAttempt = isReferredTab(),
+            updateCallStatus = isReferredTab(),
         )
         viewModel.setUserJourney(AnalyticsDefinedParams.APPLYBUTTONTRIGGERED)
         dismiss()

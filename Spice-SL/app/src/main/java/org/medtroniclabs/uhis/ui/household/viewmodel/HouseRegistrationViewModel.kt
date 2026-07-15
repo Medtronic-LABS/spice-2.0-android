@@ -13,8 +13,9 @@ import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.LocalSpinnerResponse
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineConstant
 import org.medtroniclabs.uhis.db.entity.HouseholdEntity
+import org.medtroniclabs.uhis.db.entity.VillageEntity
 import org.medtroniclabs.uhis.di.IoDispatcher
-import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.VILLAGE_ID
+import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration
 import org.medtroniclabs.uhis.mappingkey.MemberRegistration.ID_GUARDIAN
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.repo.HouseHoldRepository
@@ -24,7 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HouseRegistrationViewModel @Inject constructor(
-    @IoDispatcher override var dispatcherIO: CoroutineDispatcher,
+    @param:IoDispatcher override var dispatcherIO: CoroutineDispatcher,
     private val houseHoldRepository: HouseHoldRepository,
     private val houseHoldRepositoryMember: HouseholdMemberRepository,
 ) : BaseViewModel(dispatcherIO) {
@@ -40,6 +41,7 @@ class HouseRegistrationViewModel @Inject constructor(
     var villageListResponse = MutableLiveData<Resource<LocalSpinnerResponse>>()
     var memberVillageListResponse = MutableLiveData<Resource<LocalSpinnerResponse>>()
     var shasthyaShebikaListResponse = MutableLiveData<Resource<LocalSpinnerResponse>>()
+    var shasthyaKormiListResponse = MutableLiveData<Resource<LocalSpinnerResponse>>()
     var subVillageListResponse = MutableLiveData<Resource<LocalSpinnerResponse>>()
     var guardianMembers = MutableLiveData<Resource<LocalSpinnerResponse>>()
     var memberID: Long = -1L
@@ -79,7 +81,7 @@ class HouseRegistrationViewModel @Inject constructor(
     ) {
         viewModelScope.launch(dispatcherIO) {
             when (type) {
-                VILLAGE_ID -> {
+                HouseHoldRegistration.VILLAGE_ID -> {
                     villageListResponse.postLoading()
                     villageListResponse.postValue(houseHoldRepository.getUserVillages(tag))
                 }
@@ -93,7 +95,7 @@ class HouseRegistrationViewModel @Inject constructor(
     ) {
         viewModelScope.launch(dispatcherIO) {
             when (type) {
-                VILLAGE_ID -> {
+                HouseHoldRegistration.VILLAGE_ID -> {
                     memberVillageListResponse.postLoading()
                     memberVillageListResponse.postValue(houseHoldRepository.getUserLinkedVillages(tag))
                 }
@@ -106,10 +108,7 @@ class HouseRegistrationViewModel @Inject constructor(
         }
     }
 
-    fun loadShasthyaShebikaDataCacheByType(
-        type: String,
-        tag: String,
-    ) {
+    fun loadShasthyaShebikaDataCacheByType() {
         viewModelScope.launch(dispatcherIO) {
             val userId = SecuredPreference.getUserId()
             shasthyaShebikaListResponse.postLoading()
@@ -117,14 +116,37 @@ class HouseRegistrationViewModel @Inject constructor(
         }
     }
 
-    fun loadSubVillageDataCacheByType(
-        type: String,
-        tag: String,
-        shasthyaShebikaId: Long,
-    ) {
+    fun loadAllShasthyaKormis() {
+        viewModelScope.launch(dispatcherIO) {
+            shasthyaKormiListResponse.postLoading()
+            shasthyaKormiListResponse.postValue(houseHoldRepository.getAllShasthyaKormisSpinner())
+        }
+    }
+
+    fun loadShasthyaShebikaForKormiId(kormiId: Long) {
+        viewModelScope.launch(dispatcherIO) {
+            shasthyaShebikaListResponse.postLoading()
+            shasthyaShebikaListResponse.postValue(houseHoldRepository.getShasthyaShebikasByKormiId(kormiId))
+        }
+    }
+
+    suspend fun getVillageEntity(villageId: Long): VillageEntity? = houseHoldRepository.getVillageByID(villageId).data
+
+    fun loadSubVillageDataCacheByType(shasthyaShebikaId: Long) {
         viewModelScope.launch(dispatcherIO) {
             subVillageListResponse.postLoading()
             subVillageListResponse.postValue(houseHoldRepository.getSubVillagesByShasthyaShebikaId(shasthyaShebikaId))
+        }
+    }
+
+    /**
+     * CHCP registration loads sub-villages directly from the selected Union ([villageId])
+     * instead of via a Shasthya Shebika.
+     */
+    fun loadSubVillageByVillageId(villageId: Long) {
+        viewModelScope.launch(dispatcherIO) {
+            subVillageListResponse.postLoading()
+            subVillageListResponse.postValue(houseHoldRepository.getSubVillagesByVillageId(villageId))
         }
     }
 
@@ -134,7 +156,7 @@ class HouseRegistrationViewModel @Inject constructor(
                 houseHoldRegistrationLiveData.postLoading()
                 householdEntityDetail = houseHoldRepository.createOrUpdateHouseHoldEntity(map)
                 houseHoldRegistrationLiveData.postSuccess()
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 houseHoldRegistrationLiveData.postError()
             }
         }
@@ -144,11 +166,20 @@ class HouseRegistrationViewModel @Inject constructor(
         viewModelScope.launch(dispatcherIO) {
             try {
                 houseHoldUpdateLiveData.postLoading()
+                val detail = householdEntityDetail ?: run {
+                    houseHoldUpdateLiveData.postError()
+                    return@launch
+                }
+                val before = houseHoldRepository.getHouseHoldDetailsById(detail.id)
                 val householdEntity =
-                    houseHoldRepository.createOrUpdateHouseHoldEntity(map, householdEntityDetail)
-                houseHoldRepository.updateHouseHoldEntity(householdEntity)
+                    houseHoldRepository.createOrUpdateHouseHoldEntity(map, detail)
+                if (houseHoldRepository.hasMeaningfulHouseholdChanges(before, householdEntity)) {
+                    houseHoldRepository.updateHouseHoldEntity(householdEntity)
+                } else {
+                    householdEntityDetail = before
+                }
                 houseHoldUpdateLiveData.postSuccess()
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 houseHoldUpdateLiveData.postError()
             }
         }
@@ -161,7 +192,7 @@ class HouseRegistrationViewModel @Inject constructor(
                 householdEntityDetail = houseHoldRepository.getHouseHoldDetailsById(houseHoldId)
                 houseHoldDetailLiveData.postSuccess(householdEntityDetail)
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             houseHoldDetailLiveData.postError()
         }
     }

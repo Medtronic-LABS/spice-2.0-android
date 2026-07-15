@@ -208,7 +208,7 @@ class UnderTwoMonthsBaseActivity :
 
     private fun initializeUnderTwoMonthSummaryFragment() {
         val bundle = Bundle().apply {
-            putString(DefinedParams.EncounterId, viewModel.encounterId)
+            putString(DefinedParams.ENCOUNTER_ID, viewModel.encounterId)
             putString(DefinedParams.PatientReference, viewModel.patientReference)
         }
         replaceFragmentInId<UnderTwoMonthsTreatmentSummaryFragment>(
@@ -294,8 +294,8 @@ class UnderTwoMonthsBaseActivity :
         initializeBirthHistoryFragments()
         val ageInMonth = details.birthDate?.let { DateUtils.calculateAgeInMonths(it) }
         val bundle = Bundle().apply {
-            putString(DefinedParams.Gender, details.gender)
-            ageInMonth?.first?.let { putInt(DefinedParams.Age, it) }
+            putString(DefinedParams.GENDER, details.gender)
+            ageInMonth?.first?.let { putInt(DefinedParams.AGE, it) }
         }
         replaceFragment<ClinicalSummaryFragment>(binding.clinicalSummaryContainer.id, tag = ClinicalSummaryFragment.TAG, bundle = bundle)
         replaceFragment<ExaminationCardFragment>(binding.examinationsContainer.id, tag = ExaminationCardFragment.TAG)
@@ -340,7 +340,7 @@ class UnderTwoMonthsBaseActivity :
                 patientDetailViewModel.patientDetailsLiveData.value?.data?.let { data ->
                     val intent = Intent(this, InvestigationActivity::class.java)
                     intent.putExtra(DefinedParams.PatientId, data.patientId)
-                    intent.putExtra(DefinedParams.EncounterId, patientDetailViewModel.encounterId)
+                    intent.putExtra(DefinedParams.ENCOUNTER_ID, patientDetailViewModel.encounterId)
                     getResult.launch(intent)
                 }
             }
@@ -359,7 +359,7 @@ class UnderTwoMonthsBaseActivity :
         patientDetailViewModel.patientDetailsLiveData.value?.data?.let { data ->
             Intent(this, PrescriptionActivity::class.java).apply {
                 putExtra(DefinedParams.PatientId, data.patientId)
-                putExtra(DefinedParams.EncounterId, patientDetailViewModel.encounterId)
+                putExtra(DefinedParams.ENCOUNTER_ID, patientDetailViewModel.encounterId)
                 getResult.launch(this)
             }
         }
@@ -499,7 +499,7 @@ class UnderTwoMonthsBaseActivity :
     private val getResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.getStringExtra(DefinedParams.EncounterId)?.let { value ->
+                result.data?.getStringExtra(DefinedParams.ENCOUNTER_ID)?.let { value ->
                     patientDetailViewModel.encounterId = value
                 }
             }

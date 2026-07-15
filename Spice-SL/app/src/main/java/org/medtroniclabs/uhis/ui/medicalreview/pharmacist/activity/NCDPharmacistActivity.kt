@@ -88,7 +88,7 @@ class NCDPharmacistActivity : BaseActivity(), View.OnClickListener {
                     loadPatientInfo(resourceState.data)
                     withNetworkAvailability(online = {
                         viewModel.getPrescriptionDispenseList(
-                            DispenseUpdateRequest(patientReference = patientDetailViewModel.getPatientId()),
+                            DispenseUpdateRequest(patientReference = patientDetailViewModel.getPatientFHIRId()),
                         )
                     })
                     viewModel.patientReference = patientDetailViewModel.getPatientId()
@@ -151,14 +151,15 @@ class NCDPharmacistActivity : BaseActivity(), View.OnClickListener {
     private fun loadPatientInfo(data: PatientListRespModel?) {
         data?.let {
             binding.tvProgramId.text = it.programId.textOrHyphen()
-            binding.tvNationalId.text = it.identityValue.textOrHyphen()
-            data.firstName?.let {
-                val text = StringConverter.appendTexts(firstText = it, data.lastName)
+            binding.tvNationalId.text = (it.identityValue ?: it.nationalID?.toString()).textOrHyphen()
+            val displayName = it.name?.takeIf { name -> name.isNotBlank() }
+                ?: StringConverter.appendTexts(firstText = it.firstName.orEmpty(), it.lastName)
+            if (displayName.isNotBlank()) {
                 setTitle(
                     StringConverter.appendTexts(
-                        firstText = text,
-                        data.age.toString(),
-                        data.gender?.capitalizeFirstChar(),
+                        firstText = displayName.capitalizeFirstChar(),
+                        it.age?.toString(),
+                        it.gender?.capitalizeFirstChar(),
                         separator = "-",
                     ),
                 )
@@ -220,6 +221,7 @@ class NCDPharmacistActivity : BaseActivity(), View.OnClickListener {
                 patientDetailViewModel.getPatients(
                     id,
                     origin = patientDetailViewModel.origin?.lowercase(),
+                    patientId = it.getStringExtra(DefinedParams.PatientId),
                 )
             }
         }

@@ -34,7 +34,7 @@ class NCDPatientDeleteViewModel @Inject constructor(
             val list = ArrayList(deleteList)
             if (list.isNotEmpty()) {
                 val itemIndex =
-                    list.indexOfFirst { it.name.contains(DefinedParams.Other, ignoreCase = true) }
+                    list.indexOfFirst { it.name.contains(DefinedParams.OTHER, ignoreCase = true) }
                 if (itemIndex >= 0 && (itemIndex + 1) != list.size) {
                     val item = list.removeAt(itemIndex)
                     list.add(item)

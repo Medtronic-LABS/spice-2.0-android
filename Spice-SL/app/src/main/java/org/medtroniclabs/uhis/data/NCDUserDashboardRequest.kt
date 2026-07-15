@@ -33,6 +33,14 @@ data class NCDUserDashboardResponse(
     val pwIdentifiedFirst4MonthsWithAncCount: Int,
     val anc3PlusCount: Int,
     val highRiskPregnantWomenCount: Int,
+    val totalNcdServicesCount: Int = 0,
+    val ncdScreeningFirstServiceCount: Int = 0,
+    val ncdFollowUpAssessmentCount: Int = 0,
+    val ncdFollowUpReferralCount: Int = 0,
+    val linkedToCareCount: Int = 0,
+    val glassesSoldCustomStatusCount: Int = 0,
+    val ncdServicesInCataractCampCount: Int = 0,
+    val patientsReferredForOperationCount: Int = 0,
 )
 
 data class ActivityModel(

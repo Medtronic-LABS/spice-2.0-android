@@ -110,7 +110,7 @@ class NCDMentalHealthFragment : DialogFragment(), View.OnClickListener {
             viewModel.patientStatusId = responseMap[DefinedParams.ID] as? String
             (responseMap[NCDMRUtil.MentalHealthStatus] as? Map<*, *>)?.let { mhsMap ->
                 viewModel.mentalHealthStatusId = mhsMap[DefinedParams.ID] as? String
-                (mhsMap[DefinedParams.Status] as? String)?.let { status ->
+                (mhsMap[DefinedParams.STATUS] as? String)?.let { status ->
                     with(binding.llMentalHealth) {
                         if (childCount > 0) {
                             (getChildAt(0) as? SingleSelectionCustomView)?.singleSelectionAutofill(
@@ -119,19 +119,19 @@ class NCDMentalHealthFragment : DialogFragment(), View.OnClickListener {
                         }
                     }
                 }
-                (mhsMap[DefinedParams.MentalHealthDisorder] as? ArrayList<String>)?.let { disorders ->
+                (mhsMap[DefinedParams.MENTAL_HEALTH_DISORDER] as? ArrayList<String>)?.let { disorders ->
                     mentalHealth.addAll(disorders)
                 }
-                (mhsMap[DefinedParams.Comments] as? String)?.let { comments ->
+                (mhsMap[DefinedParams.COMMENTS] as? String)?.let { comments ->
                     binding.etComments.setText(comments)
                 }
-                (mhsMap[DefinedParams.YearOfDiagnosis] as? String)?.let { yearOfDiagnosis ->
+                (mhsMap[DefinedParams.YEAR_OF_DIAGNOSIS] as? String)?.let { yearOfDiagnosis ->
                     binding.etYrOfDiagnosis.setText(yearOfDiagnosis)
                 }
             }
             (responseMap[NCDMRUtil.SubstanceUseStatus] as? Map<*, *>)?.let { susMap ->
                 viewModel.substanceUseStatusId = susMap[DefinedParams.ID] as? String
-                (susMap[DefinedParams.Status] as? String)?.let { status ->
+                (susMap[DefinedParams.STATUS] as? String)?.let { status ->
                     with(binding.llSubstanceUse) {
                         if (childCount > 0) {
                             (getChildAt(0) as? SingleSelectionCustomView)?.singleSelectionAutofill(
@@ -140,13 +140,13 @@ class NCDMentalHealthFragment : DialogFragment(), View.OnClickListener {
                         }
                     }
                 }
-                (susMap[DefinedParams.MentalHealthDisorder] as? ArrayList<String>)?.let { disorders ->
+                (susMap[DefinedParams.MENTAL_HEALTH_DISORDER] as? ArrayList<String>)?.let { disorders ->
                     substanceUse.addAll(disorders)
                 }
-                (susMap[DefinedParams.Comments] as? String)?.let { comments ->
+                (susMap[DefinedParams.COMMENTS] as? String)?.let { comments ->
                     binding.etSubstanceComments.setText(comments)
                 }
-                (susMap[DefinedParams.YearOfDiagnosis] as? String)?.let { yearOfDiagnosis ->
+                (susMap[DefinedParams.YEAR_OF_DIAGNOSIS] as? String)?.let { yearOfDiagnosis ->
                     binding.etSubstanceDiagnosis.setText(yearOfDiagnosis)
                 }
             }
@@ -215,7 +215,7 @@ class NCDMentalHealthFragment : DialogFragment(), View.OnClickListener {
                     itemId: Long,
                 ) {
                     adapter.getData(pos)?.let {
-                        val selectedId = (it[DefinedParams.id] as? Long) ?: -1L
+                        val selectedId = (it[DefinedParams.ID] as? Long) ?: -1L
                         val selectedName = it[DefinedParams.NAME] as String?
                         val value = it[DefinedParams.Value] as String?
                         if (selectedId != -1L) {
@@ -322,7 +322,7 @@ class NCDMentalHealthFragment : DialogFragment(), View.OnClickListener {
         val list = arrayListOf<Map<String, Any>>(
             hashMapOf(
                 DefinedParams.NAME to getString(R.string.please_select),
-                DefinedParams.ID to DefinedParams.DefaultSelectID,
+                DefinedParams.ID to DefinedParams.DEFAULT_SELECT_ID,
             ),
         )
 

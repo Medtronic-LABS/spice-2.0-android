@@ -124,7 +124,7 @@ class MotherNeonatePncActivity :
 
     private fun initializeViewModel() {
         viewModel.patientId = intent.getStringExtra(DefinedParams.PatientId)
-        patientViewModel.encounterId = intent.getStringExtra(DefinedParams.EncounterId)
+        patientViewModel.encounterId = intent.getStringExtra(DefinedParams.ENCOUNTER_ID)
     }
 
     private fun setupRefreshLayout() = binding.refreshLayout.setOnRefreshListener { swipeRefresh() }
@@ -367,7 +367,7 @@ class MotherNeonatePncActivity :
     }
 
     override fun onDataLoaded(details: PatientListRespModel) {
-        if (intent?.getBooleanExtra(DefinedParams.DirectPNCFlow, false) != true) {
+        if (intent?.getBooleanExtra(DefinedParams.DIRECT_PNC_FLOW, false) != true) {
             viewModel.neonateOutCome = details.pregnancyDetails?.neonatalOutcomes
         }
         viewModel.pncVisit = details.pregnancyDetails
@@ -588,7 +588,7 @@ class MotherNeonatePncActivity :
         patientViewModel.patientDetailsLiveData.value?.data?.let { data ->
             val intent = Intent(this, InvestigationActivity::class.java)
             intent.putExtra(DefinedParams.PatientId, data.patientId)
-            intent.putExtra(DefinedParams.EncounterId, patientViewModel.encounterId)
+            intent.putExtra(DefinedParams.ENCOUNTER_ID, patientViewModel.encounterId)
             getResult.launch(intent)
         }
     }
@@ -608,7 +608,7 @@ class MotherNeonatePncActivity :
         patientViewModel.patientDetailsLiveData.value?.data?.let { data ->
             val intent = Intent(this, PrescriptionActivity::class.java)
             intent.putExtra(DefinedParams.PatientId, data.patientId)
-            intent.putExtra(DefinedParams.EncounterId, patientViewModel.encounterId)
+            intent.putExtra(DefinedParams.ENCOUNTER_ID, patientViewModel.encounterId)
             intent.putExtra(DefinedParams.IsNeonate, false)
             getResult.launch(intent)
         }
@@ -619,7 +619,7 @@ class MotherNeonatePncActivity :
             ActivityResultContracts.StartActivityForResult(),
         ) {
             if (it.resultCode == Activity.RESULT_OK) {
-                val value = it.data?.getStringExtra(DefinedParams.EncounterId)
+                val value = it.data?.getStringExtra(DefinedParams.ENCOUNTER_ID)
                 value?.let { valueString ->
                     patientViewModel.encounterId = valueString
                 }
@@ -951,7 +951,7 @@ class MotherNeonatePncActivity :
             )
 
     private fun setLabourDeliveryData(labourRequest: String?) {
-        if (intent.getBooleanExtra(DefinedParams.DirectPNCFlow, false)) {
+        if (intent.getBooleanExtra(DefinedParams.DIRECT_PNC_FLOW, false)) {
             val gson = Gson()
             val json = labourRequest
             viewModel.labourDeliveryDetails = gson.fromJson(json, CreateLabourDeliveryRequest::class.java)

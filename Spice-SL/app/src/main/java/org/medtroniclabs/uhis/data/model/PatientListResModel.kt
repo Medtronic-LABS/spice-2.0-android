@@ -1,0 +1,41 @@
+package org.medtroniclabs.uhis.data.model
+
+data class PatientListResModel(
+    val id: Long? = null,
+    val nationalId: String? = null,
+    val programId: Long? = null,
+    val firstName: String? = null,
+    val lastName: String? = null,
+    val name: String? = null,
+    val gender: String? = null,
+    val age: Int? = null,
+    val patientStatus: String? = null,
+    val enrollmentAt: String? = null,
+    val birthDate: String? = null,
+    val patientId: String? = null,
+    val memberReference: String? = null,
+    val patientReference: String? = null,
+    val initialReview: Boolean,
+    val redRiskPatient: Boolean? = null,
+    val screeningLogId: Long? = null,
+    val riskColorCode: String? = null,
+    val riskPatient: Boolean? = false,
+    val isConfirmDiagnosis: Boolean = false,
+    val referAssessment: Boolean? = null,
+    val screeningDateTime: String? = null,
+    val referredReasons: List<String>? = null,
+    val referredSite: String? = null,
+    val referredDateSince: Long? = null,
+    val callCompleted: Boolean? = null,
+    val callInitiated: Boolean = false,
+    val tenantId: Long? = null,
+    val retryAttempts: Int? = null,
+    val callRegisterId: Long? = null,
+    val identityType: String? = null,
+    val identityValue: String? = null,
+    val qrCode: String? = null,
+) {
+    fun resolvedNationalId(): String? =
+        nationalId?.takeIf { it.isNotBlank() }
+            ?: identityValue?.takeIf { it.isNotBlank() }
+}

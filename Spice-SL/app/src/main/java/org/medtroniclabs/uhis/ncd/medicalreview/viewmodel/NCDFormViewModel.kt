@@ -1,5 +1,6 @@
 package org.medtroniclabs.uhis.ncd.medicalreview.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
@@ -9,6 +10,7 @@ import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.appextensions.postError
 import org.medtroniclabs.uhis.appextensions.postLoading
 import org.medtroniclabs.uhis.appextensions.postSuccess
+import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.di.IoDispatcher
 import org.medtroniclabs.uhis.formgeneration.model.FormLayout
@@ -43,7 +45,7 @@ class NCDFormViewModel @Inject constructor(
                                         val hasVs =
                                             viewScreens.any { it.toString().equals(type, true) }
                                         if (hasVs) {
-                                            val id = (listItem[DefinedParams.id] as? Double)
+                                            val id = (listItem[DefinedParams.ID] as? Double)
                                             (listItem[DefinedParams.FormInput] as? String)?.let { responseStr ->
                                                 gson
                                                     .fromJson(responseStr, FormResponse::class.java)
@@ -69,6 +71,26 @@ class NCDFormViewModel @Inject constructor(
                     }
                 }
                 ncdFormResponse.postSuccess(formLayouts)
+            } catch (e: Exception) {
+                ncdFormResponse.postError()
+            }
+        }
+    }
+
+    /**
+     * Loads a form layout bundled as an asset (e.g. the community patient-edit form which is not
+     * synced from the backend) and posts it through the same [ncdFormResponse] stream.
+     */
+    fun getFormFromAsset(
+        context: Context,
+        fileName: String,
+    ) {
+        viewModelScope.launch(dispatcherIO) {
+            ncdFormResponse.postLoading()
+            try {
+                val json = CommonUtils.getStringFromAssets(fileName, context.assets)
+                val formResponse = Gson().fromJson(json, FormResponse::class.java)
+                ncdFormResponse.postSuccess(formResponse.formLayout)
             } catch (e: Exception) {
                 ncdFormResponse.postError()
             }

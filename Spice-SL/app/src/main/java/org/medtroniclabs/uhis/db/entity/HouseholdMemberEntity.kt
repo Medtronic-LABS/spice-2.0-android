@@ -35,6 +35,10 @@ data class HouseholdMemberEntity(
     var villageId: Long? = null,
     @ColumnInfo("shasthya_shebika_id")
     var shasthyaShebikaId: Long? = null,
+    @ColumnInfo("shasthya_kormi_id")
+    var shasthyaKormiId: Long? = null,
+    @ColumnInfo("chiefdom_id")
+    var chiefdomId: Long? = null,
     @ColumnInfo("sub_village_id")
     var subVillageId: Long? = null,
     @ColumnInfo("patient_id")
@@ -62,4 +66,8 @@ data class HouseholdMemberEntity(
     var maritalStatus: String? = null,
     @ColumnInfo("disability")
     var disability: String? = null,
+    @ColumnInfo("qr_code")
+    var qrCode: String? = null,
+    @ColumnInfo("created_by_role_name")
+    var createdByRoleName: String? = null,
 ) : BaseEntity()

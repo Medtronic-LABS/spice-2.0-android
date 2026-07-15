@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context="org.medtroniclabs.uhis.ui.membersearch.MemberSearchActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/search_background"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <include
+            android:id="@+id/llExactSearch"
+            layout="@layout/household_search_layout" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/graph_limit_linecolor"
+        app:layout_constraintTop_toBottomOf="@+id/clHeader" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvMembersCount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:fontFamily="@font/inter_bold"
+        android:padding="@dimen/_5sdp"
+        android:textColor="@color/house_hold_title"
+        android:textSize="@dimen/_18ssp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toStartOf="@id/llFilter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/llFilter"
+        tools:text="@string/household_members" />
+
+    <include
+        android:id="@+id/llFilter"
+        layout="@layout/filter_btn_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_16sdp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/view" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/filterBarrier"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="llFilter,tvMembersCount" />
+
+    <androidx.appcompat.widget.AppCompatSpinner
+        android:id="@+id/tvMemberTypes"
+        style="@style/Form_Spinner_Style"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_16sdp"
+        android:layout_marginTop="@dimen/_16sdp"
+        android:minHeight="@dimen/_40sdp"
+        app:layout_constraintTop_toBottomOf="@id/filterBarrier" />
+
+    <View
+        android:id="@+id/viewMemberTypes"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_marginTop="@dimen/_16sdp"
+        android:background="@color/graph_limit_linecolor"
+        app:layout_constraintTop_toBottomOf="@+id/tvMemberTypes" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMembersList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:padding="@dimen/_5sdp"
+        android:visibility="visible"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@id/pageProgress"
+        app:layout_constraintTop_toBottomOf="@id/viewMemberTypes" />
+
+    <ProgressBar
+        android:id="@+id/pageProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/_8sdp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvNoMembersFound"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:paddingHorizontal="@dimen/_15sdp"
+        android:text="@string/no_members_found"
+        android:textColor="@color/medium_risk_color"
+        android:textSize="@dimen/_16ssp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintTop_toBottomOf="@id/filterBarrier" />
+
+    <LinearLayout
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:padding="@dimen/_12sdp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnAddMember"
+            style="@style/Button_Style"
+            android:layout_width="match_parent"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/_8sdp"
+            android:text="@string/add_new_member_small"
+            android:textAllCaps="true"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -31,8 +31,13 @@ import org.medtroniclabs.uhis.db.entity.ChiefDomEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowConditionEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowEntity
 import org.medtroniclabs.uhis.db.entity.CommunityProfile
+import org.medtroniclabs.uhis.db.entity.ComorbidityEntity
+import org.medtroniclabs.uhis.db.entity.ComplaintsEntity
+import org.medtroniclabs.uhis.db.entity.ComplicationEntity
 import org.medtroniclabs.uhis.db.entity.ConsentEntity
 import org.medtroniclabs.uhis.db.entity.ConsentForm
+import org.medtroniclabs.uhis.db.entity.CurrentMedicationEntity
+import org.medtroniclabs.uhis.db.entity.DiagnosisEntity
 import org.medtroniclabs.uhis.db.entity.DistrictEntity
 import org.medtroniclabs.uhis.db.entity.DosageDurationEntity
 import org.medtroniclabs.uhis.db.entity.FollowUp
@@ -56,15 +61,20 @@ import org.medtroniclabs.uhis.db.entity.NCDDiagnosisEntity
 import org.medtroniclabs.uhis.db.entity.NCDFollowUp
 import org.medtroniclabs.uhis.db.entity.NCDMedicalReviewMetaEntity
 import org.medtroniclabs.uhis.db.entity.NCDPatientDetailsEntity
+import org.medtroniclabs.uhis.db.entity.PhysicalExaminationEntity
 import org.medtroniclabs.uhis.db.entity.PregnancyDetail
 import org.medtroniclabs.uhis.db.entity.RiskFactorEntity
 import org.medtroniclabs.uhis.db.entity.RxBuddyDetails
 import org.medtroniclabs.uhis.db.entity.RxBuddyFollowUpEntity
 import org.medtroniclabs.uhis.db.entity.ScreeningEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
+import org.medtroniclabs.uhis.db.entity.SiteEntity
 import org.medtroniclabs.uhis.db.entity.SubVillageEntity
+import org.medtroniclabs.uhis.db.entity.SymptomEntity
 import org.medtroniclabs.uhis.db.entity.TreatmentDetailsEntity
 import org.medtroniclabs.uhis.db.entity.TreatmentPlanEntity
 import org.medtroniclabs.uhis.db.entity.UserProfileEntity
@@ -76,7 +86,7 @@ import org.medtroniclabs.uhis.db.response.MemberAssessmentHistoryResponse
 import org.medtroniclabs.uhis.model.MemberDobGenderModel
 import org.medtroniclabs.uhis.model.assessment.AssessmentDetails
 import org.medtroniclabs.uhis.model.assessment.AssessmentMemberDetails
-import org.medtroniclabs.uhis.model.services.ServiceMemberCounts
+import org.medtroniclabs.uhis.model.followup.FollowUpSortOrder
 import org.medtroniclabs.uhis.model.services.ServiceStaticFilter
 import org.medtroniclabs.uhis.ui.assessment.AssessmentNCDEntity
 
@@ -147,11 +157,51 @@ interface RoomHelper {
     suspend fun deleteAllSubVillages()
 
     // ShasthyaShebika methods
+    suspend fun getShasthyaShebikaById(id: Long): ShasthyaShebikaEntity?
+
     suspend fun saveShasthyaShebikas(shasthyaShebikaEntityList: List<ShasthyaShebikaEntity>)
 
     suspend fun deleteAllShasthyaShebikas()
 
     suspend fun getShasthyaShebikaByShasthyaKormiId(shasthyaKormiId: Long): List<ShasthyaShebikaEntity>
+
+    // Chiefdom methods
+    suspend fun saveChiefdoms(chiefdomEntityList: List<ChiefDomEntity>)
+
+    suspend fun deleteAllChiefdoms()
+
+    suspend fun getChiefdomByVillageId(villageId: Long): List<ChiefDomEntity>
+
+    suspend fun getAllChiefdoms(): List<ChiefDomEntity>
+
+    suspend fun getChiefdomByShasthyaKormiId(shasthyaKormiId: Long): List<ChiefDomEntity>
+
+    suspend fun getChiefdomByShasthyaKormiIds(shasthyaKormiIds: List<Long>): List<ChiefDomEntity>
+
+    suspend fun getChiefdomById(chiefdomId: Long): ChiefDomEntity?
+
+    // ShasthyaKormi methods
+    suspend fun saveShasthyaKormis(shasthyaKormiEntityList: List<ShasthyaKormiEntity>)
+
+    suspend fun deleteAllShasthyaKormis()
+
+    suspend fun getShasthyaKormiByVillageId(villageId: Long): List<ShasthyaKormiEntity>
+
+    suspend fun getAllShasthyaKormis(): List<ShasthyaKormiEntity>
+
+    // ShasthyaKormiLinkedVillage methods
+    suspend fun insertShasthyaKormiLinkedVillages(linkedVillages: List<ShasthyaKormiLinkedVillageEntity>)
+
+    suspend fun deleteAllShasthyaKormiLinkedVillages()
+
+    suspend fun getSubVillagesByShasthyaKormiId(shasthyaKormiId: Long): List<SubVillageEntity>
+
+    suspend fun getSubVillagesByShasthyaKormiIds(shasthyaKormiIds: List<Long>): List<SubVillageEntity>
+
+    suspend fun getVillagesForShasthyaKormiAndChiefdom(
+        shasthyaKormiId: Long,
+        chiefdomId: Long,
+    ): List<VillageEntity>
 
     // ShasthyaShebikaLinkedVillage methods
     suspend fun insertShasthyaShebikaLinkedVillages(linkedVillages: List<ShasthyaShebikaLinkedVillageEntity>)
@@ -306,6 +356,8 @@ interface RoomHelper {
 
     suspend fun getDiagnosisList(diagnosisType: String): List<DiseaseCategoryItems>
 
+    suspend fun getDiagnosisList(): List<DiagnosisEntity>
+
     suspend fun getExaminationQuestionsByWorkFlow(workFlowType: String): ExaminationListItems
 
     suspend fun insertFollowUp(followUp: FollowUp): Long
@@ -320,10 +372,21 @@ interface RoomHelper {
 
     fun getFollowUpPatientListLiveData(
         type: String,
-        search: String? = null,
-        villageIds: List<Long> = listOf(),
+        search: String?,
+        shashthyaShebikaIds: List<Long>,
+        shashthyaShebikaIdsSize: Int,
+        villageIds: List<Long>,
+        villageIdsSize: Int,
+        selectedReferralReasonTypes: List<String>,
+        selectedReferralReasonTypesSize: Int,
+        ncdSelectedReason: String?,
+        ncdSelectedReferralTo: String?,
         fromDate: String = "",
         toDate: String = "",
+        screeningRetryAttempts: Int,
+        remainingAttempt: Int? = null,
+        callStatus: String? = null,
+        sortOrder: FollowUpSortOrder,
     ): LiveData<List<FollowUpPatientModel>>
 
     suspend fun getAllSubVillageIds(): List<Long>
@@ -337,9 +400,8 @@ interface RoomHelper {
     suspend fun insertUpdatePregnancyDetailFromBE(pregnancyDetail: PregnancyDetail)
 
     suspend fun addCallHistory(
-        oldFollowUp: FollowUp,
+        followUp: FollowUp,
         history: FollowUpCall,
-        newFollowUp: FollowUp? = null,
     )
 
     suspend fun deleteAllFollowUpCalls()
@@ -483,6 +545,12 @@ interface RoomHelper {
         phoneNumberCategory: String?,
     )
 
+    suspend fun updatePhoneNumberForMembersByCategory(
+        householdId: Long,
+        phoneNumber: String?,
+        category: String,
+    )
+
     suspend fun insertLinkHouseholdMembers(insertList: List<LinkHouseholdMember>)
 
     suspend fun deleteLinkHouseholdMembersById(deleteListIds: List<String>)
@@ -500,6 +568,8 @@ interface RoomHelper {
     suspend fun saveConsent(consentEntity: ConsentEntity)
 
     fun getConsent(formType: String): LiveData<String>
+
+    suspend fun getConsentString(formType: String): String
 
     suspend fun deleteConsent()
 
@@ -591,6 +661,8 @@ interface RoomHelper {
     ): LiveData<List<NCDMedicalReviewMetaEntity>>
 
     fun getLifeStyle(): LiveData<List<LifestyleEntity>>
+
+    suspend fun getLifeStyleList(): List<LifestyleEntity>
 
     fun getAssessmentFormData(
         formTypes: List<String>,
@@ -875,22 +947,28 @@ interface RoomHelper {
     suspend fun updateUndercountedDisabilityHouseholds(): Int
 
     fun getServiceMembers(
-        searchInput: String,
+        searchInput: String?,
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
         staticFilter: ServiceStaticFilter,
+        allowNullHousehold: Boolean = false,
+        qrCode: String? = null,
+        restrictExternalToSkCreator: Boolean = false,
     ): LiveData<List<HouseholdMemberWithTb>>
 
     /**
-     * Returns aggregated counts for all service static filters in one pass.
-     *
-     * Dynamic filters are identical to [getServiceMembers] so list and counters stay aligned.
+     * Returns counts for the given static filters in a single combined query.
+     * Dynamic filters match [getServiceMembers].
      */
-    suspend fun getAllServiceMemberCounts(
+    suspend fun getServiceMemberCounts(
+        filters: List<ServiceStaticFilter>,
         searchInput: String = "",
         filterBySs: List<Long> = emptyList(),
         filterBySubVillages: List<Long> = emptyList(),
-    ): ServiceMemberCounts
+        allowNullHousehold: Boolean = false,
+        qrCode: String? = null,
+        restrictExternalToSkCreator: Boolean = false,
+    ): Map<ServiceStaticFilter, Int>
 
     suspend fun getMemberAssessmentHistory(
         memberFhirId: String?,
@@ -898,6 +976,8 @@ interface RoomHelper {
         visitDate: String?,
         serviceProvided: String?,
     ): MemberAssessmentHistoryEntity?
+
+    suspend fun getMemberAssessmentHistoryByEncounterId(encounterId: String): MemberAssessmentHistoryEntity?
 
     suspend fun insertMemberAssessmentHistory(historyList: List<MemberAssessmentHistoryEntity>)
 
@@ -925,4 +1005,139 @@ interface RoomHelper {
         memberId: Long,
         noOfDays: Int,
     )
+
+    suspend fun deleteDuplicateAssessmentHistory(date: String)
+
+    suspend fun getFormBasedOnType(
+        formTypeOne: String,
+        formTypeTwo: String,
+    ): List<FormEntity>
+
+    suspend fun getVillageList(selectedParent: Long): List<VillageEntity>
+
+    suspend fun getOtherVillage(): VillageEntity
+
+    suspend fun getProgramList(site: String): Any
+
+    suspend fun getProgramList(
+        selectedParent: Long,
+        site: String,
+    ): Any
+
+    suspend fun getUpazilaListByDistrict(districtID: Long): List<SiteEntity>
+
+    suspend fun getUpazilaList(): Any
+
+    suspend fun updateSequenceCode(
+        villageId: Long,
+        newSequenceCode: Long,
+    )
+
+    suspend fun getScreeningRecordById(id: Long): ScreeningEntity
+
+    suspend fun getAccountSiteList(userId: Long): List<SiteEntity>
+
+    suspend fun getAccountSiteListByLevel(
+        userId: Long,
+        level: String,
+    ): List<SiteEntity>
+
+    suspend fun getUpazilaListEyeCareOnly(): Any
+
+    suspend fun getUpazilaListCataractOnly(): Any
+
+    suspend fun getSiteEntity(
+        userSite: Boolean,
+        userId: Long,
+    ): List<SiteEntity>
+
+    suspend fun getUpazilaById(upazilaId: Long): SiteEntity?
+
+    suspend fun getVillageById(villageId: Long): VillageEntity?
+
+    suspend fun getTreatmentPlanData(): List<TreatmentPlanEntity>
+
+    suspend fun getShortageReason(type: String): List<ShortageReasonEntity>
+
+    suspend fun getComorbidityBasedOnWorkflow(workflowList: ArrayList<String>): List<ComorbidityEntity>
+
+    suspend fun saveComorbidity(list: ArrayList<ComorbidityEntity>)
+
+    suspend fun deleteComorbidity()
+
+    suspend fun getComorbidity(): List<ComorbidityEntity>
+
+    suspend fun getComplication(): List<ComplicationEntity>
+
+    suspend fun saveComplication(list: ArrayList<ComplicationEntity>)
+
+    suspend fun deleteComplication()
+
+    suspend fun saveCurrentMedication(list: ArrayList<CurrentMedicationEntity>)
+
+    suspend fun deleteCurrentMedication()
+
+    suspend fun getCurrentMedicationList(): List<CurrentMedicationEntity>
+
+    suspend fun getCurrentMedicationList(type: String): List<CurrentMedicationEntity>
+
+    suspend fun savePhysicalExamination(list: ArrayList<PhysicalExaminationEntity>)
+
+    suspend fun deletePhysicalExamination()
+
+    suspend fun getPhysicalExaminationList(workFlowList: ArrayList<String>): List<PhysicalExaminationEntity>
+
+    suspend fun saveCompliants(list: ArrayList<ComplaintsEntity>)
+
+    suspend fun deleteCompliants()
+
+    suspend fun getChiefComplaints(workflowList: ArrayList<String>): List<ComplaintsEntity>
+
+    suspend fun getDiagnosis(
+        gender: ArrayList<String>,
+        type: ArrayList<String>,
+    ): List<DiagnosisEntity>
+
+    suspend fun saveSymptomList(symptoms: List<SymptomEntity>)
+
+    suspend fun deleteSymptoms()
+
+    suspend fun getSymptomsList(): List<SymptomEntity>
+
+    suspend fun getSymptomsListByType(type: String): List<SymptomEntity>
+
+    suspend fun getOperatingUnitSites(): List<SiteEntity>
+
+    suspend fun saveDiagnosis(diseaseEntityList: ArrayList<DiagnosisEntity>)
+
+    suspend fun deleteDiagnosisList()
+
+    suspend fun deleteAllSiteCache()
+
+    suspend fun saveSiteList(siteEntity: List<SiteEntity>)
+
+    suspend fun getAllChiefDoms(): List<ChiefDomEntity>
+
+    suspend fun getSubVillage(villageId: Long): List<SubVillageEntity>
+
+    suspend fun getMemberByQRCode(
+        qrCode: String,
+        memberId: Long?,
+    ): List<HouseholdMemberEntity>
+
+    suspend fun getLatestMemberServiceBAfterServiceA(
+        memberId: Long,
+        serviceA: String,
+        serviceB: String,
+    ): MemberAssessmentHistoryEntity?
+
+    suspend fun getFollowupCall(
+        followUpId: Long,
+        callDate: String,
+        userId: String,
+    ): FollowUpCall?
+
+    suspend fun insertFollowUpCall(followUpCall: FollowUpCall)
+
+    suspend fun getMembersFromAssessmentHistoryWhoReceivedNCD(): List<Long>
 }

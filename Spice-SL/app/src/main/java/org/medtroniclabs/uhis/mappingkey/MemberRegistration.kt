@@ -78,6 +78,8 @@ object MemberRegistration {
 
     const val MAX_LENGTH_NATIONAL_ID = 17
 
+    const val QR_CODE = "qrCode"
+
     val NATIONAL_ID_LENGTH = listOf(10, 13, 17)
 
     enum class MaritalStatus(val value: String) {
@@ -86,6 +88,13 @@ object MemberRegistration {
 
     enum class IdType(val value: String) {
         NATIONAL_ID("nid"),
+    }
+
+    enum class PhoneNumberCategory(val value: String) {
+        PERSONAL("personal"),
+        HOUSEHOLD_HEAD("household_head"),
+        FAMILY("family"),
+        FRIEND("friend"),
     }
 
     fun isValidRelationAge(

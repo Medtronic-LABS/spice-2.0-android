@@ -248,8 +248,8 @@ class InvestigationViewModel @Inject constructor(
             if (resultMap.containsKey(formData.id)) {
                 val actualValue = resultMap[formData.id]
                 var unitValue: String? = null
-                if (resultMap.containsKey(formData.id + DefinedParams.Unit)) {
-                    val unitValueAny = resultMap[formData.id + DefinedParams.Unit]
+                if (resultMap.containsKey(formData.id + DefinedParams.UNIT)) {
+                    val unitValueAny = resultMap[formData.id + DefinedParams.UNIT]
                     if (unitValueAny is String) {
                         unitValue = unitValueAny
                     }
@@ -286,7 +286,9 @@ class InvestigationViewModel @Inject constructor(
 
     fun getLabTestList(data: PatientListRespModel) {
         viewModelScope.launch(dispatcherIO) {
-            val patientId = if (CommonUtils.isNonCommunity()) data.patientId else data.id
+            // investigation/list expects the patient FHIR id (data.id), not the
+            // human-readable patientId.
+            val patientId = data.id
             patientId?.let { id ->
                 labTestListLiveData.postLoading()
                 val response = investigationRepository.getLabTestList(LabTestListRequest(id))

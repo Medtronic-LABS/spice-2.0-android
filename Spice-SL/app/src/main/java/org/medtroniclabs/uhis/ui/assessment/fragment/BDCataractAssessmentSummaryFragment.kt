@@ -13,12 +13,12 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
+import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.CVD_RISK_SCORE_DISPLAY
-import org.medtroniclabs.uhis.common.DefinedParams.DefaultID
+import org.medtroniclabs.uhis.common.DefinedParams.DEFAULT_ID
 import org.medtroniclabs.uhis.common.DefinedParams.ID
-import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.databinding.FragmentBdNcdSummaryBinding
 import org.medtroniclabs.uhis.formgeneration.model.FormLayout
 import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
@@ -26,11 +26,13 @@ import org.medtroniclabs.uhis.model.AssessmentSummaryModel
 import org.medtroniclabs.uhis.ui.BaseFragment
 import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils
 import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils.findValueByKey
+import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils.getSpinnerDisplayValue
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_BLOOD_PRESSURE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BMI
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BMI_CATEGORY
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BP_LOG_DETAILS
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.CAMP_DATE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.CULTURE_VALUE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.CVD_RISK
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.EYE_DISEASE
@@ -96,15 +98,19 @@ class BDCataractAssessmentSummaryFragment : BaseFragment() {
     }
 
     private fun attachObservers() {
-        viewModel.assessmentStringLiveData.value?.let {
-            val json = JSONObject(it)
+        viewModel.assessmentStringLiveData.observe(viewLifecycleOwner) { assessmentString ->
+            if (assessmentString.isNullOrBlank()) return@observe
+            val json = JSONObject(assessmentString)
             updateStatusBar(json)
             val items = createNCDSummaryData(json)
-            createSummaryView(items)
+            createSummaryView(items, json)
         }
     }
 
-    private fun createSummaryView(listSummaryData: MutableList<AssessmentSummaryModel>?) {
+    private fun createSummaryView(
+        listSummaryData: MutableList<AssessmentSummaryModel>?,
+        json: JSONObject,
+    ) {
         listSummaryData?.let { summaryData ->
             binding.parentLayout.removeAllViews()
 
@@ -115,10 +121,32 @@ class BDCataractAssessmentSummaryFragment : BaseFragment() {
                 )
             }
 
-            val isTranslationEnabled = SecuredPreference.getIsTranslationEnabled()
-
             summaryData.forEach { item ->
-                bindSummaryView(if (isTranslationEnabled) item.cultureValue else item.title, item.value)
+                val rawValue =
+                    getSpinnerDisplayValue(
+                        item.id.toString(),
+                        item.value,
+                        isTranslationEnabled,
+                        viewModel.formLayoutsLiveData.value
+                            ?.data
+                            ?.formLayout,
+                    ) ?: item.value
+                val title = if (isTranslationEnabled) item.cultureValue else item.title
+                when (item.id) {
+                    BMI -> {
+                        val bmiDisplay = AssessmentCommonUtils.formatBMISummaryDisplay(
+                            requireContext(),
+                            findValueByKey(json, BMI),
+                        )
+                        bindSummaryView(title, bmiDisplay ?: rawValue)
+                    }
+                    CVD_RISK -> {
+                        AssessmentCommonUtils.formatCVDRiskSummaryDisplay(requireContext(), json)?.let {
+                            bindSummaryView(title, it.first, it.second)
+                        } ?: rawValue?.let { bindSummaryView(title, it) }
+                    }
+                    else -> bindSummaryView(title, rawValue)
+                }
             }
         }
     }
@@ -139,11 +167,16 @@ class BDCataractAssessmentSummaryFragment : BaseFragment() {
                 val referralTypeSite = findValueByKey(json, REFERRAL_FACILITY_TYPE) as String
                 viewModel.otherAssessmentDetails[REFERRAL_FACILITY_TYPE] = referralTypeSite
 
-                viewModel.nearestFacilityLiveData.value?.data?.let { siteList ->
-                    loadPhuSitesList(siteList)
+                if (CommonUtils.isFoOrPo()) {
+                    binding.labelPhuReferred.gone()
+                    binding.etPhuChange.gone()
+                } else {
+                    viewModel.nearestFacilityLiveData.value?.data?.let { siteList ->
+                        loadPhuSitesList(siteList)
+                    }
+                    binding.labelPhuReferred.visible()
+                    binding.etPhuChange.visible()
                 }
-                binding.labelPhuReferred.visible()
-                binding.etPhuChange.visible()
                 binding.riskResultLayout.backgroundTintList =
                     ContextCompat.getColorStateList(requireContext(), R.color.attention_color)
 
@@ -221,12 +254,23 @@ class BDCataractAssessmentSummaryFragment : BaseFragment() {
             }
 
             BMI -> {
-                val bmi = findValueByKey(jsonObject, id)
-                val bmiCategory = findValueByKey(jsonObject, BMI_CATEGORY)
-                return if (bmiCategory != null && bmi != null) {
-                    "${bmi as Double} (${bmiCategory as String})"
+                val bmi = (findValueByKey(jsonObject, id) as? Number)?.toDouble()
+                val bmiCategory = findValueByKey(jsonObject, BMI_CATEGORY) as? String
+                return if (bmi != null && bmiCategory != null) {
+                    "${CommonUtils.getDecimalFormatted(bmi)} ($bmiCategory)"
                 } else {
-                    null
+                    bmi?.let { CommonUtils.getDecimalFormatted(it) }
+                }
+            }
+
+            CAMP_DATE -> {
+                val campDate = findValueByKey(jsonObject, id) as? String
+                return campDate?.let {
+                    DateUtils.convertDateFormat(
+                        it,
+                        DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
+                        DateUtils.DATE_ddMMyyyy,
+                    )
                 }
             }
 
@@ -297,8 +341,8 @@ class BDCataractAssessmentSummaryFragment : BaseFragment() {
                 ) {
                     val selectedItem = adapter.getData(position = pos)
                     selectedItem?.let {
-                        val selectedId = it[DefinedParams.id] as String?
-                        if (selectedId != DefaultID) {
+                        val selectedId = it[DefinedParams.ID] as String?
+                        if (selectedId != DEFAULT_ID) {
                             viewModel.otherAssessmentDetails[ReferredPHUSiteID] = selectedId.toString()
                         } else {
                             if (viewModel.otherAssessmentDetails.containsKey(ReferredPHUSiteID)) {
@@ -318,19 +362,16 @@ class BDCataractAssessmentSummaryFragment : BaseFragment() {
 
     private fun bindSummaryView(
         title: String?,
-        value: String?,
+        value: CharSequence?,
         valueTextColor: Int? = null,
     ) {
-        if (title != null && value != null) {
-            binding.parentLayout.addView(
-                AssessmentCommonUtils.addViewSummaryLayout(
-                    title,
-                    value,
-                    valueTextColor,
-                    requireContext(),
-                ),
-            )
-        }
+        AssessmentCommonUtils
+            .createSummaryLayout(
+                requireContext(),
+                title,
+                value,
+                valueTextColor,
+            )?.let { binding.parentLayout.addView(it) }
     }
 
     fun getCurrentAnsweredStatus(): Boolean = viewModel.otherAssessmentDetails.isNotEmpty()

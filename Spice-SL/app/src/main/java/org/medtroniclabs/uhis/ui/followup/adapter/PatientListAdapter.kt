@@ -1,10 +1,10 @@
 package org.medtroniclabs.uhis.ui.followup.adapter
 
 import android.content.Context
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.convertToLocalDateTime
@@ -13,10 +13,14 @@ import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.invisible
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
+import org.medtroniclabs.uhis.common.DateUtils
+import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
 import org.medtroniclabs.uhis.common.DateUtils.DATE_TIME_CALL_DISPLAY_FORMAT
+import org.medtroniclabs.uhis.common.DateUtils.DATE_ddMMyyyy
 import org.medtroniclabs.uhis.data.FollowUpPatientModel
 import org.medtroniclabs.uhis.databinding.LayoutItemMyPatientBinding
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
+import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 import org.medtroniclabs.uhis.ui.followup.FollowUpDefinedParams.FU_TYPE_HH_VISIT
 import org.medtroniclabs.uhis.ui.followup.FollowUpDefinedParams.FU_TYPE_MEDICAL_REVIEW
 import org.medtroniclabs.uhis.ui.followup.FollowUpDefinedParams.FU_TYPE_REFERRED
@@ -56,41 +60,67 @@ class PatientListAdapter(private val callback: (Int, FollowUpPatientModel) -> Un
                     getPatientName(context, data.name, data.dateOfBirth, data.gender)
 
                 callButton.visible()
+                tvRemainingCount.visible()
+                callButton.isEnabled = data.isValidNumber()
                 assessmentButton.visible()
-                tvLabelReason.visible()
-                tvReason.visible()
-                tvLabelReasonSeperator.visible()
-                tvLastCallAtLabel.visible()
-                tvLastCallAtLabelSeperator.visible()
-                tvLastCallAtValue.visible()
-                callButton.isEnabled = !data.isWrongNumber
+
+                groupReason.visible()
+                groupVisitDate.gone()
+                groupServiceDate.gone()
+                groupPatientStatus.gone()
+                groupLastCall.visible()
+
+                tvService.text = AssessmentUtil.mapServiceToServiceName(data.encounterName ?: "", context)
 
                 when (data.type) {
                     FU_TYPE_HH_VISIT -> {
+                        groupVisitDate.visible()
+                        groupPatientStatus.visible()
+                        groupLastCall.gone()
+                        tvNextVisitDate.text = data.nextVisitDate?.let {
+                            DateUtils.convertDateFormat(
+                                data.nextVisitDate,
+                                DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
+                                DATE_ddMMyyyy,
+                            )
+                        } ?: context.getString(R.string.separator_double_hyphen)
+                        tvLastVisitDate.text = data.encounterDate?.let {
+                            DateUtils.convertDateFormat(
+                                data.encounterDate,
+                                DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
+                                DATE_ddMMyyyy,
+                            )
+                        } ?: context.getString(R.string.separator_double_hyphen)
+
                         callButton.gone()
-                        tvLastCallAtLabel.gone()
-                        tvLastCallAtLabelSeperator.gone()
-                        tvLastCallAtValue.gone()
-                        setOverDueInfo(data.nextVisitDate, tvDueInformation)
+                        tvRemainingCount.gone()
+                        setOverDueInfo(context, data.nextVisitDate, tvDueInformation)
                     }
 
                     FU_TYPE_REFERRED -> {
                         assessmentButton.invisible()
-                        setOverDueInfo(data.encounterDate, tvDueInformation, referralDayLimit)
+                        groupServiceDate.visible()
+                        tvServiceDate.text = data.encounterDate?.let {
+                            DateUtils.convertDateFormat(
+                                data.encounterDate,
+                                DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
+                                DATE_ddMMyyyy,
+                            )
+                        } ?: context.getString(R.string.separator_double_hyphen)
+                        setOverDueInfo(context, data.encounterDate, tvDueInformation, referralDayLimit)
                     }
 
                     FU_TYPE_MEDICAL_REVIEW -> {
                         assessmentButton.invisible()
-                        tvLabelReason.gone()
-                        tvReason.gone()
-                        tvLabelReasonSeperator.gone()
-                        setOverDueInfo(data.nextVisitDate, tvDueInformation)
+                        groupReason.gone()
+                        setOverDueInfo(context, data.nextVisitDate, tvDueInformation)
                     }
                 }
 
                 tvReason.text = data.getReason(context.getString(R.string.hyphen_symbol))
                 tvPatientStatus.text = context.getPatientStatus(data.patientStatus) ?: context.getString(R.string.hyphen_symbol)
                 tvLastCallAtValue.text = data.calledAt?.convertToLocalDateTime(format = DATE_TIME_CALL_DISPLAY_FORMAT) ?: "--"
+                tvRemainingCount.text = CommonUtils.formatCountForCurrentLocale(data.remainingAttempts)
 
                 root.safeClickListener {
                     callback(ConstantPatientListAdapter.PATIENT_DETAIL, data)
@@ -144,6 +174,7 @@ class PatientListAdapter(private val callback: (Int, FollowUpPatientModel) -> Un
     }
 
     private fun setOverDueInfo(
+        context: Context,
         dateString: String?,
         tv: TextView,
         adjust: Int = 0,
@@ -156,39 +187,39 @@ class PatientListAdapter(private val callback: (Int, FollowUpPatientModel) -> Un
 
             when {
                 daysBetween < 0L -> {
-                    val suffix = if (daysBetween == -1L) {
-                        "day, Overdue"
+                    val text = if (daysBetween == -1L) {
+                        context.getString(R.string.day_overdue, CommonUtils.formatCountForCurrentLocale(-daysBetween.toInt()))
                     } else {
-                        "days, Overdue"
+                        context.getString(R.string.days_overdue, CommonUtils.formatCountForCurrentLocale(-daysBetween.toInt()))
                     }
 
-                    tv.text = "${-daysBetween} $suffix"
-                    tv.setTextColor(Color.parseColor("#994242"))
+                    tv.text = text
+                    tv.setTextColor("#994242".toColorInt())
                 }
 
                 daysBetween == 0L -> {
-                    tv.text = "Today"
-                    tv.setTextColor(Color.parseColor("#EB956A"))
+                    tv.text = context.getString(R.string.today)
+                    tv.setTextColor("#EB956A".toColorInt())
                 }
 
                 daysBetween == 1L -> {
-                    tv.text = "Tomorrow"
-                    tv.setTextColor(Color.parseColor("#54CC90"))
+                    tv.text = context.getString(R.string.tomorrow)
+                    tv.setTextColor("#54CC90".toColorInt())
                 }
 
                 daysBetween > 1L -> {
-                    tv.text = "Upcoming in $daysBetween days"
-                    tv.setTextColor(Color.parseColor("#54CC90"))
+                    tv.text = context.getString(R.string.upcoming_in_days, CommonUtils.formatCountForCurrentLocale(daysBetween.toInt()))
+                    tv.setTextColor("#54CC90".toColorInt())
                 }
 
                 else -> {
                     tv.text = "--"
-                    tv.setTextColor(Color.parseColor("#54CC90"))
+                    tv.setTextColor("#54CC90".toColorInt())
                 }
             }
         } else {
             tv.text = "--"
-            tv.setTextColor(Color.parseColor("#54CC90"))
+            tv.setTextColor("#54CC90".toColorInt())
         }
     }
 }

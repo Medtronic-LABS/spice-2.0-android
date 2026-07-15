@@ -1,26 +1,30 @@
 package org.medtroniclabs.uhis.ui.landing
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.GravityCompat
 import androidx.core.view.forEach
+import androidx.core.view.isNotEmpty
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.Constraints
@@ -32,14 +36,15 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.android.material.navigation.NavigationView
-import com.medtroniclabs.microcoaching.MicroCoachingSDK
-import com.medtroniclabs.microcoaching.ModelDownloadStrategy
-import com.medtroniclabs.microcoaching.ai.model.ModelProvider
-import com.medtroniclabs.microcoaching.domain.decision.CoachingMode
-import com.medtroniclabs.microcoaching.sherpa.SherpaOnnxStt
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.android.play.core.ktx.requestAppUpdateInfo
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import org.medtroniclabs.uhis.BuildConfig
 import org.medtroniclabs.uhis.R
-import org.medtroniclabs.uhis.SpiceBaseApplication
 import org.medtroniclabs.uhis.app.analytics.model.UserDetail
 import org.medtroniclabs.uhis.app.analytics.upload.UploadWorker
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
@@ -50,6 +55,7 @@ import org.medtroniclabs.uhis.appextensions.WORKER_UNIQUE_NAME_FOR_NCD
 import org.medtroniclabs.uhis.appextensions.cancelAllWorker
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.isVisible
+import org.medtroniclabs.uhis.appextensions.openPlayStore
 import org.medtroniclabs.uhis.appextensions.setError
 import org.medtroniclabs.uhis.appextensions.startBackgroundOfflineSync
 import org.medtroniclabs.uhis.appextensions.triggerOneTimeWorker
@@ -61,9 +67,9 @@ import org.medtroniclabs.uhis.common.DefinedParams.REFRESH_FRAGMENT
 import org.medtroniclabs.uhis.common.GeneralErrorDialog
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.TransferStatusEnum
-import org.medtroniclabs.uhis.common.resolveCoachingPersona
 import org.medtroniclabs.uhis.databinding.ActivityLandingBinding
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
+import org.medtroniclabs.uhis.model.CultureLocaleModel
 import org.medtroniclabs.uhis.ncd.data.NCDPatientTransferNotificationCountRequest
 import org.medtroniclabs.uhis.ncd.data.NCDPatientTransferUpdateRequest
 import org.medtroniclabs.uhis.ncd.data.NCDSupportRequest
@@ -84,22 +90,20 @@ import org.medtroniclabs.uhis.ui.ChooseSiteDialogueFragment
 import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.PrivacyPolicyFragment
 import org.medtroniclabs.uhis.ui.boarding.LoginActivity
-import org.medtroniclabs.uhis.ui.coaching.CoachingAssistantActivity
 import org.medtroniclabs.uhis.ui.home.HomeScreenFragment
 import org.medtroniclabs.uhis.ui.landing.adapter.PeerSupervisorNotificationAdapter
 import org.medtroniclabs.uhis.ui.landing.viewmodel.LandingViewModel
 import org.medtroniclabs.uhis.ui.landing.viewmodel.LanguagePreferenceViewModel
 import org.medtroniclabs.uhis.ui.mypatients.fragment.PatientSearchFragment
-import org.medtroniclabs.uhis.ui.mypatients.viewmodel.PatientDetailViewModel
 import org.medtroniclabs.uhis.ui.patientTransfer.NCDApproveRejectListener
 import org.medtroniclabs.uhis.ui.patientTransfer.adapter.NCDIncomingRequestAdapter
 import org.medtroniclabs.uhis.ui.patientTransfer.adapter.NCDInformationMessageAdapter
 import org.medtroniclabs.uhis.ui.patientTransfer.dialog.NCDPatientDetailDialogue
+import org.medtroniclabs.uhis.ui.services.ServicesActivity
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import android.net.ConnectivityManager as AndroidConnectivityManager
-
-private const val LANDING_TAG = "LandingActivity"
+import javax.inject.Inject
+import kotlin.system.exitProcess
 
 class LandingActivity :
     BaseActivity(),
@@ -113,12 +117,34 @@ class LandingActivity :
 
     private val viewModel: LandingViewModel by viewModels()
     private val offlineDataViewModel: NCDOfflineDataViewModel by viewModels()
-    private val patientViewModel: PatientDetailViewModel by viewModels()
     private val languageViewModel: LanguagePreferenceViewModel by viewModels()
+
+    @Inject
+    lateinit var appUpdateManager: AppUpdateManager
+
+    /**
+     * Held true while the app-version check is in flight so the splash blocks navigation
+     * (immediate updates root themselves on this activity, so we can't let the user wander
+     * off to another activity mid-check). Flipped to false as soon as the check completes
+     * or times out.
+     */
+    @Volatile
+    private var keepSplashOnScreen = true
+
+    private val appUpdateLauncher =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            // Immediate updates must succeed; treat anything other than RESULT_OK as enforcement.
+            if (result.resultCode != RESULT_OK) {
+                finishAffinity()
+                exitProcess(0)
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
-        splashScreen.setKeepOnScreenCondition { true }
+        // Splash stays up while the backend app-version check is in flight; this blocks the
+        // user from navigating into another activity before we decide whether to force-update.
+        splashScreen.setKeepOnScreenCondition { keepSplashOnScreen }
 
         super.onCreate(savedInstanceState)
 
@@ -134,7 +160,7 @@ class LandingActivity :
 
         if (!(isLoggedIn && isMetaLoaded)) {
             startActivity(Intent(this, LoginActivity::class.java))
-            splashScreen.setKeepOnScreenCondition { false }
+            keepSplashOnScreen = false
             finish()
             return
         } else {
@@ -143,6 +169,7 @@ class LandingActivity :
                     intent?.categories?.contains(Intent.CATEGORY_LAUNCHER) ?: false
                 if (isFromLauncher && !SecuredPreference.getTermsAndConditionsStatus()) {
                     startActivity(Intent(this, UserTermsConditionsActivity::class.java))
+                    keepSplashOnScreen = false
                     finish()
                     return
                 }
@@ -155,7 +182,6 @@ class LandingActivity :
         // screening and assessment sync
         offlineDataViewModel.getCountOfflineData()
         binding = ActivityLandingBinding.inflate(layoutInflater)
-        splashScreen.setKeepOnScreenCondition { false }
         setContentView(binding.root)
         // Since landing activity is setting content with setContentView,
         // applying insets separately for this screen only
@@ -168,9 +194,6 @@ class LandingActivity :
         )
         if (CommonUtils.isNonCommunity()) {
             languageViewModel.getCultures()
-        } else {
-            val menu = binding.navView.menu
-            //     menu.findItem(R.id.switch_language)?.let { menu.removeItem(it.itemId) }
         }
         initializeDrawerView()
         initializeHomeViews()
@@ -180,146 +203,16 @@ class LandingActivity :
         UserDetail.updateUserIdIfEmpty(SecuredPreference.getUserId().toString())
         UserDetail.getAppVersion(BuildConfig.VERSION_NAME)
         attachObserver()
-
-        // Re-build the MicroCoaching SDK with the freshly issued JWT (it was
-        // initialised with an empty token in SpiceBaseApplication.onCreate before login).
-        reinitCoachingSdkWithToken()
-
+        runAppVersionCheck()
         // Deeplink for directly goes to Search patient
         patientSearchDeepLink()
+
+        // Delete duplicate assessment history
+        deleteDuplicateAssessmentHistory()
     }
 
-    /**
-     * Re-build the MicroCoaching SDK so its [authToken], language, and (potentially)
-     * model path reflect the post-login state. Called from [onCreate] after auth is
-     * confirmed. No-op if the token is still missing or the SDK was not initialised
-     * in the Application class.
-     */
-    private fun reinitCoachingSdkWithToken() {
-        val token = SecuredPreference.getString(SecuredPreference.EnvironmentKey.TOKEN.name)
-        if (token.isNullOrEmpty() || !MicroCoachingSDK.isInitialized()) return
-        val modelDir = getExternalFilesDir(null)
-        val existingModel = modelDir
-            ?.listFiles()
-            ?.firstOrNull { it.extension == "task" || it.extension == "litertlm" }
-        val downloadStrategy = if (existingModel != null) {
-            ModelDownloadStrategy.PROVIDED
-        } else {
-            ModelDownloadStrategy.ON_FIRST_USE
-        }
-        MicroCoachingSDK
-            .Builder(applicationContext)
-            .language(SpiceBaseApplication.spiceLanguageToSdkLanguage(SecuredPreference.getCultureName()))
-            .backendUrl(BuildConfig.COACHING_BACKEND_URL)
-            .authToken(token)
-            .persona(resolveCoachingPersona())
-            .enableTelemetry(BuildConfig.ENABLE_COACHING_TELEMETRY)
-            .enableChat(true)
-            .enableLearnModule(true)
-            .enableApplyModule(true)
-            .enableVoice(true)
-            .offlineSttEngineFactory(SherpaOnnxStt.factory)
-            .modelDownloadStrategy(downloadStrategy)
-            .modelProviders(listOf(ModelProvider.HuggingFace))
-            .modelPath(existingModel?.absolutePath ?: "")
-            .huggingFaceToken(BuildConfig.HF_TOKEN)
-            .wifiOnlyModelDownload(false)
-            .forceMode(CoachingMode.EDGE)
-            .build()
-        // No schedulePeriodic() workaround needed anymore: Builder.build() now
-        // shuts the old instance down BEFORE constructing the new one, so the
-        // new instance's periodic sync is no longer cancelled by the old
-        // instance's teardown. (The SDK also exposes updateAuthToken() for
-        // token-only refreshes that don't change persona/language/mode.)
-        // Drawer item is `visible="false"` in XML — reveal it now that the SDK has a token.
-        binding.navView.menu
-            .findItem(R.id.chwAssistant)
-            ?.isVisible = true
-    }
-
-    /**
-     * Drawer-tap handler for "CHW Assistant". If the on-device LLM model is already
-     * staged, launch [CoachingAssistantActivity] directly. Otherwise prompt the CHW to
-     * download (~600 MB) — with a second confirmation if currently on metered (mobile)
-     * data — then fire the SDK download and surface a Snackbar so the user knows the
-     * chat will open once the model finishes downloading.
-     */
-    private fun launchCoachingAssistant() {
-        if (!MicroCoachingSDK.isInitialized()) return
-        val sdk = MicroCoachingSDK.getInstance()
-        // Low-end devices (< 3 GB RAM) run the chat in retrieval-only mode —
-        // no AI model is required, so skip the download prompt entirely.
-        if (sdk.isLowEndDevice || sdk.modelManager.isModelPresent()) {
-            CoachingAssistantActivity.launch(this)
-        } else {
-            showCoachingModelDownloadPrompt()
-        }
-    }
-
-    /**
-     * Single-dialog model-download confirmation. The previous two-dialog flow
-     * (general prompt → metered warning → trigger) was the failure surface in
-     * a QA report — the second dialog's positive callback was being dropped
-     * on some devices, leaving the user on the landing screen with no
-     * feedback. The metered-network hint is now baked into the message
-     * string so the user gives a single explicit yes.
-     */
-    private fun showCoachingModelDownloadPrompt() {
-        val metered = isOnMeteredNetwork()
-        val messageRes = if (metered) {
-            R.string.coaching_model_download_message_metered
-        } else {
-            R.string.coaching_model_download_message
-        }
-        // Dynamic download size from the SDK's configured model variant, formatted
-        // locale-aware — tracks the selected model instead of a hard-coded "~600 MB".
-        val sizeLabel = runCatching {
-            android.text.format.Formatter.formatShortFileSize(
-                this,
-                MicroCoachingSDK.getInstance().selectedModelVariant().sizeInBytes,
-            )
-        }.getOrDefault("")
-        showErrorDialogue(
-            title = getString(R.string.coaching_model_download_title),
-            message = getString(messageRes, sizeLabel),
-            isNegativeButtonNeed = true,
-            positiveButtonName = getString(R.string.yes),
-            cancelBtnName = getString(R.string.no),
-        ) { isPositive ->
-            Log.i(LANDING_TAG, "ModelDownloadPrompt dismissed — positive=$isPositive metered=$metered")
-            if (isPositive) triggerCoachingModelDownload()
-        }
-    }
-
-    private fun triggerCoachingModelDownload() {
-        Log.i(LANDING_TAG, "triggerCoachingModelDownload — calling modelManager.triggerDownload()")
-        runCatching { MicroCoachingSDK.getInstance().modelManager.triggerDownload() }
-            .onFailure { Log.e(LANDING_TAG, "modelManager.triggerDownload threw", it) }
-        Toast.makeText(this, getString(R.string.coaching_download_started), Toast.LENGTH_LONG).show()
-    }
-
-    /**
-     * Default to `true` (assume metered) when the connectivity manager or the
-     * active network is null — a transient null read shouldn't bypass the
-     * user's consent step on the rare race where we check right at network
-     * handoff.
-     */
-    private fun isOnMeteredNetwork(): Boolean {
-        val cm = getSystemService(AndroidConnectivityManager::class.java) ?: return true
-        val caps = cm.getNetworkCapabilities(cm.activeNetwork) ?: return true
-        return !caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
-    }
-
-    /**
-     * Forward connectivity-restored events to the MicroCoaching SDK so it can flush
-     * pending telemetry spans and trigger an immediate sync. Idempotent on the SDK
-     * side: safe to call on every [onResume].
-     */
-    private fun notifyCoachingSdkOnConnectivityRestored() {
-        if (!MicroCoachingSDK.isInitialized()) return
-        if (connectivityManager.isNetworkAvailable()) {
-            MicroCoachingSDK.getInstance().onConnectivityRestored()
-        }
+    private fun deleteDuplicateAssessmentHistory() {
+        viewModel.deleteDuplicateAssessmentHistory()
     }
 
     private fun syncScreeningAndAssessment() {
@@ -341,8 +234,8 @@ class LandingActivity :
         }
         offlineDataViewModel.followUpType.observe(this) {
         }
-        viewModel.patientListResponse.observe(this) { resoruceState ->
-            when (resoruceState.state) {
+        viewModel.patientListResponse.observe(this) { resourceState ->
+            when (resourceState.state) {
                 ResourceState.LOADING -> {
                     showHideList(false)
                 }
@@ -353,14 +246,14 @@ class LandingActivity :
 
                 ResourceState.SUCCESS -> {
                     showHideList(true)
-                    resoruceState.data?.let { data ->
+                    resourceState.data?.let { data ->
                         loadAdapterData(data)
                     }
                 }
             }
         }
-        viewModel.patientUpdateResponse.observe(this) { resorceState ->
-            when (resorceState.state) {
+        viewModel.patientUpdateResponse.observe(this) { resourceState ->
+            when (resourceState.state) {
                 ResourceState.LOADING -> {
                     showHideList(false)
                 }
@@ -372,7 +265,7 @@ class LandingActivity :
                 ResourceState.SUCCESS -> {
                     showHideList(true)
                     binding.drawerLayout.closeDrawer(binding.navNotificationView)
-                    resorceState.data?.let {
+                    resourceState.data?.let {
                         val generalErrorDialog =
                             GeneralErrorDialog.newInstance(
                                 if (viewModel.isSupport) {
@@ -494,7 +387,7 @@ class LandingActivity :
                 ResourceState.SUCCESS -> {
                     hideLoading()
                     resourceState.data?.let { notifications ->
-                        if (!notifications.isNullOrEmpty()) {
+                        if (notifications.isNotEmpty()) {
                             storeNotificationIds(notifications)
                         } else {
                             binding.CenterProgress.gone()
@@ -534,7 +427,7 @@ class LandingActivity :
                 ResourceState.SUCCESS -> {
                     hideLoading()
                     resourceState.data?.let { notifications ->
-                        if (!notifications.isNullOrEmpty()) {
+                        if (notifications.isNotEmpty()) {
                             showNotificationView(notifications)
                         } else {
                             binding.tvNoNotificationsFound.visible()
@@ -599,6 +492,58 @@ class LandingActivity :
                 }
             }
         }
+
+        /**
+         * Observes the language selected from LanguagePreferenceDialog.
+         * Displays the re-login confirmation dialog before initiating
+         * the locale update request.
+         */
+        languageViewModel.selectedCultureForConfirmation.observe(this) { culture ->
+            culture ?: return@observe
+
+            languageViewModel.setSelectedCultureForConfirmation(null)
+
+            showErrorDialogue(
+                message = getString(R.string.language_change_alert),
+                isNegativeButtonNeed = true,
+                cancelBtnName = getString(R.string.no),
+                positiveButtonName = getString(R.string.yes),
+            ) { isPositive ->
+                if (isPositive) {
+                    languageViewModel.cultureLocaleUpdate(
+                        CultureLocaleModel(
+                            SecuredPreference.getUserId(),
+                            culture,
+                        ),
+                    )
+                }
+            }
+        }
+
+        /**
+         * Updates the local language preference only after the
+         * locale update API succeeds, then logs out the user so
+         * the new language is applied on the next login.
+         */
+        languageViewModel.cultureUpdateResponse.observe(this) { resourceState ->
+            when (resourceState.state) {
+                ResourceState.LOADING -> showLoading()
+
+                ResourceState.SUCCESS -> {
+                    hideLoading()
+                    if (SecuredPreference.logout()) {
+                        cancelAllWorker()
+                        startActivity(Intent(this@LandingActivity, LoginActivity::class.java))
+                        finish()
+                        UserDetail.referenceId = UUID.randomUUID().toString()
+                    }
+                }
+
+                ResourceState.ERROR -> {
+                    hideLoading()
+                }
+            }
+        }
     }
 
     private fun setTransferCount(transferCount: Long): Int {
@@ -616,7 +561,7 @@ class LandingActivity :
     }
 
     private fun loadAdapterData(data: PatientTransferListResponse) {
-        if (data.incomingPatientList.size > 0) {
+        if (data.incomingPatientList.isNotEmpty()) {
             binding.rvOutgoingList.visible()
             binding.rvOutgoingList.addItemDecoration(
                 DividerItemDecoration(
@@ -629,7 +574,7 @@ class LandingActivity :
         } else {
             binding.rvOutgoingList.gone()
         }
-        if (data.outgoingPatientList.size > 0) {
+        if (data.outgoingPatientList.isNotEmpty()) {
             binding.rvInformationList.visible()
             binding.rvInformationList.layoutManager = LinearLayoutManager(this@LandingActivity)
             binding.rvInformationList.addItemDecoration(
@@ -667,7 +612,7 @@ class LandingActivity :
     }
 
     private fun onClickUploadLog() {
-        if (BuildConfig.BUILD_TYPE == "debug" || BuildConfig.BUILD_TYPE == "staging" || BuildConfig.BUILD_TYPE == "training") {
+        if (viewModel.isNonProdEnv()) {
             binding.uploadLog.setOnClickListener {
                 val uploadWorkRequest = OneTimeWorkRequest
                     .Builder(UploadWorker::class.java)
@@ -748,7 +693,7 @@ class LandingActivity :
     }
 
     private fun startSyncWorker() {
-        if (CommonUtils.isChw() || (CommonUtils.isNonCommunity() && CommonUtils.isChp())) {
+        if (CommonUtils.isChw() || CommonUtils.isCHCP() || (CommonUtils.isNonCommunity() && CommonUtils.isChp())) {
             startBackgroundOfflineSync()
             checkBGSyncStatus()
         }
@@ -756,17 +701,17 @@ class LandingActivity :
 
     private fun initializeDrawerView() {
         val menu: Menu = binding.navView.menu
-        val menuItemToRemove: MenuItem? = menu.findItem(R.id.offline_sync)
+        val offlineSyncMenuItem: MenuItem? = menu.findItem(R.id.offline_sync)
         val changeFacilityMenuItem: MenuItem? = menu.findItem(R.id.changeFacility)
-        if (CommonUtils.isCommunity() && !CommonUtils.isChw() && menuItemToRemove != null) {
-            menu.removeItem(menuItemToRemove.itemId)
+        if (CommonUtils.isCommunity() && !CommonUtils.isChw() && !CommonUtils.isCHCP() && offlineSyncMenuItem != null) {
+            menu.removeItem(offlineSyncMenuItem.itemId)
         }
         if (CommonUtils.isCommunity() && !CommonUtils.isProvider() && changeFacilityMenuItem != null) {
             menu.removeItem(changeFacilityMenuItem.itemId)
         }
 
         if (CommonUtils.isNonCommunity()) {
-            menuItemToRemove?.let {
+            offlineSyncMenuItem?.let {
                 if (CommonUtils.isTiberbuUser() || CommonUtils.isCha()) {
                     menu.removeItem(it.itemId)
                 }
@@ -776,6 +721,10 @@ class LandingActivity :
                     menu.removeItem(it.itemId)
                 }
             }
+        }
+
+        if (CommonUtils.isFoPoOrChcp() || CommonUtils.isHealthEducator() || CommonUtils.isNurse()) {
+            menu.findItem(R.id.external_member)?.let { menu.removeItem(it.itemId) }
         }
 
         onNavigationItemSelected(binding.navView.menu.findItem(R.id.home))
@@ -865,7 +814,7 @@ class LandingActivity :
             R.id.privacy_policy -> {
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
                 if (connectivityManager.isNetworkAvailable()) {
-                    binding.appBarMain.tvTitle.text = getString(R.string.privacy_policy)
+                    setToolbarTitle(getString(R.string.privacy_policy))
                     supportFragmentManager
                         .beginTransaction()
                         .replace(
@@ -892,34 +841,30 @@ class LandingActivity :
                 return true
             }
 
+            /**
+             * Opens the language selection dialog.
+             * Language update is handled after user confirmation.
+             */
             R.id.switch_language -> {
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
-                val languagePreferenceDialog =
-                    LanguagePreferenceDialog.newInstance(languagePreferenceListener)
-                languagePreferenceDialog.show(
-                    supportFragmentManager,
-                    LanguagePreferenceDialog.TAG,
-                )
+
+                LanguagePreferenceDialog
+                    .newInstance()
+                    .show(supportFragmentManager, LanguagePreferenceDialog.TAG)
+
                 return true
             }
 
             R.id.external_member -> {
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
-                val intent = Intent(this, org.medtroniclabs.uhis.ui.services.ServicesActivity::class.java)
-                intent.putExtra("isExternalMember", true)
+                val intent = Intent(this, ServicesActivity::class.java)
+                intent.putExtra(ServicesActivity.IS_EXTERNAL_MEMBER, true)
                 startActivity(intent)
                 return true
             }
 
             R.id.support -> {
-                // TODO : Handle the tiberbu
                 launchSupportDialogFragment()
-                return true
-            }
-
-            R.id.chwAssistant -> {
-                binding.drawerLayout.closeDrawer(GravityCompat.START)
-                launchCoachingAssistant()
                 return true
             }
         }
@@ -937,24 +882,6 @@ class LandingActivity :
             supportFragmentManager,
             NCDSupportDialogFragment.TAG,
         )
-    }
-
-    private val languagePreferenceListener = object : OnDialogDismissListener {
-        override fun onDialogDismissListener(isFinish: Boolean) {
-            showErrorDialogue(
-                message = getString(R.string.language_change_alert),
-                isNegativeButtonNeed = true,
-                cancelBtnName = getString(R.string.no),
-                positiveButtonName = getString(R.string.yes),
-            ) { isPositiveResult ->
-                if (isPositiveResult && SecuredPreference.logout()) {
-                    cancelAllWorker()
-                    startActivity(Intent(this@LandingActivity, LoginActivity::class.java))
-                    finish()
-                    UserDetail.referenceId = UUID.randomUUID().toString()
-                }
-            }
-        }
     }
 
     private fun goToOfflineSyncPage() {
@@ -984,9 +911,23 @@ class LandingActivity :
         }
     }
 
+    private fun setToolbarTitle(
+        title: String,
+        textSizeRes: Int = R.dimen._16ssp,
+    ) {
+        binding.appBarMain.tvTitle.apply {
+            text = title
+            setTextSize(
+                TypedValue.COMPLEX_UNIT_PX,
+                resources.getDimension(textSizeRes),
+            )
+        }
+    }
+
+    @SuppressLint("SourceLockedOrientationActivity")
     private fun handleNavigation(isDeepLink: Boolean = false) {
         if (CommonUtils.isCommunity() && CommonUtils.isRolePresent()) {
-            binding.appBarMain.tvTitle.text = getString(R.string.search_patient)
+            setToolbarTitle(getString(R.string.search_patient))
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
             val bundle = Bundle().apply {
                 putString(DefinedParams.ORIGIN, MenuConstants.MY_PATIENTS_MENU_ID)
@@ -997,12 +938,12 @@ class LandingActivity :
                 tag = PatientSearchFragment.TAG,
             )
         } else {
-            binding.appBarMain.tvTitle.text = getString(R.string.home_title)
+            setToolbarTitle(getString(R.string.home_title), R.dimen._20ssp)
             if (CommonUtils.isChwChp()) {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             }
             val bundle = Bundle().apply {
-                putBoolean(DefinedParams.IsDeepLink, isDeepLink)
+                putBoolean(DefinedParams.IS_DEEP_LINK, isDeepLink)
             }
             replaceFragmentInId<HomeScreenFragment>(
                 R.id.fragmentContainerView,
@@ -1013,7 +954,7 @@ class LandingActivity :
     }
 
     private fun selectNavigationMenu(item: MenuItem) {
-        if (binding.navView.menu.size() > 0) {
+        if (binding.navView.menu.isNotEmpty()) {
             binding.navView.menu.forEach { menuItem ->
                 menuItem.isChecked = (menuItem.itemId == item.itemId)
             }
@@ -1086,7 +1027,7 @@ class LandingActivity :
             if (CommonUtils.isNonCommunity()) {
                 withNetworkAvailability(online = {
                     this.triggerOneTimeWorker()
-                    // i added chp condition inside the method
+                    // Added chp condition inside the method
                     startSyncWorker()
                 })
             }
@@ -1099,12 +1040,10 @@ class LandingActivity :
         val refreshFragment =
             intent.getBooleanExtra(REFRESH_FRAGMENT, false)
         if (refreshFragment) {
-            if (CommonUtils.isNonCommunity()) {
-                supportFragmentManager.fragments.forEach { fragment ->
-                    supportFragmentManager.beginTransaction().remove(fragment).commit()
-                }
-                handleNavigation()
-            } else {
+            // PatientSearchFragment is the home only for community role-based users.
+            // FO/PO/CHCP are community but not role-based, so route them the same way
+            // handleNavigation() does (HomeScreenFragment) to keep the home icon consistent.
+            if (CommonUtils.isCommunity() && CommonUtils.isRolePresent()) {
                 val fragment = supportFragmentManager.findFragmentByTag(PatientSearchFragment.TAG)
                 fragment?.let {
                     supportFragmentManager.beginTransaction().remove(it).commit()
@@ -1113,6 +1052,11 @@ class LandingActivity :
                     R.id.fragmentContainerView,
                     tag = PatientSearchFragment.TAG,
                 )
+            } else {
+                supportFragmentManager.fragments.forEach { fragment ->
+                    supportFragmentManager.beginTransaction().remove(fragment).commit()
+                }
+                handleNavigation()
             }
         }
     }
@@ -1130,6 +1074,7 @@ class LandingActivity :
         }
     }
 
+    @SuppressLint("LogNotTimber")
     private fun schedulePeriodicUploadWork(context: Context) {
         val periodicRequest =
             PeriodicWorkRequestBuilder<UploadWorker>(60, TimeUnit.MINUTES)
@@ -1160,7 +1105,7 @@ class LandingActivity :
                 )
                 putAll(
                     mapOf(
-                        DefinedParams.Authorization to SecuredPreference.getString(
+                        DefinedParams.AUTHORIZATION to SecuredPreference.getString(
                             SecuredPreference.EnvironmentKey.TOKEN.toString(),
                         ),
                     ),
@@ -1170,7 +1115,106 @@ class LandingActivity :
     override fun onResume() {
         super.onResume()
         doRefreshForDataUpdate()
-        notifyCoachingSdkOnConnectivityRestored()
+        resumeInProgressAppUpdateIfAny()
+    }
+
+    /**
+     * Sequential entry point for the in-app update flow. The splash screen is held over the
+     * UI while this runs so the user cannot navigate into another activity mid-check (an
+     * immediate update is rooted on this activity and cancelling it does [exitProcess]).
+     *
+     * Flow:
+     *   1. Ask the backend whether this build is still allowed.
+     *   2. Dismiss the splash.
+     *   3. If an update is required, show a single modal dialog using the message returned
+     *      by the API. The dialog is the only way the user can proceed.
+     *   4. On the user accepting, route to Play Core's immediate update if available,
+     *      otherwise open the Play Store URL.
+     *
+     * Failures (no network, timeout, HTTP error) are non-fatal: we dismiss the splash and let
+     * the user continue.
+     */
+    private fun runAppVersionCheck() {
+        lifecycleScope.launch {
+            val result = withTimeoutOrNull(APP_VERSION_CHECK_TIMEOUT_MS) {
+                viewModel.checkAppVersion()
+            }
+            keepSplashOnScreen = false
+            if (result?.state == ResourceState.SUCCESS && result.optionalData == true) {
+                showAppUpdateRequiredDialog(result.data)
+            }
+        }
+    }
+
+    /**
+     * Shows a single non-cancellable dialog with the message returned by the [app-version]
+     * API. The dialog is the entry point for both the Play Core in-app update and the
+     * Play Store URL fallback - the user cannot reach the rest of the app without acting on
+     * it (the same enforcement pattern used in [LoginActivity]).
+     */
+    private fun showAppUpdateRequiredDialog(serverMessage: String?) {
+        showErrorDialogue(
+            title = getString(R.string.alert),
+            message = serverMessage ?: getString(R.string.please_update_the_app),
+            positiveButtonName = getString(R.string.open_play_store),
+        ) { status ->
+            if (status) {
+                lifecycleScope.launch { startImmediateUpdateOrFallback() }
+            }
+        }
+    }
+
+    /**
+     * Starts app update flow using play core API if possible
+     * Otherwise open play store with app package.
+     */
+    private suspend fun startImmediateUpdateOrFallback() {
+        val info = runCatching { appUpdateManager.requestAppUpdateInfo() }.getOrNull()
+        val canImmediate =
+            info != null &&
+                info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+                info.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+        if (canImmediate && info != null) {
+            appUpdateManager.startUpdateFlowForResult(
+                info,
+                appUpdateLauncher,
+                AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build(),
+            )
+        } else {
+            openPlayStoreUrl()
+        }
+    }
+
+    /**
+     * Unable to trigger update using play core API, ask user to manually update using play store.
+     */
+    private fun openPlayStoreUrl() {
+        val opened = openPlayStore()
+        if (!opened) {
+            showErrorDialogue(message = getString(R.string.please_check_if_play_store_available)) {}
+            return
+        }
+        finishAffinity()
+        exitProcess(0)
+    }
+
+    /**
+     * Resumes an immediate update that was interrupted (e.g. user backgrounded the app while
+     * the Play update screen was visible). Google requires this to be checked in onResume of
+     * the entry activity for [AppUpdateType.IMMEDIATE] flows.
+     */
+    private fun resumeInProgressAppUpdateIfAny() {
+        lifecycleScope.launch {
+            val info = runCatching { appUpdateManager.requestAppUpdateInfo() }.getOrNull()
+                ?: return@launch
+            if (info.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                appUpdateManager.startUpdateFlowForResult(
+                    info,
+                    appUpdateLauncher,
+                    AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build(),
+                )
+            }
+        }
     }
 
     private fun checkBGSyncStatusForNCD() {
@@ -1253,7 +1297,7 @@ class LandingActivity :
                     NCDSupportRequest(
                         userId = SecuredPreference.getUserId().toString(),
                         summary = it,
-                        healthFacilityId = SecuredPreference.getOrganizationId().toLong(),
+                        healthFacilityId = SecuredPreference.getOrganizationId(),
                     )
                 viewModel.createSupportRequest(request)
             }
@@ -1360,5 +1404,10 @@ class LandingActivity :
         cancelAllWorker()
         startActivity(Intent(this, LoginActivity::class.java))
         finish()
+    }
+
+    companion object {
+        /** Max time we hold the splash for the version check before failing open. */
+        private const val APP_VERSION_CHECK_TIMEOUT_MS = 5_000L
     }
 }

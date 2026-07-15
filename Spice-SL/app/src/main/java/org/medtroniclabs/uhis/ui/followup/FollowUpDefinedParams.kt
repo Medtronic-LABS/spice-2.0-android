@@ -1,32 +1,25 @@
 package org.medtroniclabs.uhis.ui.followup
 
+import org.medtroniclabs.uhis.ui.MenuConstants
+
 object FollowUpDefinedParams {
-    const val FilterToday = "Today"
-    const val FilterTomorrow = "Tomorrow"
-    const val FilterCustomize = "Customize"
+    const val FILTER_TODAY = "Today"
+    const val FILTER_TOMORROW = "Tomorrow"
+    const val FILTER_CUSTOMIZE = "Customize"
 
     const val FU_TYPE_HH_VISIT = "HH_VISIT"
     const val FU_TYPE_REFERRED = "REFERRED"
     const val FU_TYPE_MEDICAL_REVIEW = "MEDICAL_REVIEW"
     const val FU_ENCOUNTER_TYPE_RMNCH = "RMNCH"
 
-    const val WrongNumber = "Wrong Number"
     const val WRONG_NUMBER = "WRONG_NUMBER"
-    const val UNREACHABLE = "UNREACHABLE"
 
-    const val INFORMED = "Informed"
-    const val NOT_INFORMED = "Not Informed"
+    const val FILTER_ANC = MenuConstants.ANC
+    const val FILTER_PNC = MenuConstants.PNC_MOTHER
+    const val FILTER_NCD = MenuConstants.NCD_MENU_ID
+    const val FILTER_CHILD_HEALTH = MenuConstants.CHILDHOOD_VISIT
 
-    const val FilterMalaria = "Malaria"
-    const val FilterFever = "Fever"
-    const val FilterDiarrhoea = "Diarrhoea"
-    const val FilterANC = "ANC"
-    const val FilterPNC = "PNC"
-    const val FilterPneumonia = "Pneumonia"
-    const val FilterCough = "Cough"
-    const val FilterGeneralDangerSigns = "General Danger Signs"
-    const val FilterMUAC = "MUAC"
-    const val FilterTBSymptoms = "TB Symptoms"
-    const val FilterNCD = "NCD"
-    const val FilterFPConsult = "Family Planning Consult"
+    const val HIGH_BP = "high bp"
+    const val HIGH_BG = "high bg"
+    const val BOTH = "both"
 }

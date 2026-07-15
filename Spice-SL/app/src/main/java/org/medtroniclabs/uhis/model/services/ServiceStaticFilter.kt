@@ -53,4 +53,21 @@ enum class ServiceStaticFilter(val value: String, val culturalValue: String) {
      * Deliveries that are past due or pending update
      */
     PENDING_DELIVERIES("Pending Delivery List", "পেন্ডিং ডেলিভারি লিস্ট"),
+
+    /**
+     * Members with NCD-related service history (FO/PO service list)
+     */
+
+    NCD_SERVICES("NCD Services", "এনসিডি সেবাসমূহ"),
+
+    /**
+     * Members with cataract screening service history
+     */
+
+    CATARACT_SCREENING("Cataract Screening", "ক্যাটারাক্ট স্ক্রিনিং"),
+
+    /**
+     * Members with eye screening (eye care) service history
+     */
+    EYE_SCREENING("Eye Screening", "চক্ষু পরীক্ষা স্ক্রিনিং"),
 }

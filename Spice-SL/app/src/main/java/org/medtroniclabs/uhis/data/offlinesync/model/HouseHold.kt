@@ -4,8 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Ignore
 import org.medtroniclabs.uhis.appextensions.convertToUtcDateTime
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineSyncStatus
+import org.medtroniclabs.uhis.db.entity.HH_COLUMN_MONTHLY_INCOME_RANGE
 import org.medtroniclabs.uhis.db.entity.HouseholdEntity
-import java.util.Locale
 
 data class HouseHold(
     @ColumnInfo(name = "id")
@@ -30,6 +30,8 @@ data class HouseHold(
     val householdType: String? = null,
     @ColumnInfo(name = "monthly_income")
     val monthlyIncome: Double? = null,
+    @ColumnInfo(name = HH_COLUMN_MONTHLY_INCOME_RANGE)
+    var monthlyIncomeRange: String? = null,
     @ColumnInfo(name = "latitude")
     val latitude: Double = 0.0,
     @ColumnInfo(name = "longitude")
@@ -67,6 +69,7 @@ data class HouseHold(
             subVillageId = this.subVillageId,
             householdType = this.householdType,
             monthlyIncome = this.monthlyIncome,
+            monthlyIncomeRange = this.monthlyIncomeRange,
             latitude = this.latitude,
             longitude = this.longitude,
             version = this.version,
@@ -82,10 +85,4 @@ data class HouseHold(
             createdAt = newCreateAt
             updatedAt = newUpdatedAt
         }
-
-    private fun toRegularCase(sentence: String?): String =
-        sentence?.split(" ")?.joinToString(" ") {
-            it.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-        }
-            ?: ""
 }

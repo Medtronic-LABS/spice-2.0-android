@@ -47,7 +47,7 @@ class UnderFiveYearsClinicalSummaryViewModel @Inject constructor(
         if (resultMotherVitaminHashMap.containsKey(MedicalReviewDefinedParams.MOTHER_VITAMIN_TAG)) {
             val vitaminA =
                 resultMotherVitaminHashMap[MedicalReviewDefinedParams.MOTHER_VITAMIN_TAG] as String
-            clinicalSummaryAndSigns = if (vitaminA == DefinedParams.Yes) {
+            clinicalSummaryAndSigns = if (vitaminA == DefinedParams.YES) {
                 clinicalSummaryAndSigns.copy(vitAForMother = true)
             } else {
                 clinicalSummaryAndSigns.copy(vitAForMother = false)
@@ -59,9 +59,9 @@ class UnderFiveYearsClinicalSummaryViewModel @Inject constructor(
         if (albendazoleHashMap.containsKey(MedicalReviewDefinedParams.Albendazole)) {
             val albendazole =
                 albendazoleHashMap[MedicalReviewDefinedParams.Albendazole] as String
-            clinicalSummaryAndSigns = if (albendazole == DefinedParams.Yes) {
+            clinicalSummaryAndSigns = if (albendazole == DefinedParams.YES) {
                 clinicalSummaryAndSigns.copy(albendazole = true)
-            } else if (albendazole == DefinedParams.No) {
+            } else if (albendazole == DefinedParams.NO) {
                 clinicalSummaryAndSigns.copy(albendazole = false)
             } else {
                 clinicalSummaryAndSigns.copy(albendazole = null)

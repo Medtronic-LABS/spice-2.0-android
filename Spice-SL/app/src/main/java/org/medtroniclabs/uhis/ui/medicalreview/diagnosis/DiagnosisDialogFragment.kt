@@ -17,8 +17,8 @@ import org.medtroniclabs.uhis.appextensions.setError
 import org.medtroniclabs.uhis.appextensions.setWidth
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
-import org.medtroniclabs.uhis.common.DefinedParams.Other
-import org.medtroniclabs.uhis.common.DefinedParams.OtherNotes
+import org.medtroniclabs.uhis.common.DefinedParams.OTHER
+import org.medtroniclabs.uhis.common.DefinedParams.OTHER_NOTES
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.DiagnosisDiseaseModel
 import org.medtroniclabs.uhis.data.DiagnosisSaveUpdateRequest
@@ -158,7 +158,7 @@ class DiagnosisDialogFragment : DialogFragment(), View.OnClickListener, Diagnosi
                                     listItems
                                         .firstOrNull {
                                             it.diseaseCategory.equals(
-                                                OtherNotes,
+                                                OTHER_NOTES,
                                                 true,
                                             )
                                         }?.diseaseCondition
@@ -203,7 +203,7 @@ class DiagnosisDialogFragment : DialogFragment(), View.OnClickListener, Diagnosi
                                             .find { conditionItem -> conditionItem.value == it.diseaseCondition }
                                             ?.name
                                     nameItemValue?.let { value ->
-                                        if (value.lowercase() != Other.lowercase() || !it.diseaseCategory.equals(Other, true)) {
+                                        if (value.lowercase() != OTHER.lowercase() || !it.diseaseCategory.equals(OTHER, true)) {
                                             selectedDiseaseConditionItemList.add(
                                                 ChipViewItemModel(
                                                     id = it.diseaseConditionId,
@@ -218,7 +218,7 @@ class DiagnosisDialogFragment : DialogFragment(), View.OnClickListener, Diagnosi
                                     diagnosisMetaChipItemList,
                                     selectedDiagnosisMetaChipItemList,
                                 )
-                                diagnosisAccordionList.removeAll { it.name.lowercase() == Other.lowercase() }
+                                diagnosisAccordionList.removeAll { it.name.lowercase() == OTHER.lowercase() }
                                 diagnosisGenerator.populateDiagnosisView(
                                     diagnosisAccordionList,
                                     selectedDiseaseConditionItemList,
@@ -304,7 +304,7 @@ class DiagnosisDialogFragment : DialogFragment(), View.OnClickListener, Diagnosi
             binding.root.context,
             binding.diseaseConditionChipGroup,
         ) { name, _, isChecked ->
-            if (!diagnosisViewModel.viewDiagnosis && isShowAccordion() && name?.lowercase() != Other.lowercase()) {
+            if (!diagnosisViewModel.viewDiagnosis && isShowAccordion() && name?.lowercase() != OTHER.lowercase()) {
                 diagnosisViewModel.diagnosisMetaList.value?.data?.let { listItems ->
                     if (isChecked) {
                         val filteredList =
@@ -334,7 +334,7 @@ class DiagnosisDialogFragment : DialogFragment(), View.OnClickListener, Diagnosi
                     val list =
                         diseaseCategoryTagView
                             .getSelectedTags()
-                            .filter { it.name.equals(Other, true) }
+                            .filter { it.name.equals(OTHER, true) }
                     if (list.isNotEmpty()) {
                         binding.tvSelectedDiseaseConditionLbl.gone()
                     } else {
@@ -431,7 +431,7 @@ class DiagnosisDialogFragment : DialogFragment(), View.OnClickListener, Diagnosi
             }
         }
         diseaseCategoryTagView.getSelectedTags().let { list ->
-            val otherItem = list.filter { item -> item.value?.lowercase() == Other.lowercase() }
+            val otherItem = list.filter { item -> item.value?.lowercase() == OTHER.lowercase() }
             if (otherItem.isNotEmpty() && diagnosisViewModel.diagnosisType == MedicalReviewTypeEnums.ABOVE_FIVE_YEARS.name) {
                 otherItem[0].id?.let { otherId ->
                     diagnosisList.add(
@@ -509,14 +509,14 @@ class DiagnosisDialogFragment : DialogFragment(), View.OnClickListener, Diagnosi
         }
         val otherSelection = diseaseCategoryTagView
             .getSelectedTags()
-            .any { it.name.lowercase() == Other.lowercase() }
+            .any { it.name.lowercase() == OTHER.lowercase() }
         binding.btnOkay.isEnabled = isEmptyOrNot || (previousSelectedItems == true && diagnosisGenerator.isEmptyAccordion()) || otherSelection
     }
 
     private fun saveBtnStateHandler() {
         val otherSelection = diseaseCategoryTagView
             .getSelectedTags()
-            .any { it.name.lowercase() == Other.lowercase() }
+            .any { it.name.lowercase() == OTHER.lowercase() }
         when (diagnosisViewModel.diagnosisType) {
             MedicalReviewTypeEnums.ABOVE_FIVE_YEARS.name -> {
                 diagnosisViewModel.diagnosisDetailsList.value?.data?.let {

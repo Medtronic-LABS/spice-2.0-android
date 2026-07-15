@@ -1,5 +1,6 @@
 package org.medtroniclabs.uhis.db.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -30,6 +31,12 @@ interface PregnancyDetailDao {
 
     @Query("SELECT * FROM PregnancyDetail WHERE householdMemberLocalId=:hhmLocalId ORDER BY endAt DESC, id DESC Limit 1")
     suspend fun getPregnancyDetailByPatientId(hhmLocalId: Long): PregnancyDetail?
+
+    @Query("SELECT * FROM PregnancyDetail WHERE householdMemberLocalId = :hhmLocalId ORDER BY endAt DESC, id DESC LIMIT 1")
+    fun observeRecentPregnancyDetail(hhmLocalId: Long): LiveData<PregnancyDetail?>
+
+    @Query("SELECT * FROM PregnancyDetail WHERE householdMemberLocalId = :hhmLocalId ORDER BY endAt DESC, id DESC")
+    fun observePregnancyDetails(hhmLocalId: Long): LiveData<List<PregnancyDetail>>
 
     @Query("SELECT id from HouseholdMember where fhir_id =:memberId")
     suspend fun getHHMLocalID(memberId: String): Long?

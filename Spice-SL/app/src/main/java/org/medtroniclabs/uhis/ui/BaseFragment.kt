@@ -38,6 +38,14 @@ open class BaseFragment : Fragment() {
      */
     protected var isTranslationEnabled: Boolean = false
 
+    open fun showLoading() {
+        (requireActivity() as BaseActivity).showLoading()
+    }
+
+    open fun hideLoading() {
+        (activity as? BaseActivity)?.hideLoading()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         isTranslationEnabled = SecuredPreference.getIsTranslationEnabled()
@@ -156,7 +164,7 @@ open class BaseFragment : Fragment() {
         intent.putExtra(DefinedParams.FhirId, item.memberId)
         intent.putExtra(DefinedParams.PatientId, item.patientId)
         intent.putExtra(DefinedParams.ORIGIN, MenuConstants.ASSESSMENT.lowercase())
-        intent.putExtra(DefinedParams.Gender, item.gender)
+        intent.putExtra(DefinedParams.GENDER, item.gender)
         startActivity(intent)
     }
 

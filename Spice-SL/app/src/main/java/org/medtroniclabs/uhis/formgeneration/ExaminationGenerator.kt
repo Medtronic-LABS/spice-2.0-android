@@ -200,7 +200,7 @@ class ExaminationGenerator(
                 inputFilter.add(DigitsInputFilter())
             }
 
-            if (id == DefinedParams.NationalId) {
+            if (id == DefinedParams.NATIONAL_ID) {
                 inputFilter.add(InputFilter.AllCaps())
             }
 
@@ -363,7 +363,7 @@ class ExaminationGenerator(
                     text = setDialogText(mapList)
                 } else if (mapList.size > 1) {
                     text = if (isContainsOther(mapList)) {
-                        "${mapList.size - 1} and ${DefinedParams.Other} ${
+                        "${mapList.size - 1} and ${DefinedParams.OTHER} ${
                             getString(R.string.symptoms_selected)
                         }"
                     } else {
@@ -379,7 +379,7 @@ class ExaminationGenerator(
 
     private fun setDialogText(mapList: java.util.ArrayList<*>): String =
         if (isContainsOther(mapList)) {
-            "${DefinedParams.Other} ${
+            "${DefinedParams.OTHER} ${
                 getString(R.string.symptoms_selected)
             }"
         } else if (isNoSymptomContain(mapList)) {
@@ -393,7 +393,7 @@ class ExaminationGenerator(
         mapList.forEach { map ->
             if (map is HashMap<*, *>) {
                 val name = map[DefinedParams.NAME]
-                if (name is String && name.equals(DefinedParams.Other, true)) {
+                if (name is String && name.equals(DefinedParams.OTHER, true)) {
                     status = true
                     return@forEach
                 }
@@ -407,7 +407,7 @@ class ExaminationGenerator(
         mapList.forEach { map ->
             if (map is HashMap<*, *>) {
                 val name = map[DefinedParams.NAME]
-                if (name is String && name.startsWith(DefinedParams.NoSymptoms, true)) {
+                if (name is String && name.startsWith(DefinedParams.NO_SYMPTOMS, true)) {
                     status = true
                     return@forEach
                 }

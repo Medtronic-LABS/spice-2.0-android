@@ -56,6 +56,7 @@ object DateUtils {
     const val DATE_TIME_EEEMMMddHHmmsszyyyy = "EEE MMM dd HH:mm:ss z yyyy"
     const val DATE_TIME_YYYYMMDDTHHmmssSSSZ = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
     const val DATE_FORMAT_DD_MMMM_YYYY = "dd-MMMM-yyyy"
+    const val DATE_DD_MMM_YYYY = "dd-MMM-yyyy"
 
     fun getYearMonthAndWeek(
         inputDate: String,
@@ -125,12 +126,11 @@ object DateUtils {
             today.minusYears(years.toLong()).minusMonths(months.toLong()),
         )
         val daysTotal = daysInRemainder.toInt()
-        if (years >= 5) {
+        if (years >= 1) {
             return AgeOrDobDisplay(years, AgeOrDobDisplay.AgeOrDobUnit.YEAR)
         }
-        val totalMonths = (years * 12) + months
-        if (totalMonths > 0) {
-            return AgeOrDobDisplay(totalMonths, AgeOrDobDisplay.AgeOrDobUnit.MONTH)
+        if (months > 0) {
+            return AgeOrDobDisplay(months, AgeOrDobDisplay.AgeOrDobUnit.MONTH)
         }
         return AgeOrDobDisplay(daysTotal, AgeOrDobDisplay.AgeOrDobUnit.DAY)
     }
@@ -208,7 +208,7 @@ object DateUtils {
         )
         return format.format(date).let {
             if (outputFormat == DATE_FORMAT_yyyyMMddHHmmssZZZZZ) {
-                "${format.format(date)}${DefinedParams.DOBString}"
+                "${format.format(date)}${DefinedParams.DOB_STRING}"
             } else {
                 format.format(date)
             }
@@ -316,6 +316,13 @@ object DateUtils {
     fun calculateAge(birthYear: Int): Int {
         val currentYear = Calendar.getInstance().get(Calendar.YEAR)
         return currentYear - birthYear
+    }
+
+    fun calculateAgeInDays(birthDateStr: String?): Int {
+        val birthDate = parseDate(birthDateStr)
+        return birthDate?.let {
+            ChronoUnit.DAYS.between(it, LocalDate.now()).toInt()
+        } ?: 0
     }
 
     fun calculateAgeInMonths(birthDateString: String): Pair<Int, Date>? {
@@ -991,6 +998,15 @@ object DateUtils {
             zonedDateTime.toInstant().toEpochMilli()
         }
 
+    fun convertToTimestamp(
+        dateString: String?,
+        defaultValue: Long,
+    ): Long =
+        dateString?.let {
+            val zonedDateTime = ZonedDateTime.parse(it, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+            zonedDateTime.toInstant().toEpochMilli()
+        } ?: defaultValue
+
     fun convertToTimestampWithoutZone(
         dateString: String?,
         isStartOfDay: Boolean,
@@ -1029,6 +1045,23 @@ object DateUtils {
         } catch (_: Exception) {
             null
         }
+
+    fun getDaysDifference(dateString: String?): Long {
+        if (dateString.isNullOrEmpty()) return -1
+
+        return try {
+            val sdf = SimpleDateFormat(DATE_FORMAT_yyyyMMddHHmmssZZZZZ, Locale.ENGLISH)
+            val givenDate = sdf.parse(dateString) ?: return 0
+
+            // Today date
+            val today = Date()
+
+            val diffMillis = today.time - givenDate.time
+            diffMillis / (1000 * 60 * 60 * 24)
+        } catch (ex: Exception) {
+            -1
+        }
+    }
 
     fun getCurrentDayMonthYear(): Triple<Int, Int, Int> {
         val currentDate = LocalDate.now()
@@ -1175,6 +1208,26 @@ object DateUtils {
         }
     }
 
+    /**
+     * Formats a given time in millis to the given [displayFormat] Format
+     *
+     * @param date : Time in millis
+     * @param displayFormat : Display format to which we want to convert
+     */
+    fun formatDateToDisplayFormat(
+        date: Long,
+        displayFormat: String,
+    ): String? {
+        return try {
+            val calendar = Calendar.getInstance()
+            calendar.timeInMillis = date
+            val format = SimpleDateFormat(displayFormat, Locale.getDefault())
+            return format.format(calendar.time)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
     fun formatDate(date: Long): String? {
         return try {
             val calendar = Calendar.getInstance()
@@ -1212,4 +1265,202 @@ object DateUtils {
             false
         }
     }
+
+    fun getCurrentDate(): Calendar {
+        val calendar = Calendar.getInstance()
+
+        calendar.set(Calendar.HOUR, 0)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        return calendar
+    }
+
+    private fun convertBengaliToEnglishNumbers(input: String): String {
+        val bengaliDigits = "০১২৩৪৫৬৭৮৯"
+        val englishDigits = "0123456789"
+        return input
+            .map { char ->
+                val index = bengaliDigits.indexOf(char)
+                if (index != -1) englishDigits[index] else char
+            }.joinToString("")
+    }
+
+    private fun convertBengaliMonthToEnglish(input: String): String {
+        val monthMap = mapOf(
+            "জানুয়ারি" to "Jan",
+            "জানু." to "Jan",
+            "ফেব্রুয়ারি" to "Feb",
+            "ফেব." to "Feb",
+            "মার্চ" to "Mar",
+            "মা." to "Mar",
+            "এপ্রিল" to "Apr",
+            "এপ্রি." to "Apr",
+            "মে" to "May",
+            "জুন" to "Jun",
+            "জুলাই" to "Jul",
+            "জুল." to "Jul",
+            "আগস্ট" to "Aug",
+            "আগ." to "Aug",
+            "সেপ্টেম্বর" to "Sep",
+            "সেপ." to "Sep",
+            "অক্টোবর" to "Oct",
+            "অক্টো." to "Oct",
+            "নভেম্বর" to "Nov",
+            "নভে." to "Nov",
+            "ডিসেম্বর" to "Dec",
+            "ডিসে." to "Dec",
+        )
+
+        var updatedDate = input
+        monthMap.forEach { (bengali, english) ->
+            updatedDate = updatedDate.replace(bengali, english)
+        }
+        return updatedDate
+    }
+
+    fun convertToIsoFormat(inputDate: String): String {
+        return try {
+            val convertedDate = convertBengaliToEnglishNumbers(inputDate)
+            val englishMonthDate = convertBengaliMonthToEnglish(convertedDate)
+
+            val inputFormat = SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH)
+            val outputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ENGLISH)
+
+            // Parse the date
+            val date = inputFormat.parse(englishMonthDate) ?: return ""
+
+            // Get today's date
+            val calendar = Calendar.getInstance()
+            val today = Calendar.getInstance().apply {
+                time = date
+            }
+
+            // Check if the parsed date is today's date
+            if (calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                calendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
+            ) {
+                // If the date is today, set the current time
+                today.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY))
+                today.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE))
+                today.set(Calendar.SECOND, calendar.get(Calendar.SECOND))
+                today.set(Calendar.MILLISECOND, calendar.get(Calendar.MILLISECOND))
+            }
+
+            outputFormat.format(today.time)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ""
+        }
+    }
+
+    fun getCurrentDateTime(inputFormat: String): String {
+        val calendar = Calendar.getInstance()
+        return SimpleDateFormat(inputFormat, Locale.ENGLISH).format(calendar.time)
+    }
+
+    fun getTwoYearsLater(): Long {
+        val chosenDate = Calendar.getInstance().apply {
+            add(Calendar.YEAR, 2)
+        }
+        return chosenDate.timeInMillis
+    }
+
+    fun convertddMMMToddMM(
+        inputDate: String,
+        outputDateFormat: String? = null,
+    ): Triple<Int?, Int?, Int?> =
+        try {
+            val inputFormat = SimpleDateFormat(DATE_FORMAT_ddMMMyyyy, Locale.ENGLISH)
+            val outputFormat = SimpleDateFormat(outputDateFormat ?: DATE_ddMMyyyy, Locale.ENGLISH)
+            val date = inputFormat.parse(inputDate)
+            getYearMonthAndDate(outputFormat.format(date))
+        } catch (exception: Exception) {
+            Triple(null, null, null)
+        }
+
+    fun convertDateTimeToDateWithDay(
+        inputText: String?,
+        inputFormat: String,
+        outputFormat: String,
+        inUserTimeZone: Boolean? = false,
+        inUTC: Boolean? = null,
+    ): Pair<String, String> {
+        try {
+            inputText?.let {
+                if (it.isNotBlank()) {
+                    var userTimeZone: TimeZone? = null
+                    val isTimeZoneFormat = inputFormat == DATE_FORMAT_yyyyMMddHHmmssZZZZZ
+                    if (isTimeZoneFormat || inUserTimeZone == true) {
+                        getTimeZoneInput(inputText, isTimeZoneFormat)?.let { timeZone ->
+                            userTimeZone = timeZone
+                        }
+                    } else if (inUTC == true) {
+                        userTimeZone = getUTCFormat()
+                    }
+
+                    val sdfInput = SimpleDateFormat(inputFormat, Locale.ENGLISH)
+                    userTimeZone?.let {
+                        sdfInput.timeZone = userTimeZone
+                    }
+                    val date = sdfInput.parse(it)
+                    date?.let {
+                        val sdfOutput = SimpleDateFormat(outputFormat, Locale.ENGLISH)
+                        val sdfDay = SimpleDateFormat("EEEE", Locale.ENGLISH)
+                        userTimeZone?.let {
+                            sdfOutput.timeZone = userTimeZone
+                            sdfDay.timeZone = userTimeZone
+                        }
+
+                        val formattedDate = sdfOutput.format(date)
+                        val dayOfWeek = sdfDay.format(date)
+                        return Pair(formattedDate, dayOfWeek)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            return Pair("", "")
+        }
+        return Pair("", "")
+    }
+
+    fun calculateDaysToCurrentDateAndDay(
+        days: Int,
+        format: String,
+    ): Pair<String, String> {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, days)
+        val date = calendar.time
+        val sdfDate = SimpleDateFormat(format, Locale.ENGLISH).format(date)
+        val sdfDay = SimpleDateFormat("EEEE", Locale.ENGLISH).format(date) // Full day name
+        return Pair(sdfDate, sdfDay)
+    }
+
+    fun formatDateStringLegacy(input: String): String {
+        // Parse the input date string
+        val isoFormat = SimpleDateFormat(DATE_FORMAT_yyyyMMddHHmmssZZZZZ, Locale.getDefault())
+        val date = isoFormat.parse(input)
+
+        // Define the desired output format
+        val outputFormat = SimpleDateFormat(DATE_DD_MMM_YYYY, Locale.getDefault())
+
+        // Format the date into the desired format
+        return outputFormat.format(date)
+    }
+
+    fun getAge(dateString: String?): String {
+        return try {
+            val birthDate = dateString
+                ?.let { OffsetDateTime.parse(it).toLocalDate() }
+                ?: return "-"
+
+            val currentDate = LocalDate.now(ZoneId.systemDefault())
+            Period.between(birthDate, currentDate).years.toString()
+        } catch (e: Exception) {
+            "-"
+        }
+    }
+
+    fun getDateDDMMMYYYY(): SimpleDateFormat = SimpleDateFormat(DATE_FORMAT_ddMMMyyyy, Locale.ENGLISH)
 }

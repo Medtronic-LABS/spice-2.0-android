@@ -13,11 +13,12 @@ object MenuConstants {
     const val TB_MENU_ID = "TB"
     const val NCD_MENU_ID = "ncd"
 
+    const val MENU_REGISTRATION = "enrollment"
+
     const val EYE_CARE_MENU_ID = "eye_care"
 
     const val CATARACT_MENU_ID = "cataract"
 
-    const val BD_NCD_MENU_ID = "BD_NCD"
     const val WORKFLOW_NAME = "workflowName"
     const val DIALOG_RESULT = "DialogResult"
     const val OTHER_SYMPTOMS = "other_symptoms"
@@ -31,12 +32,15 @@ object MenuConstants {
 
     const val SCREENING = "SCREENING"
     const val REGISTRATION = "REGISTRATION"
+    const val CONFIRM_DIAGNOSIS = "CONFIRM DIAGNOSIS"
+    const val ENROLLMENT = "ENROLLMENT"
     const val ASSESSMENT = "ASSESSMENT"
     const val DASHBOARD = "DASHBOARD"
     const val MATERNAL_HEALTH = "maternalHealth"
     const val MENTAL_HEALTH = "mentalHealth"
     const val DISPENSE = "DISPENSE"
     const val FOLLOW_UP = "FOLLOW UP"
+    const val TELE_SUPPORT = "TELE SUPPORT"
     const val OTHER_REASON = "Other Reason"
     const val LIFESTYLE = "LIFESTYLE"
     const val PSYCHOLOGICAL = "PSYCHOLOGICAL"
@@ -50,6 +54,9 @@ object MenuConstants {
     const val FP_MENU_MR = "FAMILY PLANNING"
     const val HIV = "HIV"
     const val PREGNANCY_OUTCOME = "pregnancyOutcome"
+    const val MEDICAL_REVIEW_VISIT_SERVICE = "medicalreviewvisit"
+    const val MEDICAL_REVIEW_SERVICE = "medicalReview"
+    const val NCD_MEDICAL_REVIEW_SERVICE = "ncdmedicalreview"
     const val PNC_MOTHER: String = RMNCH.PNC_MOTHER_MENU
     const val CHILDHOOD_VISIT: String = RMNCH.CHILD_MENU
     const val ANC: String = RMNCH.ANC

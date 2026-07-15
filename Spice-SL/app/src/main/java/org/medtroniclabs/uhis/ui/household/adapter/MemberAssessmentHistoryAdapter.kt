@@ -5,18 +5,17 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.view.setPadding
 import androidx.recyclerview.widget.RecyclerView
-import org.medtroniclabs.uhis.R
-import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.databinding.SummaryListItemBinding
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
+import org.medtroniclabs.uhis.db.entity.PregnancyDetail
 import org.medtroniclabs.uhis.formgeneration.extension.px
-import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 
 /**
  * Adapter for showing member assessment history
  */
 class MemberAssessmentHistoryAdapter(
     val historyList: List<MemberAssessmentHistoryEntity>,
+    val memberPregnancyDetails: List<PregnancyDetail>?,
 ) : RecyclerView.Adapter<MemberAssessmentHistoryAdapter.ViewHolder>() {
     override fun onCreateViewHolder(
         viewGroup: ViewGroup,
@@ -37,57 +36,33 @@ class MemberAssessmentHistoryAdapter(
         viewHolder: ViewHolder,
         position: Int,
     ) {
-        viewHolder.bindData(historyList[position])
+        viewHolder.bindData(historyList[position], memberPregnancyDetails)
     }
 
     override fun getItemCount() = historyList.size
 
     class ViewHolder(private val view: LinearLayout) : RecyclerView.ViewHolder(view) {
-        fun bindData(history: MemberAssessmentHistoryEntity) {
+        fun bindData(
+            history: MemberAssessmentHistoryEntity,
+            memberPregnancyDetails: List<PregnancyDetail>?,
+        ) {
             val context = view.context
-            addSummaryView(
-                context.getString(R.string.service_name),
-                AssessmentUtil.mapServiceToServiceName(history.serviceProvided ?: "", context),
-            )
-            val visitDateMillis = DateUtils.getLastMenstrualDate(history.visitDate ?: "").timeInMillis
-            addSummaryView(
-                context.getString(R.string.service_date),
-                DateUtils.formatDateToDisplayFormat(visitDateMillis) ?: "",
-            )
-            val currentStatus = history.customStatus?.joinToString {
-                AssessmentUtil.mapAssessmentStatus(it, context)
-            } ?: context.getString(R.string.separator_double_hyphen)
-            addSummaryView(
-                context.getString(R.string.current_status),
-                currentStatus,
-            )
-            val referralStatus = AssessmentUtil.getReferralStatus(
-                context,
-                history.serviceProvided ?: "",
-                history.referralStatus,
-            )
-            addSummaryView(
-                context.getString(R.string.referral_status),
-                referralStatus,
-            )
-            val nextFollowUpDate = AssessmentUtil.getNextFollowUpDate(
-                context,
-                history.serviceProvided ?: "",
-                history.nextFollowUpDate,
-            )
-            addSummaryView(
-                context.getString(R.string.next_follow_up_date),
-                nextFollowUpDate,
-            )
+            view.removeAllViews()
+            val summaryItems = MemberAssessmentHistoryAdapterUtil.constructHistoryAdapterBindItems(context, history, memberPregnancyDetails)
+            summaryItems.forEach { summaryItem ->
+                addSummaryView(summaryItem.name, summaryItem.value, summaryItem.valueColor)
+            }
         }
 
         private fun addSummaryView(
             name: String,
             value: String,
+            valueColor: Int? = null,
         ) {
             val binding = SummaryListItemBinding.inflate(LayoutInflater.from(view.context))
             binding.tvLabel.text = name
             binding.tvValue.text = value
+            valueColor?.let { binding.tvValue.setTextColor(it) }
             view.addView(binding.root)
         }
     }

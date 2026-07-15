@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
+import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.databinding.ListItemHouseholdBinding
 import org.medtroniclabs.uhis.db.response.HouseHoldEntityWithLastActivity
@@ -36,7 +37,7 @@ class HouseholdListAdapter(
         notifyItemRangeInserted(0, list.size)
     }
 
-    inner class HouseholdListViewHolder(val binding: ListItemHouseholdBinding) :
+    class HouseholdListViewHolder(val binding: ListItemHouseholdBinding) :
         RecyclerView.ViewHolder(binding.root) {
         val context: Context = binding.root.context
 
@@ -65,18 +66,47 @@ class HouseholdListAdapter(
                 text = item.name
             },
         )
+        holder.binding.flexTitle.addView(
+            TextView(context).apply {
+                layoutParams = ViewGroup.MarginLayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                )
+                setTextAppearance(R.style.TextStyle_Bold_16_NoBG)
+                setTextColor(ContextCompat.getColor(context, R.color.base_muted_foreground))
+                text = formatBracServiceMembers(
+                    context,
+                    item.membersSeekingBracServices,
+                    item.totalRegisteredMembers,
+                )
+            },
+        )
         holder.binding.tvHouseholdNo.text = item.householdNo ?: holder.context.getString(R.string.separator_double_hyphen)
         holder.binding.tvLabelVillage.setText(R.string.village)
         holder.binding.tvVillageName.text = item.subVillageName
-        holder.binding.tvSSName.text = item.shasthyaShebikaName
+        val shasthyaShebika = when {
+            item.shasthyaShebikaNameSsId.isNotBlank() && item.shasthyaShebikaName.isNotBlank() -> {
+                "${item.shasthyaShebikaNameSsId} - ${item.shasthyaShebikaName}"
+            }
+
+            item.shasthyaShebikaName.isNotBlank() -> {
+                item.shasthyaShebikaName
+            }
+
+            else -> {
+                context.getString(R.string.separator_double_hyphen)
+            }
+        }
+        holder.binding.tvSSName.text = shasthyaShebika
         holder.binding.tvLastVisitDate.text = DateUtils.formatDateToDisplayFormat(item.lastActivityAt)
 
+        val services = item.assessmentHistory.filterNot { it.serviceProvided.isNullOrBlank() }
+
         // If user have received some services, then add their icons beside name
-        if (!item.services.isNullOrEmpty()) {
-            val iconsToShow = item.services
-                .map { service ->
-                    AssessmentUtil.mapServiceToServiceIcon(service)
-                }.filterNot { it == View.NO_ID }
+        if (services.isNotEmpty()) {
+            val iconsToShow = services
+                .map(AssessmentUtil::mapServiceToServiceIcon)
+                .filterNot { it == View.NO_ID }
                 .take(3)
 
             iconsToShow.forEach { iconRes ->
@@ -90,7 +120,7 @@ class HouseholdListAdapter(
                 holder.binding.flexTitle.addView(imageView)
             }
 
-            val remainingCount = item.services.size - iconsToShow.size
+            val remainingCount = services.size - iconsToShow.size
             if (remainingCount > 0) {
                 val textView = TextView(holder.context).apply {
                     layoutParams = ViewGroup.MarginLayoutParams(
@@ -125,4 +155,15 @@ class HouseholdListAdapter(
         )
 
     override fun getItemCount(): Int = houseHoldList.size
+
+    private fun formatBracServiceMembers(
+        context: Context,
+        seeking: Int,
+        total: Int,
+    ): String =
+        context.getString(
+            R.string.household_brac_service_members_value,
+            CommonUtils.formatCountForCurrentLocale(seeking),
+            CommonUtils.formatCountForCurrentLocale(total),
+        )
 }

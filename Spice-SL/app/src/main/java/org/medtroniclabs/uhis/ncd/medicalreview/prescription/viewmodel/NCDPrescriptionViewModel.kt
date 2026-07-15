@@ -108,7 +108,7 @@ class NCDPrescriptionViewModel @Inject constructor(
                     prescriptionId,
                     ProvanceDto(),
                     reason,
-                    requestFrom = DefinedParams.Africa,
+                    requestFrom = DefinedParams.AFRICA,
                 ),
             )
             removePrescriptionLiveData.postSuccess(response.data)
@@ -201,7 +201,7 @@ class NCDPrescriptionViewModel @Inject constructor(
                 val response = prescriptionRepository.getPatientPrescriptionHistoryList(
                     RemovePrescriptionRequest(
                         prescriptionId = prescriptionId,
-                        requestFrom = DefinedParams.Africa,
+                        requestFrom = DefinedParams.AFRICA,
                     ),
                 )
                 response.data.let {
@@ -234,7 +234,7 @@ class NCDPrescriptionViewModel @Inject constructor(
             PrescriptionCreateRequest(
                 enrollmentType = request.enrollmentType,
                 identityValue = request.identityValue,
-                requestFrom = DefinedParams.Africa,
+                requestFrom = DefinedParams.AFRICA,
                 encounter = EncounterDetails(
                     patientVisitId = patient_visit_id,
                     memberId = memberReference,

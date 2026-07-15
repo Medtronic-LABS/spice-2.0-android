@@ -9,7 +9,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import org.medtroniclabs.uhis.R
-import org.medtroniclabs.uhis.common.DefinedParams.DefaultID
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.model.SymptomModel
 import org.medtroniclabs.uhis.databinding.LayoutChooseSymptomsBinding
@@ -57,55 +56,22 @@ class SymptomsChooseDialog : DialogFragment(), View.OnClickListener {
 
     private fun getSymptomModelList(symptomList: List<SignsAndSymptomsEntity>?): ArrayList<SymptomModel> {
         val selectedSymptoms = viewModel.selectedSymptoms.value
-        val tempList = ArrayList<SymptomModel>()
-        symptomList?.forEach { symptom ->
-            if (selectedSymptoms != null && selectedSymptoms.isNotEmpty()) {
-                val model = selectedSymptoms.find { it.id == symptom._id }
-                if (model != null) {
-                    tempList.add(SymptomModel(symptom._id, symptom.symptom, true, symptom.type, cultureValue = symptom.displayValue, value = symptom.value))
-                } else {
-                    tempList.add(SymptomModel(symptom._id, symptom.symptom, type = symptom.type, cultureValue = symptom.displayValue, value = symptom.value))
-                }
-            } else {
-                tempList.add(SymptomModel(symptom._id, symptom.symptom, type = symptom.type, cultureValue = symptom.displayValue, value = symptom.value))
-            }
-        }
-
         val list = ArrayList<SymptomModel>()
-        list.add(
-            SymptomModel(
-                DefaultID.toLong(),
-                "",
-                false,
-                getString(R.string.hypertension),
-                viewType = 1,
-            ),
-        )
-        list.addAll(
-            tempList.filter {
-                it.type.equals(
-                    AssessmentDefinedParams.Compliance_Type_Hypertension,
-                    true,
+        symptomList
+            ?.filter { it.type.equals(AssessmentDefinedParams.Symptom_Type_Ncd, true) }
+            ?.forEach { symptom ->
+                val isSelected = selectedSymptoms?.any { it.id == symptom._id } == true
+                list.add(
+                    SymptomModel(
+                        symptom._id,
+                        symptom.symptom,
+                        isSelected,
+                        symptom.type,
+                        cultureValue = symptom.displayValue,
+                        value = symptom.value,
+                    ),
                 )
-            },
-        )
-        list.add(
-            SymptomModel(
-                DefaultID.toLong(),
-                "",
-                false,
-                getString(R.string.diabetes),
-                viewType = 1,
-            ),
-        )
-        list.addAll(
-            tempList.filter {
-                it.type.equals(
-                    AssessmentDefinedParams.Compliance_Type_Diabetes,
-                    true,
-                )
-            },
-        )
+            }
         return list
     }
 

@@ -38,10 +38,10 @@ import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
 import org.medtroniclabs.uhis.databinding.FragmentScreeningFormBuilderBinding
 import org.medtroniclabs.uhis.db.entity.RiskClassificationModel
 import org.medtroniclabs.uhis.formgeneration.FormGenerator
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.Days
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.Month
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.Week
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.Year
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.DAYS_KEY
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.MONTH_KEY
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.WEEK_KEY
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.YEAR_KEY
 import org.medtroniclabs.uhis.formgeneration.config.ViewType
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.formgeneration.listener.FormEventListener
@@ -139,7 +139,7 @@ class ScreeningFormBuilderFragment : BaseFragment(), FormEventListener, View.OnC
                     Screening.DateOfBirth, Screening.BloodGlucoseID, Screening.diabetes -> {
                         showBGCardOrNot(map)
                     }
-                    DefinedParams.Gender -> {
+                    DefinedParams.GENDER -> {
                         showHidePregnancyCard(map)
                     }
                     Screening.lastMenstrualPeriod -> {
@@ -191,7 +191,7 @@ class ScreeningFormBuilderFragment : BaseFragment(), FormEventListener, View.OnC
     }
 
     private fun showHidePregnancyCard(resultHashMap: HashMap<String, Any>) {
-        val gender = resultHashMap[DefinedParams.Gender]
+        val gender = resultHashMap[DefinedParams.GENDER]
         if (gender != null && gender is String && gender.equals(Screening.Female, true)) {
             formGenerator.showHideCardFamily(true, Screening.pregnancyAnc)
         } else {
@@ -324,7 +324,7 @@ class ScreeningFormBuilderFragment : BaseFragment(), FormEventListener, View.OnC
                 val intent = Intent(requireContext(), AssessmentToolsActivity::class.java)
                 intent.putExtra(DefinedParams.FhirId, fhirId)
                 intent.putExtra(DefinedParams.ORIGIN, MenuConstants.ASSESSMENT)
-                intent.putExtra(DefinedParams.Gender, data[DefinedParams.Gender]?.toString()?.lowercase())
+                intent.putExtra(DefinedParams.GENDER, data[DefinedParams.GENDER]?.toString()?.lowercase())
                 startActivity(intent)
                 activity?.finish()
             }
@@ -468,7 +468,7 @@ class ScreeningFormBuilderFragment : BaseFragment(), FormEventListener, View.OnC
         }
         map[Screening.UnitMeasurement] = getUnitMeasurementType()
         val unwantedKeys =
-            setOf(Week, Year, Month, Days, DefinedParams.Country, Screening.identityType)
+            setOf(WEEK_KEY, YEAR_KEY, MONTH_KEY, DAYS_KEY, DefinedParams.COUNTRY, Screening.identityType)
         map.keys.removeAll(unwantedKeys)
         var result = screeningJSON?.let {
             FormResultComposer().groupValues(
@@ -485,7 +485,7 @@ class ScreeningFormBuilderFragment : BaseFragment(), FormEventListener, View.OnC
         arguments?.getString(Screening.Initial)?.let { initial ->
             bioDataMap[Screening.Initial] = initial
         }
-        bioDataMap[DefinedParams.Country] = CommonUtils.getCountryMap()
+        bioDataMap[DefinedParams.COUNTRY] = CommonUtils.getCountryMap()
 
         result = Pair(StringConverter.convertGivenMapToString(result.second), result.second)
         val siteDetail = Gson().toJson(generalDetailsViewModel.siteDetail)
@@ -567,6 +567,9 @@ class ScreeningFormBuilderFragment : BaseFragment(), FormEventListener, View.OnC
                     ?.let { formGenerator.resetChildViews(it) }
             }
         }
+    }
+
+    override fun onQRScanRequested() {
     }
 
     private fun getAgeConditionCategory(

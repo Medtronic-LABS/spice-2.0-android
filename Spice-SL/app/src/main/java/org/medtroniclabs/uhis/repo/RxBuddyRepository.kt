@@ -65,15 +65,15 @@ class RxBuddyRepository @Inject constructor(
             dropDownList.add(
                 hashMapOf<String, Any>(
                     DefinedParams.NAME to householdMemberEntity.name,
-                    DefinedParams.id to householdMemberEntity.id,
+                    DefinedParams.ID to householdMemberEntity.id,
                 ),
             )
         }
 
         dropDownList.add(
             hashMapOf<String, Any>(
-                DefinedParams.NAME to DefinedParams.Other,
-                DefinedParams.id to 0L,
+                DefinedParams.NAME to DefinedParams.OTHER,
+                DefinedParams.ID to 0L,
             ),
         )
         return Resource(

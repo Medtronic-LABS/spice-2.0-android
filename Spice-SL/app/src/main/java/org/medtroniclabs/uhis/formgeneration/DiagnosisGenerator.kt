@@ -16,7 +16,7 @@ import org.medtroniclabs.uhis.data.DiseaseCategoryItems
 import org.medtroniclabs.uhis.data.DiseaseConditionItems
 import org.medtroniclabs.uhis.data.model.ChipViewItemModel
 import org.medtroniclabs.uhis.databinding.DiagnosisAccordionLayoutBinding
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.AccordionGroup
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.ACCORDION_GROUP
 import org.medtroniclabs.uhis.ui.TagListCustomView
 
 class DiagnosisGenerator(
@@ -39,7 +39,7 @@ class DiagnosisGenerator(
             val binding = DiagnosisAccordionLayoutBinding.inflate(LayoutInflater.from(context))
             binding.tvDiagnosisName.text = it.name
             binding.llFamilyRoot.tag = it.name
-            binding.accordionGroup.tag = it.name + AccordionGroup
+            binding.accordionGroup.tag = it.name + ACCORDION_GROUP
             binding.tvCount.tag = it.name + countSuffix
             binding.tvDiagnosisNameHolder.setOnClickListener {
                 if (binding.llFamilyRoot.visibility != View.VISIBLE) {
@@ -175,7 +175,7 @@ class DiagnosisGenerator(
     }
 
     private fun removeAccordionView(name: String) {
-        getViewByTag(name + AccordionGroup)?.let { view ->
+        getViewByTag(name + ACCORDION_GROUP)?.let { view ->
             val parent = view.parent as? ViewGroup
             parent?.removeView(view)
         }

@@ -8,14 +8,12 @@ import org.medtroniclabs.uhis.common.ConsentFormType
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.StringConverter
 import org.medtroniclabs.uhis.data.LocalSpinnerResponse
-import org.medtroniclabs.uhis.data.offlinesync.model.HouseHoldMember
 import org.medtroniclabs.uhis.data.offlinesync.model.HouseholdMemberWithTb
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineSyncStatus
 import org.medtroniclabs.uhis.db.dao.HouseholdSortOrder
 import org.medtroniclabs.uhis.db.entity.ConsentForm
 import org.medtroniclabs.uhis.db.entity.HouseholdEntity
 import org.medtroniclabs.uhis.db.entity.HouseholdMemberEntity
-import org.medtroniclabs.uhis.db.entity.SubVillageEntity
 import org.medtroniclabs.uhis.db.entity.VillageEntity
 import org.medtroniclabs.uhis.db.local.RoomHelper
 import org.medtroniclabs.uhis.db.response.HouseHoldEntityWithLastActivity
@@ -28,7 +26,7 @@ import org.medtroniclabs.uhis.network.resource.ResourceState
 import javax.inject.Inject
 
 class HouseHoldRepository @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private var apiHelper: ApiHelper,
     private var roomHelper: RoomHelper,
 ) {
@@ -79,14 +77,27 @@ class HouseHoldRepository @Inject constructor(
             Resource(state = ResourceState.ERROR)
         }
 
-    suspend fun getHouseHoldFilterUiData(userId: Long): Resource<HouseHoldFilterUiData> =
+    /** FO/PO Services filter: Shasthya Kormi list for the SK spinner (SS loads after a Kormi is chosen). */
+    suspend fun getHouseHoldFilterUiDataForServiceRecipient(): Resource<HouseHoldFilterUiData> =
         try {
-            val swasthyaSevikas = roomHelper.getShasthyaShebikaByShasthyaKormiId(userId)
-            val subVillages = mutableListOf<SubVillageEntity>()
-            if (swasthyaSevikas.isNotEmpty()) {
-                subVillages.addAll(roomHelper.getSubVillagesByShasthyaShebikaIds(swasthyaSevikas.map { it.id }))
-            }
-            Resource(state = ResourceState.SUCCESS, HouseHoldFilterUiData(swasthyaSevikas, subVillages))
+            Resource(
+                state = ResourceState.SUCCESS,
+                HouseHoldFilterUiData(skList = roomHelper.getAllShasthyaKormis()),
+            )
+        } catch (_: Exception) {
+            Resource(state = ResourceState.ERROR)
+        }
+
+    /** FO/PO Services filter: SK + SS for the selected Kormi (sub-villages load on SS selection in the UI). */
+    suspend fun getHouseHoldFilterUiDataForShasthyaKormi(kormiId: Long): Resource<HouseHoldFilterUiData> =
+        try {
+            Resource(
+                state = ResourceState.SUCCESS,
+                HouseHoldFilterUiData(
+                    ssList = roomHelper.getShasthyaShebikaByShasthyaKormiId(kormiId),
+                    skList = roomHelper.getAllShasthyaKormis(),
+                ),
+            )
         } catch (_: Exception) {
             Resource(state = ResourceState.ERROR)
         }
@@ -122,8 +133,8 @@ class HouseHoldRepository @Inject constructor(
         val householdType = map[HouseHoldRegistration.HOUSEHOLD_TYPE]
         householdEntity.householdType = CommonUtils.getStringOrEmptyString(householdType).takeIf { it.isNotEmpty() }
 
-        val monthlyIncome = map[HouseHoldRegistration.MONTHLY_INCOME]
-        householdEntity.monthlyIncome = CommonUtils.getDoubleOrNull(monthlyIncome)
+        val monthlyIncomeRange = map[HouseHoldRegistration.MONTHLY_INCOME_RANGE]
+        householdEntity.monthlyIncomeRange = CommonUtils.getStringOrEmptyString(monthlyIncomeRange).takeIf { it.isNotBlank() }
 
         val occupation = map[HouseHoldRegistration.HOUSEHOLD_HEAD_OCCUPATION]
         householdEntity.householdHeadOccupation = CommonUtils.getStringOrEmptyString(occupation).takeIf { it.isNotEmpty() }
@@ -169,9 +180,29 @@ class HouseHoldRepository @Inject constructor(
             Resource(state = ResourceState.ERROR)
         }
 
+    suspend fun getAllShasthyaKormisSpinner(): Resource<LocalSpinnerResponse> =
+        try {
+            val response = roomHelper.getAllShasthyaKormis()
+            Resource(state = ResourceState.SUCCESS, LocalSpinnerResponse("shasthya_kormi_id", response))
+        } catch (_: Exception) {
+            Resource(state = ResourceState.ERROR)
+        }
+
     suspend fun getSubVillagesByShasthyaShebikaId(shasthyaShebikaId: Long): Resource<LocalSpinnerResponse> =
         try {
             val response = roomHelper.getSubVillagesByShasthyaShebikaId(shasthyaShebikaId)
+            Resource(state = ResourceState.SUCCESS, LocalSpinnerResponse("sub_village_id", response))
+        } catch (_: Exception) {
+            Resource(state = ResourceState.ERROR)
+        }
+
+    /**
+     * CHCP registration drives the Union -> Sub-village cascade directly (no Shasthya
+     * Kormi/Shebika), so sub-villages are resolved by their parent Union [villageId].
+     */
+    suspend fun getSubVillagesByVillageId(villageId: Long): Resource<LocalSpinnerResponse> =
+        try {
+            val response = roomHelper.getSubVillage(villageId)
             Resource(state = ResourceState.SUCCESS, LocalSpinnerResponse("sub_village_id", response))
         } catch (_: Exception) {
             Resource(state = ResourceState.ERROR)
@@ -228,22 +259,6 @@ class HouseHoldRepository @Inject constructor(
 
     suspend fun getDisabilityMembersCountPerHousehold(householdId: Long): Int = roomHelper.getDisabilityMembersCountForHousehold(householdId)
 
-    private suspend fun insertHouseholdMembers(
-        householdMembers: List<HouseHoldMember>?,
-        hhIdMap: Map<String, Long>,
-    ) {
-        householdMembers?.forEach { member ->
-            hhIdMap[member.householdId]?.let {
-                roomHelper.registerMember(
-                    member.toHouseholdMemberEntity(
-                        it,
-                        OfflineSyncStatus.Success,
-                    ),
-                )
-            }
-        }
-    }
-
     suspend fun getUnSyncedHouseholdCount(): Int = roomHelper.getUnSyncedHouseholdCount()
 
     suspend fun getUnSyncedHouseholdMemberCount(): Int = roomHelper.getUnSyncedHouseholdMemberCount()
@@ -284,4 +299,24 @@ class HouseHoldRepository @Inject constructor(
     ) = roomHelper.updateTBContactTraceStatus(hhmId, tbContactTracingStatus)
 
     suspend fun getHouseholdsCountBasedSubVillage(subVillageId: Long) = roomHelper.getHouseholdsCountBasedSubVillage(subVillageId)
+
+    /**
+     * Returns true when any compared business field differs.
+     */
+    fun hasMeaningfulHouseholdChanges(
+        before: HouseholdEntity,
+        after: HouseholdEntity,
+    ): Boolean {
+        if (before.name != after.name) return true
+        if (before.villageId != after.villageId) return true
+        if (before.shasthyaShebikaId != after.shasthyaShebikaId) return true
+        if (before.subVillageId != after.subVillageId) return true
+        if (before.householdType != after.householdType) return true
+        if (before.monthlyIncomeRange != after.monthlyIncomeRange) return true
+        if (before.householdHeadOccupation != after.householdHeadOccupation) return true
+        if (before.otherOccupation != after.otherOccupation) return true
+        if (before.noOfPeople != after.noOfPeople) return true
+        if (before.disabilityPersonsCount != after.disabilityPersonsCount) return true
+        return false
+    }
 }

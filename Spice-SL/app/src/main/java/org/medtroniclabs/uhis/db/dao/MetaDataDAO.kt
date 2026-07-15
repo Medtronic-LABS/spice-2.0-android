@@ -8,13 +8,19 @@ import androidx.room.Query
 import org.medtroniclabs.uhis.data.CulturesEntity
 import org.medtroniclabs.uhis.data.DosageFrequency
 import org.medtroniclabs.uhis.data.ProgramEntity
+import org.medtroniclabs.uhis.data.ShortageReasonEntity
 import org.medtroniclabs.uhis.data.UnitMetricEntity
 import org.medtroniclabs.uhis.data.community.CommunityPopulationStatistics
 import org.medtroniclabs.uhis.data.community.CommunityProfileDetail
 import org.medtroniclabs.uhis.db.entity.ChiefDomEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowConditionEntity
 import org.medtroniclabs.uhis.db.entity.ClinicalWorkflowEntity
+import org.medtroniclabs.uhis.db.entity.ComorbidityEntity
+import org.medtroniclabs.uhis.db.entity.ComplaintsEntity
+import org.medtroniclabs.uhis.db.entity.ComplicationEntity
 import org.medtroniclabs.uhis.db.entity.ConsentEntity
+import org.medtroniclabs.uhis.db.entity.CurrentMedicationEntity
+import org.medtroniclabs.uhis.db.entity.DiagnosisEntity
 import org.medtroniclabs.uhis.db.entity.DistrictEntity
 import org.medtroniclabs.uhis.db.entity.DosageDurationEntity
 import org.medtroniclabs.uhis.db.entity.FormEntity
@@ -24,10 +30,16 @@ import org.medtroniclabs.uhis.db.entity.MedicalComplianceEntity
 import org.medtroniclabs.uhis.db.entity.MentalHealthEntity
 import org.medtroniclabs.uhis.db.entity.MenuEntity
 import org.medtroniclabs.uhis.db.entity.NCDAssessmentClinicalWorkflow
+import org.medtroniclabs.uhis.db.entity.PhysicalExaminationEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaLinkedVillageEntity
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
+import org.medtroniclabs.uhis.db.entity.SiteEntity
 import org.medtroniclabs.uhis.db.entity.SubVillageEntity
+import org.medtroniclabs.uhis.db.entity.SymptomEntity
+import org.medtroniclabs.uhis.db.entity.TreatmentPlanEntity
 import org.medtroniclabs.uhis.db.entity.UserProfileEntity
 import org.medtroniclabs.uhis.db.entity.VillageEntity
 
@@ -156,6 +168,9 @@ interface MetaDataDAO {
     @Query("SELECT formInput FROM ConsentEntity where formType=:formType")
     fun getConsent(formType: String): LiveData<String>
 
+    @Query("SELECT formInput FROM ConsentEntity where formType=:formType")
+    suspend fun getConsentString(formType: String): String
+
     @Query("DELETE FROM ConsentEntity")
     suspend fun deleteConsent()
 
@@ -194,6 +209,9 @@ interface MetaDataDAO {
 
     @Query("SELECT * FROM ChiefDomEntity where districtId=:districtId ORDER BY name ASC")
     suspend fun getChiefDoms(districtId: Long): List<ChiefDomEntity>
+
+    @Query("SELECT * FROM ChiefDomEntity")
+    suspend fun getAllChiefDoms(): List<ChiefDomEntity>
 
     @Query("DELETE FROM ChiefDomEntity")
     suspend fun deleteChiefDoms()
@@ -313,6 +331,94 @@ interface MetaDataDAO {
     @Query("SELECT * FROM ShasthyaShebikaEntity WHERE shasthyaKormiId = :shasthyaKormiId")
     suspend fun getShasthyaShebikaByShasthyaKormiId(shasthyaKormiId: Long): List<ShasthyaShebikaEntity>
 
+    @Query("SELECT * FROM ShasthyaShebikaEntity WHERE id = :id LIMIT 1")
+    suspend fun getShasthyaShebikaById(id: Long): ShasthyaShebikaEntity?
+
+    @Query(
+        "SELECT cd.* FROM ChiefDomEntity cd INNER JOIN VillageEntity v ON v.chiefdomId = cd.id WHERE v.id = :villageId",
+    )
+    suspend fun getChiefdomByVillageId(villageId: Long): List<ChiefDomEntity>
+
+    @Query("SELECT * FROM ChiefDomEntity ORDER BY name ASC")
+    suspend fun getAllChiefdoms(): List<ChiefDomEntity>
+
+    @Query(
+        """
+        SELECT DISTINCT cd.* FROM ChiefDomEntity cd
+        INNER JOIN VillageEntity v ON v.chiefdomId = cd.id
+        INNER JOIN ShasthyaKormiLinkedVillageEntity sklv ON sklv.villageId = v.id
+        WHERE sklv.shasthyaKormiId = :shasthyaKormiId
+        """,
+    )
+    suspend fun getChiefdomByShasthyaKormiId(shasthyaKormiId: Long): List<ChiefDomEntity>
+
+    @Query(
+        """
+        SELECT DISTINCT cd.* FROM ChiefDomEntity cd
+        INNER JOIN VillageEntity v ON v.chiefdomId = cd.id
+        INNER JOIN ShasthyaKormiLinkedVillageEntity sklv ON sklv.villageId = v.id
+        WHERE sklv.shasthyaKormiId IN (:shasthyaKormiIds)
+        """,
+    )
+    suspend fun getChiefdomByShasthyaKormiIds(shasthyaKormiIds: List<Long>): List<ChiefDomEntity>
+
+    @Query("SELECT * FROM ChiefDomEntity WHERE id = :chiefdomId LIMIT 1")
+    suspend fun getChiefdomById(chiefdomId: Long): ChiefDomEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertShasthyaKormis(shasthyaKormiEntityList: List<ShasthyaKormiEntity>)
+
+    @Query("DELETE FROM ShasthyaKormiEntity")
+    suspend fun deleteAllShasthyaKormis()
+
+    @Query(
+        """
+        SELECT DISTINCT sk.* FROM ShasthyaKormiEntity sk
+        INNER JOIN ShasthyaKormiLinkedVillageEntity lk ON lk.shasthyaKormiId = sk.id
+        WHERE lk.villageId = :villageId
+        """,
+    )
+    suspend fun getShasthyaKormiByVillageId(villageId: Long): List<ShasthyaKormiEntity>
+
+    @Query("SELECT * FROM ShasthyaKormiEntity ORDER BY lastName ASC, firstName ASC")
+    suspend fun getAllShasthyaKormis(): List<ShasthyaKormiEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertShasthyaKormiLinkedVillages(linkedVillages: List<ShasthyaKormiLinkedVillageEntity>)
+
+    @Query("DELETE FROM ShasthyaKormiLinkedVillageEntity")
+    suspend fun deleteAllShasthyaKormiLinkedVillages()
+
+    @Query(
+        """
+        SELECT DISTINCT sv.* FROM SubVillageEntity sv
+        INNER JOIN ShasthyaKormiLinkedVillageEntity sklv ON sv.villageId = sklv.villageId
+        WHERE sklv.shasthyaKormiId = :shasthyaKormiId
+        """,
+    )
+    suspend fun getSubVillagesByShasthyaKormiId(shasthyaKormiId: Long): List<SubVillageEntity>
+
+    @Query(
+        """
+        SELECT DISTINCT sv.* FROM SubVillageEntity sv
+        INNER JOIN ShasthyaKormiLinkedVillageEntity sklv ON sv.villageId = sklv.villageId
+        WHERE sklv.shasthyaKormiId IN (:shasthyaKormiIds)
+        """,
+    )
+    suspend fun getSubVillagesByShasthyaKormiIds(shasthyaKormiIds: List<Long>): List<SubVillageEntity>
+
+    @Query(
+        """
+        SELECT v.* FROM VillageEntity v
+        INNER JOIN ShasthyaKormiLinkedVillageEntity sklv ON v.id = sklv.villageId
+        WHERE sklv.shasthyaKormiId = :shasthyaKormiId AND v.chiefdomId = :chiefdomId
+        """,
+    )
+    suspend fun getVillagesForShasthyaKormiAndChiefdom(
+        shasthyaKormiId: Long,
+        chiefdomId: Long,
+    ): List<VillageEntity>
+
     // ShasthyaShebikaLinkedVillage methods
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertShasthyaShebikaLinkedVillages(linkedVillages: List<ShasthyaShebikaLinkedVillageEntity>)
@@ -337,4 +443,151 @@ interface MetaDataDAO {
     """,
     )
     suspend fun getSubVillagesByShasthyaShebikaIds(shasthyaShebikaIds: List<Long>): List<SubVillageEntity>
+
+    @Query("SELECT * FROM FormEntity where formType=:formTypeOne OR formType=:formTypeTwo")
+    suspend fun getFormBasedOnType(
+        formTypeOne: String,
+        formTypeTwo: String,
+    ): List<FormEntity>
+
+    @Query("SELECT * FROM VillageEntity ORDER BY name ASC")
+    suspend fun getVillageList(): List<VillageEntity>
+
+    @Query("SELECT * FROM VillageEntity")
+    suspend fun getOtherVillage(): VillageEntity
+
+    @Query("SELECT * FROM ProgramEntity")
+    suspend fun getProgramList(): List<ProgramEntity>
+
+    @Query("SELECT * FROM ProgramEntity where id = :selectedParent")
+    suspend fun getProgramList(selectedParent: Long): List<ProgramEntity>
+
+    @Query("SELECT * FROM SiteEntity where subCountyId =:districtID AND siteLevel = 'Level 1'")
+    suspend fun getUpazilaListByDistrict(districtID: Long): List<SiteEntity>
+
+    @Query("SELECT * FROM SiteEntity where siteLevel = 'Level 1'")
+    suspend fun getUpazilaList(): List<SiteEntity>
+
+    @Query("SELECT * FROM SiteEntity Where userId=:userId")
+    suspend fun getAccountSiteList(userId: Long): List<SiteEntity>
+
+    @Query("SELECT * FROM SiteEntity Where userId=:userId AND siteLevel=:level")
+    suspend fun getAccountSiteListByLevel(
+        userId: Long,
+        level: String,
+    ): List<SiteEntity>
+
+    @Query("SELECT * FROM SiteEntity where siteLevel = 'Level 1' AND eyeCare = 1")
+    suspend fun getUpazilaListEyeCareOnly(): List<SiteEntity>
+
+    @Query("SELECT * FROM SiteEntity where siteLevel = 'Level 1' AND cataract = 1")
+    suspend fun getUpazilaListCataractOnly(): List<SiteEntity>
+
+    @Query("SELECT * FROM SiteEntity Where userSite=:userSite AND userId=:userId")
+    suspend fun getSiteEntityList(
+        userSite: Boolean,
+        userId: Long,
+    ): List<SiteEntity>
+
+    @Query("SELECT * FROM SiteEntity where id=:upazilaId")
+    suspend fun getUpazilaById(upazilaId: Long): SiteEntity
+
+    @Query("SELECT * FROM VillageEntity where id=:villageId")
+    suspend fun getVillageById(villageId: Long): VillageEntity
+
+    @Query("SELECT * FROM TreatmentPlanEntity")
+    suspend fun getTreatmentPlanData(): List<TreatmentPlanEntity>
+
+    @Query("SELECT * FROM diagnosis")
+    suspend fun getDiagnosisList(): List<DiagnosisEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveDiagnosis(diseaseEntityList: ArrayList<DiagnosisEntity>)
+
+    @Query("DELETE FROM DiagnosisEntity")
+    suspend fun deleteDiagnosisList()
+
+    @Query("SELECT * FROM shortageReason where type = :type")
+    suspend fun getShortageEntries(type: String): List<ShortageReasonEntity>
+
+    @Query("SELECT * FROM comorbidity WHERE (type IN (:workflowList)) OR type  IS NULL ORDER BY display_order ASC")
+    suspend fun getComorbidityBasedOnWorkflow(workflowList: ArrayList<String>): List<ComorbidityEntity>
+
+    @Query("SELECT * FROM comorbidity ORDER BY display_order ASC")
+    suspend fun getComorbidity(): List<ComorbidityEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveComorbidity(list: ArrayList<ComorbidityEntity>)
+
+    @Query("DELETE FROM comorbidity")
+    suspend fun deleteComorbidity()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveComplication(list: ArrayList<ComplicationEntity>)
+
+    @Query("DELETE FROM complication")
+    suspend fun deleteComplication()
+
+    @Query("SELECT * FROM complication ORDER BY display_order ASC")
+    suspend fun getComplication(): List<ComplicationEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveCurrentMedication(list: ArrayList<CurrentMedicationEntity>)
+
+    @Query("DELETE FROM current_medication")
+    suspend fun deleteCurrentMedication()
+
+    @Query("SELECT * FROM current_medication ORDER BY display_order ASC")
+    suspend fun getCurrentMedicationList(): List<CurrentMedicationEntity>
+
+    @Query("SELECT * FROM current_medication where type =:type or type = 'Other' ORDER BY display_order ASC")
+    suspend fun getCurrentMedicationList(type: String): List<CurrentMedicationEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun savePhysicalExamination(list: ArrayList<PhysicalExaminationEntity>)
+
+    @Query("DELETE FROM physical_examination")
+    suspend fun deletePhysicalExamination()
+
+    @Query("SELECT * FROM physical_examination WHERE (type IN (:workFlowList)) OR type  IS NULL ORDER BY display_order ASC")
+    suspend fun getPhysicalExaminationList(workFlowList: ArrayList<String>): List<PhysicalExaminationEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveComplaints(list: ArrayList<ComplaintsEntity>)
+
+    @Query("DELETE FROM complaints")
+    suspend fun deleteComplaints()
+
+    @Query("SELECT * FROM complaints WHERE (type IN (:workflowList)) OR type  IS NULL ORDER BY display_order ASC")
+    suspend fun getChiefComplaints(workflowList: ArrayList<String>): List<ComplaintsEntity>
+
+    @Query("SELECT * FROM diagnosis where (UPPER(gender) IN (:gender) OR UPPER(diagnosis) = 'OTHER') AND (UPPER(type) NOT IN (:type)) ORDER BY display_order ASC")
+    suspend fun getDiagnosis(
+        gender: ArrayList<String>,
+        type: ArrayList<String>,
+    ): List<DiagnosisEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSymptomsList(symptomEntity: List<SymptomEntity>)
+
+    @Query("DELETE FROM Symptom")
+    suspend fun deleteSymptomList()
+
+    @Query("SELECT * FROM Symptom ORDER BY display_order")
+    suspend fun getSymptomList(): List<SymptomEntity>
+
+    @Query("SELECT * FROM Symptom WHERE LOWER(type) = LOWER(:type) ORDER BY display_order")
+    suspend fun getSymptomsListByType(type: String): List<SymptomEntity>
+
+    @Query("SELECT * FROM SiteEntity where siteLevel = 'Level 6'")
+    suspend fun getOperatingUnitSites(): List<SiteEntity>
+
+    @Query("DELETE FROM SiteEntity")
+    suspend fun deleteSiteList()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSiteDetails(siteEntity: List<SiteEntity>)
+
+    @Query("SELECT * FROM SubVillageEntity WHERE villageId =:villageId ORDER BY name ASC")
+    suspend fun getSubVillage(villageId: Long): List<SubVillageEntity>
 }

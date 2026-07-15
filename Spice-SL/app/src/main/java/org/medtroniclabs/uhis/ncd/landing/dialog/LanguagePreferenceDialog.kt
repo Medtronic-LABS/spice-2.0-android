@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.RadioButton
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.gone
@@ -22,28 +22,27 @@ import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.CulturesEntity
 import org.medtroniclabs.uhis.databinding.DialogLanguagePreferenceBinding
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
-import org.medtroniclabs.uhis.model.CultureLocaleModel
-import org.medtroniclabs.uhis.network.resource.ResourceState
-import org.medtroniclabs.uhis.ui.BaseActivity
-import org.medtroniclabs.uhis.ui.landing.OnDialogDismissListener
 import org.medtroniclabs.uhis.ui.landing.viewmodel.LanguagePreferenceViewModel
 
 @AndroidEntryPoint
-class LanguagePreferenceDialog(private val listener: OnDialogDismissListener) :
+class LanguagePreferenceDialog :
     DialogFragment(),
     View.OnClickListener {
     private lateinit var binding: DialogLanguagePreferenceBinding
-    private val viewModel: LanguagePreferenceViewModel by viewModels()
 
+    /**
+     * Shared ViewModel used to exchange the selected language
+     * with LandingActivity.
+     */
+    private val viewModel: LanguagePreferenceViewModel by activityViewModels()
+
+    /**
+     * Creates a new instance of the language preference dialog
+     */
     companion object {
         const val TAG = "LanguagePreferenceDialog"
 
-        fun newInstance(listener: OnDialogDismissListener): LanguagePreferenceDialog {
-            val fragment = LanguagePreferenceDialog(listener)
-            val args = Bundle()
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance() = LanguagePreferenceDialog()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,6 +77,7 @@ class LanguagePreferenceDialog(private val listener: OnDialogDismissListener) :
         langList: ArrayList<CulturesEntity>,
         cultureSelected: Long,
     ) {
+        binding.radioGroup.removeAllViews()
         for (i in langList.indices) {
             val radioButton = RadioButton(requireContext())
             radioButton.text = langList[i].name
@@ -99,30 +99,6 @@ class LanguagePreferenceDialog(private val listener: OnDialogDismissListener) :
         viewModel.cultureList.observe(viewLifecycleOwner) { resource ->
             resource.data?.let {
                 initializeRadioGroup(ArrayList(it), SecuredPreference.getCultureId())
-            }
-        }
-        viewModel.cultureUpdateResponse.observe(this) { resourceState ->
-            when (resourceState.state) {
-                ResourceState.LOADING -> showLoading()
-                ResourceState.SUCCESS -> {
-                    hideLoading()
-                    val cultureId = viewModel.selectedCultureId
-                        ?: (binding.radioGroup.findViewById<RadioButton>(binding.radioGroup.checkedRadioButtonId)?.tag as? Long)
-                    val culture = viewModel.cultureList.value
-                        ?.data
-                        ?.firstOrNull { it.id == cultureId }
-                    culture?.let {
-                        SecuredPreference.setUserPreferenceSync(
-                            it.id,
-                            it.name,
-                            CommonUtils.checkIfTranslationEnabled(it.name),
-                        )
-                    }
-                    listener.onDialogDismissListener(true)
-                    dismiss()
-                }
-
-                ResourceState.ERROR -> hideLoading()
             }
         }
     }
@@ -153,22 +129,28 @@ class LanguagePreferenceDialog(private val listener: OnDialogDismissListener) :
                 dismiss()
             }
 
+            // Pass the selected culture to the shared ViewModel.
+            // Actual locale update is handled in LandingActivity after user confirmation.
             R.id.btnConfirm -> {
-                (activity as? BaseActivity)?.withNetworkAvailability(online = {
-                    updateUserLocale()
-                })
-            }
-        }
-    }
+                val selectedRadioButton =
+                    binding.radioGroup.findViewById<RadioButton>(binding.radioGroup.checkedRadioButtonId)
 
-    private fun updateUserLocale() {
-        viewModel.cultureList.value?.data?.firstOrNull { it.id == viewModel.selectedCultureId }?.let {
-            viewModel.cultureLocaleUpdate(
-                CultureLocaleModel(
-                    SecuredPreference.getUserId(),
-                    it,
-                ),
-            )
+                val cultureId = viewModel.selectedCultureId ?: selectedRadioButton?.tag as? Long
+                val culture =
+                    viewModel.cultureList.value
+                        ?.data
+                        ?.firstOrNull { it.id == cultureId }
+
+                culture?.let {
+                    /**
+                     * Store the selected culture in the shared ViewModel.
+                     * LandingActivity observes this value and proceeds with
+                     * language update only after user confirmation.
+                     */
+                    viewModel.setSelectedCultureForConfirmation(it)
+                    dismiss()
+                }
+            }
         }
     }
 

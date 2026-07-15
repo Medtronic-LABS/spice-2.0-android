@@ -17,7 +17,6 @@ import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams.Househo
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.HOUSEHOLD_REGISTRATION
-import org.medtroniclabs.uhis.common.DefinedParams.VillageId
 import org.medtroniclabs.uhis.common.EntityMapper.getResultSpinnerMapList
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
@@ -32,7 +31,6 @@ import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration
 import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.NO_OF_PEOPLE
 import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.SUB_VILLAGE_ID
 import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.TOTAL_MEMBERS
-import org.medtroniclabs.uhis.mappingkey.HouseHoldRegistration.VILLAGE_ID
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
 import org.medtroniclabs.uhis.ui.BaseFragment
@@ -117,15 +115,15 @@ class HouseHoldRegistrationFragment : BaseFragment(), View.OnClickListener, Form
                             val singleItem = data.response[0]
                             if (singleItem is Map<*, *>) {
                                 val id = singleItem[DefinedParams.ID]
-                                formGenerator.getViewByTag(VILLAGE_ID)?.let { view ->
+                                formGenerator.getViewByTag(HouseHoldRegistration.VILLAGE_ID)?.let { view ->
                                     formGenerator.setValueForView(id, view)
                                 }
                             }
                         }
 
-                        arguments?.getLong(VillageId)?.let {
+                        arguments?.getLong(DefinedParams.VILLAGE_ID)?.let {
                             if (it != 0L) {
-                                formGenerator.getViewByTag(VILLAGE_ID)?.let { view ->
+                                formGenerator.getViewByTag(HouseHoldRegistration.VILLAGE_ID)?.let { view ->
                                     view.isEnabled = false
                                     formGenerator.setValueForView(it, view)
                                 }
@@ -158,8 +156,6 @@ class HouseHoldRegistrationFragment : BaseFragment(), View.OnClickListener, Form
                                         .getLongOrNull(id) ?: 0L
                                     if (shasthyaShebikaIdLong != 0L) {
                                         householdRegistrationViewModel.loadSubVillageDataCacheByType(
-                                            HouseHoldRegistration.SUB_VILLAGE_ID,
-                                            "",
                                             shasthyaShebikaIdLong,
                                         )
                                     }
@@ -203,7 +199,7 @@ class HouseHoldRegistrationFragment : BaseFragment(), View.OnClickListener, Form
                         // Set pending sub village ID if available (for edit mode)
                         pendingSubVillageId?.let { subVillageId ->
                             if (subVillageId != 0L) {
-                                formGenerator.getViewByTag(HouseHoldRegistration.SUB_VILLAGE_ID)?.let { view ->
+                                formGenerator.getViewByTag(SUB_VILLAGE_ID)?.let { view ->
                                     formGenerator.setValueForView(subVillageId, view)
                                     // Disable Village field in edit mode
                                     view.isEnabled = false
@@ -240,7 +236,7 @@ class HouseHoldRegistrationFragment : BaseFragment(), View.OnClickListener, Form
     }
 
     private fun autoPopulateFormFields(details: HouseholdEntity) {
-        formGenerator.getViewByTag(VILLAGE_ID)?.let { view ->
+        formGenerator.getViewByTag(HouseHoldRegistration.VILLAGE_ID)?.let { view ->
             if (details.villageId != 0L) {
                 view.isEnabled = false
                 formGenerator.setValueForView(details.villageId, view)
@@ -267,10 +263,14 @@ class HouseHoldRegistrationFragment : BaseFragment(), View.OnClickListener, Form
                 formGenerator.setValueForView(type, view)
             }
         }
-        formGenerator.getViewByTag(HouseHoldRegistration.MONTHLY_INCOME)?.let { view ->
-            details.monthlyIncome?.let { income ->
-                // Convert Double to String for EditText
-                formGenerator.setValueForView(income.toString(), view)
+        formGenerator.getViewByTag(HouseHoldRegistration.MONTHLY_INCOME_RANGE)?.let { view ->
+            val range = if (details.monthlyIncomeRange.isNullOrBlank()) {
+                details.monthlyIncome?.let { HouseHoldRegistration.rangeFromExactValue(it) }
+            } else {
+                details.monthlyIncomeRange
+            }
+            range?.let { incomeRange ->
+                formGenerator.setValueForView(incomeRange, view)
             }
         }
         formGenerator.getViewByTag(HouseHoldRegistration.HOUSEHOLD_NUMBER)?.let { view ->
@@ -387,7 +387,7 @@ class HouseHoldRegistrationFragment : BaseFragment(), View.OnClickListener, Form
                     householdRegistrationViewModel.loadDataCacheByType(id, localDataCache)
                 }
                 HouseHoldRegistration.SHASTHYA_SHEBIKA_ID -> {
-                    householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType(id, localDataCache)
+                    householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType()
                 }
                 HouseHoldRegistration.SUB_VILLAGE_ID -> {
                     // This will be triggered when shasthya shebika is selected (via dependentID)
@@ -398,7 +398,7 @@ class HouseHoldRegistrationFragment : BaseFragment(), View.OnClickListener, Form
                         formGenerator.getViewByTag(HouseHoldRegistration.SUB_VILLAGE_ID)?.let { view ->
                             formGenerator.setValueForView("", view)
                         }
-                        householdRegistrationViewModel.loadSubVillageDataCacheByType(id, localDataCache, shasthyaShebikaIdLong)
+                        householdRegistrationViewModel.loadSubVillageDataCacheByType(shasthyaShebikaIdLong)
                     }
                 }
                 else -> {
@@ -449,10 +449,7 @@ class HouseHoldRegistrationFragment : BaseFragment(), View.OnClickListener, Form
 
     override fun onRenderingComplete() {
         // SS list is tied to logged-in Kormi user, not Union — same as [ExternalMemberRegistrationFragment]
-        householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType(
-            HouseHoldRegistration.SHASTHYA_SHEBIKA_ID,
-            "",
-        )
+        householdRegistrationViewModel.loadShasthyaShebikaDataCacheByType()
     }
 
     override fun onUpdateInstruction(
@@ -495,9 +492,12 @@ class HouseHoldRegistrationFragment : BaseFragment(), View.OnClickListener, Form
         val subVillageId = CommonUtils.getLongOrNull(selectedId) ?: return
         if (subVillageId == 0L) return
         val parentVillageId = lastSubVillageList.find { it.id == subVillageId }?.villageId ?: return
-        formGenerator.getViewByTag(VILLAGE_ID)?.let { view ->
+        formGenerator.getViewByTag(HouseHoldRegistration.VILLAGE_ID)?.let { view ->
             formGenerator.setValueForView(parentVillageId, view)
         }
+    }
+
+    override fun onQRScanRequested() {
     }
 
     fun getHouseHoldEnteredInputs(): Boolean = formGenerator.getResultMap().isNotEmpty()

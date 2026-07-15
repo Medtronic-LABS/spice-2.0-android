@@ -251,7 +251,7 @@ class PrescriptionResultDialogFragment : DialogFragment() {
             LazyColumn {
                 itemsIndexed(bgList) { index, recentBg ->
                     when (recentBg.glucoseType) {
-                        DefinedParams.fbs -> {
+                        DefinedParams.FBS -> {
                             MedicationNudgeTableRow(
                                 fbs = getGlucoseValue(
                                     recentBg.glucoseValue,

@@ -19,9 +19,9 @@ import org.medtroniclabs.uhis.appextensions.setExpandableText
 import org.medtroniclabs.uhis.appextensions.takeIfNotNull
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.Married
-import org.medtroniclabs.uhis.common.DefinedParams.Occupation
-import org.medtroniclabs.uhis.common.DefinedParams.Single
+import org.medtroniclabs.uhis.common.DefinedParams.MARRIED
+import org.medtroniclabs.uhis.common.DefinedParams.OCCUPATION
+import org.medtroniclabs.uhis.common.DefinedParams.SINGLE
 import org.medtroniclabs.uhis.databinding.PatientInfoItemBinding
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
@@ -53,10 +53,10 @@ class PatientInfoAdapter(
         fun bind(label: Map<String, Any?>) {
             with(binding) {
                 val empty = context.getString(R.string.hyphen_symbol)
-                tvLabel.text = (label[DefinedParams.label] as? String).takeIfNotNull(empty)
+                tvLabel.text = (label[DefinedParams.LABEL] as? String).takeIfNotNull(empty)
                 tvValue.setExpandableText(
                     (label[DefinedParams.Value] as? String).takeIfNotNull(empty),
-                    title = (label[DefinedParams.label] as? String).takeIfNotNull(empty),
+                    title = (label[DefinedParams.LABEL] as? String).takeIfNotNull(empty),
                     maxLength = 25,
                     activity = activity,
                 )
@@ -71,7 +71,7 @@ class PatientInfoAdapter(
                     context.getString(R.string.cage_aid),
                 )
 
-                if (label[DefinedParams.label] != null && mentalHealthLabels.contains(label[DefinedParams.label])) {
+                if (label[DefinedParams.LABEL] != null && mentalHealthLabels.contains(label[DefinedParams.LABEL])) {
                     tvMentalHealth.visible()
                     tvMentalHealth.text = (label[Screening.type] as? String).takeIfNotNull()
                 } else {
@@ -84,12 +84,12 @@ class PatientInfoAdapter(
                         .equals(context.getString(R.string.edit_assessment), true)
                     mentalHealthAssessment.invoke(
                         Pair(
-                            label[DefinedParams.label] as? String?,
+                            label[DefinedParams.LABEL] as? String?,
                             isEdit,
                         ),
                     )
                 }
-                if (label[DefinedParams.label]?.equals(context.getString(R.string.high_risk)) == true) {
+                if (label[DefinedParams.LABEL]?.equals(context.getString(R.string.high_risk)) == true) {
                     tvValue.gone()
                     viewToggle.visible()
                     smHighRisk.visible()
@@ -111,13 +111,13 @@ class PatientInfoAdapter(
                     tvHighRiskPregnancyCriteria.gone()
                 }
 
-                val isOccupationLabel = label[DefinedParams.label] == context.getString(R.string.occupation)
+                val isOccupationLabel = label[DefinedParams.LABEL] == context.getString(R.string.occupation)
                 if (isOccupationLabel && !isHiv) {
                     if (isFamilyPlanningSummary) {
                         tvValue.visible()
                         tvSeparator.visible()
                         etOccupation.gone()
-                        binding.tvValue.text = (resultValues[Occupation] as? String)?.takeIf { it.isNotBlank() } ?: "-"
+                        binding.tvValue.text = (resultValues[OCCUPATION] as? String)?.takeIf { it.isNotBlank() } ?: "-"
                     } else {
                         tvValue.gone()
                         tvSeparator.gone()
@@ -126,13 +126,13 @@ class PatientInfoAdapter(
                     }
                 }
 
-                val isMaritalStatusLabel = label[DefinedParams.label] == context.getString(R.string.marital_status)
+                val isMaritalStatusLabel = label[DefinedParams.LABEL] == context.getString(R.string.marital_status)
                 if (isMaritalStatusLabel && !isHiv) {
                     if (isFamilyPlanningSummary) {
                         tvValue.visible()
                         tvSeparator.visible()
                         spinnerMaritalStatus.gone()
-                        binding.tvValue.text = (resultValues[DefinedParams.MaritalStatus] as? String)?.takeIf { it.isNotBlank() } ?: "-"
+                        binding.tvValue.text = (resultValues[DefinedParams.MARITAL_STATUS] as? String)?.takeIf { it.isNotBlank() } ?: "-"
                     } else {
                         tvValue.gone()
                         tvSeparator.gone()
@@ -143,7 +143,7 @@ class PatientInfoAdapter(
                         spinnerFormAdapter.setData(materialStatusList)
 
                         var defaultPosition = 0
-                        val selectedMaritalStatus = resultValues[DefinedParams.MaritalStatus] as String?
+                        val selectedMaritalStatus = resultValues[DefinedParams.MARITAL_STATUS] as String?
 
                         selectedMaritalStatus?.let { status ->
                             for ((index, patientStatus) in materialStatusList.withIndex()) {
@@ -179,12 +179,12 @@ class PatientInfoAdapter(
                     }
                 }
 
-                if (label[DefinedParams.label]?.equals(context.getString(R.string.occupation_summary)) == true) {
+                if (label[DefinedParams.LABEL]?.equals(context.getString(R.string.occupation_summary)) == true) {
                     tvSeparator.visible()
                     etOccupation.gone()
                     tvLabel.text = context.getString(R.string.occupation)
                 }
-                if (label[DefinedParams.label]?.equals(context.getString(R.string.marital_status_summary)) == true) {
+                if (label[DefinedParams.LABEL]?.equals(context.getString(R.string.marital_status_summary)) == true) {
                     tvValue.visible()
                     tvSeparator.visible()
                     spinnerMaritalStatus.gone()
@@ -223,8 +223,8 @@ class PatientInfoAdapter(
             context: Context,
             onTextChanged: (String) -> Unit,
         ) {
-            val labelText = label[DefinedParams.label] as? String
-            val isSummary = label[DefinedParams.IsSummary] == "true"
+            val labelText = label[DefinedParams.LABEL] as? String
+            val isSummary = label[DefinedParams.IS_SUMMARY] == "true"
             val value = label[DefinedParams.Value] as? String
             etValue.isEnabled = false
 
@@ -301,20 +301,20 @@ class PatientInfoAdapter(
         val dropDownList = ArrayList<Map<String, Any>>()
         dropDownList.add(
             hashMapOf<String, Any>(
-                DefinedParams.NAME to DefinedParams.DefaultIDLabel,
-                DefinedParams.ID to DefinedParams.DefaultID,
+                DefinedParams.NAME to DefinedParams.DEFAULT_ID_LABEL,
+                DefinedParams.ID to DefinedParams.DEFAULT_ID,
             ),
         )
         dropDownList.add(
             hashMapOf<String, Any>(
-                DefinedParams.NAME to Married,
-                DefinedParams.ID to Married,
+                DefinedParams.NAME to MARRIED,
+                DefinedParams.ID to MARRIED,
             ),
         )
         dropDownList.add(
             hashMapOf<String, Any>(
-                DefinedParams.NAME to Single,
-                DefinedParams.ID to Single,
+                DefinedParams.NAME to SINGLE,
+                DefinedParams.ID to SINGLE,
             ),
         )
 
@@ -325,7 +325,7 @@ class PatientInfoAdapter(
         editText: AppCompatEditText,
         callback: (String) -> Unit,
     ) {
-        val occupationValue = resultValues[DefinedParams.Occupation]
+        val occupationValue = resultValues[DefinedParams.OCCUPATION]
         val watcher = object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 callback.invoke(s?.toString().orEmpty())

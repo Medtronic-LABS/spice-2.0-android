@@ -2,20 +2,25 @@ package org.medtroniclabs.uhis.ui.assessment
 
 import android.content.Context
 import android.graphics.Typeface
+import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.core.text.color
 import org.json.JSONArray
 import org.json.JSONObject
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.setVisible
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.No
-import org.medtroniclabs.uhis.common.DefinedParams.Yes
+import org.medtroniclabs.uhis.common.DefinedParams.NO
+import org.medtroniclabs.uhis.common.DefinedParams.YES
 import org.medtroniclabs.uhis.databinding.AssessmentSummaryLayoutBinding
 import org.medtroniclabs.uhis.databinding.TextLabelLayoutBinding
 import org.medtroniclabs.uhis.formgeneration.extension.px
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
+import org.medtroniclabs.uhis.formgeneration.model.FormLayout
 import org.medtroniclabs.uhis.model.AssessmentSummaryModel
 
 object AssessmentCommonUtils {
@@ -41,7 +46,7 @@ object AssessmentCommonUtils {
                         return nestedMap[keys].toString()
                     }
                     if (nestedMap[keys] is Boolean) {
-                        return if (nestedMap[keys] == true) Yes else No
+                        return if (nestedMap[keys] == true) YES else NO
                     }
                     if (nestedMap[keys] is ArrayList<*>) {
                         val arrayListValue = nestedMap[keys] as ArrayList<*>
@@ -190,6 +195,79 @@ object AssessmentCommonUtils {
         }
 
         return null
+    }
+
+    /**
+     * Returns display value for the given selected id
+     */
+    fun getSpinnerDisplayValue(
+        fieldId: String,
+        valueId: String?,
+        isTranslationEnabled: Boolean,
+        formLayouts: List<FormLayout>?,
+    ): String? {
+        if (valueId.isNullOrBlank()) return null
+
+        val formLayout = formLayouts?.find {
+            it.id == fieldId
+        } ?: return null
+
+        val optionsList = formLayout.optionsList ?: return null
+        optionsList.forEach { option ->
+            val optionId = option[DefinedParams.ID] as? String
+                ?: option[DefinedParams.id] as? String
+            if (optionId == valueId) {
+                // Return cultureValue if translation is enabled, otherwise return name
+                return if (isTranslationEnabled) {
+                    option[DefinedParams.CULTURE_VALUE] as? String
+                        ?: option[DefinedParams.NAME] as? String
+                } else {
+                    option[DefinedParams.NAME] as? String
+                }
+            }
+        }
+
+        return null
+    }
+
+    fun formatBMISummaryDisplay(
+        context: Context,
+        bmi: Any?,
+    ): CharSequence? {
+        val bmiValue = (bmi as? Number)?.toDouble() ?: return null
+        val bmiInfo = CommonUtils.getBMIInformation(context, bmiValue)
+            ?: return CommonUtils.getDecimalFormatted(bmiValue)
+        val bmiFormattedValue = CommonUtils.getDecimalFormatted(bmiValue)
+        return SpannableStringBuilder()
+            .append(bmiFormattedValue)
+            .color(ContextCompat.getColor(context, bmiInfo.second)) {
+                append(" (${bmiInfo.first})")
+            }
+    }
+
+    fun formatCVDRiskSummaryDisplay(
+        context: Context,
+        json: JSONObject,
+    ): Pair<CharSequence, Int>? {
+        val display = findValueByKey(json, DefinedParams.CVD_RISK_SCORE_DISPLAY) as? String ?: return null
+        val score = findValueByKey(json, DefinedParams.CVD_RISK_SCORE) as? Number ?: return null
+        return Pair(display, CommonUtils.cvdRiskColorCode(score.toLong(), context))
+    }
+
+    fun createSummaryLayout(
+        context: Context,
+        title: String?,
+        value: CharSequence?,
+        valueTextColor: Int? = null,
+    ): ConstraintLayout? {
+        if (title == null || value == null) return null
+        return if (value is Spanned) {
+            addViewSummaryLayout(title, value.toString(), null, context).apply {
+                AssessmentSummaryLayoutBinding.bind(this).tvValue.text = value
+            }
+        } else {
+            addViewSummaryLayout(title, value.toString(), valueTextColor, context)
+        }
     }
 
     /**

@@ -5,4 +5,6 @@ object ConsentFormType {
     val HouseHoldCulture = "HouseHoldCulture"
     val EPI = "EPI"
     val HIV = "HIV"
+    var enrollmentCulture = "enrollmentCulture"
+    var enrollment = "enrollment"
 }

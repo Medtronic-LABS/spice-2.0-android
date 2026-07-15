@@ -194,7 +194,7 @@ class NCDQuantityDifferenceDialogueFragment : DialogFragment(), View.OnClickList
                     }
                 if (!filterList.isNullOrEmpty()) {
                     val listWithoutReason = filterList.filter {
-                        it.reason != null && it.reason.equals(DefinedParams.DefaultIDLabel)
+                        it.reason != null && it.reason.equals(DefinedParams.DEFAULT_ID_LABEL)
                     }
                     if (listWithoutReason.isEmpty()) {
                         dialog?.dismiss()
@@ -246,7 +246,7 @@ class NCDQuantityDifferenceDialogueFragment : DialogFragment(), View.OnClickList
         dropDownList.add(
             hashMapOf<String, Any>(
                 DefinedParams.NAME to getString(R.string.please_select),
-                DefinedParams.ID to DefinedParams.DefaultID,
+                DefinedParams.ID to DefinedParams.DEFAULT_ID,
             ),
         )
 

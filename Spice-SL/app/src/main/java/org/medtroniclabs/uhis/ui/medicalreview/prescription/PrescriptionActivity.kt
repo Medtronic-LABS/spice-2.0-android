@@ -20,7 +20,7 @@ import org.medtroniclabs.uhis.common.CommonUtils.convertListToIndexedString
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.HIV
-import org.medtroniclabs.uhis.common.DefinedParams.SearchLengthPrescription
+import org.medtroniclabs.uhis.common.DefinedParams.SEARCH_LENGTH_PRESCRIPTION
 import org.medtroniclabs.uhis.data.EncounterDetails
 import org.medtroniclabs.uhis.data.MedicationRequestObject
 import org.medtroniclabs.uhis.data.MedicationResponse
@@ -218,10 +218,10 @@ class PrescriptionActivity :
                     hideLoading()
                     resource.data?.let { map ->
                         val intent = Intent()
-                        if (map.containsKey(DefinedParams.EncounterId)) {
-                            val value = map[DefinedParams.EncounterId]
+                        if (map.containsKey(DefinedParams.ENCOUNTER_ID)) {
+                            val value = map[DefinedParams.ENCOUNTER_ID]
                             if (value is String) {
-                                intent.putExtra(DefinedParams.EncounterId, value)
+                                intent.putExtra(DefinedParams.ENCOUNTER_ID, value)
                                 intent.putExtra(DefinedParams.PRESCRIPTION, true)
                             }
                         }
@@ -959,7 +959,7 @@ class PrescriptionActivity :
     }
 
     private fun calculateQuantity(data: MedicationRequestObject): String {
-        val frequency = data.medicationResponse.selectedMap?.get(DefinedParams.Frequency) as? Int?
+        val frequency = data.medicationResponse.selectedMap?.get(DefinedParams.FREQUENCY) as? Int?
         if (data.medicationResponse.prescribedDays != null && frequency != null) {
             data.medicationResponse.quantity = data.medicationResponse.prescribedDays!! * frequency
         } else {
@@ -976,7 +976,7 @@ class PrescriptionActivity :
     }
 
     private fun initView() {
-        patientViewModel.encounterId = intent.getStringExtra(DefinedParams.EncounterId)
+        patientViewModel.encounterId = intent.getStringExtra(DefinedParams.ENCOUNTER_ID)
         prescriptionViewModel.patientId = intent.getStringExtra(DefinedParams.PatientId)
         prescriptionViewModel.getFrequencyList()
         prescriptionViewModel.getInstructionList()
@@ -984,7 +984,7 @@ class PrescriptionActivity :
             if (it.isNullOrEmpty()) {
                 // default showing all medicines
             } else {
-                if (it.length > SearchLengthPrescription) {
+                if (it.length > SEARCH_LENGTH_PRESCRIPTION) {
                     prescriptionViewModel.searchMedicationByName(it.toString())
                 }
             }
@@ -1108,7 +1108,7 @@ class PrescriptionActivity :
             if (data.medicationResponse.prescribedDays == null ||
                 data.medicationResponse.prescribedDays == 0L ||
                 (
-                    data.medicationResponse.instruction == DefinedParams.DefaultIDLabel &&
+                    data.medicationResponse.instruction == DefinedParams.DEFAULT_ID_LABEL &&
                         !(data.medicationResponse.prescriptionId != null && !data.medicationResponse.isEditable)
                 )
             ) {
@@ -1126,7 +1126,7 @@ class PrescriptionActivity :
             if (data.medicationResponse.prescribedDays == null ||
                 data.medicationResponse.prescribedDays == 0L ||
                 (
-                    data.medicationResponse.instruction == DefinedParams.DefaultIDLabel &&
+                    data.medicationResponse.instruction == DefinedParams.DEFAULT_ID_LABEL &&
                         !(data.medicationResponse.prescriptionId != null && !data.medicationResponse.isEditable)
                 )
             ) {

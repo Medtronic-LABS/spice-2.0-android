@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.medtroniclabs.uhis.appextensions.postLoading
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.UserProfile
@@ -28,7 +29,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LandingViewModel @Inject constructor(
     private val metaRepository: MetaRepository,
-    @IoDispatcher override var dispatcherIO: CoroutineDispatcher,
+    @param:IoDispatcher override var dispatcherIO: CoroutineDispatcher,
+    private val isNonProd: Boolean,
 ) : BaseViewModel(dispatcherIO) {
     val menuListLiveData = MutableLiveData<Resource<List<MenuEntity>>>()
     val userProfileLiveData = MutableLiveData<Resource<UserProfile>>()
@@ -121,4 +123,28 @@ class LandingViewModel @Inject constructor(
             cbsNotificationUpdateResponse.postValue(result)
         }
     }
+
+    /**
+     * Delete duplicate assessment history from May 1st, 2026,
+     * as we want to fix only for non-migrated data.
+     */
+    fun deleteDuplicateAssessmentHistory() {
+        viewModelScope.launch(dispatcherIO) {
+            if (!SecuredPreference.getBoolean(SecuredPreference.EnvironmentKey.DELETED_DUPLICATE_ASSESSMENT_HISTORY)) {
+                metaRepository.deleteDuplicateAssessmentHistory("2026-05-01")
+                SecuredPreference.putBoolean(SecuredPreference.EnvironmentKey.DELETED_DUPLICATE_ASSESSMENT_HISTORY, true)
+            }
+        }
+    }
+
+    /**
+     * Sequentially asks the backend whether this build is still allowed to run.
+     * Returns a [Resource] following the same contract as [MetaRepository.checkAppVersion].
+     */
+    suspend fun checkAppVersion(): Resource<String> =
+        withContext(dispatcherIO) {
+            metaRepository.checkAppVersion()
+        }
+
+    fun isNonProdEnv() = isNonProd
 }

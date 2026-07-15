@@ -154,6 +154,7 @@
                 android:paddingStart="@dimen/_40sdp"
                 android:paddingEnd="@dimen/_40sdp"
                 android:text="@string/add_new_member"
+                android:textStyle="bold"
                 android:textAllCaps="true"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"

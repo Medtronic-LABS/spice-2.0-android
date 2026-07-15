@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Bitmap
@@ -12,12 +13,13 @@ import android.os.Build
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import org.medtroniclabs.uhis.BuildConfig
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.offlinesync.GetSyncStatusWorker
 import org.medtroniclabs.uhis.offlinesync.ScheduledSyncWork
@@ -50,9 +52,9 @@ fun Context.isFineAndCoarseLocationPermissionGranted(): Boolean =
             Manifest.permission.ACCESS_COARSE_LOCATION,
         ) == PackageManager.PERMISSION_GRANTED
 
-fun Context.getPatientStatus(status: String?): String? {
+fun Context.getPatientStatus(status: String?): String? =
     status?.let {
-        return when (status) {
+        when (status) {
             ReferralStatus.OnTreatment.name -> {
                 this.getString(R.string.on_treatment)
             }
@@ -66,11 +68,10 @@ fun Context.getPatientStatus(status: String?): String? {
             }
 
             else -> {
-                return null
+                null
             }
         }
-    } ?: return null
-}
+    }
 
 fun Context.changePatientStatus(input: String): String {
     val onTreatmentString = getString(R.string.on_treatment)
@@ -90,14 +91,7 @@ fun Context.triggerOneTimeWorker() {
     val workRequest = OneTimeWorkRequestBuilder<GetSyncStatusWorker>()
         .setConstraints(constraints)
         .build()
-    val workerInfos = workManager.getWorkInfosForUniqueWork(WORKER_UNIQUE_NAME_FOR_NCD).get()
-    val noPendingWorker =
-        workerInfos
-            ?.filter { it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.BLOCKED }
-            .isNullOrEmpty()
-    val existingWorkPolicy =
-        if (noPendingWorker) ExistingWorkPolicy.APPEND else ExistingWorkPolicy.KEEP
-    workManager.enqueueUniqueWork(WORKER_UNIQUE_NAME_FOR_NCD, existingWorkPolicy, workRequest)
+    workManager.enqueueUniqueWork(WORKER_UNIQUE_NAME_FOR_NCD, ExistingWorkPolicy.KEEP, workRequest)
 }
 
 fun Context.cancelAllWorker() {
@@ -179,14 +173,7 @@ fun Context.startBackgroundOfflineSync() {
         .setInitialDelay(0, TimeUnit.SECONDS)
         .setConstraints(constraint)
         .build()
-
-    val workerInfos = workManager.getWorkInfosForUniqueWork(WORKER_UNIQUE_NAME).get()
-    val noPendingWorker = workerInfos?.filter { it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.BLOCKED }.isNullOrEmpty()
-
-    val existingWorkPolicy =
-        if (noPendingWorker) ExistingWorkPolicy.APPEND else ExistingWorkPolicy.KEEP
-
-    workManager.enqueueUniqueWork(WORKER_UNIQUE_NAME, existingWorkPolicy, postWorker)
+    workManager.enqueueUniqueWork(WORKER_UNIQUE_NAME, ExistingWorkPolicy.KEEP, postWorker)
 }
 
 fun Double.toCleanString(): String = if (this % 1.0 == 0.0) this.toInt().toString() else this.toString()
@@ -238,3 +225,20 @@ fun Context.getStringForLocale(
         .resources
         .getString(resId)
 }
+
+/**
+ * Opens play store app with the package name, returns true if able to open
+ */
+fun Context.openPlayStore(): Boolean =
+    try {
+        startActivity(
+            Intent(Intent.ACTION_VIEW).apply {
+                data =
+                    ("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID).toUri()
+                setPackage("com.android.vending")
+            },
+        )
+        true
+    } catch (_: Exception) {
+        false
+    }

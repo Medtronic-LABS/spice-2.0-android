@@ -289,7 +289,7 @@ class AssessmentOtherSymptomsFragment : BaseFragment(), FormEventListener, View.
         viewVisibility: Int,
     ) {
         formGenerator
-            .getViewByTag(id + DefinedParams.Information)
+            .getViewByTag(id + DefinedParams.INFORMATION)
             ?.apply { visibility = viewVisibility }
     }
 
@@ -309,12 +309,15 @@ class AssessmentOtherSymptomsFragment : BaseFragment(), FormEventListener, View.
          */
     }
 
+    override fun onQRScanRequested() {
+    }
+
     private fun updateColorCode(
         id: String,
         colorCode: Int,
     ) {
         formGenerator
-            .getViewByTag(id + DefinedParams.Information)
+            .getViewByTag(id + DefinedParams.INFORMATION)
             ?.let { view ->
                 if (view is TextView) {
                     view.setTextColor(colorCode)

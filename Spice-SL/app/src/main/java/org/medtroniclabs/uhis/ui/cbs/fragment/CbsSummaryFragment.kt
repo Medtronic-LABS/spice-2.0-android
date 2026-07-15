@@ -17,8 +17,8 @@ import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.CbsNotifiableCondition
-import org.medtroniclabs.uhis.common.DefinedParams.NotifiableConditions
-import org.medtroniclabs.uhis.common.DefinedParams.OtherNotifiableConditions
+import org.medtroniclabs.uhis.common.DefinedParams.NOTIFIABLE_CONDITIONS
+import org.medtroniclabs.uhis.common.DefinedParams.OTHER_NOTIFIABLE_CONDITIONS
 import org.medtroniclabs.uhis.common.DefinedParams.RmnchNotifiableCondition
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.StringConverter
@@ -222,9 +222,9 @@ class CbsSummaryFragment : BaseFragment(), View.OnClickListener {
             viewModel.workflowName.equals(PNCNeonatal, true) ||
             viewModel.workflowName.equals(ChildHoodVisit, true)
         ) {
-            listSummaryData.filter { it.value != null && !it.id.equals(OtherNotifiableConditions, true) }.forEach { item ->
+            listSummaryData.filter { it.value != null && !it.id.equals(OTHER_NOTIFIABLE_CONDITIONS, true) }.forEach { item ->
                 if (setOf(
-                        NotifiableConditions,
+                        NOTIFIABLE_CONDITIONS,
                         CbsNotifiableCondition,
                         RmnchNotifiableCondition,
                     ).contains(item.id)
@@ -233,7 +233,7 @@ class CbsSummaryFragment : BaseFragment(), View.OnClickListener {
                         listSummaryData
                             .find {
                                 it.id.equals(
-                                    OtherNotifiableConditions,
+                                    OTHER_NOTIFIABLE_CONDITIONS,
                                     true,
                                 )
                             }?.value
@@ -245,9 +245,9 @@ class CbsSummaryFragment : BaseFragment(), View.OnClickListener {
                 }
             }
         } else {
-            listSummaryData.filter { it.value != null && !it.id.equals(OtherNotifiableConditions, true) }.forEach { item ->
+            listSummaryData.filter { it.value != null && !it.id.equals(OTHER_NOTIFIABLE_CONDITIONS, true) }.forEach { item ->
                 if (setOf(
-                        NotifiableConditions,
+                        NOTIFIABLE_CONDITIONS,
                         CbsNotifiableCondition,
                         RmnchNotifiableCondition,
                     ).contains(item.id)
@@ -256,7 +256,7 @@ class CbsSummaryFragment : BaseFragment(), View.OnClickListener {
                         listSummaryData
                             .find {
                                 it.id.equals(
-                                    OtherNotifiableConditions,
+                                    OTHER_NOTIFIABLE_CONDITIONS,
                                     true,
                                 )
                             }?.value

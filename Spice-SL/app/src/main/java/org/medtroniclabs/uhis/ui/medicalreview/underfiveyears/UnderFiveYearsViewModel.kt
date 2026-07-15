@@ -385,7 +385,7 @@ class UnderFiveYearsViewModel @Inject constructor(
         return null
     }
 
-    private fun mapStringToBoolean(value: String): Boolean = value == DefinedParams.Yes
+    private fun mapStringToBoolean(value: String): Boolean = value == DefinedParams.YES
 
     fun underFiveYearsSummaryCreate(
         details: PatientListRespModel,

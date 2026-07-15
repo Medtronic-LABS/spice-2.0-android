@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "d5480d3c79da8d1455e96b857b72655e",
+    "identityHash": "b9b6ffa1c9d43cd2cb191241d2a33f2e",
     "entities": [
       {
         "tableName": "Household",
@@ -17,7 +17,8 @@
           {
             "fieldPath": "householdNo",
             "columnName": "household_no",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "name",
@@ -40,22 +41,26 @@
           {
             "fieldPath": "shasthyaShebikaId",
             "columnName": "shasthya_shebika_id",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "subVillageId",
             "columnName": "sub_village_id",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "householdType",
             "columnName": "household_type",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "monthlyIncome",
             "columnName": "monthly_income",
-            "affinity": "REAL"
+            "affinity": "REAL",
+            "notNull": false
           },
           {
             "fieldPath": "latitude",
@@ -72,32 +77,38 @@
           {
             "fieldPath": "version",
             "columnName": "version",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "lastUpdated",
             "columnName": "lastUpdated",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "disabilityPersonsCount",
             "columnName": "disability_persons_count",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "householdHeadOccupation",
             "columnName": "household_head_occupation",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "otherOccupation",
             "columnName": "other_occupation",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "fhirId",
             "columnName": "fhir_id",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "sync_status",
@@ -176,7 +187,8 @@
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `idx_household_updated_at` ON `${TABLE_NAME}` (`updated_at`)"
           }
-        ]
+        ],
+        "foreignKeys": []
       },
       {
         "tableName": "HouseholdMember",
@@ -197,12 +209,14 @@
           {
             "fieldPath": "phoneNumber",
             "columnName": "phone_number",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "phoneNumberCategory",
             "columnName": "phone_number_category",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "dateOfBirth",
@@ -219,27 +233,32 @@
           {
             "fieldPath": "householdId",
             "columnName": "household_id",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "villageId",
             "columnName": "villageId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "shasthyaShebikaId",
             "columnName": "shasthya_shebika_id",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "subVillageId",
             "columnName": "sub_village_id",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "patientId",
             "columnName": "patient_id",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "isActive",
@@ -250,22 +269,26 @@
           {
             "fieldPath": "version",
             "columnName": "version",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "lastUpdated",
             "columnName": "lastUpdated",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "motherReferenceId",
             "columnName": "motherReferenceId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "deceasedReason",
             "columnName": "deceasedReason",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "latitude",
@@ -288,7 +311,8 @@
           {
             "fieldPath": "nationalId",
             "columnName": "national_id",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "isHouseholdHead",
@@ -299,32 +323,38 @@
           {
             "fieldPath": "householdFhirId",
             "columnName": "household_fhir_id",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "guardianId",
             "columnName": "guardian_hh_member_id",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "guardianFhirId",
             "columnName": "guardian_hh_member_fhir_id",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "maritalStatus",
             "columnName": "marital_status",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "disability",
             "columnName": "disability",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "fhirId",
             "columnName": "fhir_id",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "sync_status",
@@ -403,7 +433,8 @@
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `idx_HouseholdMember_disability` ON `${TABLE_NAME}` (`disability`)"
           }
-        ]
+        ],
+        "foreignKeys": []
       },
       {
         "tableName": "SymptomEntity",
@@ -424,27 +455,32 @@
           {
             "fieldPath": "type",
             "columnName": "type",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "displayValue",
             "columnName": "culture_value",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "displayOrder",
             "columnName": "display_order",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "value",
             "columnName": "value",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "category",
             "columnName": "category",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "isTitle",
@@ -458,7 +494,9 @@
           "columnNames": [
             "_id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "Assessment",
@@ -479,17 +517,20 @@
           {
             "fieldPath": "memberId",
             "columnName": "memberId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "householdId",
             "columnName": "householdId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "patientId",
             "columnName": "patientId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "villageId",
@@ -512,12 +553,14 @@
           {
             "fieldPath": "otherDetails",
             "columnName": "otherDetails",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "callResult",
             "columnName": "callResult",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "isReferred",
@@ -534,17 +577,20 @@
           {
             "fieldPath": "referredReason",
             "columnName": "referredReason",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "followUpId",
             "columnName": "followUpId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "status",
             "columnName": "status",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "latitude",
@@ -561,7 +607,8 @@
           {
             "fieldPath": "fhirId",
             "columnName": "fhir_id",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "sync_status",
@@ -613,7 +660,8 @@
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `idx_Assessment_updated_at` ON `${TABLE_NAME}` (`updated_at`)"
           }
-        ]
+        ],
+        "foreignKeys": []
       },
       {
         "tableName": "MenuEntity",
@@ -634,7 +682,8 @@
           {
             "fieldPath": "roleName",
             "columnName": "roleName",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "name",
@@ -651,12 +700,14 @@
           {
             "fieldPath": "subModule",
             "columnName": "subModule",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "displayValue",
             "columnName": "culture_value",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -664,7 +715,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "UserProfileEntity",
@@ -688,7 +741,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "VillageEntity",
@@ -709,12 +764,14 @@
           {
             "fieldPath": "villagecode",
             "columnName": "villagecode",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "chiefdomId",
             "columnName": "chiefdomId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "countryId",
@@ -725,7 +782,8 @@
           {
             "fieldPath": "districtId",
             "columnName": "districtId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "isUserVillage",
@@ -736,17 +794,20 @@
           {
             "fieldPath": "chiefdomCode",
             "columnName": "chiefdomCode",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "districtCode",
             "columnName": "districtCode",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "healthFacilityId",
             "columnName": "healthFacilityId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -754,11 +815,13 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "HealthFacilityEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `tenantId` INTEGER NOT NULL, `districtId` INTEGER NOT NULL, `chiefdomId` INTEGER NOT NULL, `fhirId` TEXT, `isDefault` INTEGER NOT NULL, `isUserSite` INTEGER NOT NULL, `phoneNumber` TEXT, `type` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `tenantId` INTEGER NOT NULL, `districtId` INTEGER NOT NULL, `chiefdomId` INTEGER NOT NULL, `fhirId` TEXT, `isDefault` INTEGER NOT NULL, `isUserSite` INTEGER NOT NULL, `phoneNumber` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -793,7 +856,8 @@
           {
             "fieldPath": "fhirId",
             "columnName": "fhirId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "isDefault",
@@ -810,12 +874,8 @@
           {
             "fieldPath": "phoneNumber",
             "columnName": "phoneNumber",
-            "affinity": "TEXT"
-          },
-          {
-            "fieldPath": "type",
-            "columnName": "type",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -823,7 +883,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "ClinicalWorkflowEntity",
@@ -844,12 +906,14 @@
           {
             "fieldPath": "moduleType",
             "columnName": "moduleType",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "workflowName",
             "columnName": "workflowName",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "countryId",
@@ -860,7 +924,8 @@
           {
             "fieldPath": "displayOrder",
             "columnName": "displayOrder",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -868,7 +933,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "FormEntity",
@@ -895,12 +962,14 @@
           {
             "fieldPath": "workflowName",
             "columnName": "workflowName",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "clinicalWorkflowId",
             "columnName": "clinicalWorkflowId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -908,7 +977,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "ClinicalWorkflowConditionEntity",
@@ -923,17 +994,20 @@
           {
             "fieldPath": "gender",
             "columnName": "gender",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "maxAge",
             "columnName": "maxAge",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "minAge",
             "columnName": "minAge",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "clinicalWorkflowId",
@@ -944,7 +1018,8 @@
           {
             "fieldPath": "subModule",
             "columnName": "subModule",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "moduleType",
@@ -955,17 +1030,20 @@
           {
             "fieldPath": "groupName",
             "columnName": "groupName",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "cultureGroupName",
             "columnName": "cultureGroupName",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "category",
             "columnName": "category",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -973,7 +1051,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "MetaItemByTypeAndCategoryEntity",
@@ -1000,12 +1080,14 @@
           {
             "fieldPath": "category",
             "columnName": "category",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "type",
             "columnName": "type",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "displayOrder",
@@ -1016,12 +1098,14 @@
           {
             "fieldPath": "displayValue",
             "columnName": "culture_value",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "value",
             "columnName": "value",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -1029,7 +1113,9 @@
           "columnNames": [
             "itemId"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "DiagnosisEntity",
@@ -1062,7 +1148,8 @@
           {
             "fieldPath": "type",
             "columnName": "type",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "diseaseCondition",
@@ -1073,7 +1160,8 @@
           {
             "fieldPath": "cultureValue",
             "columnName": "cultureValue",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -1081,7 +1169,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "ExaminationsEntity",
@@ -1108,12 +1198,14 @@
           {
             "fieldPath": "formInput",
             "columnName": "formInput",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "displayOrder",
             "columnName": "displayOrder",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -1121,7 +1213,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "LabourDeliveryMetaEntity",
@@ -1148,12 +1242,14 @@
           {
             "fieldPath": "category",
             "columnName": "category",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "type",
             "columnName": "type",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "displayOrder",
@@ -1173,7 +1269,9 @@
           "columnNames": [
             "itemId"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "FollowUp",
@@ -1188,12 +1286,14 @@
           {
             "fieldPath": "id",
             "columnName": "id",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "householdId",
             "columnName": "householdId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "memberId",
@@ -1210,22 +1310,26 @@
           {
             "fieldPath": "encounterId",
             "columnName": "encounterId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "patientStatus",
             "columnName": "patientStatus",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "currentPatientStatus",
             "columnName": "currentPatientStatus",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "reason",
             "columnName": "reason",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "attempts",
@@ -1254,27 +1358,32 @@
           {
             "fieldPath": "encounterType",
             "columnName": "encounterType",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "encounterName",
             "columnName": "encounterName",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "encounterDate",
             "columnName": "encounterDate",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "nextVisitDate",
             "columnName": "nextVisitDate",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "referredSiteId",
             "columnName": "referredSiteId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "villageId",
@@ -1297,7 +1406,8 @@
           {
             "fieldPath": "calledAt",
             "columnName": "calledAt",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "syncStatus",
@@ -1317,7 +1427,9 @@
           "columnNames": [
             "referenceId"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "FollowUpCall",
@@ -1362,12 +1474,14 @@
           {
             "fieldPath": "patientStatus",
             "columnName": "patientStatus",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "reason",
             "columnName": "reason",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "isSynced",
@@ -1393,7 +1507,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "PregnancyDetail",
@@ -1414,177 +1530,212 @@
           {
             "fieldPath": "patientId",
             "columnName": "patientId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "householdMemberId",
             "columnName": "householdMemberId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "pregnancyEpisodeId",
             "columnName": "pregnancyEpisodeId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "tbContactTraceStatus",
             "columnName": "tbContactTraceStatus",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "lastMenstrualPeriod",
             "columnName": "lastMenstrualPeriod",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "estimatedDeliveryDate",
             "columnName": "estimatedDeliveryDate",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "pregnancyTest",
             "columnName": "pregnancyTest",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "gravida",
             "columnName": "gravida",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "parity",
             "columnName": "parity",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "numberOfLivingChildren",
             "columnName": "numberOfLivingChildren",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "ageOfLastChild",
             "columnName": "ageOfLastChild",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "ancVisitNo",
             "columnName": "ancVisitNo",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "previousPregnancyComplications",
             "columnName": "previousPregnancyComplications",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "pregnantWomanExistingIllness",
             "columnName": "pregnantWomanExistingIllness",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "pregnantWomanOnTreatment",
             "columnName": "pregnantWomanOnTreatment",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "highRiskPregnantWoman",
             "columnName": "highRiskPregnantWoman",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "gapsInAnc",
             "columnName": "gapsInAnc",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "ancWeight",
             "columnName": "ancWeight",
-            "affinity": "REAL"
+            "affinity": "REAL",
+            "notNull": false
           },
           {
             "fieldPath": "ancVisitDate",
             "columnName": "ancVisitDate",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "pncVisitNo",
             "columnName": "pncVisitNo",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "pncIllness",
             "columnName": "pncIllness",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "highRiskMother",
             "columnName": "highRiskMother",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "gapsInPnc",
             "columnName": "gapsInPnc",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "dateOfDelivery",
             "columnName": "dateOfDelivery",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "complicationsDuringDelivery",
             "columnName": "complicationsDuringDelivery",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "typeOfAbortion",
             "columnName": "typeOfAbortion",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "noOfNeonates",
             "columnName": "noOfNeonates",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "neonatePatientId",
             "columnName": "neonatePatientId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "isDeliveryAtHome",
             "columnName": "isDeliveryAtHome",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "neonateHouseholdMemberLocalId",
             "columnName": "neonateHouseholdMemberLocalId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "isNeonateDeathRecordedByPHU",
             "columnName": "isNeonateDeathRecordedByPHU",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "childVisitNo",
             "columnName": "childVisitNo",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "childCongenitalDefect",
             "columnName": "childCongenitalDefect",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "startAt",
             "columnName": "startAt",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "endAt",
             "columnName": "endAt",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -1603,7 +1754,8 @@
             "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_PregnancyDetail_pregnancyEpisodeId` ON `${TABLE_NAME}` (`pregnancyEpisodeId`)"
           }
-        ]
+        ],
+        "foreignKeys": []
       },
       {
         "tableName": "FrequencyEntity",
@@ -1624,7 +1776,8 @@
           {
             "fieldPath": "displayValue",
             "columnName": "displayValue",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "displayOrder",
@@ -1641,7 +1794,8 @@
           {
             "fieldPath": "description",
             "columnName": "description",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -1649,7 +1803,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "ConsentForm",
@@ -1679,7 +1835,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "LinkHouseholdMember",
@@ -1706,7 +1864,8 @@
           {
             "fieldPath": "syncStatus",
             "columnName": "syncStatus",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -1714,7 +1873,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "CallHistory",
@@ -1762,7 +1923,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "ProgramEntity",
@@ -1792,7 +1955,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "CulturesEntity",
@@ -1822,7 +1987,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "ConsentEntity",
@@ -1852,7 +2019,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "MentalHealthEntity",
@@ -1867,7 +2036,8 @@
           {
             "fieldPath": "formInput",
             "columnName": "formInput",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -1875,7 +2045,9 @@
           "columnNames": [
             "formType"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "MedicalComplianceEntity",
@@ -1896,17 +2068,20 @@
           {
             "fieldPath": "displayOrder",
             "columnName": "display_order",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "displayValue",
             "columnName": "culture_value",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "parentComplianceId",
             "columnName": "parent_compliance_id",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "childExists",
@@ -1917,7 +2092,8 @@
           {
             "fieldPath": "value",
             "columnName": "value",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -1925,7 +2101,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "ChiefDomEntity",
@@ -1946,7 +2124,8 @@
           {
             "fieldPath": "code",
             "columnName": "code",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "districtId",
@@ -1960,7 +2139,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "DistrictEntity",
@@ -1981,7 +2162,8 @@
           {
             "fieldPath": "code",
             "columnName": "code",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "countryId",
@@ -1995,7 +2177,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "ScreeningEntity",
@@ -2034,12 +2218,14 @@
           {
             "fieldPath": "userId",
             "columnName": "userId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "signature",
             "columnName": "signature",
-            "affinity": "BLOB"
+            "affinity": "BLOB",
+            "notNull": false
           },
           {
             "fieldPath": "isReferred",
@@ -2053,7 +2239,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "RiskFactorEntity",
@@ -2089,7 +2277,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "LifestyleEntity",
@@ -2110,12 +2300,14 @@
           {
             "fieldPath": "displayValue",
             "columnName": "displayValue",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "value",
             "columnName": "value",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "answers",
@@ -2141,7 +2333,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "NCDMedicalReviewMetaEntity",
@@ -2180,17 +2374,20 @@
           {
             "fieldPath": "type",
             "columnName": "type",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "category",
             "columnName": "category",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "value",
             "columnName": "value",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -2198,7 +2395,9 @@
           "columnNames": [
             "primaryId"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "AssessmentNCDEntity",
@@ -2231,7 +2430,8 @@
           {
             "fieldPath": "userId",
             "columnName": "userId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -2239,7 +2439,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "unit_metric_entity",
@@ -2260,7 +2462,8 @@
           {
             "fieldPath": "type",
             "columnName": "type",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "displayOrder",
@@ -2271,7 +2474,8 @@
           {
             "fieldPath": "description",
             "columnName": "description",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "status",
@@ -2309,7 +2513,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "dosage_frequency_entity",
@@ -2342,7 +2548,8 @@
           {
             "fieldPath": "description",
             "columnName": "description",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "status",
@@ -2353,7 +2560,8 @@
           {
             "fieldPath": "displayValue",
             "columnName": "displayValue",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "isDefault",
@@ -2379,7 +2587,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "NCDDiagnosisEntity",
@@ -2406,22 +2616,26 @@
           {
             "fieldPath": "value",
             "columnName": "value",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "displayValue",
             "columnName": "culture_value",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "type",
             "columnName": "type",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "gender",
             "columnName": "gender",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -2429,7 +2643,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "TreatmentPlanEntity",
@@ -2450,7 +2666,8 @@
           {
             "fieldPath": "displayValue",
             "columnName": "displayValue",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "displayOrder",
@@ -2473,12 +2690,14 @@
           {
             "fieldPath": "riskLevel",
             "columnName": "riskLevel",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "type",
             "columnName": "type",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -2486,7 +2705,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "shortageReason",
@@ -2525,7 +2746,8 @@
           {
             "fieldPath": "value",
             "columnName": "value",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -2533,7 +2755,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "DosageDurationEntity",
@@ -2560,7 +2784,8 @@
           {
             "fieldPath": "displayValue",
             "columnName": "displayValue",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "quantity",
@@ -2574,7 +2799,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "NCDFollowUp",
@@ -2589,142 +2816,170 @@
           {
             "fieldPath": "deleted",
             "columnName": "deleted",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "isCompleted",
             "columnName": "isCompleted",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "isWrongNumber",
             "columnName": "isWrongNumber",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "isInitiated",
             "columnName": "isInitiated",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "patientId",
             "columnName": "patientId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "memberId",
             "columnName": "memberId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "type",
             "columnName": "type",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "referredSiteId",
             "columnName": "referredSiteId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "identityType",
             "columnName": "identityType",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "identityValue",
             "columnName": "identityValue",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "name",
             "columnName": "name",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "gender",
             "columnName": "gender",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "dateOfBirth",
             "columnName": "dateOfBirth",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "phoneNumber",
             "columnName": "phoneNumber",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "countyName",
             "columnName": "countyName",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "subCountyName",
             "columnName": "subCountyName",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "communityHealthUnitName",
             "columnName": "communityHealthUnitName",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "villageId",
             "columnName": "villageId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "villageName",
             "columnName": "villageName",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "landmark",
             "columnName": "landmark",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "retryAttempts",
             "columnName": "retryAttempts",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "overDueCategories",
             "columnName": "overDueCategories",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "dueDate",
             "columnName": "dueDate",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "referredReasons",
             "columnName": "referredReasons",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "createdBy",
             "columnName": "createdBy",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "updatedBy",
             "columnName": "updatedBy",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "createdAt",
             "columnName": "createdAt",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "updatedAt",
             "columnName": "updatedAt",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -2732,7 +2987,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "LinkedVillageEntity",
@@ -2765,12 +3022,14 @@
           {
             "fieldPath": "villagecode",
             "columnName": "villagecode",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "chiefdomId",
             "columnName": "chiefdomId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "countryId",
@@ -2781,7 +3040,8 @@
           {
             "fieldPath": "districtId",
             "columnName": "districtId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "isUserVillage",
@@ -2792,12 +3052,14 @@
           {
             "fieldPath": "chiefdomCode",
             "columnName": "chiefdomCode",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "districtCode",
             "columnName": "districtCode",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -2805,7 +3067,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "NCDCallDetails",
@@ -2826,17 +3090,20 @@
           {
             "fieldPath": "villageId",
             "columnName": "villageId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "patientId",
             "columnName": "patientId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "memberId",
             "columnName": "memberId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "appType",
@@ -2847,67 +3114,80 @@
           {
             "fieldPath": "referredSiteId",
             "columnName": "referredSiteId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "callDate",
             "columnName": "callDate",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "duration",
             "columnName": "duration",
-            "affinity": "REAL"
+            "affinity": "REAL",
+            "notNull": false
           },
           {
             "fieldPath": "status",
             "columnName": "status",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "reason",
             "columnName": "reason",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "otherReason",
             "columnName": "otherReason",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "patientStatus",
             "columnName": "patientStatus",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "type",
             "columnName": "type",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "attempts",
             "columnName": "attempts",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "latitude",
             "columnName": "latitude",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "longitude",
             "columnName": "longitude",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "visitedFacilityId",
             "columnName": "visitedFacilityId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "otherVisitedFacilityName",
             "columnName": "otherVisitedFacilityName",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "isSynced",
@@ -2918,22 +3198,26 @@
           {
             "fieldPath": "createdBy",
             "columnName": "createdBy",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "updatedBy",
             "columnName": "updatedBy",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "createdAt",
             "columnName": "createdAt",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "updatedAt",
             "columnName": "updatedAt",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -2941,7 +3225,9 @@
           "columnNames": [
             "localId"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "NCDPatientDetailsEntity",
@@ -2956,7 +3242,8 @@
           {
             "fieldPath": "patientDetails",
             "columnName": "patientDetails",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -2964,7 +3251,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "CommunityProfile",
@@ -2985,17 +3274,20 @@
           {
             "fieldPath": "communityDescription",
             "columnName": "communityDescription",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "registeredDate",
             "columnName": "registeredDate",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "payload",
             "columnName": "payload",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "latitude",
@@ -3012,7 +3304,8 @@
           {
             "fieldPath": "fhirId",
             "columnName": "fhir_id",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "sync_status",
@@ -3044,7 +3337,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "RxBuddyDetails",
@@ -3059,7 +3354,8 @@
           {
             "fieldPath": "rxBuddyId",
             "columnName": "rxBuddyId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "patientMemberId",
@@ -3070,17 +3366,20 @@
           {
             "fieldPath": "householdMemberId",
             "columnName": "householdMemberId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "name",
             "columnName": "name",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "phoneNumber",
             "columnName": "phoneNumber",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "relationship",
@@ -3103,12 +3402,14 @@
           {
             "fieldPath": "otherRelationship",
             "columnName": "otherRelationship",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "followUpId",
             "columnName": "followUpId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "isActive",
@@ -3152,7 +3453,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "TreatmentDetailsEntity",
@@ -3179,37 +3482,44 @@
           {
             "fieldPath": "treatmentStartDate",
             "columnName": "treatmentStartDate",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "diagnoses",
             "columnName": "diagnoses",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "diagnosedDate",
             "columnName": "diagnosedDate",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "prescriptions",
             "columnName": "prescriptions",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "healthUnitNo",
             "columnName": "healthUnitNo",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "icDistrictTBNo",
             "columnName": "icDistrictTBNo",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "tbConfirmationDate",
             "columnName": "tbConfirmationDate",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -3217,7 +3527,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "RxBuddyFollowUpEntity",
@@ -3238,7 +3550,8 @@
           {
             "fieldPath": "rxBuddyId",
             "columnName": "rxBuddyId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "patientMemberId",
@@ -3249,7 +3562,8 @@
           {
             "fieldPath": "followUp",
             "columnName": "followUp",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "nextVisitDate",
@@ -3260,7 +3574,8 @@
           {
             "fieldPath": "followUpId",
             "columnName": "followUpId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "syncStatus",
@@ -3298,7 +3613,9 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "SubVillageEntity",
@@ -3319,7 +3636,8 @@
           {
             "fieldPath": "code",
             "columnName": "code",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "villageId",
@@ -3344,7 +3662,8 @@
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `idx_subvillage_villageId` ON `${TABLE_NAME}` (`villageId`)"
           }
-        ]
+        ],
+        "foreignKeys": []
       },
       {
         "tableName": "ShasthyaShebikaEntity",
@@ -3365,17 +3684,20 @@
           {
             "fieldPath": "phoneNumber",
             "columnName": "phoneNumber",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "ssId",
             "columnName": "ssId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "shasthyaKormiId",
             "columnName": "shasthyaKormiId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -3394,7 +3716,8 @@
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `idx_shasthya_shebika_ssId` ON `${TABLE_NAME}` (`ssId`)"
           }
-        ]
+        ],
+        "foreignKeys": []
       },
       {
         "tableName": "ShasthyaShebikaLinkedVillageEntity",
@@ -3439,7 +3762,8 @@
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `idx_linked_subvillage_id` ON `${TABLE_NAME}` (`subVillageId`)"
           }
-        ]
+        ],
+        "foreignKeys": []
       },
       {
         "tableName": "MemberAssessmentHistory",
@@ -3454,32 +3778,38 @@
           {
             "fieldPath": "memberFhirId",
             "columnName": "memberFhirId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "memberId",
             "columnName": "memberId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "visitDate",
             "columnName": "visitDate",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "serviceProvided",
             "columnName": "serviceProvided",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "encounterId",
             "columnName": "encounterId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "customStatus",
             "columnName": "customStatus",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "latestVisit",
@@ -3490,17 +3820,20 @@
           {
             "fieldPath": "referralStatus",
             "columnName": "referralStatus",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "referralReason",
             "columnName": "referralReason",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "nextFollowUpDate",
             "columnName": "nextFollowUpDate",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -3537,12 +3870,14 @@
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `idx_member_assessment_history_service_provided` ON `${TABLE_NAME}` (`serviceProvided`)"
           }
-        ]
+        ],
+        "foreignKeys": []
       }
     ],
+    "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd5480d3c79da8d1455e96b857b72655e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b9b6ffa1c9d43cd2cb191241d2a33f2e')"
     ]
   }
 }

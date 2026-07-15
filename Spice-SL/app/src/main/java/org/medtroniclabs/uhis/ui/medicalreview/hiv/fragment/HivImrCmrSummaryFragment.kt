@@ -122,7 +122,7 @@ class HivImrCmrSummaryFragment : BaseFragment(), View.OnClickListener {
         binding.tvDiagnosesLabel.text = getText(R.string.diagnosis_tb)
         binding.tvComborbiditiesLabel.text = if (isEMTCTMR)getString(R.string.obstetric_examination)else getString(R.string.comorbidities_coinfections)
         views.forEach { it.setVisible(false) }
-        viewModel.getEmtctStatusByCategory(DefinedParams.emtctVisitStatus)
+        viewModel.getEmtctStatusByCategory(DefinedParams.EMTCT_VISIT_STATUS)
         viewModel.getMaternalStatusByCategory(MedicalReviewTypeEnums.maternal_outcome.name)
     }
 
@@ -188,7 +188,7 @@ class HivImrCmrSummaryFragment : BaseFragment(), View.OnClickListener {
             }
             tvDiagnosesText.text = diagnosisList
                 .filter {
-                    it.diseaseCategory.lowercase() != DefinedParams.OtherNotes.lowercase()
+                    it.diseaseCategory.lowercase() != DefinedParams.OTHER_NOTES.lowercase()
                 }.map { it.diseaseCategory }
                 .distinct()
                 .takeIf { it.isNotEmpty() }

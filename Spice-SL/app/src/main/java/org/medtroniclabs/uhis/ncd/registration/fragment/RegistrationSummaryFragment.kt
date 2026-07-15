@@ -50,8 +50,8 @@ class RegistrationSummaryFragment : BaseFragment(), View.OnClickListener {
 
     private fun inflateTreatmentPlanResponse() {
         viewModel.registrationResponseLiveData.value?.data?.treatmentPlanResponse.let { treatmentPlanMap ->
-            if (treatmentPlanMap?.containsKey(DefinedParams.TreatmentPlan) == true) {
-                treatmentPlanMap[DefinedParams.TreatmentPlan]?.let { list ->
+            if (treatmentPlanMap?.containsKey(DefinedParams.TREATMENT_PLAN) == true) {
+                treatmentPlanMap[DefinedParams.TREATMENT_PLAN]?.let { list ->
                     if (list is ArrayList<*>) {
                         addTPCardView(list)
                     }
@@ -71,7 +71,7 @@ class RegistrationSummaryFragment : BaseFragment(), View.OnClickListener {
         cardBinding.llFamilyRoot.let { layout ->
             treatmentPlanMap.forEach {
                 if (it is Map<*, *>) {
-                    val lbl = it[DefinedParams.label]
+                    val lbl = it[DefinedParams.LABEL]
                     val value = it[DefinedParams.Value]
                     if (lbl is String && value is String) {
                         layout.addView(

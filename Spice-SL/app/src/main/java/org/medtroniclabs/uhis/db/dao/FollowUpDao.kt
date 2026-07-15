@@ -9,7 +9,8 @@ import androidx.room.Transaction
 import org.medtroniclabs.uhis.data.FollowUpPatientModel
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineSyncStatus
 import org.medtroniclabs.uhis.db.entity.FollowUp
-import org.medtroniclabs.uhis.microcoaching.TodaysVisitRow
+import org.medtroniclabs.uhis.model.followup.FollowUpSortOrder
+import org.medtroniclabs.uhis.ui.followup.FollowUpDefinedParams
 
 @Dao
 interface FollowUpDao {
@@ -22,65 +23,80 @@ interface FollowUpDao {
     @Query("SELECT * FROM FollowUp WHERE id = :id")
     suspend fun getFollowUpDetailsById(id: Long): FollowUp
 
+    @Transaction
     @Query(
-        "SELECT fu.id, hhm.id AS localPatientId, hhm.name, fu.patientId, hhm.phone_number as phoneNumber, hhm.date_of_birth as dateOfBirth, hhm.gender, fu.reason, fu.patientStatus, ve.name AS village, hh.id as householdId, hh.name AS householdName, NULL as landmark, fu.type, fu.encounterType, fu.calledAt, fu.successfulAttempts, fu.unsuccessfulAttempts, fu.nextVisitDate, fu.encounterDate, fu.isWrongNumber, fu.updatedAt " +
+        "SELECT fu.id, hhm.id AS localPatientId, hhm.name, fu.patientId, hhm.phone_number as phoneNumber, hhm.date_of_birth as dateOfBirth, hhm.gender, fu.reason, fu.patientStatus, ve.name AS village, hh.id as householdId, hh.name AS householdName, NULL as landmark, fu.type, fu.encounterType, fu.calledAt, fu.successfulAttempts, fu.unsuccessfulAttempts, fu.nextVisitDate, fu.encounterDate, fu.isWrongNumber, fu.updatedAt, fu.encounterName, fu.encounterId, fu.attempts, " +
+            "(SELECT status FROM FollowUpCall WHERE followUpId = fu.id ORDER BY callDate DESC LIMIT 1) AS recentCallStatus, " +
+            "CASE WHEN (:screeningRetryAttempts - fu.attempts) < 1 THEN 1 ELSE (:screeningRetryAttempts - fu.attempts) END AS remainingAttempts " +
             "FROM FollowUp AS fu INNER JOIN HouseholdMember AS hhm ON fu.memberId = hhm.fhir_id LEFT JOIN Household AS hh ON hhm.household_id = hh.id LEFT JOIN SubVillageEntity AS ve ON fu.villageId = ve.id " +
-            "WHERE fu.isCompleted = 0 AND hhm.isActive = 1 AND fu.id IS NOT NULL AND fu.villageId IN (:villageIds) AND " +
+            "WHERE fu.isCompleted = 0 AND " +
+            "hhm.isActive = 1 AND " +
+            "fu.id IS NOT NULL AND " +
+            "CASE WHEN :villageIdsSize > 0 THEN fu.villageId IN (:villageIds) WHEN :shashthyaShebikaIdsSize > 0 THEN fu.villageId IN (SELECT DISTINCT sslv.subVillageId FROM ShasthyaShebikaLinkedVillageEntity AS sslv WHERE sslv.shasthyaShebikaId IN (:shashthyaShebikaIds)) ELSE 1 END AND " +
+            "((:selectedReferralReasonTypesSize = 0 AND (:ncdSelectedReason IS NULL OR :ncdSelectedReason= '') AND (:ncdSelectedReferralTo IS NULL OR :ncdSelectedReferralTo='')) OR (:selectedReferralReasonTypesSize > 0 AND LOWER(fu.encounterName) IN (:selectedReferralReasonTypes)) OR ((:ncdSelectedReason IS NOT NULL AND :ncdSelectedReason != '') OR (:ncdSelectedReferralTo IS NOT NULL AND :ncdSelectedReferralTo != '')) AND LOWER(fu.encounterName) = LOWER('${FollowUpDefinedParams.FILTER_NCD}') AND ((:ncdSelectedReason IS NULL OR :ncdSelectedReason = '') OR LOWER(fu.reason) LIKE '%' || :ncdSelectedReason || '%') AND ((:ncdSelectedReferralTo IS NULL OR :ncdSelectedReferralTo = '') OR LOWER(fu.referralFacilityType) = LOWER(:ncdSelectedReferralTo))) AND " +
             "fu.type=:type AND " +
-            "(hhm.name LIKE '%' || :search || '%' OR fu.patientId LIKE :search || '%' OR :search IS NULL) AND " +
-            "CASE WHEN :fromDate = '' THEN 1 ELSE date(fu.encounterDate) BETWEEN :fromDate AND :toDate END ORDER BY fu.encounterDate",
+            "(hhm.name LIKE '%' || :search || '%' OR hhm.phone_number LIKE '%' || :search || '%' OR :search IS NULL) AND " +
+            "CASE WHEN :fromDate = '' THEN 1 ELSE date(fu.encounterDate) BETWEEN :fromDate AND :toDate END AND " +
+            "CASE WHEN :remainingAttempt IS NULL THEN 1 ELSE remainingAttempts = :remainingAttempt END AND " +
+            "CASE WHEN :callStatus IS NULL OR :callStatus = '' THEN 1 ELSE recentCallStatus = :callStatus END " +
+            "ORDER BY " +
+            "CASE WHEN :sortOrder = 'DEFAULT' THEN remainingAttempts END DESC, " +
+            "CASE WHEN :sortOrder = 'LATEST_SCREENING_DATE' THEN fu.encounterDate END DESC, " +
+            "CASE WHEN :sortOrder = 'OLDEST_SCREENING_DATE' THEN fu.encounterDate END ASC",
     )
     fun getReferredFollowUpPatientListLiveData(
         type: String,
         search: String? = null,
+        shashthyaShebikaIds: List<Long>,
+        shashthyaShebikaIdsSize: Int,
         villageIds: List<Long> = listOf(),
+        villageIdsSize: Int,
+        selectedReferralReasonTypes: List<String>,
+        selectedReferralReasonTypesSize: Int,
+        ncdSelectedReason: String?,
+        ncdSelectedReferralTo: String?,
         fromDate: String = "",
         toDate: String = "",
+        screeningRetryAttempts: Int,
+        remainingAttempt: Int? = null,
+        callStatus: String? = null,
+        sortOrder: FollowUpSortOrder,
     ): LiveData<List<FollowUpPatientModel>>
 
+    @Transaction
     @Query(
-        "SELECT fu.id, hhm.id AS localPatientId, hhm.name, fu.patientId, hhm.phone_number as phoneNumber, hhm.date_of_birth as dateOfBirth, hhm.gender, fu.reason, fu.patientStatus, ve.name AS village, hh.id as householdId, hh.name AS householdName, NULL as landmark, fu.type, fu.encounterType, fu.calledAt, fu.successfulAttempts, fu.unsuccessfulAttempts, fu.nextVisitDate, fu.encounterDate, fu.isWrongNumber, fu.updatedAt " +
+        "SELECT fu.id, hhm.id AS localPatientId, hhm.name, fu.patientId, hhm.phone_number as phoneNumber, hhm.date_of_birth as dateOfBirth, hhm.gender, fu.reason, fu.patientStatus, ve.name AS village, hh.id as householdId, hh.name AS householdName, NULL as landmark, fu.type, fu.encounterType, fu.calledAt, fu.successfulAttempts, fu.unsuccessfulAttempts, fu.nextVisitDate, fu.encounterDate, fu.isWrongNumber, fu.updatedAt, fu.encounterName, fu.encounterId, fu.attempts, " +
+            "(SELECT status FROM FollowUpCall WHERE followUpId = fu.id ORDER BY callDate DESC LIMIT 1) AS recentCallStatus, " +
+            "CASE WHEN (:screeningRetryAttempts - fu.attempts) < 1 THEN 1 ELSE (:screeningRetryAttempts - fu.attempts) END AS remainingAttempts, hh.id AS householdLocalId " +
             "FROM FollowUp AS fu INNER JOIN HouseholdMember AS hhm ON fu.memberId = hhm.fhir_id LEFT JOIN Household AS hh ON hhm.household_id = hh.id LEFT JOIN SubVillageEntity AS ve ON fu.villageId = ve.id " +
-            "WHERE fu.isCompleted = 0 AND hhm.isActive = 1 AND fu.id IS NOT NULL AND fu.villageId IN (:villageIds) AND " +
+            "WHERE fu.isCompleted = 0 AND " +
+            "hhm.isActive = 1 AND " +
+            "fu.id IS NOT NULL AND " +
+            "CASE WHEN :villageIdsSize > 0 THEN fu.villageId IN (:villageIds) WHEN :shashthyaShebikaIdsSize > 0 THEN fu.villageId IN (SELECT DISTINCT sslv.subVillageId FROM ShasthyaShebikaLinkedVillageEntity AS sslv WHERE sslv.shasthyaShebikaId IN (:shashthyaShebikaIds)) ELSE 1 END AND " +
+            "((:selectedReferralReasonTypesSize = 0 AND (:ncdSelectedReason IS NULL OR :ncdSelectedReason= '') AND (:ncdSelectedReferralTo IS NULL OR :ncdSelectedReferralTo='')) OR (:selectedReferralReasonTypesSize > 0 AND LOWER(fu.encounterName) IN (:selectedReferralReasonTypes)) OR ((:ncdSelectedReason IS NOT NULL AND :ncdSelectedReason != '') OR (:ncdSelectedReferralTo IS NOT NULL AND :ncdSelectedReferralTo != '')) AND LOWER(fu.encounterName) = LOWER('${FollowUpDefinedParams.FILTER_NCD}') AND ((:ncdSelectedReason IS NULL OR :ncdSelectedReason = '') OR LOWER(fu.reason) LIKE '%' || :ncdSelectedReason || '%') AND ((:ncdSelectedReferralTo IS NULL OR :ncdSelectedReferralTo = '') OR LOWER(fu.referralFacilityType) = LOWER(:ncdSelectedReferralTo))) AND " +
             "fu.type=:type AND " +
-            "(hhm.name LIKE '%' || :search || '%' OR fu.patientId LIKE :search || '%' OR :search IS NULL) AND " +
-            "CASE WHEN :fromDate = '' THEN 1 ELSE date(fu.nextVisitDate) BETWEEN :fromDate AND :toDate END ORDER BY fu.nextVisitDate",
+            "(hhm.name LIKE '%' || :search || '%' OR hhm.phone_number LIKE '%' || :search || '%' OR :search IS NULL) AND " +
+            "CASE WHEN :fromDate = '' THEN 1 ELSE date(fu.nextVisitDate) BETWEEN :fromDate AND :toDate END " +
+            "ORDER BY fu.nextVisitDate",
     )
     fun getOtherFollowUpPatientListLiveData(
         type: String,
         search: String? = null,
+        shashthyaShebikaIds: List<Long>,
+        shashthyaShebikaIdsSize: Int,
         villageIds: List<Long> = listOf(),
+        villageIdsSize: Int,
+        selectedReferralReasonTypes: List<String>,
+        selectedReferralReasonTypesSize: Int,
+        ncdSelectedReason: String?,
+        ncdSelectedReferralTo: String?,
         fromDate: String = "",
         toDate: String = "",
+        screeningRetryAttempts: Int,
     ): LiveData<List<FollowUpPatientModel>>
 
     @Query("SELECT * FROM FollowUp WHERE syncStatus IN (:syncStatus)")
     suspend fun getAllFollowUps(syncStatus: List<String> = listOf(OfflineSyncStatus.NotSynced.name, OfflineSyncStatus.NetworkError.name)): List<FollowUp>
-
-    /**
-     * Minimal, PII-free projection of follow-ups due on [today] (`yyyy-MM-dd`)
-     * that aren't completed — the MicroCoaching SDK's today's-visit refresher
-     * source. The local DB only holds this CHW's villages' follow-ups, so no CHW/
-     * village filter is needed; `date(nextVisitDate)` mirrors the existing
-     * follow-up "today" filters above.
-     *
-     * `isPregnant` is a derived flag (1 when the member has an open pregnancy episode
-     * — an ANC visit recorded and no delivery date yet), via a correlated EXISTS so
-     * a member with multiple pregnancy rows never multiplies the visit. Used to match
-     * the trigger's `is_pregnant` predicate; no other patient data is exposed.
-     */
-    @Query(
-        "SELECT fu.type AS type, fu.encounterType AS encounterType, " +
-            "fu.nextVisitDate AS nextVisitDate, fu.villageId AS villageId, " +
-            "CASE WHEN EXISTS (" +
-            "  SELECT 1 FROM PregnancyDetail pd " +
-            "  JOIN HouseholdMember hhm ON pd.householdMemberLocalId = hhm.id " +
-            "  WHERE hhm.fhir_id = fu.memberId AND pd.ancVisitNo IS NOT NULL AND pd.dateOfDelivery IS NULL" +
-            ") THEN 1 ELSE 0 END AS isPregnant " +
-            "FROM FollowUp fu " +
-            "WHERE fu.isCompleted = 0 AND fu.nextVisitDate IS NOT NULL AND date(fu.nextVisitDate) = :today",
-    )
-    suspend fun getVisitsDueOn(today: String): List<TodaysVisitRow>
 
     @Query("SELECT COUNT(referenceId) FROM FollowUp where syncStatus IN (:syncStatus)")
     suspend fun getUnSyncedCount(syncStatus: List<String> = listOf(OfflineSyncStatus.NotSynced.name, OfflineSyncStatus.NetworkError.name)): Int

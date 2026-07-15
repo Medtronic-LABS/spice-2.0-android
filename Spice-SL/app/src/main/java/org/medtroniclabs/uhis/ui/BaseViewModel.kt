@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.app.analytics.db.AnalyticsRepository
 import org.medtroniclabs.uhis.app.analytics.model.UserDetail
@@ -15,10 +16,11 @@ import org.medtroniclabs.uhis.di.IoDispatcher
 import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 @HiltViewModel
 open class BaseViewModel @Inject constructor(
-    @IoDispatcher open var dispatcherIO: CoroutineDispatcher,
+    @param:IoDispatcher open var dispatcherIO: CoroutineDispatcher,
 ) : ViewModel() {
     init {
         logViewModelLifecycle("Created")
@@ -92,6 +94,11 @@ open class BaseViewModel @Inject constructor(
         super.onCleared()
         logViewModelLifecycle("Cleared")
     }
+
+    fun launch(
+        context: CoroutineContext = dispatcherIO,
+        block: suspend CoroutineScope.() -> Unit,
+    ) = viewModelScope.launch(context, block = block)
 
     private fun logViewModelLifecycle(state: String) {
         Timber.tag("ViewModelLifecycle").d("${javaClass.simpleName} $state")

@@ -64,9 +64,9 @@ object PNCAssessmentEvaluator {
             val systolic = CommonUtils.getInteger(maternalAssessment[AssessmentDefinedParams.SYSTOLIC])
             val diastolic = CommonUtils.getInteger(maternalAssessment[AssessmentDefinedParams.DIASTOLIC])
             val isBpHigh = isHighBp(systolic, diastolic)
-            val isKnownHtn = isValueEquals(maternalAssessment[RMNCH.ID_KNOWN_HTN], DefinedParams.Yes)
-            val isEclampsia = isValueEquals(maternalAssessment[RMNCH.ID_ECLAMPSIA], DefinedParams.Yes)
-            val isOnTreatmentHtn = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_HTN_ECLAMPSIA], DefinedParams.Yes)
+            val isKnownHtn = isValueEquals(maternalAssessment[RMNCH.ID_KNOWN_HTN], DefinedParams.YES)
+            val isEclampsia = isValueEquals(maternalAssessment[RMNCH.ID_ECLAMPSIA], DefinedParams.YES)
+            val isOnTreatmentHtn = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_HTN_ECLAMPSIA], DefinedParams.YES)
             val isEdemaPresent = isValueEquals(maternalAssessment[RMNCH.ID_EDEMA])
             val isUrineAlbuminPresent = isValueEquals(maternalAssessment[RMNCH.ID_URINARY_ALBUMIN])
 
@@ -118,9 +118,9 @@ object PNCAssessmentEvaluator {
             }
 
             // 14. Known DM/GDM patient not on treatment
-            val dmPatient = isValueEquals(maternalAssessment[RMNCH.ID_DM_PATIENT], DefinedParams.Yes)
-            val gdmPatient = isValueEquals(maternalAssessment[RMNCH.ID_GDM_PATIENT], DefinedParams.Yes)
-            val isOnTreatmentDm = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_DM_GDM], DefinedParams.Yes)
+            val dmPatient = isValueEquals(maternalAssessment[RMNCH.ID_DM_PATIENT], DefinedParams.YES)
+            val gdmPatient = isValueEquals(maternalAssessment[RMNCH.ID_GDM_PATIENT], DefinedParams.YES)
+            val isOnTreatmentDm = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_DM_GDM], DefinedParams.YES)
             if ((dmPatient || gdmPatient) && !isOnTreatmentDm) {
                 urgentReferral.add(PNCUrgentReferrals.DM_GDM_NOT_ON_TREATMENT.value + "::" + PNCUrgentReferrals.DM_GDM_NOT_ON_TREATMENT.cultureValue)
             }
@@ -180,27 +180,27 @@ object PNCAssessmentEvaluator {
                 }
             }
 
-            val isKnownHtn = isValueEquals(maternalAssessment[RMNCH.ID_KNOWN_HTN], DefinedParams.Yes)
-            val isEclampsia = isValueEquals(maternalAssessment[RMNCH.ID_ECLAMPSIA], DefinedParams.Yes)
-            val isOnTreatmentHtn = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_HTN_ECLAMPSIA], DefinedParams.Yes)
+            val isKnownHtn = isValueEquals(maternalAssessment[RMNCH.ID_KNOWN_HTN], DefinedParams.YES)
+            val isEclampsia = isValueEquals(maternalAssessment[RMNCH.ID_ECLAMPSIA], DefinedParams.YES)
+            val isOnTreatmentHtn = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_HTN_ECLAMPSIA], DefinedParams.YES)
 
-            // 5. On treatment for HTN or Pre-eclampsia / Eclampsia
+            // 6. On treatment for HTN or Pre-eclampsia / Eclampsia
             if ((isKnownHtn || isEclampsia) && isOnTreatmentHtn) {
                 nonUrgentReferral.add(
                     PNCNonUrgentReferrals.HTN_ECLAMPSIA_ON_TREATMENT.value + "::" + PNCNonUrgentReferrals.HTN_ECLAMPSIA_ON_TREATMENT.cultureValue,
                 )
             }
 
-            val dmPatient = isValueEquals(maternalAssessment[RMNCH.ID_DM_PATIENT], DefinedParams.yes)
-            val gdmPatient = isValueEquals(maternalAssessment[RMNCH.ID_GDM_PATIENT], DefinedParams.yes)
-            val onTreatmentDmGdm = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_DM_GDM], DefinedParams.Yes)
+            val dmPatient = isValueEquals(maternalAssessment[RMNCH.ID_DM_PATIENT], DefinedParams.YES_SMALL)
+            val gdmPatient = isValueEquals(maternalAssessment[RMNCH.ID_GDM_PATIENT], DefinedParams.YES_SMALL)
+            val onTreatmentDmGdm = isValueEquals(maternalAssessment[RMNCH.ID_ON_TREATMENT_DM_GDM], DefinedParams.YES)
 
-            // 6. On treatment for DM/GDM
+            // 7. On treatment for DM/GDM
             if ((dmPatient || gdmPatient) && onTreatmentDmGdm) {
                 nonUrgentReferral.add(PNCNonUrgentReferrals.DM_GDM_ON_TREATMENT.value + "::" + PNCNonUrgentReferrals.DM_GDM_ON_TREATMENT.cultureValue)
             }
 
-            // 7. Other
+            // 8. Other
             (maternalAssessment[RMNCH.ID_POSTPARTUM_DANGER_SIGNS] as? List<*>)?.let { dangerSigns ->
                 val selectedSigns = dangerSigns
                     .filterIsInstance<Map<String, Any>>()
@@ -219,7 +219,7 @@ object PNCAssessmentEvaluator {
 
     /**
      * Identifies care gaps in supplementation and contraception for the PNC period.
-     * Supplementation gaps (Vitamin A, IFA, Calcium) are grouped into a single reason.
+     * Supplementation gaps (vitamin A, IFA, Calcium) are grouped into a single reason.
      *
      * @param resultMap The assessment result map containing maternal health and contraception data.
      * @return A list of strings representing the care gaps found.
@@ -234,7 +234,7 @@ object PNCAssessmentEvaluator {
 
             // 1. Supplementation (Vitamin A, IFA, Calcium)
             // Vitamin A
-            if (!isValueEquals(maternalAssessment[RMNCH.ID_VITAMIN_A_CONSUMED], DefinedParams.Yes)) {
+            if (!isValueEquals(maternalAssessment[RMNCH.ID_VITAMIN_A_CONSUMED], DefinedParams.YES)) {
                 hasSupplementationGaps = true
                 supplementationGaps.add(PNCSupplementation.VITAMIN_A.value)
                 cultureSupplementationGaps.add(PNCSupplementation.VITAMIN_A.cultureValue)
@@ -242,11 +242,10 @@ object PNCAssessmentEvaluator {
 
             // IFA and Calcium
             val daysSinceDelivery = CommonUtils.getInteger(resultMap[RMNCH.ID_DAYS_SINCE_DELIVERY])
-            val expectedTablets = daysSinceDelivery + 1
 
             // IFA (Non-optional integer)
             val ifaConsumed = CommonUtils.getInteger(maternalAssessment[RMNCH.ID_IFA_TABLETS_CONSUMED])
-            if (ifaConsumed < expectedTablets) {
+            if (ifaConsumed < daysSinceDelivery) {
                 hasSupplementationGaps = true
                 supplementationGaps.add(PNCSupplementation.IFA.value)
                 cultureSupplementationGaps.add(PNCSupplementation.IFA.cultureValue)
@@ -254,7 +253,7 @@ object PNCAssessmentEvaluator {
 
             // Calcium (Non-optional integer)
             val calciumConsumed = CommonUtils.getInteger(maternalAssessment[RMNCH.ID_CALCIUM_TABLETS_CONSUMED])
-            if (calciumConsumed < expectedTablets) {
+            if (calciumConsumed < daysSinceDelivery) {
                 hasSupplementationGaps = true
                 supplementationGaps.add(PNCSupplementation.CALCIUM.value)
                 cultureSupplementationGaps.add(PNCSupplementation.CALCIUM.cultureValue)
@@ -290,9 +289,11 @@ object PNCAssessmentEvaluator {
                     hb < AssessmentDefinedParams.HEMOGLOBIN_SEVERE_ANEMIA_THRESHOLD -> {
                         level = AnemiaLevel.Severe
                     }
+
                     hb < AssessmentDefinedParams.HEMOGLOBIN_MODERATE_ANEMIA_THRESHOLD -> {
                         level = AnemiaLevel.Moderate
                     }
+
                     hb < AssessmentDefinedParams.HEMOGLOBIN_MILD_ANEMIA_THRESHOLD -> {
                         level = AnemiaLevel.Mild
                     }
@@ -326,8 +327,8 @@ object PNCAssessmentEvaluator {
         diastolic: Int,
     ): Boolean {
         if (systolic <= 0 && diastolic <= 0) return false
-        return systolic >= AssessmentDefinedParams.BP_SYSTOLIC_THRESHOLD.toInt() ||
-            diastolic >= AssessmentDefinedParams.BP_DIASTOLIC_THRESHOLD.toInt()
+        return systolic >= AssessmentDefinedParams.HIGH_BP_SYSTOLIC_THRESHOLD.toInt() ||
+            diastolic >= AssessmentDefinedParams.HIGH_BP_DIASTOLIC_THRESHOLD.toInt()
     }
 
     /**

@@ -1,13 +1,15 @@
 package org.medtroniclabs.uhis.db.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import org.medtroniclabs.uhis.appextensions.convertToUtcDateTime
 import org.medtroniclabs.uhis.data.offlinesync.model.ProvanceDto
 import org.medtroniclabs.uhis.data.offlinesync.utils.OfflineSyncStatus
+import org.medtroniclabs.uhis.db.entity.EntitiesName.FOLLOW_UP
 
-@Entity(tableName = "FollowUp")
+@Entity(tableName = FOLLOW_UP)
 data class FollowUp(
     @PrimaryKey(autoGenerate = true)
     val referenceId: Long = 0,
@@ -28,6 +30,8 @@ data class FollowUp(
     val encounterDate: String? = null,
     val nextVisitDate: String? = null,
     val referredSiteId: String? = null,
+    @ColumnInfo(FU_COLUMN_REFERRAL_FACILITY_TYPE)
+    val referralFacilityType: String? = null,
     val villageId: String,
     var isCompleted: Boolean = false,
     var isWrongNumber: Boolean = false,
@@ -36,8 +40,10 @@ data class FollowUp(
     var updatedAt: Long = System.currentTimeMillis(),
 ) {
     @Ignore
-    var followUpDetails: List<FollowUpCall> = listOf()
+    var followUpDetails: List<FollowUpCall>? = null
 
     @Ignore
     var provenance: ProvanceDto = ProvanceDto(modifiedDate = System.currentTimeMillis().convertToUtcDateTime())
 }
+
+const val FU_COLUMN_REFERRAL_FACILITY_TYPE = "referralFacilityType"

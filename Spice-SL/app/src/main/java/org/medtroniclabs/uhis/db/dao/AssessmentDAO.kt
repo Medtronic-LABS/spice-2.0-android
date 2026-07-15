@@ -31,7 +31,7 @@ interface AssessmentDAO {
 
     @Query(
         "SELECT a.id, a.householdMemberLocalId, a.villageId, a.assessmentType, a.assessmentDetails, a.patientId, a.referralStatus, a.referredReason, a.otherDetails, a.callResult, a.memberId, a.householdId, a.isReferred, a.created_at AS createdAt, a.followUpId, a.latitude, a.longitude, pd.neonatePatientId as neonatePatientId, pd.neonateHouseholdMemberLocalId as neonatePatientReferenceId, a.status as status " +
-            "FROM Assessment AS a LEFT JOIN PregnancyDetail AS pd ON a.householdMemberLocalId = pd.householdMemberLocalId " +
+            "FROM Assessment AS a LEFT JOIN PregnancyDetail AS pd ON pd.id = (SELECT pd2.id FROM PregnancyDetail AS pd2 WHERE pd2.householdMemberLocalId = a.householdMemberLocalId ORDER BY COALESCE(pd2.endAt, '') DESC, pd2.id DESC LIMIT 1) " +
             "WHERE a.sync_status IN (:status) AND a.householdMemberLocalId =:hhmId",
     )
     suspend fun getUnSyncedAssessmentByHHMId(
@@ -41,7 +41,7 @@ interface AssessmentDAO {
 
     @Query(
         "SELECT a.id, a.householdMemberLocalId, a.villageId, a.assessmentType, a.assessmentDetails, hhm.patient_id as patientId, a.referralStatus, a.referredReason, a.otherDetails, a.callResult, hhm.fhir_id as memberId, hh.fhir_id as householdId, a.isReferred, a.created_at AS createdAt, a.followUpId, a.latitude, a.longitude, pd.neonatePatientId as neonatePatientId, pd.neonateHouseholdMemberLocalId as neonatePatientReferenceId, a.status as status " +
-            "FROM Assessment AS a LEFT JOIN PregnancyDetail AS pd ON a.householdMemberLocalId = pd.householdMemberLocalId INNER JOIN HouseholdMember AS hhm ON a.householdMemberLocalId = hhm.id LEFT JOIN Household AS hh ON hhm.household_id = hh.id " +
+            "FROM Assessment AS a LEFT JOIN PregnancyDetail AS pd ON pd.id = (SELECT pd2.id FROM PregnancyDetail AS pd2 WHERE pd2.householdMemberLocalId = a.householdMemberLocalId ORDER BY COALESCE(pd2.endAt, '') DESC, pd2.id DESC LIMIT 1) INNER JOIN HouseholdMember AS hhm ON a.householdMemberLocalId = hhm.id LEFT JOIN Household AS hh ON hhm.household_id = hh.id " +
             "WHERE a.id NOT IN (:addedAssessmentIds) AND hhm.fhir_id IS NOT NULL AND (hh.id IS NULL OR hh.fhir_id IS NOT NULL) AND a.sync_status IN (:status)",
     )
     suspend fun getOtherUnSyncedAssessments(

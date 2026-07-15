@@ -226,7 +226,9 @@ class MotherNeonatePncSummaryFragment(var isShowNeonate: Boolean) : BaseFragment
                         )
                     }
                     convertListToString(
-                        ArrayList(list.filter { it.diseaseCategory.lowercase() != DefinedParams.OtherNotes.lowercase() }.map { it.diseaseCategory }.distinct()),
+                        ArrayList(
+                            list.filter { it.diseaseCategory.lowercase() != DefinedParams.OTHER_NOTES.lowercase() }.map { it.diseaseCategory }.distinct(),
+                        ),
                     )
                 } ?: requireContext().getString(R.string.empty__)
         }

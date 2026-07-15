@@ -167,7 +167,7 @@ class PhuWalkInsActivity : BaseActivity(), View.OnClickListener, PhuLinkCallback
     override fun onCallClicked(patientLinkedDetails: UnAssignedHouseholdMemberDetail) {
         viewModel.memberID = patientLinkedDetails.lMemberId.toLong()
         SecuredPreference.putLong(
-            DefinedParams.houseHoldLinkStartTiming,
+            DefinedParams.HOUSE_HOLD_LINK_START_TIMING,
             System.currentTimeMillis(),
         )
         val dialIntent = Intent(Intent.ACTION_DIAL)

@@ -45,7 +45,7 @@ class ClinicalSummaryViewModel @Inject constructor(
         if (resultMotherVitaminHashMap.containsKey(MedicalReviewDefinedParams.MOTHER_VITAMIN_TAG)) {
             val vitaminA =
                 resultMotherVitaminHashMap[MedicalReviewDefinedParams.MOTHER_VITAMIN_TAG] as String
-            clinicalSummaryAndSigns = if (vitaminA == DefinedParams.Yes) {
+            clinicalSummaryAndSigns = if (vitaminA == DefinedParams.YES) {
                 clinicalSummaryAndSigns.copy(vitAForMother = true)
             } else {
                 clinicalSummaryAndSigns.copy(vitAForMother = false)
@@ -57,9 +57,9 @@ class ClinicalSummaryViewModel @Inject constructor(
         if (resultBreastFeedingHashMap.containsKey(MedicalReviewDefinedParams.BREAST_FEEDING_TAG)) {
             val breastFeeding =
                 resultBreastFeedingHashMap[MedicalReviewDefinedParams.BREAST_FEEDING_TAG] as String
-            clinicalSummaryAndSigns = if (breastFeeding == DefinedParams.Yes) {
+            clinicalSummaryAndSigns = if (breastFeeding == DefinedParams.YES) {
                 clinicalSummaryAndSigns.copy(breastFeeding = true)
-            } else if (breastFeeding == DefinedParams.No) {
+            } else if (breastFeeding == DefinedParams.NO) {
                 clinicalSummaryAndSigns.copy(breastFeeding = false)
             } else {
                 clinicalSummaryAndSigns.copy(breastFeeding = null)
@@ -71,9 +71,9 @@ class ClinicalSummaryViewModel @Inject constructor(
         if (resultExclusiveBreastFeedHashMap.containsKey(MedicalReviewDefinedParams.EXCLUSIVE_BREAST_FEED_TAG)) {
             val exclusiveBreastFeeding =
                 resultExclusiveBreastFeedHashMap[MedicalReviewDefinedParams.EXCLUSIVE_BREAST_FEED_TAG] as String
-            clinicalSummaryAndSigns = if (exclusiveBreastFeeding == DefinedParams.Yes) {
+            clinicalSummaryAndSigns = if (exclusiveBreastFeeding == DefinedParams.YES) {
                 clinicalSummaryAndSigns.copy(exclusiveBreastFeeding = true)
-            } else if (exclusiveBreastFeeding == DefinedParams.No) {
+            } else if (exclusiveBreastFeeding == DefinedParams.NO) {
                 clinicalSummaryAndSigns.copy(exclusiveBreastFeeding = false)
             } else {
                 clinicalSummaryAndSigns.copy(exclusiveBreastFeeding = null)

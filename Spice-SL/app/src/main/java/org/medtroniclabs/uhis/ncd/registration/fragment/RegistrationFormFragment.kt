@@ -16,10 +16,10 @@ import org.medtroniclabs.uhis.common.StringConverter
 import org.medtroniclabs.uhis.data.model.RecommendedDosageListModel
 import org.medtroniclabs.uhis.databinding.FragmentRegistrationFormBinding
 import org.medtroniclabs.uhis.formgeneration.FormGenerator
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.Days
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.Month
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.Week
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.Year
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.DAYS_KEY
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.MONTH_KEY
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.WEEK_KEY
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.YEAR_KEY
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.formgeneration.listener.FormEventListener
 import org.medtroniclabs.uhis.formgeneration.model.FormLayout
@@ -289,7 +289,7 @@ class RegistrationFormFragment : BaseFragment(), View.OnClickListener, FormEvent
                 val intent = Intent(requireContext(), AssessmentToolsActivity::class.java)
                 intent.putExtra(DefinedParams.FhirId, fhirId)
                 intent.putExtra(DefinedParams.ORIGIN, MenuConstants.ASSESSMENT)
-                intent.putExtra(DefinedParams.Gender, "male")
+                intent.putExtra(DefinedParams.GENDER, "male")
                 startActivity(intent)
                 activity?.finish()
             }
@@ -390,7 +390,7 @@ class RegistrationFormFragment : BaseFragment(), View.OnClickListener, FormEvent
     }
 
     private fun isGenderOrPregnantField(formLayout: FormLayout): Boolean =
-        formLayout.id.equals(DefinedParams.Gender, true) ||
+        formLayout.id.equals(DefinedParams.GENDER, true) ||
             formLayout.id.equals(Screening.isPregnant, true)
 
     private fun isPregnantFemale(): Boolean {
@@ -408,7 +408,7 @@ class RegistrationFormFragment : BaseFragment(), View.OnClickListener, FormEvent
         resultMap?.remove(Screening.identityType)
         withNetworkAvailability(online = {
             resultMap?.let { map ->
-                val unwantedKeys = setOf(Week, Year, Month, Days)
+                val unwantedKeys = setOf(WEEK_KEY, YEAR_KEY, MONTH_KEY, DAYS_KEY)
                 map.keys.removeAll(unwantedKeys)
                 val result = serverData?.let {
                     FormResultComposer().groupValues(
@@ -472,6 +472,9 @@ class RegistrationFormFragment : BaseFragment(), View.OnClickListener, FormEvent
         /*
        Never used
          */
+    }
+
+    override fun onQRScanRequested() {
     }
 
     companion object {

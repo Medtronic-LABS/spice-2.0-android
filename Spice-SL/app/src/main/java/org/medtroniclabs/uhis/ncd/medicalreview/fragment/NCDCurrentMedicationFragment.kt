@@ -161,7 +161,7 @@ class NCDCurrentMedicationFragment : BaseFragment() {
     private fun showNotes() {
         if (viewModel.chips.firstOrNull {
                 it.name.equals(
-                    DefinedParams.Other,
+                    DefinedParams.OTHER,
                     ignoreCase = true,
                 )
             } != null
@@ -178,7 +178,7 @@ class NCDCurrentMedicationFragment : BaseFragment() {
     fun validateInput(isMandatory: Boolean = true): Pair<Boolean, AppCompatEditText?> {
         val hasChips = viewModel.chips.isNotEmpty()
         val hasOtherChip =
-            viewModel.chips.any { it.name.equals(DefinedParams.Other, ignoreCase = true) }
+            viewModel.chips.any { it.name.equals(DefinedParams.OTHER, ignoreCase = true) }
         val commentsNotBlank = binding.etOtherCurrentMedication.text?.isNotBlank() == true
 
         val adheringValid = validateAdheringCurrentMed()

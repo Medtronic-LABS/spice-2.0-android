@@ -154,7 +154,7 @@ class AssessmentOtherSymptomSummaryFragment : BaseFragment(), View.OnClickListen
                 ) {
                     val selectedItem = adapter.getData(position = pos)
                     selectedItem?.let {
-                        val selectedId = it[DefinedParams.id] as String?
+                        val selectedId = it[DefinedParams.ID] as String?
                         viewModel.otherAssessmentDetails[ReferredPHUSiteID] = selectedId?.toLong() ?: -1L
                     }
                 }
@@ -202,7 +202,7 @@ class AssessmentOtherSymptomSummaryFragment : BaseFragment(), View.OnClickListen
                                 )
                             feverObject?.optString(RdtTest)
                         }
-                        if (item.value == DefinedParams.Yes && rdtResult == RdtPositive) {
+                        if (item.value == DefinedParams.YES && rdtResult == RdtPositive) {
                             bindSummaryView(
                                 item.title,
                                 requireContext().getString(

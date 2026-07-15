@@ -87,5 +87,40 @@ enum class AssessmentStatus {
 
     UNCONTROLLED_BG,
 
+    /** NCD visit with normal BP/BG and patient not referred. */
+    NORMAL_NCD,
+
+    GLASSES_SOLD,
+
+    /** NCD vitals captured during a cataract camp visit (form: ncdServiceProvided = Yes). */
+    NCD_SERVICE_IN_CATARACT_CAMP,
+
+    /** Cataract form: patientReferredForOperation = Yes. */
+    REFERRED_FOR_OPERATION,
+
+    /** Eye problem: cataracts. */
+    CATARACTS,
+
+    /** Eye problem: lacrimal (tear duct) problem. */
+    LECRIMAL_TEAR_DUCT_PROBLEM,
+
+    /** Eye problem: pterygium. */
+    PTERYGIUM,
+
+    /** Eye problem: glaucoma. */
+    GLAUCOMA,
+
+    /** Eye problem: myopia. */
+    MYOPIA,
+
+    /** Eye problem: presbyopia. */
+    PRESBYOPIA,
+
+    /** Eye problem: other problem. */
+    OTHER_EYE_PROBLEM,
+
+    /** Eye problem: no problem. */
+    NO_EYE_PROBLEM,
+
     DEFAULT,
 }

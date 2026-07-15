@@ -2,6 +2,7 @@ package org.medtroniclabs.uhis.common
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.gson.Gson
@@ -76,6 +77,13 @@ object SecuredPreference {
         PEER_SUPERVISOR_NOTIFICATION_TOKEN,
         IS_FAMILY_PLANNING_LOADED,
         IS_HIV_DATA_LOADED,
+
+        /**
+         * Flag to store whether duplicate assessment history are deleted
+         */
+        DELETED_DUPLICATE_ASSESSMENT_HISTORY,
+
+        DEFAULT_CHIEFDOM_ID_FOR_NURSE,
     }
 
     private const val DEFAULT_SUFFIX = "_preferences"
@@ -182,6 +190,8 @@ object SecuredPreference {
      * @see android.content.SharedPreferences.getBoolean
      */
     fun getBoolean(key: String): Boolean = preferences.getBoolean(key, false)
+
+    fun getBoolean(key: EnvironmentKey): Boolean = getBoolean(key.name)
 
     /**
      * Retrieves a stored long value.
@@ -372,6 +382,13 @@ object SecuredPreference {
         editor.apply()
     }
 
+    fun putBoolean(
+        key: EnvironmentKey,
+        value: Boolean,
+    ) {
+        putBoolean(key.name, value)
+    }
+
     /**
      * Stores a String value.
      *
@@ -396,9 +413,19 @@ object SecuredPreference {
      */
     fun remove(key: String) {
         val prefs = preferences
-        val editor = prefs.edit()
-        editor.remove(key)
-        editor.apply()
+        prefs.edit {
+            remove(key)
+        }
+    }
+
+    /**
+     * Removes a preference value.
+     *
+     * @param key The name of the preference to remove.
+     * @see android.content.SharedPreferences.Editor.remove
+     */
+    fun remove(key: EnvironmentKey) {
+        remove(key.name)
     }
 
     /**
@@ -619,7 +646,7 @@ object SecuredPreference {
 
     fun getIsTranslationEnabled() = getCulturePreference()?.isTranslationEnabled ?: false
 
-    fun getCultureName() = getCulturePreference()?.name ?: DefinedParams.EN_Locale
+    fun getCultureName() = getCulturePreference()?.name ?: DefinedParams.EN_LOCALE
 
     private fun saveCulturePreference(model: CulturePreference) {
         val culture = Gson().toJson(model)
@@ -659,4 +686,6 @@ object SecuredPreference {
     fun removePeerSupervisorToken() {
         remove(EnvironmentKey.PEER_SUPERVISOR_NOTIFICATION_TOKEN.name)
     }
+
+    fun canDoRegistration(): Boolean = true
 }

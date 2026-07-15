@@ -15,7 +15,7 @@ import org.medtroniclabs.uhis.appextensions.isVisible
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils.getOptionMap
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.Other
+import org.medtroniclabs.uhis.common.DefinedParams.OTHER
 import org.medtroniclabs.uhis.data.MedicalReviewMetaItems
 import org.medtroniclabs.uhis.databinding.FragmentHivTestBinding
 import org.medtroniclabs.uhis.formgeneration.extension.markMandatorys
@@ -156,9 +156,9 @@ class HivTestFragment : BaseFragment(), View.OnClickListener {
         val entryPoint = ArrayList<Map<String, Any>>()
         entryPoint.add(
             hashMapOf<String, Any>(
-                DefinedParams.NAME to DefinedParams.DefaultIDLabel,
-                DefinedParams.id to DefinedParams.DefaultID,
-                DefinedParams.Value to DefinedParams.DefaultIDLabel,
+                DefinedParams.NAME to DefinedParams.DEFAULT_ID_LABEL,
+                DefinedParams.ID to DefinedParams.DEFAULT_ID,
+                DefinedParams.Value to DefinedParams.DEFAULT_ID_LABEL,
             ),
         )
 
@@ -166,7 +166,7 @@ class HivTestFragment : BaseFragment(), View.OnClickListener {
             entryPoint.add(
                 hashMapOf<String, Any>(
                     DefinedParams.NAME to it.name,
-                    DefinedParams.id to it.id.toString(),
+                    DefinedParams.ID to it.id.toString(),
                     DefinedParams.Value to (it.value ?: it.name),
                 ),
             )
@@ -187,9 +187,9 @@ class HivTestFragment : BaseFragment(), View.OnClickListener {
                     val selectedItem = adapter.getData(position = pos)
                     selectedItem?.let {
                         val selectedName = it[DefinedParams.NAME] as String?
-                        if (selectedName != DefinedParams.DefaultIDLabel) {
+                        if (selectedName != DefinedParams.DEFAULT_ID_LABEL) {
                             hivViewModel.selectedEntryPoint = it[DefinedParams.Value] as String
-                            if (hivViewModel.selectedEntryPoint.equals(Other, true)) {
+                            if (hivViewModel.selectedEntryPoint.equals(OTHER, true)) {
                                 binding.etOtherEntryPoint.visible()
                             } else if (binding.etOtherEntryPoint.isVisible()) {
                                 binding.etOtherEntryPoint.gone()

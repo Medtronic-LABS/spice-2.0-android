@@ -1,12 +1,21 @@
 package org.medtroniclabs.uhis.ui.assessment.utils
 
 import android.content.Context
+import android.graphics.Color
 import android.view.View
+import android.widget.TextView
+import androidx.core.text.buildSpannedString
+import androidx.core.text.color
+import androidx.core.text.italic
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DateUtils.DATE_FORMAT_yyyyMMddHHmmssZZZZZ
 import org.medtroniclabs.uhis.common.DateUtils.DATE_ddMMyyyy
+import org.medtroniclabs.uhis.common.SecuredPreference
+import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
+import org.medtroniclabs.uhis.formgeneration.FormGenerator
 import org.medtroniclabs.uhis.formgeneration.model.BPModel
+import org.medtroniclabs.uhis.mappingkey.Screening
 import org.medtroniclabs.uhis.ui.MenuConstants
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_BLOOD_PRESSURE
@@ -30,8 +39,18 @@ import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
 import org.medtroniclabs.uhis.ui.assessment.statuslogic.AssessmentStatus
 import java.util.Locale
 import kotlin.math.roundToInt
+import kotlin.text.lastIndexOf
+import kotlin.text.substring
 
 object AssessmentUtil {
+    fun isMedicalReviewVisitService(serviceProvided: String?): Boolean =
+        serviceProvided.equals(MenuConstants.MEDICAL_REVIEW_VISIT_SERVICE, ignoreCase = true) ||
+            serviceProvided.equals(MenuConstants.MEDICAL_REVIEW_SERVICE, ignoreCase = true)
+
+    fun isEnrollmentService(serviceProvided: String?): Boolean =
+        serviceProvided.equals(MenuConstants.MENU_REGISTRATION, ignoreCase = true) ||
+            serviceProvided.equals(MenuConstants.ENROLLMENT, ignoreCase = true)
+
     fun calculateAverageBloodPressure(resultMap: HashMap<String, Any>): Pair<Int, Int> {
         val bpLogs = resultMap[BP_LOG] as HashMap<String, Any>
 
@@ -106,7 +125,7 @@ object AssessmentUtil {
     fun getSymptomsList(resultMap: HashMap<String, Any>): List<String> {
         val list = mutableListOf<String>()
 
-        val symptomsLogs = resultMap[SYMPTOMS_LOG] as HashMap<String, Any>
+        val symptomsLogs = resultMap[SYMPTOMS_LOG] as? HashMap<String, Any> ?: return list
         if (symptomsLogs.containsKey(NCD_SYMPTOMS)) {
             val ncdSymptoms = symptomsLogs[NCD_SYMPTOMS] as List<*>
 
@@ -135,6 +154,12 @@ object AssessmentUtil {
             MenuConstants.FP_MENU_ID.lowercase() -> context.getString(R.string.family_planning)
             MenuConstants.EYE_CARE_MENU_ID.lowercase() -> context.getString(R.string.eye_care)
             MenuConstants.CATARACT_MENU_ID.lowercase() -> context.getString(R.string.cataract)
+            MenuConstants.NCD_MENU_ID.lowercase(), "bd_ncd" -> context.getString(R.string.ncd)
+            MenuConstants.MENU_REGISTRATION.lowercase(),
+            MenuConstants.ENROLLMENT.lowercase(),
+            -> context.getString(R.string.ncd_enrollment)
+            MenuConstants.NCD_MEDICAL_REVIEW_SERVICE.lowercase(),
+            -> context.getString(R.string.ncd_follow_up)
             MenuConstants.PREGNANCY_OUTCOME.lowercase() -> context.getString(R.string.pregnancy_outcome)
             RMNCH.ANC.lowercase() -> context.getString(R.string.anc)
             RMNCH.PNC_MOTHER_MENU.lowercase() -> context.getString(R.string.pnc)
@@ -163,11 +188,51 @@ object AssessmentUtil {
             }
 
             MenuConstants.NCD_MENU_ID, MenuConstants.CATARACT_MENU_ID -> {
-                referralStatus ?: context.getString(R.string.na)
+                when {
+                    isReferredReferralStatus(referralStatus) -> ReferralStatus.Referred.name
+                    !referralStatus.isNullOrBlank() -> referralStatus
+                    else -> context.getString(R.string.na)
+                }
             }
 
             else -> context.getString(R.string.na)
         } ?: run { context.getString(R.string.separator_double_hyphen) }
+
+    /**
+     * Returns referred location (facility type) for NCD service history when available.
+     */
+    fun getReferredLocation(
+        service: String,
+        referralFacilityType: String?,
+        referralStatus: String?,
+    ): String? =
+        when (service.lowercase()) {
+            MenuConstants.NCD_MENU_ID.lowercase() -> {
+                referralFacilityType?.takeIf { it.isNotBlank() }
+                    ?: legacyReferredLocationFromStatus(referralStatus)
+            }
+
+            else -> null
+        }
+
+    fun shouldShowReferredLocation(
+        service: String,
+        referredLocation: String?,
+    ): Boolean =
+        !referredLocation.isNullOrBlank() &&
+            service.equals(MenuConstants.NCD_MENU_ID, true)
+
+    private fun isReferredReferralStatus(referralStatus: String?): Boolean {
+        if (referralStatus.isNullOrBlank()) return false
+        return ReferralStatus.Referred.name.equals(referralStatus, true) ||
+            referralStatus.startsWith("Referred To", ignoreCase = true)
+    }
+
+    private fun legacyReferredLocationFromStatus(referralStatus: String?): String? {
+        val prefix = "Referred To "
+        if (!referralStatus.orEmpty().startsWith(prefix, ignoreCase = true)) return null
+        return referralStatus?.substring(prefix.length)?.takeIf { it.isNotBlank() }
+    }
 
     /**
      * Returns display follow-up date based on service
@@ -180,8 +245,7 @@ object AssessmentUtil {
         when (service.lowercase()) {
             RMNCH.ANC.lowercase(),
             RMNCH.PNC_MOTHER_MENU.lowercase(),
-            MenuConstants.NCD_MENU_ID.lowercase(),
-            MenuConstants.CATARACT_MENU_ID.lowercase(),
+            MenuConstants.NCD_MEDICAL_REVIEW_SERVICE.lowercase(),
             -> {
                 followUpDate?.let {
                     DateUtils.convertDateFormat(
@@ -196,12 +260,105 @@ object AssessmentUtil {
         } ?: run { context.getString(R.string.separator_double_hyphen) }
 
     /**
+     * Formats saved custom status values for Service History, combining High BP/BG when both apply
+     * and omitting legacy controlled vitals statuses.
+     */
+    fun formatServiceHistoryCurrentStatus(
+        customStatus: List<String>?,
+        context: Context,
+        serviceProvided: String? = null,
+        referralStatus: String? = null,
+    ): String? {
+        val effectiveStatus = applyNcdNormalStatusFallback(customStatus, serviceProvided, referralStatus)
+        if (effectiveStatus.isEmpty()) return null
+
+        val vitalsStatuses = setOf(
+            AssessmentStatus.UNCONTROLLED_BP.name,
+            AssessmentStatus.UNCONTROLLED_BG.name,
+            AssessmentStatus.CONTROLLED_BP.name,
+            AssessmentStatus.CONTROLLED_BG.name,
+        )
+        val hasHighBp = effectiveStatus.contains(AssessmentStatus.UNCONTROLLED_BP.name)
+        val hasHighBg = effectiveStatus.contains(AssessmentStatus.UNCONTROLLED_BG.name)
+        val eyeStatuses = effectiveStatus.filter { isEyeProblemStatus(it) }
+        val ncdStatuses = effectiveStatus.filter { it == AssessmentStatus.NORMAL_NCD.name }
+        val otherStatuses = effectiveStatus.filter { status ->
+            status !in vitalsStatuses &&
+                !isEyeProblemStatus(status) &&
+                status != AssessmentStatus.NORMAL_NCD.name
+        }
+
+        val displayParts = mutableListOf<String>()
+        when {
+            hasHighBp && hasHighBg ->
+                displayParts.add(context.getString(R.string.high_both))
+
+            hasHighBp ->
+                displayParts.add(context.getString(R.string.high_bp))
+
+            hasHighBg ->
+                displayParts.add(context.getString(R.string.high_bg))
+        }
+        ncdStatuses.forEach { status ->
+            mapAssessmentStatus(status, context).takeIf { it.isNotBlank() }?.let { displayParts.add(it) }
+        }
+        eyeStatuses.forEach { status ->
+            val display = if (isNcdService(serviceProvided)) {
+                formatEyeProblemStatus(status, context)
+            } else {
+                mapAssessmentStatus(status, context)
+            }
+            display.takeIf { it.isNotBlank() }?.let { displayParts.add(it) }
+        }
+        otherStatuses.forEach { status ->
+            mapAssessmentStatus(status, context).takeIf { it.isNotBlank() }?.let { displayParts.add(it) }
+        }
+        return displayParts.takeIf { it.isNotEmpty() }?.joinToString()
+    }
+
+    private fun isEyeProblemStatus(status: String): Boolean = status in EYE_PROBLEM_STATUSES
+
+    private fun isNcdService(serviceProvided: String?): Boolean = serviceProvided.equals(MenuConstants.NCD_MENU_ID, ignoreCase = true)
+
+    private fun formatEyeProblemStatus(
+        status: String,
+        context: Context,
+    ): String {
+        val label = mapAssessmentStatus(status, context)
+        if (label.isBlank()) return ""
+        return context.getString(R.string.assessment_status_eye_problem, label)
+    }
+
+    private fun applyNcdNormalStatusFallback(
+        customStatus: List<String>?,
+        serviceProvided: String?,
+        referralStatus: String?,
+    ): List<String> {
+        val statuses = customStatus?.toMutableList() ?: mutableListOf()
+        if (serviceProvided?.lowercase() != MenuConstants.NCD_MENU_ID.lowercase()) return statuses
+        if (isReferredReferralStatus(referralStatus)) return statuses
+        if (statuses.contains(AssessmentStatus.UNCONTROLLED_BP.name) ||
+            statuses.contains(AssessmentStatus.UNCONTROLLED_BG.name)
+        ) {
+            return statuses
+        }
+        if (!statuses.contains(AssessmentStatus.NORMAL_NCD.name)) {
+            statuses.add(0, AssessmentStatus.NORMAL_NCD.name)
+        }
+        return statuses
+    }
+
+    /**
      * Maps corresponding status to display value
      */
     fun mapAssessmentStatus(
         status: String,
         context: Context,
     ): String {
+        if (status.startsWith(AssessmentDefinedParams.GLASS_POWER_STATUS_PREFIX)) {
+            val power = status.removePrefix(AssessmentDefinedParams.GLASS_POWER_STATUS_PREFIX)
+            return context.getString(R.string.assessment_status_glass_power, power)
+        }
         val assessmentStatus = try {
             AssessmentStatus.valueOf(status)
         } catch (_: Exception) {
@@ -268,20 +425,68 @@ object AssessmentUtil {
                 context.getString(R.string.gaps_in_pnc)
             }
 
-            AssessmentStatus.CONTROLLED_BP -> {
-                context.getString(R.string.controlled_bp)
-            }
-            AssessmentStatus.CONTROLLED_BG -> {
-                context.getString(R.string.controlled_bg)
-            }
+            AssessmentStatus.CONTROLLED_BP,
+            AssessmentStatus.CONTROLLED_BG,
+            -> ""
+
             AssessmentStatus.UNCONTROLLED_BP -> {
-                context.getString(R.string.uncontrolled_bp)
-            }
-            AssessmentStatus.UNCONTROLLED_BG -> {
-                context.getString(R.string.uncontrolled_bg)
+                context.getString(R.string.high_bp)
             }
 
-            AssessmentStatus.DEFAULT -> {
+            AssessmentStatus.UNCONTROLLED_BG -> {
+                context.getString(R.string.high_bg)
+            }
+
+            AssessmentStatus.NORMAL_NCD -> {
+                context.getString(R.string.normal)
+            }
+
+            AssessmentStatus.GLASSES_SOLD -> {
+                context.getString(R.string.assessment_status_glasses_sold)
+            }
+
+            AssessmentStatus.NCD_SERVICE_IN_CATARACT_CAMP -> {
+                context.getString(R.string.assessment_status_ncd_service_cataract_camp)
+            }
+
+            AssessmentStatus.REFERRED_FOR_OPERATION -> {
+                context.getString(R.string.assessment_status_referred_for_operation)
+            }
+
+            AssessmentStatus.CATARACTS -> {
+                context.getString(R.string.assessment_status_cataracts)
+            }
+
+            AssessmentStatus.LECRIMAL_TEAR_DUCT_PROBLEM -> {
+                context.getString(R.string.assessment_status_lacrimal_tear_duct_problem)
+            }
+
+            AssessmentStatus.PTERYGIUM -> {
+                context.getString(R.string.assessment_status_pterygium)
+            }
+
+            AssessmentStatus.GLAUCOMA -> {
+                context.getString(R.string.assessment_status_glaucoma)
+            }
+
+            AssessmentStatus.MYOPIA -> {
+                context.getString(R.string.assessment_status_myopia)
+            }
+
+            AssessmentStatus.PRESBYOPIA -> {
+                context.getString(R.string.assessment_status_presbyopia)
+            }
+
+            AssessmentStatus.OTHER_EYE_PROBLEM -> {
+                context.getString(R.string.assessment_status_other_eye_problem)
+            }
+
+            AssessmentStatus.NO_EYE_PROBLEM -> {
+                context.getString(R.string.assessment_status_no_eye_problem)
+            }
+
+            AssessmentStatus.DEFAULT,
+            -> {
                 status.uppercase(Locale.ENGLISH)
             }
         }
@@ -305,18 +510,231 @@ object AssessmentUtil {
     }
 
     /**
+     * Returns ANC menu revisit cooldown based on persisted summary status from the last ANC visit.
+     * Reuses HIGH_RISK_PW customStatus set by AssessmentStatusGenerator (same rule as summary UI).
+     */
+    fun getAncMenuRevisitDays(customStatus: ArrayList<String>?): Long =
+        if (customStatus?.contains(AssessmentStatus.HIGH_RISK_PW.name) == true) {
+            AssessmentDefinedParams.ANC_MENU_REVISIT_DAYS_HIGH_RISK
+        } else {
+            AssessmentDefinedParams.ANC_MENU_REVISIT_DAYS_NORMAL
+        }
+
+    /**
      * Returns services icon for the given service
      */
-    fun mapServiceToServiceIcon(service: String): Int =
-        when (service.lowercase()) {
-            MenuConstants.PREGNANT_WOMEN_PROFILE.lowercase() -> R.drawable.ic_services_anc
-            RMNCH.ANC.lowercase() -> R.drawable.ic_services_anc
+    fun mapServiceToServiceIcon(service: MemberAssessmentHistoryEntity): Int =
+        when (service.serviceProvided?.lowercase()) {
+            MenuConstants.PREGNANT_WOMEN_PROFILE.lowercase() -> {
+                if (service.customStatus?.contains(AssessmentStatus.HIGH_RISK_PW.name) == true) {
+                    R.drawable.ic_services_anc_high_risk
+                } else {
+                    R.drawable.ic_services_anc
+                }
+            }
+
+            RMNCH.ANC.lowercase() -> {
+                if (service.customStatus?.contains(AssessmentStatus.HIGH_RISK_PW.name) == true) {
+                    R.drawable.ic_services_anc_high_risk
+                } else {
+                    R.drawable.ic_services_anc
+                }
+            }
+
             MenuConstants.FP_MENU_ID.lowercase() -> R.drawable.ic_services_family_planning
             RMNCH.CHILD_MENU.lowercase() -> R.drawable.ic_services_child_health
             MenuConstants.PREGNANCY_OUTCOME.lowercase() -> R.drawable.ic_services_pnc
-            RMNCH.PNC_MOTHER_MENU.lowercase() -> R.drawable.ic_services_pnc
+            RMNCH.PNC_MOTHER_MENU.lowercase() -> {
+                if (service.customStatus?.contains(AssessmentStatus.HIGH_RISK_PNC.name) == true) {
+                    R.drawable.ic_services_pnc_high_risk
+                } else {
+                    R.drawable.ic_services_pnc
+                }
+            }
+
+            MenuConstants.NCD_MENU_ID.lowercase() -> R.drawable.ic_services_ncd
+            MenuConstants.EYE_CARE_MENU_ID.lowercase() -> R.drawable.ic_services_eye_care
+            MenuConstants.CATARACT_MENU_ID.lowercase() -> R.drawable.ic_cataract
             else -> {
                 View.NO_ID
             }
         }
+
+    fun getLocalServiceProvidedByName(): String? {
+        val user = SecuredPreference.getUserDetails() ?: return null
+        val name = listOfNotNull(user.firstName?.trim(), user.lastName?.trim()).joinToString(" ")
+        return name.takeIf { it.isNotBlank() } ?: user.username?.trim()?.takeIf { it.isNotBlank() }
+    }
+
+    fun getLocalServiceProvidedByRole(): String? = SecuredPreference.getRole().takeIf { it.isNotBlank() }
+
+    fun formatServiceProviderDisplay(
+        context: Context,
+        name: String?,
+        role: String?,
+    ): String {
+        val providerName = name?.takeIf { it.isNotBlank() }
+        val providerRole = role?.takeIf { it.isNotBlank() }
+        return when {
+            providerName != null && providerRole != null -> "$providerName ($providerRole)"
+            providerName != null -> providerName
+            providerRole != null -> providerRole
+            else -> context.getString(R.string.separator_double_hyphen)
+        }
+    }
+
+    fun getHeightWeightFromHistory(history: MemberAssessmentHistoryEntity): Pair<String?, String?> {
+        val observations = history.observations
+        val height = observations?.height?.trim()?.takeIf { it.isNotEmpty() }
+        val weight = observations?.weight?.trim()?.takeIf { it.isNotEmpty() }
+        return height to weight
+    }
+
+    fun getLatestHeightWeightFromHistories(histories: List<MemberAssessmentHistoryEntity>): Pair<String?, String?>? =
+        histories
+            .mapNotNull { history ->
+                val (height, weight) = getHeightWeightFromHistory(history)
+                if (height == null && weight == null) return@mapNotNull null
+                val visitMillis = DateUtils.getLastMenstrualDate(history.visitDate ?: "").timeInMillis
+                Triple(visitMillis, height, weight)
+            }.maxByOrNull { it.first }
+            ?.let { it.second to it.third }
+
+    fun prefillHeightAndWeight(
+        formGenerator: FormGenerator,
+        height: String?,
+        weight: String?,
+        isHeightReadOnly: Boolean = false,
+    ) {
+        height?.let { value ->
+            formGenerator.getViewByTag(Screening.Height)?.let { view ->
+                formGenerator.setValueForView(value, view)
+                if (isHeightReadOnly) {
+                    view.isEnabled = false
+                }
+            }
+        }
+        weight?.let { value ->
+            formGenerator.getViewByTag(Screening.Weight)?.let { view ->
+                formGenerator.setValueForView(value, view)
+            }
+        }
+    }
+
+    fun formatServiceHistoryBloodPressure(
+        context: Context,
+        bp: String?,
+    ): String {
+        val value = bp?.trim()?.takeIf { it.isNotEmpty() }
+        return value?.let {
+            if (it.contains("mmHg", ignoreCase = true)) {
+                it
+            } else {
+                "$it ${context.getString(R.string.mmHg)}"
+            }
+        } ?: context.getString(R.string.separator_double_hyphen)
+    }
+
+    fun formatServiceHistoryBloodGlucose(
+        context: Context,
+        bg: String?,
+        bgType: String? = null,
+    ): String {
+        val value = bg?.trim()?.takeIf { it.isNotEmpty() }
+        return value?.let {
+            val formatted = if (it.contains("mmol", ignoreCase = true)) {
+                it
+            } else {
+                "$it $MMOLL"
+            }
+            val type = bgType?.trim()?.takeIf { typeValue -> typeValue.isNotEmpty() }
+            if (type != null) "$formatted ($type)" else formatted
+        } ?: context.getString(R.string.separator_double_hyphen)
+    }
+
+    /**
+     * Updates field title with status text in red color
+     * If statusText is null, restores original title
+     */
+    fun updateFieldTitleWithStatus(
+        formGenerator: FormGenerator,
+        originalTitles: HashMap<String, String>,
+        isTranslationEnabled: Boolean,
+        fieldId: String,
+        statusText: String? = null,
+        statusTextCulture: String? = null,
+        textLabelFieldIds: List<String> = emptyList(),
+        previousValue: String? = null,
+    ) {
+        val tag = if (fieldId in textLabelFieldIds) {
+            // For TextLabel, the title TextView is tagged with just the fieldId
+            fieldId
+        } else {
+            // For other fields, use fieldId + titleSuffix
+            fieldId + AssessmentDefinedParams.TITLE_SUFFIX
+        }
+
+        val titleView = formGenerator.getViewByTag(tag) as? TextView
+        titleView?.let { tv ->
+            // Get original title (store it first time if not stored)
+            var originalTitle = originalTitles[fieldId] ?: run {
+                // Since status is always added last, this will only remove the status, preserving unit measurements
+                val currentText = tv.text.toString()
+                // Remove only the last status pattern at the end: " (Status Text)"
+                // Since status is always added last, this will remove only the status, keeping the rest of the title intact
+                val statusPattern = "\\s+\\([^)]+\\)\\s*$".toRegex()
+                val original = currentText.replace(statusPattern, "")
+                originalTitles[fieldId] = original
+                original
+            }
+            val displayStatus = if (isTranslationEnabled && !statusTextCulture.isNullOrBlank()) {
+                statusTextCulture
+            } else {
+                statusText
+            }
+
+            // Find if the title contains *(mandatory) mark
+            val starIndex = originalTitle.lastIndexOf(" *")
+            // If mandatory mark is there remove it from title
+            // We will append it later with red color.
+            if (starIndex != -1) {
+                originalTitle = originalTitle.substring(0, starIndex)
+            }
+
+            tv.text = buildSpannedString {
+                append(originalTitle)
+                // Append mandatory mark
+                if (starIndex != -1) {
+                    color(Color.RED) {
+                        append(" *")
+                    }
+                }
+                // Append previous value
+                if (!previousValue.isNullOrBlank()) {
+                    color(Color.GRAY) {
+                        italic {
+                            append(" ($previousValue)")
+                        }
+                    }
+                }
+                // Append status
+                if (!displayStatus.isNullOrBlank()) {
+                    color(Color.RED) {
+                        append(" ($displayStatus)")
+                    }
+                }
+            }
+        }
+    }
+
+    private val EYE_PROBLEM_STATUSES = setOf(
+        AssessmentStatus.CATARACTS.name,
+        AssessmentStatus.LECRIMAL_TEAR_DUCT_PROBLEM.name,
+        AssessmentStatus.PTERYGIUM.name,
+        AssessmentStatus.GLAUCOMA.name,
+        AssessmentStatus.MYOPIA.name,
+        AssessmentStatus.PRESBYOPIA.name,
+        AssessmentStatus.OTHER_EYE_PROBLEM.name,
+        AssessmentStatus.NO_EYE_PROBLEM.name,
+    )
 }

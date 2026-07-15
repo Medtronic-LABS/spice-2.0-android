@@ -14,7 +14,7 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.Other
+import org.medtroniclabs.uhis.common.DefinedParams.OTHER
 import org.medtroniclabs.uhis.databinding.ActivityNcdhrioBaseBinding
 import org.medtroniclabs.uhis.formgeneration.extension.capitalizeFirstChar
 import org.medtroniclabs.uhis.formgeneration.extension.safePopupMenuClickListener
@@ -238,8 +238,8 @@ class NCDHrioBaseActivity : BaseActivity() {
 
         binding.healthType.tvKey.text = getString(R.string.health_insurance_type)
         binding.healthType.tvValue.text = patientListRespModel.insuranceType ?: getString(R.string.hyphen_symbol)
-        binding.healthType.tvValue.text = if (patientListRespModel.insuranceType.equals(Other, true)) {
-            "$Other${patientListRespModel.otherInsurance?.takeIf { it.isNotBlank() }?.let { " - $it" } ?: ""}"
+        binding.healthType.tvValue.text = if (patientListRespModel.insuranceType.equals(OTHER, true)) {
+            "$OTHER${patientListRespModel.otherInsurance?.takeIf { it.isNotBlank() }?.let { " - $it" } ?: ""}"
         } else {
             patientListRespModel.insuranceType ?: getString(R.string.hyphen_symbol)
         }

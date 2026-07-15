@@ -4,7 +4,10 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import org.medtroniclabs.uhis.common.SecuredPreference
+import org.medtroniclabs.uhis.db.entity.EntitiesName.MEMBER_ASSESSMENT_HISTORY_ENTITY
 import org.medtroniclabs.uhis.db.entity.MemberAssessmentHistoryEntity
 import org.medtroniclabs.uhis.db.response.DashboardCountsRow
 import org.medtroniclabs.uhis.db.response.MaternalDashboardCountsRow
@@ -20,7 +23,24 @@ interface MemberAssessmentHistoryDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateAssessmentHistory(assessmentHistory: MemberAssessmentHistoryEntity)
 
-    @Query("SELECT * FROM memberassessmenthistory WHERE (memberFhirId = :memberFhirId OR memberId = :memberId) AND visitDate = :visitDate AND serviceProvided = :serviceProvided LIMIT 1")
+    @Query(
+        """
+        SELECT * FROM memberassessmenthistory
+        WHERE encounterId = :encounterId
+        LIMIT 1
+        """,
+    )
+    suspend fun getAssessmentHistoryByEncounterId(encounterId: String): MemberAssessmentHistoryEntity?
+
+    @Query(
+        """
+        SELECT * FROM memberassessmenthistory
+        WHERE (memberFhirId = :memberFhirId OR memberId = :memberId)
+            AND visitDate = :visitDate
+            AND LOWER(serviceProvided) = LOWER(:serviceProvided)
+        LIMIT 1
+        """,
+    )
     suspend fun getAssessmentHistory(
         memberFhirId: String?,
         memberId: Long?,
@@ -68,24 +88,194 @@ interface MemberAssessmentHistoryDao {
             0 AS householdRegisteredCount,
             0 AS pwIdentifiedFirst4MonthsWithAncCount,
             0 AS anc3PlusCount,
-            0 AS highRiskPregnantWomenCount
+            SUM(
+                CASE
+                    WHEN LOWER(h.serviceProvided) IN ('anc')
+                        AND h.customStatus IS NOT NULL
+                        AND INSTR(h.customStatus, 'HIGH_RISK_PW') > 0
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS highRiskPregnantWomenCount,
+            SUM(
+                CASE
+                    WHEN LOWER(h.serviceProvided) = 'ncd' THEN 1
+                    WHEN LOWER(h.serviceProvided) = 'cataract'
+                        AND h.customStatus IS NOT NULL
+                        AND INSTR(h.customStatus, 'NCD_SERVICE_IN_CATARACT_CAMP') > 0
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS totalNcdServicesCount,
+            SUM(
+                CASE
+                    WHEN LOWER(h.serviceProvided) = 'ncd'
+                    AND NOT EXISTS (
+                        SELECT 1 FROM memberassessmenthistory p
+                        WHERE p.memberId = h.memberId
+                        AND LOWER(p.serviceProvided) = 'ncd'
+                        AND (
+                            p.visitDate < h.visitDate
+                            OR (
+                                p.visitDate = h.visitDate
+                                AND p.id < h.id
+                            )
+                        )
+                    )
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS ncdScreeningFirstServiceCount,
+            SUM(
+                CASE
+                    WHEN LOWER(h.serviceProvided) = 'ncd'
+                    AND EXISTS (
+                        SELECT 1 FROM memberassessmenthistory p
+                        WHERE p.memberId = h.memberId
+                        AND LOWER(p.serviceProvided) = 'ncd'
+                        AND (
+                            p.visitDate < h.visitDate
+                            OR (
+                                p.visitDate = h.visitDate
+                                AND p.id < h.id
+                            )
+                        )
+                    )
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS ncdFollowUpAssessmentCount,
+            SUM(
+                CASE
+                    WHEN h.referralStatus IS NOT NULL
+                    AND (
+                        h.referralStatus = 'Referred'
+                        OR h.referralStatus LIKE 'Referred To%'
+                    )
+                    AND (
+                        LOWER(h.serviceProvided) = 'ncd'
+                        OR (
+                            LOWER(h.serviceProvided) = 'cataract'
+                            AND h.customStatus IS NOT NULL
+                            AND INSTR(h.customStatus, 'NCD_SERVICE_IN_CATARACT_CAMP') > 0
+                        )
+                    )
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS ncdFollowUpReferralCount,
+            SUM(
+                CASE
+                    WHEN h.customStatus IS NOT NULL AND INSTR(h.customStatus, 'GLASSES_SOLD') > 0
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS glassesSoldCustomStatusCount,
+            SUM(
+                CASE
+                    WHEN LOWER(h.serviceProvided) = 'cataract'
+                    AND h.customStatus IS NOT NULL
+                    AND INSTR(h.customStatus, 'NCD_SERVICE_IN_CATARACT_CAMP') > 0
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS ncdServicesInCataractCampCount,
+            SUM(
+                CASE
+                    WHEN LOWER(h.serviceProvided) = 'cataract'
+                    AND h.customStatus IS NOT NULL
+                    AND INSTR(h.customStatus, 'REFERRED_FOR_OPERATION') > 0
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS patientsReferredForOperationCount,
+            (
+                SELECT COUNT(DISTINCT COALESCE(CAST(e.memberId AS TEXT), e.memberFhirId))
+                FROM memberassessmenthistory AS e
+                LEFT JOIN householdmember AS ehm ON ehm.id = e.memberId
+                LEFT JOIN household AS ehh ON ehh.id = ehm.household_id
+                WHERE LOWER(e.serviceProvided) = 'enrollment'
+                  AND (:startDate IS NULL OR date(datetime(e.visitDate, 'localtime')) >= :startDate)
+                  AND (:endDate IS NULL OR date(datetime(e.visitDate, 'localtime')) <= :endDate)
+                  AND (
+                      CASE
+                          WHEN :subVillageIdsSize > 0
+                          THEN COALESCE(ehm.sub_village_id, ehh.sub_village_id) IN (:subVillageIds)
+
+                          WHEN :ssIdsSize > 0
+                          THEN COALESCE(ehm.sub_village_id, ehh.sub_village_id) IN (
+                              SELECT DISTINCT sslv.subVillageId
+                              FROM ShasthyaShebikaLinkedVillageEntity AS sslv
+                              WHERE sslv.shasthyaShebikaId IN (:ssIds)
+                          )
+
+                          ELSE 1
+                      END
+                  )
+                  AND EXISTS (
+                      SELECT 1 FROM memberassessmenthistory AS n
+                      WHERE (
+                            (e.memberId IS NOT NULL AND n.memberId = e.memberId)
+                            OR (
+                                e.memberFhirId IS NOT NULL AND e.memberFhirId != ''
+                                AND n.memberFhirId = e.memberFhirId
+                            )
+                        )
+                        AND (
+                            LOWER(n.serviceProvided) = 'ncd'
+                            OR (
+                                LOWER(n.serviceProvided) = 'cataract'
+                                AND n.customStatus IS NOT NULL
+                                AND INSTR(n.customStatus, 'NCD_SERVICE_IN_CATARACT_CAMP') > 0
+                            )
+                        )
+                        AND n.visitDate <= e.visitDate
+                        AND n.practitionerId IS :userId
+                        AND NOT EXISTS (
+                            SELECT 1 FROM memberassessmenthistory AS n2
+                            WHERE (
+                                (e.memberId IS NOT NULL AND n2.memberId = e.memberId)
+                                OR (
+                                    e.memberFhirId IS NOT NULL AND e.memberFhirId != ''
+                                    AND n2.memberFhirId = e.memberFhirId
+                                )
+                              )
+                              AND (
+                                  LOWER(n2.serviceProvided) = 'ncd'
+                                  OR (
+                                      LOWER(n2.serviceProvided) = 'cataract'
+                                      AND n2.customStatus IS NOT NULL
+                                      AND INSTR(n2.customStatus, 'NCD_SERVICE_IN_CATARACT_CAMP') > 0
+                                  )
+                              )
+                              AND n2.visitDate <= e.visitDate
+                              AND (
+                                  n2.visitDate > n.visitDate
+                                  OR (
+                                      n2.visitDate = n.visitDate
+                                      AND n2.id > n.id
+                                  )
+                              )
+                        )
+                  )
+            ) AS linkedToCareCount
         FROM memberassessmenthistory AS h
         LEFT JOIN householdmember AS hm ON hm.id = h.memberId
         LEFT JOIN household AS hh ON hh.id = hm.household_id
         WHERE (:startDate IS NULL OR date(datetime(h.visitDate, 'localtime')) >= :startDate)
         AND (:endDate IS NULL OR date(datetime(h.visitDate, 'localtime')) <= :endDate)
         AND (
-            (:ssIdsSize = 0 AND :subVillageIdsSize = 0)
-            OR (:subVillageIdsSize > 0 AND COALESCE(hm.sub_village_id, hh.sub_village_id) IN (:subVillageIds))
-            OR (
-                :ssIdsSize > 0
-                AND COALESCE(hm.sub_village_id, hh.sub_village_id) IN (
-                    SELECT DISTINCT sslv.subVillageId
-                    FROM ShasthyaShebikaLinkedVillageEntity AS sslv
-                    WHERE sslv.shasthyaShebikaId IN (:ssIds)
-                )
-            )
+            CASE
+                WHEN :subVillageIdsSize > 0
+                THEN COALESCE(hm.sub_village_id, hh.sub_village_id) IN (:subVillageIds)
+
+                WHEN :ssIdsSize > 0
+                THEN COALESCE(hm.sub_village_id, hh.sub_village_id) IN (SELECT DISTINCT sslv.subVillageId FROM ShasthyaShebikaLinkedVillageEntity AS sslv WHERE sslv.shasthyaShebikaId IN (:ssIds))
+
+                ELSE 1
+            END
         )
+        AND (practitionerId IS NULL OR practitionerId IS :userId)
         """,
     )
     suspend fun getDashboardCounts(
@@ -95,6 +285,7 @@ interface MemberAssessmentHistoryDao {
         ssIdsSize: Int,
         subVillageIds: List<Long>,
         subVillageIdsSize: Int,
+        userId: String = SecuredPreference.getUserFhirId(),
     ): DashboardCountsRow?
 
     @Query(
@@ -113,62 +304,83 @@ interface MemberAssessmentHistoryDao {
         filtered_members AS (
             SELECT
                 hm.id AS memberId,
+                hm.fhir_id AS memberFhirId,
                 COALESCE(hm.shasthya_shebika_id, hh.shasthya_shebika_id) AS ssId,
                 COALESCE(hm.sub_village_id, hh.sub_village_id) AS subVillageId
             FROM HouseholdMember AS hm
             LEFT JOIN Household AS hh ON hh.id = hm.household_id
         )
         SELECT
-            SUM(
-                CASE
-                    WHEN EXISTS (
-                        SELECT 1
-                        FROM MemberAssessmentHistory AS h
-                        WHERE h.memberId = lp.householdMemberLocalId
-                          AND LOWER(h.serviceProvided) = 'anc'
-                          AND (:startDate IS NULL OR date(datetime(h.visitDate, 'localtime')) >= :startDate)
-                          AND (:endDate IS NULL OR date(datetime(h.visitDate, 'localtime')) <= :endDate)
-                          AND date(datetime(h.visitDate, 'localtime')) >= substr(lp.lastMenstrualPeriod, 1, 10)
-                          AND date(datetime(h.visitDate, 'localtime')) <= date(substr(lp.lastMenstrualPeriod, 1, 10), '+4 months')
+            COALESCE(
+                (
+                    SELECT SUM(
+                        CASE
+                            WHEN EXISTS (
+                                SELECT 1
+                                FROM MemberAssessmentHistory AS h
+                                WHERE h.memberId = lp.householdMemberLocalId
+                                  AND LOWER(h.serviceProvided) = 'anc'
+                                  AND (:startDate IS NULL OR date(datetime(h.visitDate, 'localtime')) >= :startDate)
+                                  AND (:endDate IS NULL OR date(datetime(h.visitDate, 'localtime')) <= :endDate)
+                                  AND date(datetime(h.visitDate, 'localtime')) >= substr(lp.lastMenstrualPeriod, 1, 10)
+                                  AND date(datetime(h.visitDate, 'localtime')) <= date(substr(lp.lastMenstrualPeriod, 1, 10), '+4 months')
+                                  AND (h.practitionerId IS NULL OR h.practitionerId IS :userId)
+                            )
+                            THEN 1 ELSE 0
+                        END
                     )
-                    THEN 1 ELSE 0
-                END
+                    FROM latest_pregnancy AS lp
+                    INNER JOIN filtered_members AS fm ON fm.memberId = lp.householdMemberLocalId
+                    WHERE (lp.dateOfDelivery IS NULL OR lp.dateOfDelivery = '')
+                    AND (lp.lastMenstrualPeriod IS NOT NULL AND lp.lastMenstrualPeriod != '')
+                    AND (lp.estimatedDeliveryDate IS NULL OR substr(lp.estimatedDeliveryDate, 1, 10) > date('now', '-45 days'))
+                    AND (
+                        CASE
+                            WHEN :subVillageIdsSize > 0
+                            THEN fm.subVillageId IN (:subVillageIds)
+
+                            WHEN :ssIdsSize > 0
+                            THEN fm.subVillageId IN (
+                                SELECT DISTINCT sslv.subVillageId
+                                FROM ShasthyaShebikaLinkedVillageEntity AS sslv
+                                WHERE sslv.shasthyaShebikaId IN (:ssIds)
+                            )
+
+                            ELSE 1
+                        END
+                    )
+                ),
+                0
             ) AS pwIdentifiedFirst4MonthsWithAncCount,
-            SUM(
-                CASE
-                    WHEN (
-                        SELECT COUNT(1)
-                        FROM MemberAssessmentHistory AS h
-                        WHERE h.memberId = lp.householdMemberLocalId
-                          AND LOWER(h.serviceProvided) = 'anc'
-                          AND (:startDate IS NULL OR date(datetime(h.visitDate, 'localtime')) >= :startDate)
-                          AND (:endDate IS NULL OR date(datetime(h.visitDate, 'localtime')) <= :endDate)
-                    ) >= 3
-                    THEN 1 ELSE 0
-                END
+            COALESCE(
+                (
+                    SELECT COUNT(DISTINCT h.memberFhirId)
+                    FROM MemberAssessmentHistory AS h
+                    INNER JOIN filtered_members AS fm ON fm.memberFhirId = h.memberFhirId
+                    WHERE LOWER(h.serviceProvided) = 'anc'
+                      AND h.memberFhirId IS NOT NULL
+                      AND h.memberFhirId != ''
+                      AND (h.practitionerId IS NULL OR h.practitionerId IS :userId)
+                      AND CAST(json_extract(h.observations, '$.ancVisitNumber') AS INTEGER) = 3
+                      AND (:startDate IS NULL OR date(datetime(h.visitDate, 'localtime')) >= :startDate)
+                      AND (:endDate   IS NULL OR date(datetime(h.visitDate, 'localtime')) <= :endDate)
+                      AND (
+                          CASE
+                              WHEN :subVillageIdsSize > 0
+                                  THEN fm.subVillageId IN (:subVillageIds)
+                              WHEN :ssIdsSize > 0
+                                  THEN fm.subVillageId IN (
+                                      SELECT DISTINCT sslv.subVillageId
+                                      FROM ShasthyaShebikaLinkedVillageEntity AS sslv
+                                      WHERE sslv.shasthyaShebikaId IN (:ssIds)
+                                  )
+                              ELSE 1
+                          END
+                      )
+                ),
+                0
             ) AS anc3PlusCount,
-            SUM(
-                CASE
-                    WHEN (lp.highRiskPregnantWoman IS NOT NULL AND lp.highRiskPregnantWoman != '')
-                    THEN 1 ELSE 0
-                END
-            ) AS highRiskPregnantWomenCount
-        FROM latest_pregnancy AS lp
-        INNER JOIN filtered_members AS fm ON fm.memberId = lp.householdMemberLocalId
-        WHERE (lp.dateOfDelivery IS NULL OR lp.dateOfDelivery = '')
-        AND (lp.lastMenstrualPeriod IS NOT NULL AND lp.lastMenstrualPeriod != '')
-        AND (lp.estimatedDeliveryDate IS NULL OR substr(lp.estimatedDeliveryDate, 1, 10) >= date('now', '-45 days'))
-        AND (
-            (:ssIdsSize = 0 AND :subVillageIdsSize = 0)
-            OR (:subVillageIdsSize > 0 AND fm.subVillageId IN (:subVillageIds))
-            OR ( :ssIdsSize > 0
-                AND fm.subVillageId IN (
-                    SELECT DISTINCT sslv.subVillageId
-                    FROM ShasthyaShebikaLinkedVillageEntity AS sslv
-                    WHERE sslv.shasthyaShebikaId IN (:ssIds)
-                )
-            )
-        )
+            0 AS highRiskPregnantWomenCount
         """,
     )
     suspend fun getMaternalDashboardCounts(
@@ -178,6 +390,7 @@ interface MemberAssessmentHistoryDao {
         ssIdsSize: Int,
         subVillageIds: List<Long>,
         subVillageIdsSize: Int,
+        userId: String = SecuredPreference.getUserFhirId(),
     ): MaternalDashboardCountsRow?
 
     /**
@@ -200,4 +413,46 @@ interface MemberAssessmentHistoryDao {
         memberId: Long,
         noOfDays: Int,
     )
+
+    @Transaction
+    @Query("DELETE FROM $MEMBER_ASSESSMENT_HISTORY_ENTITY WHERE id NOT IN (SELECT MIN(id) FROM $MEMBER_ASSESSMENT_HISTORY_ENTITY GROUP BY memberId, serviceProvided, visitDate, customStatus) AND date(datetime(visitDate, 'localtime')) >= :date")
+    suspend fun deleteDuplicateRecords(date: String)
+
+    /**
+     * This will return a recent service which occurred after a particular recent service
+     */
+    @Query(
+        """
+            SELECT * FROM memberassessmenthistory
+                WHERE memberId = :memberId
+                AND serviceProvided = :serviceB
+                AND visitDate > (
+                    SELECT MAX(visitDate)
+                    FROM memberassessmenthistory
+                    WHERE memberId = :memberId
+                    AND serviceProvided = :serviceA
+                )
+                ORDER BY visitDate DESC
+                LIMIT 1
+        """,
+    )
+    suspend fun getLatestMemberServiceBAfterServiceA(
+        memberId: Long,
+        serviceA: String,
+        serviceB: String,
+    ): MemberAssessmentHistoryEntity?
+
+    @Query(
+        """
+            SELECT CAST(memberFhirId AS INTEGER) FROM memberassessmenthistory
+            WHERE memberFhirId IS NOT NULL AND memberFhirId !=''
+            AND (LOWER(serviceProvided) = 'ncd'
+                            OR (
+                                LOWER(serviceProvided) = 'cataract'
+                                AND customStatus IS NOT NULL
+                                AND INSTR(customStatus, 'NCD_SERVICE_IN_CATARACT_CAMP') > 0
+                            ))
+        """,
+    )
+    suspend fun getMembersFromAssessmentHistoryWhoReceivedNCD(): List<Long>
 }

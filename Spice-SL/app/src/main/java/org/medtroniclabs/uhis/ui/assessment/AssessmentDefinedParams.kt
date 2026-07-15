@@ -19,9 +19,7 @@ object AssessmentDefinedParams {
     const val IsClinicTaken = "isTakenToClinic"
     const val AssessmentNotes = "notes"
     const val NextFollowupDate = "nextVisitDate"
-    const val ReferredPHUSite = "referredSite"
     const val ReferredPHUSiteID = "referredSiteId"
-    const val ReferralFacilityType = "referralFacilityType"
     const val Green = "Green"
     const val Red = "Red"
     const val Yellow = "Yellow"
@@ -83,6 +81,7 @@ object AssessmentDefinedParams {
     const val other_compliance: String = "otherCompliance"
     const val Compliance_Type_Diabetes = "Diabetes"
     const val Compliance_Type_Hypertension = "Hypertension"
+    const val Symptom_Type_Ncd = "ncdSymptom"
     const val id = "id"
     const val other_symptom = "otherSymptom"
     const val NoSymptoms = "No symptoms"
@@ -194,14 +193,8 @@ object AssessmentDefinedParams {
     const val otherRelationshipIC = "otherRelationshipIC"
 
     // Family Planning Field IDs
-    const val NumberOfLivingChildren = "numberOfLivingChildren"
-    const val DesireForChildrenInFuture = "desireForChildrenInFuture"
-
-    // Family Planning Desire Values
-    const val DesireYesWithin2Yrs = "yesWithin2Yrs"
-    const val DesireYesAfter2Yrs = "yesAfter2Yrs"
-    const val DesireNoMore = "noMoreChildren"
-    const val DesireUnsure = "unsure"
+    const val NUMBER_OF_LIVING_CHILDREN = "numberOfLivingChildren"
+    const val DESIRE_FOR_CHILDREN_IN_FUTURE = "desireForChildrenInFuture"
 
     // Child Health Field Ids
     const val WHAT_FED_LAST_24_HRS = "childFeedLast24Hrs"
@@ -216,11 +209,29 @@ object AssessmentDefinedParams {
 
     const val NCD_SYMPTOMS = "ncdSymptoms"
 
-    const val NCD_SYMPTOM = "ncdSymptom"
-
     const val ANY_NEW_OR_WORSENING_SYMPTOMS = "Any new or worsening symptoms"
 
     const val NEW_WORSENING_SYMPTOMS = "newWorseningSymptoms"
+
+    /**
+     * Spinner : Are you taking medication regularly? (symptomsLog)
+     */
+    const val ID_NCD_SYMPTOMS_MEDICATION = "ncdSymptomsMedication"
+
+    /**
+     * SingleSelectionView : Have you been diagnosed with High blood pressure or hypertension before?
+     */
+    const val ID_DIAGNOSED_BP = "diagnosedBP"
+
+    /**
+     * SingleSelectionView : Have you been diagnosed with High blood Sugar or diabetes before?
+     */
+    const val ID_DIAGNOSED_GLUCOSE = "diagnosedGlucose"
+
+    /**
+     * Spinner : Have the glasses been sold?
+     */
+    const val ID_HAVE_THE_GLASSES_BEEN_SOLD = "haveTheGlassesBeenSold"
 
     // RMNCH Field IDs
     const val BLOOD_SUGAR = "bloodSugar"
@@ -307,8 +318,8 @@ object AssessmentDefinedParams {
     const val ILLNESS_DM = "DM"
 
     // RMNCH Blood Pressure Thresholds
-    const val BP_SYSTOLIC_THRESHOLD = 140.0
-    const val BP_DIASTOLIC_THRESHOLD = 90.0
+    const val HIGH_BP_SYSTOLIC_THRESHOLD = 140.0
+    const val HIGH_BP_DIASTOLIC_THRESHOLD = 90.0
 
     // RMNCH Blood Sugar Thresholds
     const val BLOOD_SUGAR_FASTING_THRESHOLD = 5.1
@@ -360,7 +371,6 @@ object AssessmentDefinedParams {
     const val PARITY_HIGH_RISK_THRESHOLD = 4
     const val NUMBER_OF_LIVING_CHILDREN_THRESHOLD = 1
     const val AGE_OF_LAST_CHILD_HIGH_RISK_YEARS = 2
-    const val WEEKS_SINGULAR_THRESHOLD = 1.0
     const val MONTHS_FOR_YEARS_DISPLAY = 12
     const val MONTHS_YEARS_SINGULAR_THRESHOLD = 1
 
@@ -371,6 +381,8 @@ object AssessmentDefinedParams {
     const val FACILITY_IDENTIFIED_FOR_DELIVERY = "facilityIdentifiedForDelivery"
 
     const val ANC_VISIT_DATE = "ancVisitDate"
+    const val ANC_MENU_REVISIT_DAYS_NORMAL = 15L
+    const val ANC_MENU_REVISIT_DAYS_HIGH_RISK = 1L
 
     const val LABEL_HIGH_RISK_PREGNANT_WOMAN = "High risk pregnant woman"
 
@@ -486,6 +498,7 @@ object AssessmentDefinedParams {
 
     const val GLUCOSE_LOG = "glucoseLog"
     const val SYMPTOMS_LOG = "symptomsLog"
+    const val HAS_SYMPTOMS = "hasSymptoms"
 
     const val HBA1C_DATE_TIME = "hba1cDateTime"
 
@@ -520,6 +533,11 @@ object AssessmentDefinedParams {
     const val RBS_MAXIMUM_MGDL_VALUE = 140
     const val FBS_MAXIMUM_VALUE_BD = 7.0
     const val RBS_MAXIMUM_VALUE_BD = 11.1
+
+    const val FOLLOW_UP_FBS_MAXIMUM_VALUE_BD = 7.0
+    const val FOLLOW_UP_RBS_MAXIMUM_VALUE_BD = 10.0
+    const val FOLLOW_UP_FBS_MAXIMUM_MGDL_VALUE = 131
+    const val FOLLOW_UP_RBS_MAXIMUM_MGDL_VALUE = 180
 
     const val UPAZILA_FBS_RBS_MAXIMUM_VALUE_BD = 15
 
@@ -566,6 +584,11 @@ object AssessmentDefinedParams {
     const val FP_METHOD_STERILIZATION_FEMALE = "sterilizationFemale"
 
     /**
+     * Spinner : Pregnancy Outcome
+     */
+    const val ID_PREGNANCY_OUTCOME_TYPE = "pregnancyOutcomeType"
+
+    /**
      * CardView : Abortion
      */
     const val ID_ABORTION = "abortion"
@@ -590,10 +613,23 @@ object AssessmentDefinedParams {
      */
     const val ID_MODE_OF_DELIVERY = "modeOfDelivery"
 
+    /**
+     * Spinner : Birth Attendant
+     */
+    const val ID_BIRTH_ATTENDANT = "birthAttendant"
+
     enum class ModeOfDelivery(val value: String) {
         NORMAL_DELIVERY("normalDelivery"),
         ASSISTED_DELIVERY("assistedDelivery"),
         CESAREAN_SECTION("cesareanSection"),
+    }
+
+    enum class PregnancyOutcomeType(val value: String) {
+        LIVE_BIRTH("liveBirth"),
+    }
+
+    enum class PlaceOfDelivery(val value: String) {
+        HOME("home"),
     }
 
     const val FAMILY_PLANNING_FORM = "family_planning_form"
@@ -622,12 +658,37 @@ object AssessmentDefinedParams {
     const val REASON_ = "reason_"
 
     const val BIO_METRICS = "bioMetrics"
+    const val BIOMETRIC_FAMILY = "biometric"
 
     const val TITLE_SUFFIX = "titleTextView"
     const val SUMMARY_VALUE = "summaryValue"
     const val SUMMARY_ROOT = "summaryRoot"
 
+    const val EYE_CARE_FORM = "eye_care"
+    const val CATARACT_FORM = "cataract"
+
+    const val GENERAL_INFORMATION = "generalInformation"
+    const val CAMP_DATE = "camp_date"
+    const val CAMP_TYPE = "camp_type"
+
     const val EYE_DISEASE = "eyeDisease"
+    const val GLASS_POWER = "glassPower"
+    const val GLASS_POWER_STATUS_PREFIX = "GLASS_POWER:"
+
+    const val EYE_PROBLEM_CATARACTS = "cataracts"
+    const val EYE_PROBLEM_LECRIMAL_TEAR_DUCT = "lecrimalTearDuctProblem"
+    const val EYE_PROBLEM_PTERYGIUM = "pterygium"
+    const val EYE_PROBLEM_GLAUCOMA = "glaucoma"
+    const val EYE_PROBLEM_MYOPIA = "myopia"
+    const val EYE_PROBLEM_PRESBYOPIA = "presbyopia"
+    const val EYE_PROBLEM_OTHER = "otherProblem"
+    const val EYE_PROBLEM_NONE = "noProblem"
+
+    /** Cataract form: Has NCD service been provided? */
+    const val NCD_SERVICE_PROVIDED = "ncdServiceProvided"
+
+    /** Cataract form: Has the patient been referred for operation? */
+    const val PATIENT_REFERRED_FOR_OPERATION = "patientReferredForOperation"
 
     const val HISTORY_OF_OTHER_DISEASES = "historyOfOtherDiseases"
 

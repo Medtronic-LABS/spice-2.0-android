@@ -103,7 +103,7 @@ class MotherNeonateAncSummary : BaseFragment(), View.OnClickListener {
         ): MotherNeonateAncSummary {
             val fragment = MotherNeonateAncSummary()
             val bundle = Bundle()
-            bundle.putString(DefinedParams.EncounterId, encounterId)
+            bundle.putString(DefinedParams.ENCOUNTER_ID, encounterId)
             bundle.putString(DefinedParams.FhirId, fhirId)
             fragment.arguments = bundle
             return fragment
@@ -318,9 +318,9 @@ class MotherNeonateAncSummary : BaseFragment(), View.OnClickListener {
                 ) {
                     val selectedItem = adapter?.getData(position = pos)
                     selectedItem?.let {
-                        val selectedId = it[DefinedParams.id] as String?
+                        val selectedId = it[DefinedParams.ID] as String?
                         val selectedPatientStatus = it[DefinedParams.Value] as String?
-                        if (selectedId != DefinedParams.DefaultID) {
+                        if (selectedId != DefinedParams.DEFAULT_ID) {
                             viewModel.patientStatus = selectedPatientStatus
                             // handleRecoveredState()
                         } else {

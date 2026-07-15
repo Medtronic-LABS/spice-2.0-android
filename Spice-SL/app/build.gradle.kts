@@ -28,42 +28,20 @@ android {
         applicationId = "org.medtroniclabs.uhis"
         minSdk = 23
         targetSdk = 36
-        versionCode = 21
-        versionName = "1.0.1"
+        versionCode = 33
+        versionName = "1.2.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
-
-        missingDimensionStrategy("version", "production")
         resValue("color", "toolbar_color", "#2514BE")
-
-        // MicroCoaching SDK config (flavor-agnostic)
-        buildConfigField("String", "HF_TOKEN", "\"${envProperties["HF_TOKEN"] ?: ""}\"")
-        buildConfigField(
-            "boolean",
-            "ENABLE_COACHING_TELEMETRY",
-            "${envProperties["ENABLE_COACHING_TELEMETRY"] ?: "false"}",
-        )
-    }
-
-    // Produce one APK per ABI on every build:
-    //   • app-arm64-v8a-<flavor>-<type>.apk → real mobile devices (production ships this)
-    //   • app-x86_64-<flavor>-<type>.apk    → Intel/Windows dev emulators
-    // Each APK is single-ABI, so neither carries the other's ~70 MB of native libs —
-    // the arm64 build stays as lean as the old arm64-only filter. x86 and armeabi-v7a
-    // are intentionally excluded. isUniversalApk = false → no extra all-ABI APK.
-    splits {
-        abi {
-            isEnable = true
-            reset()
-            include("arm64-v8a", "x86_64")
-            isUniversalApk = false
-        }
     }
 
     // Make exported Room schemas available to tests
     sourceSets {
         getByName("androidTest") {
             assets.srcDir("$projectDir/schemas")
+        }
+        maybeCreate("bracStaging").apply {
+            res.srcDir("src/staging/res")
         }
     }
 
@@ -111,6 +89,7 @@ android {
     flavorDimensions += "version"
     productFlavors {
         create("dev") {
+            isDefault = true
             dimension = "version"
             applicationIdSuffix = ".dev"
             resValue("string", "app_name", "UHIS Dev")
@@ -129,6 +108,13 @@ android {
             resValue("string", "app_name", "UHIS Training")
             resValue("color", "toolbar_color", "#f1b192")
         }
+        create("bracStaging") {
+            dimension = "version"
+            applicationIdSuffix = ".staging"
+            signingConfig = signingConfigs.getByName("staging")
+            resValue("string", "app_name", "UHIS Training")
+            resValue("color", "toolbar_color", "#f1b192")
+        }
         create("production") {
             dimension = "version"
             signingConfig = signingConfigs.getByName("production")
@@ -141,14 +127,14 @@ android {
             if (variantBuilder.productFlavors.any { it.second == "production" }) {
                 variantBuilder.enable = false
             }
-            if (variantBuilder.productFlavors.any { it.second == "staging" }) {
-                variantBuilder.enable = false
-            }
         }
     }
 
     buildTypes {
         debug {
+            // This helps to use the signingConfig added for different variants
+            // instead of using default android debug keystore
+            signingConfig = null
             isDebuggable = true
             applicationVariants.all {
                 when (productFlavors[0].name) {
@@ -157,21 +143,18 @@ android {
                         buildConfigField("String", "ADMIN_BASE_URL", "\"${envProperties["UHIS_DEV_ADMIN_BASE_URL"]}\"")
                         buildConfigField("String", "SALT", "\"${envProperties["UHIS_DEV_SALT_KEY"]}\"")
                         buildConfigField("String", "ROOM_DB_ENCRYPTION_KEY", "\"${envProperties["UHIS_DEV_DB_ENCRYPTION_KEY"]}\"")
-                        buildConfigField("String", "COACHING_BACKEND_URL", "\"${envProperties["UHIS_DEV_COACHING_BACKEND_URL"] ?: "http://10.0.2.2:8000/"}\"")
                     }
                     "qa" -> {
                         buildConfigField("String", "API_BASE_URL", "\"${envProperties["UHIS_QA_API_BASE_URL"]}\"")
                         buildConfigField("String", "ADMIN_BASE_URL", "\"${envProperties["UHIS_QA_ADMIN_BASE_URL"]}\"")
                         buildConfigField("String", "SALT", "\"${envProperties["UHIS_QA_SALT_KEY"]}\"")
                         buildConfigField("String", "ROOM_DB_ENCRYPTION_KEY", "\"${envProperties["UHIS_QA_DB_ENCRYPTION_KEY"]}\"")
-                        buildConfigField("String", "COACHING_BACKEND_URL", "\"${envProperties["UHIS_QA_COACHING_BACKEND_URL"] ?: "http://10.0.2.2:8000/"}\"")
                     }
                 }
             }
         }
         release {
             isMinifyEnabled = true
-            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
@@ -183,28 +166,30 @@ android {
                         buildConfigField("String", "ADMIN_BASE_URL", "\"${envProperties["UHIS_DEV_ADMIN_BASE_URL"]}\"")
                         buildConfigField("String", "SALT", "\"${envProperties["UHIS_DEV_SALT_KEY"]}\"")
                         buildConfigField("String", "ROOM_DB_ENCRYPTION_KEY", "\"${envProperties["UHIS_DEV_DB_ENCRYPTION_KEY"]}\"")
-                        buildConfigField("String", "COACHING_BACKEND_URL", "\"${envProperties["UHIS_DEV_COACHING_BACKEND_URL"] ?: "http://10.0.2.2:8000/"}\"")
                     }
                     "qa" -> {
                         buildConfigField("String", "API_BASE_URL", "\"${envProperties["UHIS_QA_API_BASE_URL"]}\"")
                         buildConfigField("String", "ADMIN_BASE_URL", "\"${envProperties["UHIS_QA_ADMIN_BASE_URL"]}\"")
                         buildConfigField("String", "SALT", "\"${envProperties["UHIS_QA_SALT_KEY"]}\"")
                         buildConfigField("String", "ROOM_DB_ENCRYPTION_KEY", "\"${envProperties["UHIS_QA_DB_ENCRYPTION_KEY"]}\"")
-                        buildConfigField("String", "COACHING_BACKEND_URL", "\"${envProperties["UHIS_QA_COACHING_BACKEND_URL"] ?: "http://10.0.2.2:8000/"}\"")
                     }
                     "staging" -> {
                         buildConfigField("String", "API_BASE_URL", "\"${envProperties["UHIS_STAGE_API_BASE_URL"]}\"")
                         buildConfigField("String", "ADMIN_BASE_URL", "\"${envProperties["UHIS_STAGE_ADMIN_BASE_URL"]}\"")
                         buildConfigField("String", "SALT", "\"${envProperties["UHIS_STAGE_SALT_KEY"]}\"")
                         buildConfigField("String", "ROOM_DB_ENCRYPTION_KEY", "\"${envProperties["UHIS_STAGE_DB_ENCRYPTION_KEY"]}\"")
-                        buildConfigField("String", "COACHING_BACKEND_URL", "\"${envProperties["UHIS_STAGE_COACHING_BACKEND_URL"] ?: "http://10.0.2.2:8000/"}\"")
+                    }
+                    "bracStaging" -> {
+                        buildConfigField("String", "API_BASE_URL", "\"${envProperties["UHIS_BRAC_STAGE_API_BASE_URL"]}\"")
+                        buildConfigField("String", "ADMIN_BASE_URL", "\"${envProperties["UHIS_BRAC_STAGE_ADMIN_BASE_URL"]}\"")
+                        buildConfigField("String", "SALT", "\"${envProperties["UHIS_BRAC_STAGE_SALT_KEY"]}\"")
+                        buildConfigField("String", "ROOM_DB_ENCRYPTION_KEY", "\"${envProperties["UHIS_BRAC_STAGE_DB_ENCRYPTION_KEY"]}\"")
                     }
                     "production" -> {
                         buildConfigField("String", "API_BASE_URL", "\"${envProperties["UHIS_PROD_API_BASE_URL"]}\"")
                         buildConfigField("String", "ADMIN_BASE_URL", "\"${envProperties["UHIS_PROD_ADMIN_BASE_URL"]}\"")
                         buildConfigField("String", "SALT", "\"${envProperties["UHIS_PROD_SALT_KEY"]}\"")
                         buildConfigField("String", "ROOM_DB_ENCRYPTION_KEY", "\"${envProperties["UHIS_PROD_DB_ENCRYPTION_KEY"]}\"")
-                        buildConfigField("String", "COACHING_BACKEND_URL", "\"${envProperties["UHIS_PROD_COACHING_BACKEND_URL"] ?: "http://10.0.2.2:8000/"}\"")
                     }
                 }
             }
@@ -212,12 +197,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
         isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     buildFeatures {
@@ -225,8 +210,6 @@ android {
         buildConfig = true
         compose = true
     }
-    // Kotlin 2.x: the Compose compiler is provided by the kotlin.plugin.compose plugin
-    // applied above; no manual kotlinCompilerExtensionVersion required.
 
     packaging {
         jniLibs {
@@ -257,12 +240,6 @@ dependencies {
 
     implementation(project(":analytics"))
 
-    // MicroCoaching SDK (sourced from mavenLocal — see ../micro-coaching-android-sdk)
-    implementation("com.medtroniclabs.microcoaching:sdk-android:0.5.2-SNAPSHOT")
-    // Optional offline-Bengali STT engine. Bundles sherpa-onnx (~30 MB)
-    // and provides SherpaOnnxStt.factory which the Builder consumes below.
-    implementation("com.medtroniclabs.microcoaching:sdk-android-sherpa:0.4.0-SNAPSHOT")
-
     // Provide Lifecycle lint to avoid detector crashes
     // lintChecks("androidx.lifecycle:lifecycle-runtime-lint:2.8.6")
 
@@ -283,8 +260,8 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 
     // Dagger-Hilt
-    implementation("com.google.dagger:hilt-android:2.56")
-    kapt("com.google.dagger:hilt-compiler:2.56")
+    implementation("com.google.dagger:hilt-android:2.57.1")
+    kapt("com.google.dagger:hilt-compiler:2.57.1")
     kapt("androidx.hilt:hilt-compiler:1.2.0")
 
     // Retrofit & OkHttp
@@ -293,9 +270,9 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 
     // Room
-    implementation("androidx.room:room-runtime:2.7.1")
-    kapt("androidx.room:room-compiler:2.7.1")
-    implementation("androidx.room:room-ktx:2.7.1")
+    implementation("androidx.room:room-runtime:2.7.2")
+    kapt("androidx.room:room-compiler:2.7.2")
+    implementation("androidx.room:room-ktx:2.7.2")
 
     // Coroutines & Lifecycle
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
@@ -368,6 +345,8 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose")
     implementation("androidx.compose.runtime:runtime-livedata")
+
+    implementation("io.github.g00fy2.quickie:quickie-bundled:1.11.0")
 
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.28.0")
 

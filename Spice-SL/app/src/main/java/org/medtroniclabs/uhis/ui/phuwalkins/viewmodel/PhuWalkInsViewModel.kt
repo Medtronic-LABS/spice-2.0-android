@@ -67,7 +67,7 @@ class PhuWalkInsViewModel @Inject constructor(
 
     fun saveCallHistory() {
         viewModelScope.launch(dispatcherIO) {
-            val callStartTime = SecuredPreference.getLong(DefinedParams.houseHoldLinkStartTiming)
+            val callStartTime = SecuredPreference.getLong(DefinedParams.HOUSE_HOLD_LINK_START_TIMING)
             householdMemberRepository.addLinkMemberCall(
                 memberID.toString(),
                 callStartTime = callStartTime,

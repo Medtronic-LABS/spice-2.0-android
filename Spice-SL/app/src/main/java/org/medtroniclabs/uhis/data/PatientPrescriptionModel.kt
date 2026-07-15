@@ -20,6 +20,7 @@ data class UpdateMedicationModel(
     var id: Long? = null,
     var isDeleted: Boolean? = null,
     var medicationId: Long? = null,
+    var prescriptionId: Long? = null,
     var dosageForm: String? = null,
     var dosageUnitId: Long? = null,
     var dosageFrequencyId: Long? = null,

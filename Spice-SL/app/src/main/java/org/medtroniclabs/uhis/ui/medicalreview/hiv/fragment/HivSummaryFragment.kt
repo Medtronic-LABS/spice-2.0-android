@@ -18,7 +18,7 @@ import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.Other
+import org.medtroniclabs.uhis.common.DefinedParams.OTHER
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.ViewUtils
 import org.medtroniclabs.uhis.data.model.Eligibilities
@@ -84,7 +84,7 @@ class HivSummaryFragment : BaseFragment(), View.OnClickListener {
         }
         hivViewModel.getHivScreeningDetails(
             HivScreeningResponse(
-                encounterId = arguments?.getString(DefinedParams.EncounterId) ?: "",
+                encounterId = arguments?.getString(DefinedParams.ENCOUNTER_ID) ?: "",
                 patientReference = arguments?.getString(DefinedParams.PatientReference) ?: "",
             ),
         )
@@ -137,7 +137,7 @@ class HivSummaryFragment : BaseFragment(), View.OnClickListener {
             }
             tvDiagnosesText.text = diagnosisList
                 .filter {
-                    it.diseaseCategory.lowercase() != DefinedParams.OtherNotes.lowercase()
+                    it.diseaseCategory.lowercase() != DefinedParams.OTHER_NOTES.lowercase()
                 }.map { it.diseaseCategory }
                 .distinct()
                 .takeIf { it.isNotEmpty() }
@@ -226,7 +226,7 @@ class HivSummaryFragment : BaseFragment(), View.OnClickListener {
     private fun generateEntryPointText(response: HivCreateScreeningSummaryResponse): String? {
         return response.entryPoint?.let {
             if (it.isNotEmpty()) {
-                if (it.equals(Other, true)) {
+                if (it.equals(OTHER, true)) {
                     return "${it.capitalizeFirstChar()} - ${hivViewModel.otherEntryPoint}"
                 }
                 return it
@@ -268,7 +268,7 @@ class HivSummaryFragment : BaseFragment(), View.OnClickListener {
                 append(label)
                 val padding = " ".repeat(8)
                 types.forEach { type ->
-                    val line = if (type.equals(Other, ignoreCase = true) &&
+                    val line = if (type.equals(OTHER, ignoreCase = true) &&
                         !otherPopulationType.isNullOrBlank()
                     ) {
                         "$type - ${otherPopulationType.trim()}"

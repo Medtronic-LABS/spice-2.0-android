@@ -1,0 +1,4198 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 6,
+    "identityHash": "fe8b968ebb21f9039d6a8face08f8e9d",
+    "entities": [
+      {
+        "tableName": "Household",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `household_no` TEXT, `name` TEXT NOT NULL, `village_id` INTEGER NOT NULL, `no_of_people` INTEGER NOT NULL, `shasthya_shebika_id` INTEGER, `sub_village_id` INTEGER, `household_type` TEXT, `monthly_income` REAL, `monthly_income_range` TEXT, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `version` TEXT, `lastUpdated` TEXT, `disability_persons_count` INTEGER, `household_head_occupation` TEXT, `other_occupation` TEXT, `fhir_id` TEXT, `sync_status` TEXT NOT NULL, `created_by` INTEGER NOT NULL, `updated_at` INTEGER NOT NULL, `created_at` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "householdNo",
+            "columnName": "household_no",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "villageId",
+            "columnName": "village_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noOfPeople",
+            "columnName": "no_of_people",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shasthyaShebikaId",
+            "columnName": "shasthya_shebika_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "subVillageId",
+            "columnName": "sub_village_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "householdType",
+            "columnName": "household_type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "monthlyIncome",
+            "columnName": "monthly_income",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "monthlyIncomeRange",
+            "columnName": "monthly_income_range",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "lastUpdated",
+            "columnName": "lastUpdated",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "disabilityPersonsCount",
+            "columnName": "disability_persons_count",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "householdHeadOccupation",
+            "columnName": "household_head_occupation",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "otherOccupation",
+            "columnName": "other_occupation",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "fhirId",
+            "columnName": "fhir_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sync_status",
+            "columnName": "sync_status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdBy",
+            "columnName": "created_by",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updated_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "idx_sub_village_id",
+            "unique": false,
+            "columnNames": [
+              "sub_village_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_sub_village_id` ON `${TABLE_NAME}` (`sub_village_id`)"
+          },
+          {
+            "name": "idx_village_id",
+            "unique": false,
+            "columnNames": [
+              "village_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_village_id` ON `${TABLE_NAME}` (`village_id`)"
+          },
+          {
+            "name": "id_shasthya_shebika_id",
+            "unique": false,
+            "columnNames": [
+              "shasthya_shebika_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `id_shasthya_shebika_id` ON `${TABLE_NAME}` (`shasthya_shebika_id`)"
+          },
+          {
+            "name": "idx_household_no",
+            "unique": false,
+            "columnNames": [
+              "household_no"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_household_no` ON `${TABLE_NAME}` (`household_no`)"
+          },
+          {
+            "name": "idx_household_updated_at",
+            "unique": false,
+            "columnNames": [
+              "updated_at"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_household_updated_at` ON `${TABLE_NAME}` (`updated_at`)"
+          }
+        ]
+      },
+      {
+        "tableName": "HouseholdMember",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `phone_number` TEXT, `phone_number_category` TEXT, `date_of_birth` TEXT NOT NULL, `gender` TEXT NOT NULL, `household_id` INTEGER, `villageId` INTEGER, `shasthya_shebika_id` INTEGER, `shasthya_kormi_id` INTEGER, `chiefdom_id` INTEGER, `sub_village_id` INTEGER, `patient_id` TEXT, `isActive` INTEGER NOT NULL, `version` TEXT, `lastUpdated` TEXT, `motherReferenceId` INTEGER, `deceasedReason` TEXT, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `id_type` TEXT NOT NULL, `national_id` TEXT, `is_house_hold_head` INTEGER NOT NULL, `household_fhir_id` TEXT, `guardian_hh_member_id` INTEGER, `guardian_hh_member_fhir_id` TEXT, `marital_status` TEXT, `disability` TEXT, `qr_code` TEXT, `created_by_role_name` TEXT, `fhir_id` TEXT, `sync_status` TEXT NOT NULL, `created_by` INTEGER NOT NULL, `updated_at` INTEGER NOT NULL, `created_at` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "phoneNumber",
+            "columnName": "phone_number",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "phoneNumberCategory",
+            "columnName": "phone_number_category",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dateOfBirth",
+            "columnName": "date_of_birth",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gender",
+            "columnName": "gender",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "householdId",
+            "columnName": "household_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "villageId",
+            "columnName": "villageId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "shasthyaShebikaId",
+            "columnName": "shasthya_shebika_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "shasthyaKormiId",
+            "columnName": "shasthya_kormi_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "chiefdomId",
+            "columnName": "chiefdom_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "subVillageId",
+            "columnName": "sub_village_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "patientId",
+            "columnName": "patient_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isActive",
+            "columnName": "isActive",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "lastUpdated",
+            "columnName": "lastUpdated",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "motherReferenceId",
+            "columnName": "motherReferenceId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "deceasedReason",
+            "columnName": "deceasedReason",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idType",
+            "columnName": "id_type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nationalId",
+            "columnName": "national_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isHouseholdHead",
+            "columnName": "is_house_hold_head",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "householdFhirId",
+            "columnName": "household_fhir_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "guardianId",
+            "columnName": "guardian_hh_member_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "guardianFhirId",
+            "columnName": "guardian_hh_member_fhir_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "maritalStatus",
+            "columnName": "marital_status",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "disability",
+            "columnName": "disability",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "qrCode",
+            "columnName": "qr_code",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdByRoleName",
+            "columnName": "created_by_role_name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "fhirId",
+            "columnName": "fhir_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sync_status",
+            "columnName": "sync_status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdBy",
+            "columnName": "created_by",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updated_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "idx_household_id",
+            "unique": false,
+            "columnNames": [
+              "household_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_household_id` ON `${TABLE_NAME}` (`household_id`)"
+          },
+          {
+            "name": "idx_HouseholdMember_updated_at",
+            "unique": false,
+            "columnNames": [
+              "updated_at"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_HouseholdMember_updated_at` ON `${TABLE_NAME}` (`updated_at`)"
+          },
+          {
+            "name": "idx_HouseholdMember_fhir_id",
+            "unique": true,
+            "columnNames": [
+              "fhir_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `idx_HouseholdMember_fhir_id` ON `${TABLE_NAME}` (`fhir_id`)"
+          },
+          {
+            "name": "idx_guardian_hh_member_fhir_id",
+            "unique": false,
+            "columnNames": [
+              "guardian_hh_member_fhir_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_guardian_hh_member_fhir_id` ON `${TABLE_NAME}` (`guardian_hh_member_fhir_id`)"
+          },
+          {
+            "name": "idx_HouseholdMember_disability",
+            "unique": false,
+            "columnNames": [
+              "disability"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_HouseholdMember_disability` ON `${TABLE_NAME}` (`disability`)"
+          }
+        ]
+      },
+      {
+        "tableName": "SymptomEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER NOT NULL, `symptom` TEXT NOT NULL, `type` TEXT, `culture_value` TEXT, `display_order` INTEGER, `value` TEXT, `category` TEXT, `isTitle` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "symptom",
+            "columnName": "symptom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "displayValue",
+            "columnName": "culture_value",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "display_order",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isTitle",
+            "columnName": "isTitle",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "_id"
+          ]
+        }
+      },
+      {
+        "tableName": "Assessment",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `householdMemberLocalId` INTEGER NOT NULL, `memberId` TEXT, `householdId` TEXT, `patientId` TEXT, `villageId` TEXT NOT NULL, `assessmentType` TEXT NOT NULL, `assessmentDetails` TEXT NOT NULL, `otherDetails` TEXT, `callResult` TEXT, `isReferred` INTEGER NOT NULL, `referralStatus` TEXT NOT NULL, `referredReason` TEXT, `followUpId` INTEGER, `status` TEXT, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `fhir_id` TEXT, `sync_status` TEXT NOT NULL, `created_by` INTEGER NOT NULL, `updated_at` INTEGER NOT NULL, `created_at` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "householdMemberLocalId",
+            "columnName": "householdMemberLocalId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memberId",
+            "columnName": "memberId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "householdId",
+            "columnName": "householdId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "patientId",
+            "columnName": "patientId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "villageId",
+            "columnName": "villageId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assessmentType",
+            "columnName": "assessmentType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assessmentDetails",
+            "columnName": "assessmentDetails",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "otherDetails",
+            "columnName": "otherDetails",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "callResult",
+            "columnName": "callResult",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isReferred",
+            "columnName": "isReferred",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "referralStatus",
+            "columnName": "referralStatus",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "referredReason",
+            "columnName": "referredReason",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "followUpId",
+            "columnName": "followUpId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fhirId",
+            "columnName": "fhir_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sync_status",
+            "columnName": "sync_status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdBy",
+            "columnName": "created_by",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updated_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "idx_householdMemberLocalId",
+            "unique": false,
+            "columnNames": [
+              "householdMemberLocalId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_householdMemberLocalId` ON `${TABLE_NAME}` (`householdMemberLocalId`)"
+          },
+          {
+            "name": "idx_Assessment_updated_at",
+            "unique": false,
+            "columnNames": [
+              "updated_at"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_Assessment_updated_at` ON `${TABLE_NAME}` (`updated_at`)"
+          }
+        ]
+      },
+      {
+        "tableName": "MenuEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `menuId` TEXT NOT NULL, `roleName` TEXT, `name` TEXT NOT NULL, `displayOrder` INTEGER NOT NULL, `subModule` TEXT, `culture_value` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "menuId",
+            "columnName": "menuId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "roleName",
+            "columnName": "roleName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "displayOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subModule",
+            "columnName": "subModule",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "displayValue",
+            "columnName": "culture_value",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "UserProfileEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profileData` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "profileData",
+            "columnName": "profileData",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "VillageEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `villagecode` TEXT, `chiefdomId` INTEGER, `countryId` INTEGER NOT NULL, `districtId` INTEGER, `isUserVillage` INTEGER NOT NULL, `chiefdomCode` TEXT, `districtCode` TEXT, `healthFacilityId` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "villagecode",
+            "columnName": "villagecode",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "chiefdomId",
+            "columnName": "chiefdomId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "countryId",
+            "columnName": "countryId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "districtId",
+            "columnName": "districtId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "isUserVillage",
+            "columnName": "isUserVillage",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chiefdomCode",
+            "columnName": "chiefdomCode",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "districtCode",
+            "columnName": "districtCode",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "healthFacilityId",
+            "columnName": "healthFacilityId",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "HealthFacilityEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `tenantId` INTEGER NOT NULL, `districtId` INTEGER NOT NULL, `chiefdomId` INTEGER NOT NULL, `fhirId` TEXT, `isDefault` INTEGER NOT NULL, `isUserSite` INTEGER NOT NULL, `phoneNumber` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tenantId",
+            "columnName": "tenantId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "districtId",
+            "columnName": "districtId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chiefdomId",
+            "columnName": "chiefdomId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fhirId",
+            "columnName": "fhirId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isDefault",
+            "columnName": "isDefault",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isUserSite",
+            "columnName": "isUserSite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "phoneNumber",
+            "columnName": "phoneNumber",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "ClinicalWorkflowEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `moduleType` TEXT, `workflowName` TEXT, `countryId` INTEGER NOT NULL, `displayOrder` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "moduleType",
+            "columnName": "moduleType",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "workflowName",
+            "columnName": "workflowName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "countryId",
+            "columnName": "countryId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "displayOrder",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "FormEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `formInput` TEXT NOT NULL, `formType` TEXT NOT NULL, `workflowName` TEXT, `clinicalWorkflowId` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "formInput",
+            "columnName": "formInput",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "formType",
+            "columnName": "formType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "workflowName",
+            "columnName": "workflowName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "clinicalWorkflowId",
+            "columnName": "clinicalWorkflowId",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "ClinicalWorkflowConditionEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `gender` TEXT, `maxAge` INTEGER, `minAge` INTEGER, `clinicalWorkflowId` INTEGER NOT NULL, `subModule` TEXT, `moduleType` TEXT NOT NULL, `groupName` TEXT, `cultureGroupName` TEXT, `category` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gender",
+            "columnName": "gender",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "maxAge",
+            "columnName": "maxAge",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "minAge",
+            "columnName": "minAge",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "clinicalWorkflowId",
+            "columnName": "clinicalWorkflowId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subModule",
+            "columnName": "subModule",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "moduleType",
+            "columnName": "moduleType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "groupName",
+            "columnName": "groupName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "cultureGroupName",
+            "columnName": "cultureGroupName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "MetaItemByTypeAndCategoryEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id` INTEGER NOT NULL, `name` TEXT NOT NULL, `category` TEXT, `type` TEXT, `displayOrder` INTEGER NOT NULL, `culture_value` TEXT, `value` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "itemId",
+            "columnName": "itemId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "displayOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayValue",
+            "columnName": "culture_value",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "itemId"
+          ]
+        }
+      },
+      {
+        "tableName": "DiagnosisEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `displayOrder` INTEGER NOT NULL, `value` TEXT NOT NULL, `type` TEXT, `diseaseCondition` TEXT NOT NULL, `cultureValue` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "displayOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "diseaseCondition",
+            "columnName": "diseaseCondition",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cultureValue",
+            "columnName": "cultureValue",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "ExaminationsEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `type` TEXT NOT NULL, `formInput` TEXT, `displayOrder` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "formInput",
+            "columnName": "formInput",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "displayOrder",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "LabourDeliveryMetaEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id` INTEGER NOT NULL, `name` TEXT NOT NULL, `category` TEXT, `type` TEXT, `displayOrder` INTEGER NOT NULL, `value` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "itemId",
+            "columnName": "itemId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "displayOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "itemId"
+          ]
+        }
+      },
+      {
+        "tableName": "FollowUp",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`referenceId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id` INTEGER, `householdId` TEXT, `memberId` TEXT NOT NULL, `patientId` TEXT NOT NULL, `encounterId` TEXT, `patientStatus` TEXT, `currentPatientStatus` TEXT, `reason` TEXT, `attempts` INTEGER NOT NULL, `successfulAttempts` INTEGER NOT NULL, `unsuccessfulAttempts` INTEGER NOT NULL, `type` TEXT NOT NULL, `encounterType` TEXT, `encounterName` TEXT, `encounterDate` TEXT, `nextVisitDate` TEXT, `referredSiteId` TEXT, `referralFacilityType` TEXT, `villageId` TEXT NOT NULL, `isCompleted` INTEGER NOT NULL, `isWrongNumber` INTEGER NOT NULL, `calledAt` INTEGER, `syncStatus` TEXT NOT NULL, `updatedAt` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "referenceId",
+            "columnName": "referenceId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "householdId",
+            "columnName": "householdId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "memberId",
+            "columnName": "memberId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "patientId",
+            "columnName": "patientId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "encounterId",
+            "columnName": "encounterId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "patientStatus",
+            "columnName": "patientStatus",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "currentPatientStatus",
+            "columnName": "currentPatientStatus",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "reason",
+            "columnName": "reason",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "attempts",
+            "columnName": "attempts",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "successfulAttempts",
+            "columnName": "successfulAttempts",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unsuccessfulAttempts",
+            "columnName": "unsuccessfulAttempts",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "encounterType",
+            "columnName": "encounterType",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "encounterName",
+            "columnName": "encounterName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "encounterDate",
+            "columnName": "encounterDate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "nextVisitDate",
+            "columnName": "nextVisitDate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "referredSiteId",
+            "columnName": "referredSiteId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "referralFacilityType",
+            "columnName": "referralFacilityType",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "villageId",
+            "columnName": "villageId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isCompleted",
+            "columnName": "isCompleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isWrongNumber",
+            "columnName": "isWrongNumber",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "calledAt",
+            "columnName": "calledAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "syncStatus",
+            "columnName": "syncStatus",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "referenceId"
+          ]
+        }
+      },
+      {
+        "tableName": "FollowUpCall",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `followUpId` INTEGER NOT NULL, `callDate` TEXT NOT NULL, `duration` REAL, `attempts` INTEGER NOT NULL, `status` TEXT NOT NULL, `callType` TEXT, `isWillingToVisitUHC` INTEGER, `visitRejectReason` TEXT, `otherVisitRejectReason` TEXT, `unSuccessfulCallReason` TEXT, `wrongNumber` INTEGER NOT NULL, `isSynced` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `calledByUserId` TEXT NOT NULL, `calledByUserFullName` TEXT NOT NULL, `calledByUserRole` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "followUpId",
+            "columnName": "followUpId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "callDate",
+            "columnName": "callDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "duration",
+            "columnName": "duration",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "attempts",
+            "columnName": "attempts",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "callType",
+            "columnName": "callType",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isWillingToVisitUHC",
+            "columnName": "isWillingToVisitUHC",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "visitRejectReason",
+            "columnName": "visitRejectReason",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "otherVisitRejectReason",
+            "columnName": "otherVisitRejectReason",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "unSuccessfulCallReason",
+            "columnName": "unSuccessfulCallReason",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "wrongNumber",
+            "columnName": "wrongNumber",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isSynced",
+            "columnName": "isSynced",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "calledByUserId",
+            "columnName": "calledByUserId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "calledByUserFullName",
+            "columnName": "calledByUserFullName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "calledByUserRole",
+            "columnName": "calledByUserRole",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "PregnancyDetail",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `householdMemberLocalId` INTEGER NOT NULL, `patientId` TEXT, `householdMemberId` TEXT, `pregnancyEpisodeId` TEXT, `tbContactTraceStatus` INTEGER, `lastMenstrualPeriod` TEXT, `estimatedDeliveryDate` TEXT, `pregnancyTest` TEXT, `gravida` INTEGER, `parity` INTEGER, `numberOfLivingChildren` INTEGER, `ageOfLastChild` TEXT, `ancVisitNo` INTEGER, `previousPregnancyComplications` TEXT, `pregnantWomanExistingIllness` TEXT, `pregnantWomanOnTreatment` TEXT, `highRiskPregnantWoman` TEXT, `gapsInAnc` TEXT, `ancWeight` REAL, `ancVisitDate` TEXT, `pncVisitNo` INTEGER, `pncIllness` TEXT, `highRiskMother` TEXT, `gapsInPnc` TEXT, `dateOfDelivery` TEXT, `complicationsDuringDelivery` TEXT, `typeOfAbortion` TEXT, `noOfNeonates` INTEGER, `neonatePatientId` TEXT, `isDeliveryAtHome` INTEGER, `neonateHouseholdMemberLocalId` INTEGER, `isNeonateDeathRecordedByPHU` INTEGER, `childVisitNo` INTEGER, `childCongenitalDefect` TEXT, `startAt` TEXT, `endAt` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "householdMemberLocalId",
+            "columnName": "householdMemberLocalId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "patientId",
+            "columnName": "patientId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "householdMemberId",
+            "columnName": "householdMemberId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "pregnancyEpisodeId",
+            "columnName": "pregnancyEpisodeId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "tbContactTraceStatus",
+            "columnName": "tbContactTraceStatus",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "lastMenstrualPeriod",
+            "columnName": "lastMenstrualPeriod",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "estimatedDeliveryDate",
+            "columnName": "estimatedDeliveryDate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "pregnancyTest",
+            "columnName": "pregnancyTest",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "gravida",
+            "columnName": "gravida",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "parity",
+            "columnName": "parity",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "numberOfLivingChildren",
+            "columnName": "numberOfLivingChildren",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "ageOfLastChild",
+            "columnName": "ageOfLastChild",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "ancVisitNo",
+            "columnName": "ancVisitNo",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "previousPregnancyComplications",
+            "columnName": "previousPregnancyComplications",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "pregnantWomanExistingIllness",
+            "columnName": "pregnantWomanExistingIllness",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "pregnantWomanOnTreatment",
+            "columnName": "pregnantWomanOnTreatment",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "highRiskPregnantWoman",
+            "columnName": "highRiskPregnantWoman",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "gapsInAnc",
+            "columnName": "gapsInAnc",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "ancWeight",
+            "columnName": "ancWeight",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "ancVisitDate",
+            "columnName": "ancVisitDate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "pncVisitNo",
+            "columnName": "pncVisitNo",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "pncIllness",
+            "columnName": "pncIllness",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "highRiskMother",
+            "columnName": "highRiskMother",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "gapsInPnc",
+            "columnName": "gapsInPnc",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dateOfDelivery",
+            "columnName": "dateOfDelivery",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "complicationsDuringDelivery",
+            "columnName": "complicationsDuringDelivery",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "typeOfAbortion",
+            "columnName": "typeOfAbortion",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "noOfNeonates",
+            "columnName": "noOfNeonates",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "neonatePatientId",
+            "columnName": "neonatePatientId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isDeliveryAtHome",
+            "columnName": "isDeliveryAtHome",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "neonateHouseholdMemberLocalId",
+            "columnName": "neonateHouseholdMemberLocalId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "isNeonateDeathRecordedByPHU",
+            "columnName": "isNeonateDeathRecordedByPHU",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "childVisitNo",
+            "columnName": "childVisitNo",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "childCongenitalDefect",
+            "columnName": "childCongenitalDefect",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "startAt",
+            "columnName": "startAt",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "endAt",
+            "columnName": "endAt",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_PregnancyDetail_pregnancyEpisodeId",
+            "unique": true,
+            "columnNames": [
+              "pregnancyEpisodeId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_PregnancyDetail_pregnancyEpisodeId` ON `${TABLE_NAME}` (`pregnancyEpisodeId`)"
+          },
+          {
+            "name": "idx_pregnancy_detail_member_local_id",
+            "unique": false,
+            "columnNames": [
+              "householdMemberLocalId",
+              "endAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_pregnancy_detail_member_local_id` ON `${TABLE_NAME}` (`householdMemberLocalId`, `endAt`)"
+          }
+        ]
+      },
+      {
+        "tableName": "FrequencyEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `displayValue` TEXT, `displayOrder` INTEGER NOT NULL, `frequency` INTEGER NOT NULL, `description` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayValue",
+            "columnName": "displayValue",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "displayOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "frequency",
+            "columnName": "frequency",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "ConsentForm",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `content` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "content",
+            "columnName": "content",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "LinkHouseholdMember",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `memberId` TEXT NOT NULL, `status` TEXT NOT NULL, `syncStatus` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memberId",
+            "columnName": "memberId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "syncStatus",
+            "columnName": "syncStatus",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "CallHistory",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `referenceId` TEXT NOT NULL, `callStartTime` INTEGER NOT NULL, `callEndTime` INTEGER NOT NULL, `syncStatus` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "referenceId",
+            "columnName": "referenceId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "callStartTime",
+            "columnName": "callStartTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "callEndTime",
+            "columnName": "callEndTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "syncStatus",
+            "columnName": "syncStatus",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "ProgramEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `healthFacilityIds` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "healthFacilityIds",
+            "columnName": "healthFacilityIds",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "CulturesEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `code` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "ConsentEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `formType` TEXT NOT NULL, `formInput` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "formType",
+            "columnName": "formType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "formInput",
+            "columnName": "formInput",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "MentalHealthEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`formType` TEXT NOT NULL, `formInput` TEXT, PRIMARY KEY(`formType`))",
+        "fields": [
+          {
+            "fieldPath": "formType",
+            "columnName": "formType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "formInput",
+            "columnName": "formInput",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "formType"
+          ]
+        }
+      },
+      {
+        "tableName": "MedicalComplianceEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `display_order` INTEGER, `culture_value` TEXT, `parent_compliance_id` INTEGER, `child_exists` INTEGER NOT NULL, `value` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "display_order",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "displayValue",
+            "columnName": "culture_value",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "parentComplianceId",
+            "columnName": "parent_compliance_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "childExists",
+            "columnName": "child_exists",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "ChiefDomEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `code` TEXT, `districtId` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "districtId",
+            "columnName": "districtId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "DistrictEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `code` TEXT, `countryId` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "countryId",
+            "columnName": "countryId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "ScreeningEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `screeningDetails` TEXT NOT NULL, `generalDetails` TEXT NOT NULL, `uploadStatus` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `userId` TEXT, `signature` BLOB, `isReferred` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "screeningDetails",
+            "columnName": "screeningDetails",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "generalDetails",
+            "columnName": "generalDetails",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uploadStatus",
+            "columnName": "uploadStatus",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "userId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "signature",
+            "columnName": "signature",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "isReferred",
+            "columnName": "isReferred",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "RiskFactorEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nonLabEntity` TEXT NOT NULL, `uploadStatus` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nonLabEntity",
+            "columnName": "nonLabEntity",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uploadStatus",
+            "columnName": "uploadStatus",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "LifestyleEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `displayValue` TEXT, `value` TEXT, `answers` TEXT NOT NULL, `type` TEXT NOT NULL, `displayOrder` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayValue",
+            "columnName": "displayValue",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "answers",
+            "columnName": "answers",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "displayOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "NCDMedicalReviewMetaEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`primaryId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id` INTEGER NOT NULL, `name` TEXT NOT NULL, `displayValue` TEXT NOT NULL, `displayOrder` INTEGER NOT NULL, `type` TEXT, `category` TEXT, `value` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "primaryId",
+            "columnName": "primaryId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayValue",
+            "columnName": "displayValue",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "displayOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "primaryId"
+          ]
+        }
+      },
+      {
+        "tableName": "AssessmentNCDEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `assessmentDetails` TEXT NOT NULL, `uploadStatus` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `userId` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assessmentDetails",
+            "columnName": "assessmentDetails",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uploadStatus",
+            "columnName": "uploadStatus",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "userId",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "unit_metric_entity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `unit` TEXT NOT NULL, `type` TEXT, `displayOrder` INTEGER NOT NULL, `description` TEXT, `status` INTEGER NOT NULL, `displayValue` TEXT NOT NULL, `isDefault` INTEGER NOT NULL, `answerDependent` INTEGER NOT NULL, `childExists` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "displayOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayValue",
+            "columnName": "displayValue",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDefault",
+            "columnName": "isDefault",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "answerDependent",
+            "columnName": "answerDependent",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "childExists",
+            "columnName": "childExists",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "dosage_frequency_entity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `displayOrder` INTEGER NOT NULL, `frequency` INTEGER NOT NULL, `description` TEXT, `status` INTEGER NOT NULL, `displayValue` TEXT, `isDefault` INTEGER NOT NULL, `answerDependent` INTEGER NOT NULL, `childExists` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "displayOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "frequency",
+            "columnName": "frequency",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayValue",
+            "columnName": "displayValue",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isDefault",
+            "columnName": "isDefault",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "answerDependent",
+            "columnName": "answerDependent",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "childExists",
+            "columnName": "childExists",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "NCDDiagnosisEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `displayOrder` INTEGER NOT NULL, `value` TEXT, `culture_value` TEXT, `type` TEXT, `gender` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "displayOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "displayValue",
+            "columnName": "culture_value",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "gender",
+            "columnName": "gender",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "TreatmentPlanEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `displayValue` TEXT, `displayOrder` INTEGER NOT NULL, `duration` TEXT NOT NULL, `period` TEXT NOT NULL, `riskLevel` TEXT, `type` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayValue",
+            "columnName": "displayValue",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "displayOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "duration",
+            "columnName": "duration",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "period",
+            "columnName": "period",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "riskLevel",
+            "columnName": "riskLevel",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "shortageReason",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `type` TEXT NOT NULL, `displayOrder` INTEGER NOT NULL, `displayValue` TEXT NOT NULL, `value` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "displayOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayValue",
+            "columnName": "displayValue",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "DosageDurationEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `displayOrder` INTEGER NOT NULL, `displayValue` TEXT, `quantity` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "displayOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayValue",
+            "columnName": "displayValue",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "NCDFollowUp",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `deleted` INTEGER, `isCompleted` INTEGER, `isWrongNumber` INTEGER, `isInitiated` INTEGER, `patientId` TEXT, `memberId` TEXT, `type` TEXT, `referredSiteId` TEXT, `identityType` TEXT, `identityValue` TEXT, `name` TEXT, `gender` TEXT, `dateOfBirth` TEXT, `phoneNumber` TEXT, `countyName` TEXT, `subCountyName` TEXT, `communityHealthUnitName` TEXT, `villageId` TEXT, `villageName` TEXT, `landmark` TEXT, `retryAttempts` INTEGER, `overDueCategories` TEXT, `dueDate` INTEGER, `referredReasons` TEXT, `createdBy` INTEGER, `updatedBy` INTEGER, `createdAt` INTEGER, `updatedAt` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "isCompleted",
+            "columnName": "isCompleted",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "isWrongNumber",
+            "columnName": "isWrongNumber",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "isInitiated",
+            "columnName": "isInitiated",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "patientId",
+            "columnName": "patientId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "memberId",
+            "columnName": "memberId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "referredSiteId",
+            "columnName": "referredSiteId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "identityType",
+            "columnName": "identityType",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "identityValue",
+            "columnName": "identityValue",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "gender",
+            "columnName": "gender",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dateOfBirth",
+            "columnName": "dateOfBirth",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "phoneNumber",
+            "columnName": "phoneNumber",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "countyName",
+            "columnName": "countyName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "subCountyName",
+            "columnName": "subCountyName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "communityHealthUnitName",
+            "columnName": "communityHealthUnitName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "villageId",
+            "columnName": "villageId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "villageName",
+            "columnName": "villageName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "landmark",
+            "columnName": "landmark",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "retryAttempts",
+            "columnName": "retryAttempts",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "overDueCategories",
+            "columnName": "overDueCategories",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dueDate",
+            "columnName": "dueDate",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "referredReasons",
+            "columnName": "referredReasons",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdBy",
+            "columnName": "createdBy",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "updatedBy",
+            "columnName": "updatedBy",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "LinkedVillageEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `villageId` INTEGER NOT NULL, `tenantId` INTEGER NOT NULL, `name` TEXT NOT NULL, `villagecode` TEXT, `chiefdomId` INTEGER, `countryId` INTEGER NOT NULL, `districtId` INTEGER, `isUserVillage` INTEGER NOT NULL, `chiefdomCode` TEXT, `districtCode` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "villageId",
+            "columnName": "villageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tenantId",
+            "columnName": "tenantId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "villagecode",
+            "columnName": "villagecode",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "chiefdomId",
+            "columnName": "chiefdomId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "countryId",
+            "columnName": "countryId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "districtId",
+            "columnName": "districtId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "isUserVillage",
+            "columnName": "isUserVillage",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chiefdomCode",
+            "columnName": "chiefdomCode",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "districtCode",
+            "columnName": "districtCode",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "NCDCallDetails",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`localId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id` INTEGER NOT NULL, `villageId` TEXT, `patientId` TEXT, `memberId` TEXT, `appType` TEXT NOT NULL, `referredSiteId` TEXT, `callDate` TEXT, `duration` REAL, `status` TEXT, `reason` TEXT, `otherReason` TEXT, `patientStatus` TEXT, `type` TEXT, `attempts` INTEGER, `latitude` TEXT, `longitude` TEXT, `visitedFacilityId` INTEGER, `otherVisitedFacilityName` TEXT, `isSynced` INTEGER NOT NULL, `createdBy` INTEGER, `updatedBy` INTEGER, `createdAt` INTEGER, `updatedAt` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "localId",
+            "columnName": "localId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "villageId",
+            "columnName": "villageId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "patientId",
+            "columnName": "patientId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "memberId",
+            "columnName": "memberId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "appType",
+            "columnName": "appType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "referredSiteId",
+            "columnName": "referredSiteId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "callDate",
+            "columnName": "callDate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "duration",
+            "columnName": "duration",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "reason",
+            "columnName": "reason",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "otherReason",
+            "columnName": "otherReason",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "patientStatus",
+            "columnName": "patientStatus",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "attempts",
+            "columnName": "attempts",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "visitedFacilityId",
+            "columnName": "visitedFacilityId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "otherVisitedFacilityName",
+            "columnName": "otherVisitedFacilityName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isSynced",
+            "columnName": "isSynced",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdBy",
+            "columnName": "createdBy",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "updatedBy",
+            "columnName": "updatedBy",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "localId"
+          ]
+        }
+      },
+      {
+        "tableName": "NCDPatientDetailsEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `patientDetails` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "patientDetails",
+            "columnName": "patientDetails",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "CommunityProfile",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `villageId` INTEGER NOT NULL, `communityDescription` TEXT, `registeredDate` TEXT, `payload` TEXT, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `fhir_id` TEXT, `sync_status` TEXT NOT NULL, `created_by` INTEGER NOT NULL, `updated_at` INTEGER NOT NULL, `created_at` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "villageId",
+            "columnName": "villageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "communityDescription",
+            "columnName": "communityDescription",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "registeredDate",
+            "columnName": "registeredDate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "payload",
+            "columnName": "payload",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fhirId",
+            "columnName": "fhir_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sync_status",
+            "columnName": "sync_status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdBy",
+            "columnName": "created_by",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updated_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "RxBuddyDetails",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `rxBuddyId` INTEGER, `patientMemberId` TEXT NOT NULL, `householdMemberId` INTEGER, `name` TEXT, `phoneNumber` TEXT, `relationship` TEXT NOT NULL, `isMonitorSheetProvider` INTEGER NOT NULL, `nextVisitDate` TEXT NOT NULL, `otherRelationship` TEXT, `followUpId` INTEGER, `isActive` INTEGER NOT NULL, `syncStatus` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `createdBy` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rxBuddyId",
+            "columnName": "rxBuddyId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "patientMemberId",
+            "columnName": "patientMemberId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "householdMemberId",
+            "columnName": "householdMemberId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "phoneNumber",
+            "columnName": "phoneNumber",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "relationship",
+            "columnName": "relationship",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isMonitorSheetProvider",
+            "columnName": "isMonitorSheetProvider",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nextVisitDate",
+            "columnName": "nextVisitDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "otherRelationship",
+            "columnName": "otherRelationship",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "followUpId",
+            "columnName": "followUpId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "isActive",
+            "columnName": "isActive",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "syncStatus",
+            "columnName": "syncStatus",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdBy",
+            "columnName": "createdBy",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "TreatmentDetailsEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `memberId` TEXT NOT NULL, `type` TEXT NOT NULL, `treatmentStartDate` TEXT, `diagnoses` TEXT, `diagnosedDate` TEXT, `prescriptions` TEXT, `healthUnitNo` INTEGER, `icDistrictTBNo` INTEGER, `tbConfirmationDate` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memberId",
+            "columnName": "memberId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "treatmentStartDate",
+            "columnName": "treatmentStartDate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "diagnoses",
+            "columnName": "diagnoses",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "diagnosedDate",
+            "columnName": "diagnosedDate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "prescriptions",
+            "columnName": "prescriptions",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "healthUnitNo",
+            "columnName": "healthUnitNo",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "icDistrictTBNo",
+            "columnName": "icDistrictTBNo",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "tbConfirmationDate",
+            "columnName": "tbConfirmationDate",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "RxBuddyFollowUpEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `rxBuddyLocalId` INTEGER NOT NULL, `rxBuddyId` INTEGER, `patientMemberId` TEXT NOT NULL, `followUp` TEXT, `nextVisitDate` TEXT NOT NULL, `followUpId` INTEGER, `syncStatus` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `createdBy` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rxBuddyLocalId",
+            "columnName": "rxBuddyLocalId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rxBuddyId",
+            "columnName": "rxBuddyId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "patientMemberId",
+            "columnName": "patientMemberId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "followUp",
+            "columnName": "followUp",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "nextVisitDate",
+            "columnName": "nextVisitDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "followUpId",
+            "columnName": "followUpId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "syncStatus",
+            "columnName": "syncStatus",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdBy",
+            "columnName": "createdBy",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "SubVillageEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `code` TEXT, `villageId` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "villageId",
+            "columnName": "villageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "idx_subvillage_villageId",
+            "unique": false,
+            "columnNames": [
+              "villageId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_subvillage_villageId` ON `${TABLE_NAME}` (`villageId`)"
+          }
+        ]
+      },
+      {
+        "tableName": "ShasthyaShebikaEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `phoneNumber` TEXT, `ssId` TEXT, `shasthyaKormiId` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "phoneNumber",
+            "columnName": "phoneNumber",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "ssId",
+            "columnName": "ssId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "shasthyaKormiId",
+            "columnName": "shasthyaKormiId",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "idx_shasthya_shebika_ssId",
+            "unique": false,
+            "columnNames": [
+              "ssId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_shasthya_shebika_ssId` ON `${TABLE_NAME}` (`ssId`)"
+          }
+        ]
+      },
+      {
+        "tableName": "ShasthyaShebikaLinkedVillageEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`shasthyaShebikaId` INTEGER NOT NULL, `subVillageId` INTEGER NOT NULL, PRIMARY KEY(`shasthyaShebikaId`, `subVillageId`))",
+        "fields": [
+          {
+            "fieldPath": "shasthyaShebikaId",
+            "columnName": "shasthyaShebikaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subVillageId",
+            "columnName": "subVillageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "shasthyaShebikaId",
+            "subVillageId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "idx_linked_shasthya_shebika_id",
+            "unique": false,
+            "columnNames": [
+              "shasthyaShebikaId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_linked_shasthya_shebika_id` ON `${TABLE_NAME}` (`shasthyaShebikaId`)"
+          },
+          {
+            "name": "idx_linked_subvillage_id",
+            "unique": false,
+            "columnNames": [
+              "subVillageId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_linked_subvillage_id` ON `${TABLE_NAME}` (`subVillageId`)"
+          }
+        ]
+      },
+      {
+        "tableName": "MemberAssessmentHistory",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `memberFhirId` TEXT, `memberId` INTEGER, `visitDate` TEXT, `serviceProvided` TEXT, `encounterId` TEXT, `customStatus` TEXT, `latestVisit` INTEGER NOT NULL, `referralStatus` TEXT, `referralFacilityType` TEXT, `referralReason` TEXT, `nextFollowUpDate` TEXT, `serviceProvidedByName` TEXT, `serviceProvidedByRole` TEXT, `practitionerId` TEXT, `observations` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memberFhirId",
+            "columnName": "memberFhirId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "memberId",
+            "columnName": "memberId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "visitDate",
+            "columnName": "visitDate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "serviceProvided",
+            "columnName": "serviceProvided",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "encounterId",
+            "columnName": "encounterId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "customStatus",
+            "columnName": "customStatus",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "latestVisit",
+            "columnName": "latestVisit",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "referralStatus",
+            "columnName": "referralStatus",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "referralFacilityType",
+            "columnName": "referralFacilityType",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "referralReason",
+            "columnName": "referralReason",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "nextFollowUpDate",
+            "columnName": "nextFollowUpDate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "serviceProvidedByName",
+            "columnName": "serviceProvidedByName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "serviceProvidedByRole",
+            "columnName": "serviceProvidedByRole",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "practitionerId",
+            "columnName": "practitionerId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "observations",
+            "columnName": "observations",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "idx_member_assessment_history_visit_date",
+            "unique": false,
+            "columnNames": [
+              "visitDate"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_member_assessment_history_visit_date` ON `${TABLE_NAME}` (`visitDate`)"
+          },
+          {
+            "name": "idx_member_assessment_history_member_id",
+            "unique": false,
+            "columnNames": [
+              "memberId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_member_assessment_history_member_id` ON `${TABLE_NAME}` (`memberId`)"
+          },
+          {
+            "name": "idx_mah_member_visit",
+            "unique": false,
+            "columnNames": [
+              "memberId",
+              "visitDate"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_mah_member_visit` ON `${TABLE_NAME}` (`memberId`, `visitDate`)"
+          },
+          {
+            "name": "idx_member_assessment_history_member_fhir_id",
+            "unique": false,
+            "columnNames": [
+              "memberFhirId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_member_assessment_history_member_fhir_id` ON `${TABLE_NAME}` (`memberFhirId`)"
+          },
+          {
+            "name": "idx_member_assessment_history_service_provided",
+            "unique": false,
+            "columnNames": [
+              "serviceProvided"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_member_assessment_history_service_provided` ON `${TABLE_NAME}` (`serviceProvided`)"
+          },
+          {
+            "name": "idx_mah_practitioner_id",
+            "unique": false,
+            "columnNames": [
+              "practitionerId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_mah_practitioner_id` ON `${TABLE_NAME}` (`practitionerId`)"
+          },
+          {
+            "name": "idx_mah_member_service_visit",
+            "unique": false,
+            "columnNames": [
+              "memberId",
+              "serviceProvided",
+              "visitDate"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_mah_member_service_visit` ON `${TABLE_NAME}` (`memberId`, `serviceProvided`, `visitDate`)"
+          }
+        ]
+      },
+      {
+        "tableName": "diagnosis",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER NOT NULL, `diagnosis` TEXT NOT NULL, `type` TEXT, `gender` TEXT, `culture_value` TEXT, `display_order` INTEGER, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "diagnosis",
+            "columnName": "diagnosis",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "gender",
+            "columnName": "gender",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "cultureValue",
+            "columnName": "culture_value",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "display_order",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "_id"
+          ]
+        }
+      },
+      {
+        "tableName": "SiteEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `userSite` INTEGER NOT NULL, `role` TEXT, `roleName` TEXT, `createdAt` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `tenantId` INTEGER NOT NULL, `countyId` INTEGER, `accountId` INTEGER, `subCountyId` INTEGER, `isDefault` INTEGER NOT NULL, `isQualipharmEnabledSite` INTEGER, `siteLevel` TEXT, `countryName` TEXT, `countyName` TEXT, `code` TEXT, `bpLog` INTEGER NOT NULL, `glucoseLog` INTEGER NOT NULL, `phq4` INTEGER NOT NULL, `cataract` INTEGER NOT NULL, `eyeCare` INTEGER NOT NULL, `subCountyName` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userSite",
+            "columnName": "userSite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "role",
+            "columnName": "role",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "roleName",
+            "columnName": "roleName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "userId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tenantId",
+            "columnName": "tenantId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "countyId",
+            "columnName": "countyId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "accountId",
+            "columnName": "accountId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "subCountyId",
+            "columnName": "subCountyId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "isDefault",
+            "columnName": "isDefault",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isQualipharmEnabledSite",
+            "columnName": "isQualipharmEnabledSite",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "siteLevel",
+            "columnName": "siteLevel",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "countryName",
+            "columnName": "countryName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "countyName",
+            "columnName": "countyName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "bpLog",
+            "columnName": "bpLog",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "glucoseLog",
+            "columnName": "glucoseLog",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "phq4",
+            "columnName": "phq4",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cataract",
+            "columnName": "cataract",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eyeCare",
+            "columnName": "eyeCare",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subCountyName",
+            "columnName": "subCountyName",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "comorbidity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER NOT NULL, `display_order` INTEGER NOT NULL, `comorbidity` TEXT NOT NULL, `culture_value` TEXT, `type` TEXT, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "display_order",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "comorbidity",
+            "columnName": "comorbidity",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cultureValue",
+            "columnName": "culture_value",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "_id"
+          ]
+        }
+      },
+      {
+        "tableName": "complication",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER NOT NULL, `display_order` INTEGER NOT NULL, `complication` TEXT NOT NULL, `culture_value` TEXT, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "display_order",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "complication",
+            "columnName": "complication",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cultureValue",
+            "columnName": "culture_value",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "_id"
+          ]
+        }
+      },
+      {
+        "tableName": "current_medication",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER NOT NULL, `display_order` INTEGER NOT NULL, `medication_name` TEXT NOT NULL, `type` TEXT NOT NULL, `culture_value` TEXT, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "display_order",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "medicationName",
+            "columnName": "medication_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cultureValue",
+            "columnName": "culture_value",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "_id"
+          ]
+        }
+      },
+      {
+        "tableName": "physical_examination",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER NOT NULL, `display_order` INTEGER NOT NULL, `name` TEXT NOT NULL, `culture_value` TEXT, `type` TEXT, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "display_order",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cultureValue",
+            "columnName": "culture_value",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "_id"
+          ]
+        }
+      },
+      {
+        "tableName": "complaints",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER NOT NULL, `display_order` INTEGER NOT NULL, `name` TEXT NOT NULL, `culture_value` TEXT, `type` TEXT, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "display_order",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cultureValue",
+            "columnName": "culture_value",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "_id"
+          ]
+        }
+      },
+      {
+        "tableName": "Symptom",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER NOT NULL, `symptom` TEXT NOT NULL, `type` TEXT, `culture_value` TEXT, `display_order` INTEGER, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "symptom",
+            "columnName": "symptom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "cultureValue",
+            "columnName": "culture_value",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "display_order",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "_id"
+          ]
+        }
+      },
+      {
+        "tableName": "ShasthyaKormiEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `firstName` TEXT NOT NULL, `lastName` TEXT NOT NULL, `gender` TEXT, `phoneNumber` TEXT, `username` TEXT, `email` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "firstName",
+            "columnName": "firstName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastName",
+            "columnName": "lastName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gender",
+            "columnName": "gender",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "phoneNumber",
+            "columnName": "phoneNumber",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "username",
+            "columnName": "username",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "email",
+            "columnName": "email",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "ShasthyaKormiLinkedVillageEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`shasthyaKormiId` INTEGER NOT NULL, `villageId` INTEGER NOT NULL, PRIMARY KEY(`shasthyaKormiId`, `villageId`))",
+        "fields": [
+          {
+            "fieldPath": "shasthyaKormiId",
+            "columnName": "shasthyaKormiId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "villageId",
+            "columnName": "villageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "shasthyaKormiId",
+            "villageId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "idx_linked_shasthya_kormi_id",
+            "unique": false,
+            "columnNames": [
+              "shasthyaKormiId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_linked_shasthya_kormi_id` ON `${TABLE_NAME}` (`shasthyaKormiId`)"
+          },
+          {
+            "name": "idx_linked_kormi_village_id",
+            "unique": false,
+            "columnNames": [
+              "villageId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_linked_kormi_village_id` ON `${TABLE_NAME}` (`villageId`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fe8b968ebb21f9039d6a8face08f8e9d')"
+    ]
+  }
+}

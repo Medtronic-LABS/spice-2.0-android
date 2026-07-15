@@ -149,7 +149,7 @@ class NCDFollowUpOfflineBottomDialogFilter : BottomSheetDialogFragment(), View.O
                 binding.registrationStatusChipGroup,
             ) { _, _, _ ->
                 viewModel.filterByDateRange = dateRangeTagView.getSelectedTags()
-                changeUIFromToDateVisibility(viewModel.filterByDateRange.any { it.name.uppercase() == FollowUpDefinedParams.FilterCustomize.uppercase() })
+                changeUIFromToDateVisibility(viewModel.filterByDateRange.any { it.name.uppercase() == FollowUpDefinedParams.FILTER_CUSTOMIZE.uppercase() })
                 enableConfirm()
             }
         composeStatusListChipView()
@@ -204,7 +204,7 @@ class NCDFollowUpOfflineBottomDialogFilter : BottomSheetDialogFragment(), View.O
 
     private fun prefillData() {
         viewModel.filterByDateRange.let {
-            if (it.any { it.name.uppercase() == FollowUpDefinedParams.FilterCustomize.uppercase() }) {
+            if (it.any { it.name.uppercase() == FollowUpDefinedParams.FILTER_CUSTOMIZE.uppercase() }) {
                 viewModel.customDate?.startDate?.let {
                     binding.etFromDate.text = DateUtils.convertDateTimeToDate(
                         it,
@@ -328,7 +328,7 @@ class NCDFollowUpOfflineBottomDialogFilter : BottomSheetDialogFragment(), View.O
         if (isStatusListValid &&
             dateRangeTagView
                 .getSelectedTags()
-                .any { it.name.uppercase() == FollowUpDefinedParams.FilterCustomize.uppercase() }
+                .any { it.name.uppercase() == FollowUpDefinedParams.FILTER_CUSTOMIZE.uppercase() }
         ) {
             isStatusListValid =
                 (viewModel.customDate?.startDate != null && viewModel.customDate?.endDate != null)

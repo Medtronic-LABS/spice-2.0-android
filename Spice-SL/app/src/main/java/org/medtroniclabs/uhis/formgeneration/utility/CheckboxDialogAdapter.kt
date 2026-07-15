@@ -11,7 +11,7 @@ import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.OtherMethodSpecify
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.OTHER_METHOD_SPECIFY
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 
 class CheckboxDialogAdapter(
@@ -71,7 +71,7 @@ class CheckboxDialogAdapter(
             holder.checkBoxHeader.text =
                 if (translate) item.displayValue ?: item.symptom else item.symptom
         } else if (holder is DialogViewHolder) {
-            if (item.symptom == OtherMethodSpecify) {
+            if (item.symptom == OTHER_METHOD_SPECIFY) {
                 holder.separator.visible()
             } else {
                 holder.separator.gone()
@@ -132,7 +132,7 @@ class CheckboxDialogAdapter(
                 map[DefinedParams.CULTURE_VALUE] = cultureValue
             }
             it.value?.let { value ->
-                map[DefinedParams.value] = value
+                map[DefinedParams.VALUE] = value
             }
             selectedItemList.add(map)
         }

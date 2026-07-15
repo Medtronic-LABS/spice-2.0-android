@@ -173,6 +173,9 @@ class AssessmentFamilyPlanningFragment : BaseFragment(), FormEventListener, View
     ) {
     }
 
+    override fun onQRScanRequested() {
+    }
+
     override fun onClick(view: View?) {
         when (view?.id) {
             R.id.btnSubmit -> {

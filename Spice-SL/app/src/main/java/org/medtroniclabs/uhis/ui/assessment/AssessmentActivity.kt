@@ -4,26 +4,17 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
-import androidx.lifecycle.lifecycleScope
-import com.medtroniclabs.microcoaching.MicroCoachingSDK
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.model.UserDetail
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.appextensions.startBackgroundOfflineSync
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.SpiceLocationManager
 import org.medtroniclabs.uhis.databinding.ActivityAssessmentBinding
-import org.medtroniclabs.uhis.db.dao.MetaDataDAO
-import org.medtroniclabs.uhis.db.entity.AssessmentEntity
 import org.medtroniclabs.uhis.formgeneration.extension.capitalizeFirstChar
 import org.medtroniclabs.uhis.mappingkey.Screening
-import org.medtroniclabs.uhis.microcoaching.toComplianceState
-import org.medtroniclabs.uhis.microcoaching.toSdkAssessmentMap
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
 import org.medtroniclabs.uhis.ui.MenuConstants
@@ -66,22 +57,13 @@ import org.medtroniclabs.uhis.ui.home.AssessmentToolsActivity
 import org.medtroniclabs.uhis.ui.household.HouseholdDefinedParams
 import org.medtroniclabs.uhis.ui.household.summary.HouseholdSummaryActivity
 import org.medtroniclabs.uhis.ui.landing.LandingActivity
+import org.medtroniclabs.uhis.ui.membersearch.MemberSearchActivity
 import org.medtroniclabs.uhis.ui.services.ServicesActivity
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class AssessmentActivity : BaseActivity() {
     private lateinit var binding: ActivityAssessmentBinding
     private val viewModel: AssessmentViewModel by viewModels()
-
-    /**
-     * Used by [notifyMicroCoachingSDK] to resolve `villageId → chiefdomId`
-     * (SPICE's equivalent of the backend's `upazila_id`). Field injection
-     * matches the `@Inject lateinit var` pattern already used by
-     * [AssessmentViewModel.connectivityManager].
-     */
-    @Inject
-    lateinit var metaDataDAO: MetaDataDAO
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,9 +83,21 @@ class AssessmentActivity : BaseActivity() {
             },
         )
         getIntentValue()
+        if (isCataractAccessDenied() || isEyeCareAccessDenied()) {
+            finish()
+            return
+        }
         loadFragment()
         attachObservers()
     }
+
+    private fun isCataractAccessDenied(): Boolean =
+        CommonUtils.isCataractMenuId(viewModel.menuId) &&
+            !CommonUtils.isCataractWorkflowEnabledForUser()
+
+    private fun isEyeCareAccessDenied(): Boolean =
+        CommonUtils.isEyeCareMenuId(viewModel.menuId) &&
+            !CommonUtils.isEyeCareWorkflowEnabledForUser()
 
     private fun getCurrentLocation() {
         val locationManager = SpiceLocationManager(this)
@@ -252,14 +246,7 @@ class AssessmentActivity : BaseActivity() {
             finish()
         } else {
             setupAnalytic(AnalyticsDefinedParams.BackButtonClicked)
-            when (supportFragmentManager.findFragmentById(R.id.fragmentContainer)) {
-                is AssessmentICCMSummaryFragment,
-                is AssessmentRMNCHSummaryFragment,
-                is AssessmentOtherSymptomSummaryFragment,
-                -> {
-                    finishSuccessFlow()
-                }
-
+            when (supportFragmentManager.findFragmentById(R.id.formsFragmentContainer)) {
                 is AssessmentNCDSummaryFragment -> {
                     val intent = Intent(this, LandingActivity::class.java)
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -268,7 +255,11 @@ class AssessmentActivity : BaseActivity() {
                 }
 
                 else -> {
-                    this@AssessmentActivity.finish()
+                    if (isFromSummary) {
+                        finishSuccessFlow()
+                    } else {
+                        finish()
+                    }
                 }
             }
         }
@@ -584,8 +575,7 @@ class AssessmentActivity : BaseActivity() {
 
                 ResourceState.SUCCESS -> {
                     hideLoading()
-                    resource.data?.let { (_, assessmentEntity) ->
-                        notifyMicroCoachingSDK(assessmentEntity)
+                    resource.data?.let {
                         loadSummaryFragment()
                     }
                 }
@@ -600,16 +590,6 @@ class AssessmentActivity : BaseActivity() {
             when (resource.state) {
                 ResourceState.SUCCESS -> {
                     hideLoading()
-                    // Referral committed on the summary screen (PHU pick + "Done").
-                    // Fire the SDK referral hook for community assessments — the
-                    // ones with a referral picker. Compliance gaps evaluate here
-                    // (the `actual.*` side now exists), not at assessment-submit.
-                    // Fired before finishSuccessFlow() so lifecycleScope is alive.
-                    if (!CommonUtils.isNonCommunity()) {
-                        viewModel.assessmentSaveLiveData.value?.data?.second?.let { entity ->
-                            notifyMicroCoachingSDK(entity, asReferral = true)
-                        }
-                    }
                     finishSuccessFlow()
                     if (!CommonUtils.isNonCommunity()) {
                         startBackgroundOfflineSync()
@@ -750,15 +730,17 @@ class AssessmentActivity : BaseActivity() {
                     ?.data
                     ?.householdLocalId
                 val isExternalMember = householdLocalId == null || householdLocalId == 0L
-                if (viewModel.entryPoint == ServicesActivity.ENTRY_POINT_SERVICES) {
+                if (viewModel.entryPoint == MemberSearchActivity.ENTRY_POINT_MEMBER_SEARCH) {
+                    Intent(this, MemberSearchActivity::class.java)
+                } else if (viewModel.entryPoint == ServicesActivity.ENTRY_POINT_SERVICES) {
                     Intent(this, ServicesActivity::class.java)
                 } else if (isExternalMember) {
                     Intent(this, ServicesActivity::class.java).apply {
-                        putExtra("isExternalMember", true)
+                        putExtra(ServicesActivity.IS_EXTERNAL_MEMBER, true)
                     }
                 } else {
                     Intent(this, HouseholdSummaryActivity::class.java).apply {
-                        putExtra(DefinedParams.householdId, viewModel.selectedHouseholdId)
+                        putExtra(DefinedParams.householdId, resolveHouseholdIdForSummary())
                         putExtra(HouseholdDefinedParams.IS_FROM_HOUSEHOLD_REGISTRATION, false)
                     }
                 }
@@ -768,6 +750,16 @@ class AssessmentActivity : BaseActivity() {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
         finish()
+    }
+
+    private fun resolveHouseholdIdForSummary(): Long {
+        if (viewModel.selectedHouseholdId > 0L) {
+            return viewModel.selectedHouseholdId
+        }
+        return viewModel.memberDetailsLiveData.value
+            ?.data
+            ?.householdLocalId
+            ?.takeIf { it > 0L } ?: -1L
     }
 
     private fun getIntentValue() {
@@ -811,86 +803,5 @@ class AssessmentActivity : BaseActivity() {
         getCurrentLocation()
     }
 
-    /**
-     * Hand the just-submitted assessment off to the MicroCoaching SDK so it
-     * can emit the `clinical_observed` family events (`spice_action_observed`,
-     * conditional `risk_flag_observed`) plus the stub `card_shown` row.
-     *
-     * Surfaces three pieces of real SPICE data the SDK uses to compute the
-     * three-axis referral correctness (`correctReferral`,
-     * `correctReferralLocation`, `correctReferralType`):
-     *
-     *  - `viewModel.referralStatus` — the system-prescribed referral
-     *    classification computed by `ReferralResultGenerator`. Set inside
-     *    `AssessmentViewModel.saveAssessment` before `assessmentSaveLiveData`
-     *    posts SUCCESS, so it's reliably available here.
-     *  - `viewModel.referralReason` — the system-prescribed reasons /
-     *    facility-type tokens. Also set before SUCCESS.
-     *  - `chiefdomId` resolved via `MetaDataDAO.getVillageByID(...)` — the
-     *    SPICE equivalent of the backend's geographic `upazila_id`.
-     *
-     * Without these, the SDK falls back to a `risk_level`-based heuristic.
-     *
-     * `encounterId` is intentionally left blank — `AssessmentActivity`'s
-     * Intent extras carry MEMBER_ID and HOUSEHOLD_ID but not a visit id, and
-     * the SDK accepts blank (writes null `patient_visit_id` on the wire).
-     * TEAM-CONFIRM: revisit once SPICE exposes the encounter / visit id at
-     * assessment-submit time.
-     *
-     * The SDK wraps event recording in `runCatching`, so the host flow is
-     * never blocked by telemetry failures.
-     */
-    private fun notifyMicroCoachingSDK(
-        assessmentEntity: AssessmentEntity,
-        asReferral: Boolean = false,
-    ) {
-        if (!MicroCoachingSDK.isInitialized()) return
-        val chwId = runCatching { SecuredPreference.getUserId().toString() }
-            .getOrDefault("")
-        if (chwId.isBlank()) return
-
-        // Snapshot mutable VM fields now (they may be reset by a subsequent
-        // submission before the IO coroutine resumes).
-        val systemReferralStatus = viewModel.referralStatus
-        val systemReferralReasons = viewModel.referralReason
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            val upazilaId = runCatching {
-                // SPICE hierarchy: village → chiefdom → district. The closest
-                // match for the backend's `upazila_id` is `chiefdomId`
-                // (one administrative level above village).
-                assessmentEntity.villageId
-                    .toLongOrNull()
-                    ?.let { metaDataDAO.getVillageByID(it).chiefdomId }
-                    ?.toString()
-            }.getOrNull()
-
-            val sdk = MicroCoachingSDK.getInstance()
-            if (asReferral) {
-                // The CHW's committed referral (picked PHU). This is where
-                // spice_referral_compliance gaps are evaluated — the `actual.*`
-                // side only exists once the pick is confirmed. Pass the full
-                // {recommended, actual} compliance state.
-                sdk.onReferralSubmitted(
-                    encounterId = "",
-                    patientId = assessmentEntity.patientId.orEmpty(),
-                    referralData = assessmentEntity.toComplianceState(
-                        systemReferralStatus = systemReferralStatus,
-                        systemReferralReasons = systemReferralReasons,
-                        upazilaId = upazilaId,
-                    ),
-                )
-            } else {
-                sdk.onAssessmentSubmitted(
-                    encounterId = "",
-                    patientId = assessmentEntity.patientId.orEmpty(),
-                    assessmentData = assessmentEntity.toSdkAssessmentMap(
-                        systemReferralStatus = systemReferralStatus,
-                        systemReferralReasons = systemReferralReasons,
-                        upazilaId = upazilaId,
-                    ),
-                )
-            }
-        }
-    }
+    override fun consumeImeInsets() = true
 }

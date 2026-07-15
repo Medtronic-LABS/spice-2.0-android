@@ -38,6 +38,7 @@ import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
 import org.medtroniclabs.uhis.mappingkey.Screening
 import org.medtroniclabs.uhis.ncd.medicalreview.MedicationListener
+import org.medtroniclabs.uhis.ncd.medicalreview.NCDMRUtil
 import org.medtroniclabs.uhis.ncd.medicalreview.prescription.adapter.NCDDiscontinuedMedicationAdapter
 import org.medtroniclabs.uhis.ncd.medicalreview.prescription.adapter.NCDPrescriptionAdapter
 import org.medtroniclabs.uhis.ncd.medicalreview.prescription.dialog.NCDInstructionExpansionDialog
@@ -83,9 +84,11 @@ class NCDPrescriptionActivity :
     }
 
     fun getPatients() {
-        prescriptionViewModel.patientReference = intent.getStringExtra(DefinedParams.PatientId)
-        prescriptionViewModel.memberReference = intent.getStringExtra(DefinedParams.id)
-        prescriptionViewModel.patient_visit_id = intent.getStringExtra(DefinedParams.PatientVisitId)
+        // patientReference must be the patient FHIR id (passed in via DefinedParams.ID =
+        // getPatientFHIRId()), not the human-readable patientId.
+        prescriptionViewModel.patientReference = intent.getStringExtra(DefinedParams.ID)
+        prescriptionViewModel.memberReference = intent.getStringExtra(DefinedParams.ID)
+        prescriptionViewModel.patient_visit_id = intent.getStringExtra(DefinedParams.PATIENT_VISIT_ID)
         prescriptionViewModel.enrollmentType = intent.getStringExtra(DefinedParams.EnrollmentType)
         prescriptionViewModel.identityValue = intent.getStringExtra(Screening.identityValue)
         fetchPrescriptionList()
@@ -192,10 +195,10 @@ class NCDPrescriptionActivity :
                 ResourceState.SUCCESS -> {
                     resourceState.data?.let { map ->
                         val intent = Intent()
-                        if (map.containsKey(DefinedParams.EncounterId)) {
-                            val value = map[DefinedParams.EncounterId]
+                        if (map.containsKey(DefinedParams.ENCOUNTER_ID)) {
+                            val value = map[DefinedParams.ENCOUNTER_ID]
                             if (value is String) {
-                                intent.putExtra(DefinedParams.EncounterId, value)
+                                intent.putExtra(DefinedParams.ENCOUNTER_ID, value)
                             }
                         }
                         setResult(RESULT_OK, intent)
@@ -463,7 +466,7 @@ class NCDPrescriptionActivity :
                     showErrorMessage = it.showErrorMessage,
                     codeDetails = it.codeDetails,
                 )
-                model.dosage_form_name_entered = it.dosageFormName
+                model.dosageFormNameEntered = it.dosageFormName
                 prescriptionViewModel.prescriptionUIModel!!.add(model)
             } else {
                 val model = MedicationResponse(
@@ -481,7 +484,7 @@ class NCDPrescriptionActivity :
                     showErrorMessage = it.showErrorMessage,
                     codeDetails = it.codeDetails,
                 )
-                model.dosage_form_name_entered = it.dosageFormName
+                model.dosageFormNameEntered = it.dosageFormName
                 prescriptionViewModel.prescriptionUIModel!!.add(model)
             }
             loadPrescriptionListData()
@@ -567,12 +570,12 @@ class NCDPrescriptionActivity :
         val medicationEditBinding = NcdRowPrescriptionEditBinding.inflate(layoutInflater)
         medicationEditBinding.tvMedicationName.text =
             if (model.name.isNullOrBlank()) getString(R.string.separator_hyphen) else model.name
-        if (model.dosage_form_name_entered.isNullOrBlank() || (model.id ?: 0) <= 0) {
+        if (model.dosageFormNameEntered.isNullOrBlank() || (model.id ?: 0) <= 0) {
             otherMedicationEdit(medicationEditBinding, model)
         } else {
             medicationEditBinding.tvForm.visibility = View.VISIBLE
             medicationEditBinding.spinnerForm.visibility = View.GONE
-            medicationEditBinding.tvForm.text = model.dosage_form_name_entered
+            medicationEditBinding.tvForm.text = model.dosageFormNameEntered
         }
 
         model.filledPrescriptionDays?.let {
@@ -586,10 +589,11 @@ class NCDPrescriptionActivity :
 
         medicationEditBinding.divider.visibility = dividerVisibility(dividerStatus)
 
-        medicationEditBinding.etInstruction.text = model.instruction_entered ?: ""
+        medicationEditBinding.etInstruction.text = model.instructionEntered ?: ""
 
         // Dosage Unit Value
         medicationEditBinding.etDosage.visibility = View.VISIBLE
+        NCDMRUtil.applyDosageInputRestrictions(medicationEditBinding.etDosage)
         medicationEditBinding.etDosage.setText(model.enteredDosageUnitValue ?: "")
 
         medicationEditBinding.tvDosage.visibility = View.GONE
@@ -613,8 +617,8 @@ class NCDPrescriptionActivity :
                 ) {
                     val selectedItem = dosageAdapter.getData(position = p2)
                     selectedItem?.let {
-                        model.dosage_unit_selected = it[DefinedParams.ID].toString().toLong()
-                        model.dosage_unit_name_entered = it[DefinedParams.NAME] as String
+                        model.dosageUnitSelected = it[DefinedParams.ID].toString().toLong()
+                        model.dosageUnitNameEntered = it[DefinedParams.NAME] as String
                     }
                 }
 
@@ -624,7 +628,7 @@ class NCDPrescriptionActivity :
                      */
                 }
             }
-        model.dosage_unit_name_entered?.let {
+        model.dosageUnitNameEntered?.let {
             medicationEditBinding.tvUnit.setSelection(
                 getSpinnerPosition(dosageAdapter, it),
                 true,
@@ -685,8 +689,8 @@ class NCDPrescriptionActivity :
                     val selectedItem = adapter.getData(position = p2)
                     selectedItem?.let {
                         editSpinnerFrequency(selectedItem, medicationEditBinding, model)
-                        model.dosage_frequency_name_entered = it[DefinedParams.NAME] as String
-                        model.dosage_frequency_entered = it[DefinedParams.ID].toString().toLong()
+                        model.dosageFrequencyNameEntered = it[DefinedParams.NAME] as String
+                        model.dosageFrequencyEntered = it[DefinedParams.ID].toString().toLong()
                     }
                 }
 
@@ -696,7 +700,7 @@ class NCDPrescriptionActivity :
                      */
                 }
             }
-        model.dosage_frequency_name_entered?.let {
+        model.dosageFrequencyNameEntered?.let {
             medicationEditBinding.spinnerFrequency.setSelection(
                 getSpinnerPosition(adapter, it),
                 true,
@@ -723,9 +727,9 @@ class NCDPrescriptionActivity :
         }
         medicationEditBinding.etInstruction.addTextChangedListener {
             it?.let {
-                model.instruction_entered = it.toString()
+                model.instructionEntered = it.toString()
             } ?: kotlin.run {
-                model.instruction_entered = null
+                model.instructionEntered = null
             }
         }
         medicationEditBinding.ivRemoveMedication.safeClickListener {
@@ -737,12 +741,12 @@ class NCDPrescriptionActivity :
             model.isEdited = false
             model.filledPrescriptionDays = model.prescribedDays
             model.enteredDosageUnitValue = model.dosageUnitValue
-            model.dosage_form_name_entered = model.dosageFormName
-            model.dosage_frequency_name_entered = model.dosageFrequencyName
-            model.dosage_frequency_entered = model.dosage_frequency_entered
-            model.dosage_unit_selected = model.dosageUnitId
-            model.dosage_unit_name_entered = model.dosageUnitName
-            model.instruction_entered = model.instructionNote
+            model.dosageFormNameEntered = model.dosageFormName
+            model.dosageFrequencyNameEntered = model.dosageFrequencyName
+            model.dosageFrequencyEntered = model.dosageFrequencyEntered
+            model.dosageUnitSelected = model.dosageUnitId
+            model.dosageUnitNameEntered = model.dosageUnitName
+            model.instructionEntered = model.instructionNote
             loadPrescriptionListData()
         }
         medicationEditBinding.etInstruction.safeClickListener {
@@ -838,12 +842,12 @@ class NCDPrescriptionActivity :
             model.isEdited = true
             model.filledPrescriptionDays = null
             model.enteredDosageUnitValue = null
-            model.dosage_form_name_entered = model.dosageFormName
-            model.dosage_unit_name_entered = null
-            model.instruction_entered = null
-            model.dosage_unit_selected = null
-            model.dosage_frequency_entered = null
-            model.dosage_frequency_name_entered = null
+            model.dosageFormNameEntered = model.dosageFormName
+            model.dosageUnitNameEntered = null
+            model.instructionEntered = null
+            model.dosageUnitSelected = null
+            model.dosageFrequencyEntered = null
+            model.dosageFrequencyNameEntered = null
             loadPrescriptionListData()
         }
 
@@ -988,12 +992,10 @@ class NCDPrescriptionActivity :
             0
         }
 
-    private fun checkValue(it: Editable?): Editable? =
-        if (it.isNullOrBlank()) {
-            null
-        } else {
-            it
-        }
+    private fun checkValue(it: Editable?): Editable? {
+        if (it.isNullOrBlank()) return null
+        return if (NCDMRUtil.isValidDosageValue(it.toString())) it else null
+    }
 
     private fun editSpinnerFrequency(
         selectedItem: Map<String, Any>,
@@ -1002,9 +1004,9 @@ class NCDPrescriptionActivity :
     ) {
         selectedItem.let {
             if (!(
-                    model.dosage_frequency_name_entered != null &&
-                        model.dosage_frequency_name_entered!!.isNotEmpty() &&
-                        model.dosage_frequency_name_entered == (it[DefinedParams.NAME] as String)
+                    model.dosageFrequencyNameEntered != null &&
+                        model.dosageFrequencyNameEntered!!.isNotEmpty() &&
+                        model.dosageFrequencyNameEntered == (it[DefinedParams.NAME] as String)
                 )
             ) {
                 if (it.containsKey(DefinedParams.DESCRIPTION)) {
@@ -1012,8 +1014,8 @@ class NCDPrescriptionActivity :
                         it[DefinedParams.DESCRIPTION] as String
                 }
             } else {
-                if (!model.instruction_entered.isNullOrBlank()) {
-                    medicationEditBinding.etInstruction.text = model.instruction_entered
+                if (!model.instructionEntered.isNullOrBlank()) {
+                    medicationEditBinding.etInstruction.text = model.instructionEntered
                 } else {
                     medicationEditBinding.etInstruction.text =
                         it[DefinedParams.DESCRIPTION] as String
@@ -1062,7 +1064,7 @@ class NCDPrescriptionActivity :
                 ) {
                     val selectedItem = spinnerFormAdapter.getData(position = p2)
                     selectedItem?.let {
-                        model.dosage_form_name_entered = it[DefinedParams.ID] as String
+                        model.dosageFormNameEntered = it[DefinedParams.ID] as String
                     }
                 }
 
@@ -1072,7 +1074,7 @@ class NCDPrescriptionActivity :
                      */
                 }
             }
-        model.dosage_form_name_entered?.let {
+        model.dosageFormNameEntered?.let {
             medicationEditBinding.spinnerFrequency.setSelection(
                 getSpinnerPosition(spinnerFormAdapter, it),
                 true,
@@ -1099,32 +1101,32 @@ class NCDPrescriptionActivity :
         val dropDownList = ArrayList<Map<String, Any>>()
         dropDownList.add(
             hashMapOf<String, Any>(
-                DefinedParams.NAME to DefinedParams.DefaultIDLabel,
-                DefinedParams.ID to DefinedParams.DefaultID,
+                DefinedParams.NAME to DefinedParams.DEFAULT_ID_LABEL,
+                DefinedParams.ID to DefinedParams.DEFAULT_ID,
             ),
         )
         dropDownList.add(
             hashMapOf<String, Any>(
-                DefinedParams.NAME to DefinedParams.Tablet,
-                DefinedParams.ID to DefinedParams.Tablet,
+                DefinedParams.NAME to DefinedParams.TABLET,
+                DefinedParams.ID to DefinedParams.TABLET,
             ),
         )
         dropDownList.add(
             hashMapOf<String, Any>(
-                DefinedParams.NAME to DefinedParams.Liquid_Oral,
-                DefinedParams.ID to DefinedParams.Liquid_Oral,
+                DefinedParams.NAME to DefinedParams.LIQUID_ORAL,
+                DefinedParams.ID to DefinedParams.LIQUID_ORAL,
             ),
         )
         dropDownList.add(
             hashMapOf<String, Any>(
-                DefinedParams.NAME to DefinedParams.Injection_Injectable_Solution,
-                DefinedParams.ID to DefinedParams.Injection_Injectable_Solution,
+                DefinedParams.NAME to DefinedParams.INJECTION_INJECTABLE_SOLUTION,
+                DefinedParams.ID to DefinedParams.INJECTION_INJECTABLE_SOLUTION,
             ),
         )
         dropDownList.add(
             hashMapOf<String, Any>(
-                DefinedParams.NAME to DefinedParams.Capsule,
-                DefinedParams.ID to DefinedParams.Capsule,
+                DefinedParams.NAME to DefinedParams.CAPSULE,
+                DefinedParams.ID to DefinedParams.CAPSULE,
             ),
         )
 
@@ -1155,16 +1157,16 @@ class NCDPrescriptionActivity :
                             medicationId = it.id,
                             medicationName = it.name,
                             prescriptionId = it.prescriptionId,
-                            dosageUnitName = it.dosage_unit_name_entered,
+                            dosageUnitName = it.dosageUnitNameEntered,
                             dosageUnitValue = it.enteredDosageUnitValue,
-                            dosageFormName = it.dosage_form_name_entered,
-                            dosageFrequencyName = it.dosage_frequency_name_entered,
-                            dosageFrequencyId = it.dosage_frequency_entered,
+                            dosageFormName = it.dosageFormNameEntered,
+                            dosageFrequencyName = it.dosageFrequencyNameEntered,
+                            dosageFrequencyId = it.dosageFrequencyEntered,
                             prescribedDays = it.filledPrescriptionDays,
                             dosageDurationName = it.dosage_duration_name,
-                            instructionNote = it.instruction_entered,
+                            instructionNote = it.instructionEntered,
                             isDeleted = false,
-                            dosageUnitId = it.dosage_unit_selected,
+                            dosageUnitId = it.dosageUnitSelected,
                             classificationName = it.classificationName,
                             brandName = it.brandName,
                             codeDetailsObject = it.codeDetails,
@@ -1196,11 +1198,11 @@ class NCDPrescriptionActivity :
         prescriptionModel.let { prescription ->
             var isValid = true
             val invalidList = ArrayList<String>()
-            if (prescription.enteredDosageUnitValue.isNullOrBlank()) {
+            if (!NCDMRUtil.isValidDosageValue(prescription.enteredDosageUnitValue)) {
                 isValid = false
                 invalidList.add(getString(R.string.dosage))
             }
-            prescription.dosage_unit_name_entered?.let {
+            prescription.dosageUnitNameEntered?.let {
                 if (validateSpinnerValue(it)) {
                     isValid = false
                     invalidList.add(getString(R.string.unit))
@@ -1209,8 +1211,8 @@ class NCDPrescriptionActivity :
                 isValid = false
                 invalidList.add(getString(R.string.unit))
             }
-            prescription.dosage_form_name_entered?.let {
-                if (it.isEmpty() || it == DefinedParams.DefaultID) {
+            prescription.dosageFormNameEntered?.let {
+                if (it.isEmpty() || it == DefinedParams.DEFAULT_ID) {
                     isValid = false
                     invalidList.add(getString(R.string.form))
                 }
@@ -1218,7 +1220,7 @@ class NCDPrescriptionActivity :
                 isValid = false
                 invalidList.add(getString(R.string.form))
             }
-            prescription.dosage_frequency_name_entered?.let {
+            prescription.dosageFrequencyNameEntered?.let {
                 if (validateSpinnerValue(it)) {
                     isValid = false
                     invalidList.add(getString(R.string.frequency))
@@ -1307,12 +1309,12 @@ class NCDPrescriptionActivity :
                 it.filledPrescriptionDays = null
                 it.dosage_duration_name = null
                 it.enteredDosageUnitValue = null
-                it.dosage_form_name_entered = it.dosageFormName
-                it.dosage_frequency_entered = null
-                it.dosage_frequency_name_entered = null
-                it.dosage_unit_name_entered = null
-                it.instruction_entered = null
-                it.dosage_unit_selected = null
+                it.dosageFormNameEntered = it.dosageFormName
+                it.dosageFrequencyEntered = null
+                it.dosageFrequencyNameEntered = null
+                it.dosageUnitNameEntered = null
+                it.instructionEntered = null
+                it.dosageUnitSelected = null
             }
         }
         loadPrescriptionListData()
@@ -1343,7 +1345,7 @@ class NCDPrescriptionActivity :
                     patientReference = it.patientReference,
                     memberReference = it.memberReference,
                     isActive = !isFromDiscontinue,
-                    requestFrom = DefinedParams.Africa,
+                    requestFrom = DefinedParams.AFRICA,
                 ),
             )
         }

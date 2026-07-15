@@ -1,12 +1,90 @@
 {
-    "formLayout":
-    [
+    "formLayout": [
         {
-            "familyOrder": 0,
+            "familyOrder": 1,
+            "id": "ancServicesBirthPreparedness",
+            "title": "ANC services and Birth Preparedness",
+            "titleCulture": "ANC সেবা এবং প্রসবের প্রস্তুতি",
+            "viewType": "CardView"
+        },
+        {
+            "family": "ancServicesBirthPreparedness",
+            "id": "ancVisitsOtherProviders",
+            "orderId": 1,
+            "isSummary": false,
+            "viewType": "EditText",
+            "inputType": 3,
+            "isMandatory": true,
+            "isEnabled": true,
+            "title": "No. of ANC visits conducted with other providers",
+            "titleCulture": "অন্য কোন সেবাকেন্দ্র/সেবাদাতার কাছ থেকে কতবার এএনসি সেবা নিয়েছেন?",
+            "errorMessage": "Please enter a valid number",
+            "cultureErrorMessage": "অনুগ্রহ করে একটি বৈধ মান লিখুন",
+            "maxLength": 2,
+            "minValue": 0
+        },
+        {
+            "familyOrder": 2,
+            "id": "pregnancyOutcome",
+            "title": "Pregnancy Outcome",
+            "titleCulture": "ডেলিভারি রেজিস্ট্রেশন",
+            "viewType": "CardView"
+        },
+        {
+            "family": "pregnancyOutcome",
+            "id": "pregnancyOutcomeType",
+            "orderId": 1,
+            "isSummary": false,
+            "viewType": "Spinner",
+            "isMandatory": true,
+            "isEnabled": true,
+            "title": "Pregnancy Outcome",
+            "titleCulture": "গর্ভাবস্থার ফলাফল",
+            "errorMessage": "Please select pregnancy outcome",
+            "cultureErrorMessage": "অনুগ্রহ করে গর্ভাবস্থার ফলাফল নির্বাচন করুন",
+            "visibility": "visible",
+            "optionsList": [
+                {
+                    "id": "maternalDeath",
+                    "name": "Maternal Death",
+                    "cultureValue": "মাতৃমৃত্যু"
+                },
+                {
+                    "id": "liveBirth",
+                    "name": "Delivery outcome",
+                    "cultureValue": "প্রসবের ফলাফল"
+                },
+                {
+                    "id": "abortion",
+                    "name": "Abortion",
+                    "cultureValue": "গর্ভপাত"
+                }
+            ],
+            "condition": [
+                {
+                    "eq": "abortion",
+                    "targetId": "abortion",
+                    "visibility": "visible"
+                },
+                {
+                    "eq": "maternalDeath",
+                    "targetId": "maternalDeath",
+                    "visibility": "visible"
+                },
+                {
+                    "eq": "liveBirth",
+                    "targetId": "deliveryOutcomes",
+                    "visibility": "visible"
+                }
+            ]
+        },
+        {
+            "familyOrder": 3,
             "id": "maternalDeath",
             "title": "Maternal Death",
             "titleCulture": "মাতৃমৃত্যু",
-            "viewType": "CardView"
+            "viewType": "CardView",
+            "visibility": "gone"
         },
         {
             "family": "maternalDeath",
@@ -16,13 +94,13 @@
             "isSummary": false,
             "viewType": "Spinner",
             "isEnabled": true,
+            "isMandatory": true,
             "title": "Time of death",
             "titleCulture": "মৃত্যুর সময়",
             "errorMessage": "Please select time of death",
             "cultureErrorMessage": "অনুগ্রহ করে মৃত্যুর সময় নির্বাচন করুন",
             "visibility": "visible",
-            "optionsList":
-            [
+            "optionsList": [
                 {
                     "id": "beforeDelivery",
                     "name": "Before delivery",
@@ -39,115 +117,22 @@
                     "cultureValue": "প্রসবের ৪২ দিনের মধ্যে"
                 }
             ],
-            "condition":
-            [
+            "condition": [
                 {
                     "eq": "beforeDelivery",
                     "targetId": "gestationMonthAtDeath",
                     "visibility": "visible"
                 },
                 {
-                    "eqList":
-                    [
-                        "within42DaysAfterDelivery",
+                    "eqList": [
                         "duringChildbirth",
-                        "beforeDelivery"
+                        "within42DaysAfterDelivery"
                     ],
-                    "targetId": "abortion",
-                    "visibility": "gone"
-                },
-                {
-                    "eqList":
-                    [
-                        "within42DaysAfterDelivery",
-                        "duringChildbirth",
-                        "beforeDelivery"
-                    ],
-                    "targetId": "gestationMonthAtAbortion",
-                    "visibility": "gone"
-                },
-                {
-                    "eqList":
-                    [
-                        "within42DaysAfterDelivery",
-                        "duringChildbirth"
-                    ],
-                    "targetId": "typeOfAbortion",
-                    "visibility": "gone"
-                },
-                {
-                    "eq": "beforeDelivery",
                     "targetId": "deliveryOutcomes",
-                    "visibility": "gone"
+                    "visibility": "visible"
                 },
                 {
-                    "eq": "beforeDelivery",
-                    "targetId": "deliveryOutcome",
-                    "visibility": "gone"
-                },
-                {
-                    "eq": "beforeDelivery",
-                    "targetId": "liveBirthNumbers",
-                    "visibility": "gone"
-                },
-                {
-                    "eq": "beforeDelivery",
-                    "targetId": "stillbirthNumbers",
-                    "visibility": "gone"
-                },
-                {
-                    "eq": "beforeDelivery",
-                    "targetId": "placeOfDelivery",
-                    "visibility": "gone"
-                },
-                {
-                    "eq": "beforeDelivery",
-                    "targetId": "dateOfDelivery",
-                    "visibility": "gone"
-                },
-                {
-                    "eq": "beforeDelivery",
-                    "targetId": "modeOfDelivery",
-                    "visibility": "gone"
-                },
-                {
-                    "eq": "beforeDelivery",
-                    "targetId": "birthAttendant",
-                    "visibility": "gone"
-                },
-                {
-                    "eq": "beforeDelivery",
-                    "targetId": "anyComplicationsDuringDelivery",
-                    "visibility": "gone"
-                },
-                {
-                    "eq": "beforeDelivery",
-                    "targetId": "complicationsDuringDelivery",
-                    "visibility": "gone"
-                },
-                {
-                    "eq": "beforeDelivery",
-                    "targetId": "counsellingAdverseEvent",
-                    "visibility": "gone"
-                },
-                {
-                    "eq": "beforeDelivery",
-                    "targetId": "counsellingAbortion",
-                    "visibility": "gone"
-                },
-                {
-                    "eq": "beforeDelivery",
-                    "targetId": "counsellingStillBirth",
-                    "visibility": "gone"
-                },
-                {
-                    "eq": "beforeDelivery",
-                    "targetId": "counsellingNeonatalDeath",
-                    "visibility": "gone"
-                },
-                {
-                    "eqList":
-                    [
+                    "eqList": [
                         "beforeDelivery",
                         "within42DaysAfterDelivery",
                         "duringChildbirth"
@@ -194,8 +179,7 @@
             "visibility": "gone",
             "hint": "Cause of death",
             "hintCulture": "মাতৃমৃত্যুর কারণ নির্বাচন করুন",
-            "optionsList":
-            [
+            "optionsList": [
                 {
                     "id": "excessiveBleeding",
                     "name": "Excessive bleeding",
@@ -237,15 +221,15 @@
                     "cultureValue": "অন্যান্য চিকিৎসাজনিত জটিলতা"
                 }
             ],
-            "condition":
-            []
+            "condition": []
         },
         {
-            "familyOrder": 1,
+            "familyOrder": 4,
             "id": "abortion",
             "title": "Abortion",
             "titleCulture": "গর্ভপাত",
-            "viewType": "CardView"
+            "viewType": "CardView",
+            "visibility": "gone"
         },
         {
             "family": "abortion",
@@ -256,6 +240,7 @@
             "viewType": "EditText",
             "inputType": 2,
             "isEnabled": true,
+            "isMandatory": true,
             "title": "Gestation month at the time of abortion",
             "titleCulture": "গর্ভপাতের সময় গর্ভকাল মাস",
             "errorMessage": "Please enter gestation month (must be less than 6 months)",
@@ -265,85 +250,7 @@
             "hintCulture": "গর্ভকাল (মাস) লিখুন",
             "maxLength": 1,
             "minValue": 1,
-            "maxValue": 5,
-            "condition":
-            [
-                {
-                    "greaterThanOrEqual": 1,
-                    "targetId": "typeOfAbortion",
-                    "visibility": "visible"
-                },
-                {
-                    "greaterThanOrEqual": 1,
-                    "targetId": "deliveryOutcomes",
-                    "visibility": "gone"
-                },
-                {
-                    "greaterThanOrEqual": 1,
-                    "targetId": "deliveryOutcome",
-                    "visibility": "gone"
-                },
-                {
-                    "greaterThanOrEqual": 1,
-                    "targetId": "liveBirthNumbers",
-                    "visibility": "gone"
-                },
-                {
-                    "greaterThanOrEqual": 1,
-                    "targetId": "stillbirthNumbers",
-                    "visibility": "gone"
-                },
-                {
-                    "greaterThanOrEqual": 1,
-                    "targetId": "placeOfDelivery",
-                    "visibility": "gone"
-                },
-                {
-                    "greaterThanOrEqual": 1,
-                    "targetId": "dateOfDelivery",
-                    "visibility": "gone"
-                },
-                {
-                    "greaterThanOrEqual": 1,
-                    "targetId": "modeOfDelivery",
-                    "visibility": "gone"
-                },
-                {
-                    "greaterThanOrEqual": 1,
-                    "targetId": "birthAttendant",
-                    "visibility": "gone"
-                },
-                {
-                    "greaterThanOrEqual": 1,
-                    "targetId": "anyComplicationsDuringDelivery",
-                    "visibility": "gone"
-                },
-                {
-                    "greaterThanOrEqual": 1,
-                    "targetId": "complicationsDuringDelivery",
-                    "visibility": "gone"
-                },
-                {
-                    "greaterThanOrEqual": 1,
-                    "targetId": "counsellingAdverseEvent",
-                    "visibility": "gone"
-                },
-                {
-                    "greaterThanOrEqual": 1,
-                    "targetId": "counsellingAbortion",
-                    "visibility": "gone"
-                },
-                {
-                    "greaterThanOrEqual": 1,
-                    "targetId": "counsellingStillBirth",
-                    "visibility": "gone"
-                },
-                {
-                    "greaterThanOrEqual": 1,
-                    "targetId": "counsellingNeonatalDeath",
-                    "visibility": "gone"
-                }
-            ]
+            "maxValue": 5
         },
         {
             "family": "abortion",
@@ -358,9 +265,8 @@
             "titleCulture": "গর্ভপাতের ধরন",
             "errorMessage": "Please select type of abortion",
             "cultureErrorMessage": "গর্ভপাতের ধরন নির্বাচন করুন",
-            "visibility": "gone",
-            "optionsList":
-            [
+            "visibility": "visible",
+            "optionsList": [
                 {
                     "id": "spontaneous",
                     "name": "Spontaneous",
@@ -372,15 +278,15 @@
                     "cultureValue": "ইচ্ছাকৃতভাবে/চিকিৎসার মাধ্যমে গর্ভপাত"
                 }
             ],
-            "condition":
-            []
+            "condition": []
         },
         {
-            "familyOrder": 2,
+            "familyOrder": 5,
             "id": "deliveryOutcomes",
             "title": "Delivery outcomes",
             "titleCulture": "প্রসবের ফলাফল",
-            "viewType": "CardView"
+            "viewType": "CardView",
+            "visibility": "gone"
         },
         {
             "family": "deliveryOutcomes",
@@ -414,9 +320,8 @@
             "hintCulture": "সংখ্যা লিখুন",
             "maxLength": 1,
             "minValue": 0,
-            "maxValue": 5,
-            "condition":
-            []
+            "maxValue": 4,
+            "condition": []
         },
         {
             "family": "deliveryOutcomes",
@@ -435,8 +340,9 @@
             "visibility": "visible",
             "hint": "Enter number",
             "hintCulture": "সংখ্যা লিখুন",
-            "maxLength": 2,
-            "minValue": 0
+            "maxLength": 1,
+            "minValue": 0,
+            "maxValue": 4
         },
         {
             "family": "deliveryOutcomes",
@@ -452,8 +358,7 @@
             "errorMessage": "Please select place of delivery",
             "cultureErrorMessage": "অনুগ্রহ করে প্রসবের স্থান নির্বাচন করুন",
             "visibility": "visible",
-            "optionsList":
-            [
+            "optionsList": [
                 {
                     "id": "home",
                     "name": "Home",
@@ -470,14 +375,7 @@
                     "cultureValue": "বেসরকারি স্বাস্থ্যকেন্দ্রে"
                 }
             ],
-            "condition":
-            [
-                {
-                    "eq": "home",
-                    "targetId": "birthAttendant",
-                    "visibility": "visible"
-                }
-            ]
+            "condition": []
         },
         {
             "family": "deliveryOutcomes",
@@ -511,8 +409,7 @@
             "errorMessage": "Please select mode of delivery",
             "cultureErrorMessage": "অনুগ্রহ করে প্রসবের পদ্ধতি নির্বাচন করুন",
             "visibility": "visible",
-            "optionsList":
-            [
+            "optionsList": [
                 {
                     "id": "normalDelivery",
                     "name": "Normal Delivery",
@@ -544,8 +441,7 @@
             "errorMessage": "Please select birth attendant",
             "cultureErrorMessage": "অনুগ্রহ করে প্রসবের সহায়তাকারী নির্বাচন করুন",
             "visibility": "gone",
-            "optionsList":
-            [
+            "optionsList": [
                 {
                     "id": "fwv",
                     "name": "FWV (Family welfare visitor)",
@@ -607,8 +503,7 @@
             "errorMessage": "Please select if there were any complications",
             "cultureErrorMessage": "অনুগ্রহ করে প্রসবকালীন জটিলতা থাকলে নির্বাচন করুন",
             "visibility": "visible",
-            "optionsList":
-            [
+            "optionsList": [
                 {
                     "id": "yes",
                     "name": "Yes",
@@ -621,8 +516,7 @@
                 }
             ],
             "optionType": "boolean",
-            "condition":
-            [
+            "condition": [
                 {
                     "eq": "yes",
                     "targetId": "complicationsDuringDelivery",
@@ -646,8 +540,7 @@
             "visibility": "gone",
             "hint": "Complications",
             "hintCulture": "জটিলতা",
-            "optionsList":
-            [
+            "optionsList": [
                 {
                     "id": "excessiveBleeding",
                     "name": "Excessive bleeding",
@@ -691,7 +584,7 @@
             ]
         },
         {
-            "familyOrder": 4,
+            "familyOrder": 6,
             "id": "counsellingAdverseEvent",
             "isSummary": true,
             "title": "Counselling in case of adverse event",
@@ -710,15 +603,13 @@
             "title": "Emotional Support",
             "titleCulture": "মানসিক সহায়তা",
             "visibility": "visible",
-            "instructions":
-            [
+            "instructions": [
                 "I am very sorry for your loss. I know this is an incredibly difficult time for you and your family. What you are feeling right now - whether it's sadness, anger, confusion, or numbness - all of these feelings are completely normal. There is no right or wrong way to grieve.",
                 "It's important that you allow yourself to feel these emotions. Don't hold them inside. Talk to your partner, your family, or someone you trust about how you're feeling. Some days will be harder than others, and that's okay. Healing takes time, and everyone heals at their own pace.",
                 "If you feel comfortable, you can also connect with other mothers who have experienced similar losses. There are support groups available that can help. And if you ever feel overwhelmed or need professional support, please don't hesitate to reach out. We are here to help you.",
                 "Remember, seeking help is a sign of strength, not weakness. Your feelings matter, and you deserve support during this difficult time."
             ],
-            "instructionsCulture":
-            [
+            "instructionsCulture": [
                 "আমি আপনার ক্ষতির জন্য আন্তরিকভাবে দুঃখিত। আমি জানি, এই সময়টা আপনার এবং আপনার পরিবারের জন্য খুবই কঠিন।",
                 "এই মুহূর্তে আপনি যা অনুভব করছেন- দুঃখ, রাগ, বিভ্রান্তি বা কিছুই অনুভব না হওয়া এগুলো সবই স্বাভাবিক। শোক প্রকাশের কোনো নির্দিষ্ট সঠিক বা ভুল উপায় নেই।",
                 "আপনার অনুভূতিগুলো চেপে না রেখে নিজেকে সেগুলো অনুভব করতে দিন। আপনার সঙ্গী, পরিবার বা বিশ্বাসযোগ্য কারো সাথে আপনার অনুভূতি নিয়ে কথা বলুন। কিছু দিন অন্য দিনের চেয়ে বেশি কঠিন লাগতে পারে এটা স্বাভাবিক। সুস্থ হতে সময় লাগে, আর প্রত্যেকে নিজের মতো করে ধীরে ধীরে ভালো হয়।",
@@ -738,16 +629,14 @@
             "title": "Future Pregnancy Planning",
             "titleCulture": "ভবিষ্যত গর্ভাবস্থার পরিকল্পনা",
             "visibility": "visible",
-            "instructions":
-            [
+            "instructions": [
                 "I know this may be difficult to think about right now, but I want to talk to you about family planning for your future health and wellbeing",
                 "It's very important to wait at least 6 months before becoming pregnant again. Your body needs this time to heal completely, both physically and emotionally. Becoming pregnant too soon can increase risks for you and your future baby.",
                 "To prevent pregnancy during this time, I recommend using a family planning method. We have several options available: IUD, contraceptive pills, injections, condoms, and other methods. We can discuss which method would work best for you based on your health and preferences. All of these methods are safe and effective.",
                 "Remember, you can become pregnant again even before your periods return, so it's important to start family planning right away if you don't want to conceive immediately.",
                 "When you and your family decide you're ready to try for another pregnancy, please come see us first. We'll make sure you're taking folic acid tablets, eating well, and managing any health conditions. We'll also help you register for antenatal care as early as possible in your next pregnancy - ideally within the first 3 months - so we can monitor you closely and ensure a healthy pregnancy."
             ],
-            "instructionsCulture":
-            [
+            "instructionsCulture": [
                 "আপা, আমি বুঝতে পারছি এই সময়টা আপনার জন্য খুব কঠিন। তারপরও আপনার ভবিষ্যতের সুস্থতার জন্য একটা গুরুত্বপূর্ণ কথা বলি—\nএখন অন্তত ৬ মাস গর্ভধারণ না করা খুব জরুরি। এতে আপনার শরীর ও মন ভালোভাবে সুস্থ হওয়ার সময় পাবে। তাড়াতাড়ি গর্ভধারণ করলে আপনার ও পরবর্তী বাচ্চার জন্য ঝুঁকি বাড়বে। তাই এই সময়টা নিরাপদ রাখতে একটা পরিবার পরিকল্পনা পদ্ধতি ব্যবহার করা খুব দরকার—যেমন: কপার-টি, পিল, ইনজেকশন বা কনডম। আপনি চাইলে আমি আপনার জন্য সবচেয়ে সহজ ও ভালো পদ্ধতিটা বেছে নিতে সাহায্য করতে পারি।",
                 "একটা গুরুত্বপূর্ণ বিষয়—মাসিক শুরু না হলেও গর্ভধারণ হতে পারে, তাই দেরি না করে এখন থেকেই পদ্ধতি শুরু করা ভালো।",
                 "আপা, যখন আপনি আবার বাচ্চা নিতে প্রস্তুত হবেন, তার আগে একবার আমাদের সাথে যোগাযোগ করবেন। তখন আমরা নিশ্চিত করব—আপনি ঠিকভাবে ফলিক অ্যাসিড খাচ্ছেন, ভালো খাবার নিচ্ছেন, আর শুরু থেকেই (প্রথম ৩ মাসের মধ্যে) নিয়মিত চেকআপ করছেন।",

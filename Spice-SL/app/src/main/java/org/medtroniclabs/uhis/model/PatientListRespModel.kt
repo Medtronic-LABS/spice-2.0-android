@@ -36,7 +36,7 @@ data class PatientListRespModel(
     val chwPhoneNumber: String? = null,
     val maritalStatus: String? = null,
     val houseHoldId: String? = null,
-    val houseHoldNumber: Long? = null,
+    val houseHoldNumber: String? = null,
     val dateOfOnset: String? = null,
     var isPregnant: Boolean? = null,
     var isPregnancyRisk: Boolean? = null,
@@ -94,6 +94,14 @@ data class PatientListRespModel(
     val entryPoint: String? = null,
     val isEmtctFlow: Boolean? = null,
     val otherEntryPoint: String? = null,
+    val patientHealthHistory: PatientHealthHistory? = null,
+) : Serializable
+
+data class PatientHealthHistory(
+    val heartAttack: String? = null,
+    val stroke: String? = null,
+    val kidneyDisease: String? = null,
+    val copd: String? = null,
 ) : Serializable
 
 data class PregnancyDetails(

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/centerGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.8" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvUnion"
+        style="@style/TextStyle_Medium_16_NoBG"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/union"
+        android:textColor="@color/b_w_black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatSpinner
+        android:id="@+id/spinnerUnion"
+        style="@style/Form_Spinner_Style"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_8sdp"
+        app:layout_constraintEnd_toStartOf="@id/centerGuideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvUnion" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvVillage"
+        style="@style/TextStyle_Medium_16_NoBG"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_24sdp"
+        android:text="@string/village"
+        android:textColor="@color/b_w_black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spinnerUnion" />
+
+    <androidx.appcompat.widget.AppCompatSpinner
+        android:id="@+id/spinnerVillage"
+        style="@style/Form_Spinner_Style"
+        android:layout_width="@dimen/_0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_8sdp"
+        app:layout_constraintEnd_toStartOf="@id/centerGuideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvVillage" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/grpVillage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="spinnerVillage, tvVillage" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

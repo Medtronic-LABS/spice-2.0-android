@@ -190,12 +190,6 @@ class AssessmentPregnantWomenRegistrationFragment :
                             // Gestational Week
                             updateGestationalWeek(lastMenstrualDate)
 
-                            // Pregnancy test
-                            formGenerator
-                                .getViewByTag(
-                                    PregnantWomen.ID_PREGNANCY_TEST + formGenerator.rootSuffix,
-                                )?.visible()
-
                             // Gravida
                             formGenerator
                                 .getViewByTag(
@@ -233,10 +227,9 @@ class AssessmentPregnantWomenRegistrationFragment :
      * Calculates gestational week and updates UI
      */
     private fun updateGestationalWeek(lastMenstrualDate: Calendar) {
+        val gestationalAge = DateUtils.calculateGestationalAge(lastMenstrualDate)
         val gestationalAgeWeekString = formatGestationalAge(
-            DateUtils.calculateGestationalAge(
-                lastMenstrualDate,
-            ),
+            gestationalAge,
             requireContext(),
         )
         formGenerator
@@ -252,6 +245,7 @@ class AssessmentPregnantWomenRegistrationFragment :
                 PregnantWomen.ID_GESTATIONAL_WEEK,
             ) as? TextView
         )?.text = gestationalAgeWeekString
+        updatePregnancyTestVisibility(gestationalAge)
     }
 
     /**
@@ -415,6 +409,9 @@ class AssessmentPregnantWomenRegistrationFragment :
     ) {
     }
 
+    override fun onQRScanRequested() {
+    }
+
     override fun onClick(view: View) {
         when (view.id) {
             binding.btnSubmit.id -> {
@@ -423,6 +420,25 @@ class AssessmentPregnantWomenRegistrationFragment :
                     viewModel.fetchCurrentLocation(requireContext())
                     formGenerator.formSubmitAction(view)
                 })
+            }
+        }
+    }
+
+    /**
+     * Updates the visibility of the Pregnancy Test field based on gestational age.
+     * Uses total gestational days (weeks × 7 + days) so 16 weeks + 1 day exceeds the limit.
+     */
+    private fun updatePregnancyTestVisibility(gestationalAge: Pair<Long, Long>) {
+        val totalGestationalDays = gestationalAge.first * 7 + gestationalAge.second
+        val pregnancyTestView = formGenerator.getViewByTag(
+            PregnantWomen.ID_PREGNANCY_TEST + formGenerator.rootSuffix,
+        )
+        if (totalGestationalDays <= PregnantWomen.PREGNANCY_TEST_MAX_GESTATIONAL_DAYS) {
+            pregnancyTestView?.visible()
+        } else {
+            pregnancyTestView?.let { view ->
+                formGenerator.resetChildViews(view)
+                view.gone()
             }
         }
     }

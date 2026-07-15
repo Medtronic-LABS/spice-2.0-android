@@ -57,7 +57,7 @@ class ReferPatientFragment : BaseDialogFragment(), View.OnClickListener {
             val bundle = Bundle()
             bundle.putString(DefinedParams.NAME, name)
             bundle.putString(DefinedParams.PatientReference, patientReference)
-            bundle.putString(DefinedParams.EncounterId, encounterId)
+            bundle.putString(DefinedParams.ENCOUNTER_ID, encounterId)
             fragment.arguments = bundle
             return fragment
         }
@@ -167,8 +167,8 @@ class ReferPatientFragment : BaseDialogFragment(), View.OnClickListener {
         val list = arrayListOf<Map<String, Any>>()
         list.add(
             hashMapOf<String, Any>(
-                DefinedParams.NAME to DefinedParams.DefaultIDLabel,
-                DefinedParams.ID to DefinedParams.DefaultID,
+                DefinedParams.NAME to DefinedParams.DEFAULT_ID_LABEL,
+                DefinedParams.ID to DefinedParams.DEFAULT_ID,
             ),
         )
         listItems?.forEach {
@@ -218,15 +218,15 @@ class ReferPatientFragment : BaseDialogFragment(), View.OnClickListener {
         val list = arrayListOf<Map<String, Any>>()
         list.add(
             hashMapOf<String, Any>(
-                DefinedParams.NAME to DefinedParams.DefaultIDLabel,
-                DefinedParams.ID to DefinedParams.DefaultID,
+                DefinedParams.NAME to DefinedParams.DEFAULT_ID_LABEL,
+                DefinedParams.ID to DefinedParams.DEFAULT_ID,
             ),
         )
         listItems.forEach {
             list.add(
                 hashMapOf<String, Any>(
                     DefinedParams.NAME to it.name,
-                    DefinedParams.TenantId to it.tenantId,
+                    DefinedParams.TENANT_ID to it.tenantId,
                     DefinedParams.ID to it.id,
                     DefinedParams.FhirId to it.fhirId,
                 ),
@@ -249,10 +249,10 @@ class ReferPatientFragment : BaseDialogFragment(), View.OnClickListener {
             ) {
                 val selectedValue = referToAdapter.getData(position)
                 selectedValue?.let {
-                    val selectedTenantId = it[DefinedParams.TenantId] as? String
+                    val selectedTenantId = it[DefinedParams.TENANT_ID] as? String
                     val selectedFHIRId = it[DefinedParams.FhirId] as? String
                     val selectedId = it[DefinedParams.ID] as? String
-                    if (selectedId != DefinedParams.DefaultID) {
+                    if (selectedId != DefinedParams.DEFAULT_ID) {
                         selectedTenantId?.let { tenantId ->
                             viewModel.referToSelectedId = selectedFHIRId
                             isEnableRefer()
@@ -311,7 +311,7 @@ class ReferPatientFragment : BaseDialogFragment(), View.OnClickListener {
     private fun postResultInput() {
         val assessmentName: String? = arguments?.getString(DefinedParams.NAME, "")
         val patientReference: String? = arguments?.getString(DefinedParams.PatientReference, "")
-        val encounterId: String? = arguments?.getString(DefinedParams.EncounterId, "")
+        val encounterId: String? = arguments?.getString(DefinedParams.ENCOUNTER_ID, "")
         val referralTicketType: String = when (assessmentName) {
             MedicalReviewTypeEnums.ABOVE_FIVE_YEARS.name, MedicalReviewTypeEnums.UNDER_FIVE_YEARS.name, MedicalReviewTypeEnums.UNDER_TWO_MONTHS.name -> DefinedParams.ICCM
             MedicalReviewTypeEnums.ANC_REVIEW.name, MedicalReviewTypeEnums.PNC_MOTHER_REVIEW.name, MedicalReviewTypeEnums.MOTHER_DELIVERY_REVIEW.name -> DefinedParams.RMNCH

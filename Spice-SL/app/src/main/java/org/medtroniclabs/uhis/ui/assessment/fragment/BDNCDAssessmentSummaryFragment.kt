@@ -1,11 +1,13 @@
 package org.medtroniclabs.uhis.ui.assessment.fragment
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.activityViewModels
 import org.json.JSONArray
 import org.json.JSONObject
@@ -13,19 +15,22 @@ import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.visible
+import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.CVD_RISK_SCORE_DISPLAY
-import org.medtroniclabs.uhis.common.DefinedParams.DefaultID
-import org.medtroniclabs.uhis.common.SecuredPreference
+import org.medtroniclabs.uhis.common.DefinedParams.DEFAULT_ID
 import org.medtroniclabs.uhis.databinding.FragmentBdNcdSummaryBinding
 import org.medtroniclabs.uhis.formgeneration.utility.CustomSpinnerAdapter
 import org.medtroniclabs.uhis.model.AssessmentSummaryModel
 import org.medtroniclabs.uhis.ui.BaseFragment
 import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils
 import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils.findValueByKey
+import org.medtroniclabs.uhis.ui.assessment.AssessmentCommonUtils.getSpinnerDisplayValue
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_BLOOD_PRESSURE
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_DIASTOLIC
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.AVG_SYSTOLIC
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BMI
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BMI_CATEGORY
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.BP_LOG_DETAILS
@@ -38,15 +43,15 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_UNIT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HBA1CUnit
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.HEIGHT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.MMHG
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NCD_SYMPTOM
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NAME
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.NCD_SYMPTOMS
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.REFERRAL_FACILITY_TYPE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.ReferredPHUSiteID
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.WEIGHT
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.hba1c
+import org.medtroniclabs.uhis.ui.assessment.referrallogic.NCDReferralColorEvaluator
 import org.medtroniclabs.uhis.ui.assessment.referrallogic.utils.ReferralStatus
 import org.medtroniclabs.uhis.ui.assessment.viewmodel.AssessmentViewModel
-import kotlin.collections.set
 
 class BDNCDAssessmentSummaryFragment : BaseFragment() {
     private val viewModel: AssessmentViewModel by activityViewModels()
@@ -93,15 +98,48 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
     }
 
     private fun attachObservers() {
-        viewModel.assessmentStringLiveData.value?.let {
-            val json = JSONObject(it)
+        viewModel.assessmentStringLiveData.observe(viewLifecycleOwner) { assessmentString ->
+            if (assessmentString.isNullOrBlank()) return@observe
+            val json = JSONObject(assessmentString)
             updateStatusBar(json)
+            if (viewModel.isFollowupVisit) {
+                applyRiskColor(json)
+            }
             val items = createNCDSummaryData(json)
-            createSummaryView(items)
+            createSummaryView(items, json)
         }
     }
 
-    private fun createSummaryView(listSummaryData: MutableList<AssessmentSummaryModel>?) {
+    private fun applyRiskColor(json: JSONObject) {
+        val systolic = (findValueByKey(json, AVG_SYSTOLIC) as? Number)?.toInt()?.takeIf { it > 0 }
+        val diastolic = (findValueByKey(json, AVG_DIASTOLIC) as? Number)?.toInt()?.takeIf { it > 0 }
+        val glucoseUnit = findValueByKey(json, GLUCOSE_UNIT) as? String
+        val glucoseType = findValueByKey(json, GLUCOSE_TYPE) as? String
+        val glucoseValue = (findValueByKey(json, GLUCOSE) as? Number)?.toDouble()?.takeIf { it > 0 }
+        val hasSymptoms = hasNcdSymptoms(json)
+        val colorResult = NCDReferralColorEvaluator.evaluate(
+            NCDReferralColorEvaluator.Input(
+                systolic = systolic,
+                diastolic = diastolic,
+                glucoseUnit = glucoseUnit,
+                glucoseType = glucoseType,
+                glucoseValue = glucoseValue,
+                hasSymptoms = hasSymptoms,
+            ),
+        )
+        binding.riskResultLayout.backgroundTintList =
+            ColorStateList.valueOf(colorResult.colorHex.toColorInt())
+    }
+
+    private fun hasNcdSymptoms(json: JSONObject): Boolean {
+        val symptoms = findValueByKey(json, NCD_SYMPTOMS)
+        return symptoms is JSONArray && symptoms.length() > 0
+    }
+
+    private fun createSummaryView(
+        listSummaryData: MutableList<AssessmentSummaryModel>?,
+        json: JSONObject,
+    ) {
         listSummaryData?.let { summaryData ->
             binding.parentLayout.removeAllViews()
 
@@ -112,10 +150,32 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
                 )
             }
 
-            val isTranslationEnabled = SecuredPreference.getIsTranslationEnabled()
-
             summaryData.forEach { item ->
-                bindSummaryView(if (isTranslationEnabled) item.cultureValue else item.title, item.value)
+                val rawValue =
+                    getSpinnerDisplayValue(
+                        item.id.toString(),
+                        item.value,
+                        isTranslationEnabled,
+                        viewModel.formLayoutsLiveData.value
+                            ?.data
+                            ?.formLayout,
+                    ) ?: item.value
+                val title = if (isTranslationEnabled) item.cultureValue else item.title
+                when (item.id) {
+                    BMI -> {
+                        val bmiDisplay = AssessmentCommonUtils.formatBMISummaryDisplay(
+                            requireContext(),
+                            findValueByKey(json, BMI),
+                        )
+                        bindSummaryView(title, bmiDisplay ?: rawValue)
+                    }
+                    CVD_RISK -> {
+                        AssessmentCommonUtils.formatCVDRiskSummaryDisplay(requireContext(), json)?.let {
+                            bindSummaryView(title, it.first, it.second)
+                        } ?: rawValue?.let { bindSummaryView(title, it) }
+                    }
+                    else -> bindSummaryView(title, rawValue)
+                }
             }
         }
     }
@@ -136,11 +196,16 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
                 val referralTypeSite = findValueByKey(json, REFERRAL_FACILITY_TYPE) as String
                 viewModel.otherAssessmentDetails[REFERRAL_FACILITY_TYPE] = referralTypeSite
 
-                viewModel.nearestFacilityLiveData.value?.data?.let { siteList ->
-                    loadPhuSitesList(siteList)
+                if (CommonUtils.isFoPoOrChcp() || referralTypeSite == FACILITY_TYPE_UPAZILA) {
+                    binding.labelPhuReferred.gone()
+                    binding.etPhuChange.gone()
+                } else {
+                    viewModel.nearestFacilityLiveData.value?.data?.let { siteList ->
+                        loadPhuSitesList(siteList)
+                    }
+                    binding.labelPhuReferred.visible()
+                    binding.etPhuChange.visible()
                 }
-                binding.labelPhuReferred.visible()
-                binding.etPhuChange.visible()
                 binding.riskResultLayout.backgroundTintList =
                     ContextCompat.getColorStateList(requireContext(), R.color.attention_color)
 
@@ -186,16 +251,19 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
         jsonObject: JSONObject,
     ): String? {
         return when (id) {
-            NCD_SYMPTOMS, NCD_SYMPTOM -> {
+            NCD_SYMPTOMS -> {
                 val list = mutableListOf<String>()
                 findValueByKey(jsonObject, id)?.let {
                     val jsonArray = it as JSONArray
 
                     for (i in 0 until jsonArray.length()) {
                         val sign = jsonArray.getJSONObject(i)
-
-                        sign.optString(CULTURE_VALUE).let { value ->
-                            list.add(value)
+                        val name = sign.optString(NAME)
+                        val cultureValue = sign.optString(CULTURE_VALUE)
+                        if (isTranslationEnabled && cultureValue.isNotBlank()) {
+                            list.add(cultureValue)
+                        } else {
+                            list.add(name)
                         }
                     }
 
@@ -209,7 +277,7 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
                 val glucoseValue = findValueByKey(jsonObject, id)
                 val unit = findValueByKey(jsonObject, GLUCOSE_UNIT)
                 val type = findValueByKey(jsonObject, GLUCOSE_TYPE)
-                return if (unit != null && type != null && glucoseValue != null) {
+                if (unit != null && type != null && glucoseValue != null) {
                     "${glucoseValue as Double} ${unit as String} (${type as String})"
                 } else {
                     null
@@ -219,7 +287,7 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
             hba1c -> {
                 val hba1 = findValueByKey(jsonObject, id)
                 val unit = findValueByKey(jsonObject, HBA1CUnit)
-                return if (unit != null && hba1 != null) {
+                if (unit != null && hba1 != null) {
                     "${hba1 as Double} ${unit as String}"
                 } else {
                     null
@@ -227,23 +295,23 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
             }
 
             BMI -> {
-                val bmi = findValueByKey(jsonObject, id)
-                val bmiCategory = findValueByKey(jsonObject, BMI_CATEGORY)
-                return if (bmiCategory != null && bmi != null) {
-                    "${bmi as Double} (${bmiCategory as String})"
+                val bmi = (findValueByKey(jsonObject, id) as? Number)?.toDouble()
+                val bmiCategory = findValueByKey(jsonObject, BMI_CATEGORY) as? String
+                if (bmi != null && bmiCategory != null) {
+                    "${CommonUtils.getDecimalFormatted(bmi)} ($bmiCategory)"
                 } else {
-                    null
+                    bmi?.let { CommonUtils.getDecimalFormatted(it) }
                 }
             }
 
             BP_LOG_DETAILS -> {
                 val bp = findValueByKey(jsonObject, AVG_BLOOD_PRESSURE) as? String
-                return "$bp $MMHG"
+                "$bp $MMHG"
             }
 
             CVD_RISK -> {
                 val cvdRiskLevel = findValueByKey(jsonObject, CVD_RISK_SCORE_DISPLAY)
-                return if (cvdRiskLevel != null) {
+                if (cvdRiskLevel != null) {
                     cvdRiskLevel as String
                 } else {
                     null
@@ -268,8 +336,8 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
                 ) {
                     val selectedItem = adapter.getData(position = pos)
                     selectedItem?.let {
-                        val selectedId = it[DefinedParams.id] as String?
-                        if (selectedId != DefaultID) {
+                        val selectedId = it[DefinedParams.ID] as String?
+                        if (selectedId != DEFAULT_ID) {
                             viewModel.otherAssessmentDetails[ReferredPHUSiteID] = selectedId.toString()
                             // Capture the picked facility's tier → actual.destinationTier
                             // for the MicroCoaching referral_location_* gaps.
@@ -311,18 +379,15 @@ class BDNCDAssessmentSummaryFragment : BaseFragment() {
 
     private fun bindSummaryView(
         title: String?,
-        value: String?,
+        value: CharSequence?,
         valueTextColor: Int? = null,
     ) {
-        if (title != null && value != null) {
-            binding.parentLayout.addView(
-                AssessmentCommonUtils.addViewSummaryLayout(
-                    title,
-                    value,
-                    valueTextColor,
-                    requireContext(),
-                ),
-            )
-        }
+        AssessmentCommonUtils
+            .createSummaryLayout(
+                requireContext(),
+                title,
+                value,
+                valueTextColor,
+            )?.let { binding.parentLayout.addView(it) }
     }
 }

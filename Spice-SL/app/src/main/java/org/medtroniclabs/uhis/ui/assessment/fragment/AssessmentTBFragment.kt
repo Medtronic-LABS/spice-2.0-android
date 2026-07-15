@@ -13,7 +13,7 @@ import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams.TBTYPE
 import org.medtroniclabs.uhis.common.DateUtils
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.DefinedParams.DefaultID
+import org.medtroniclabs.uhis.common.DefinedParams.DEFAULT_ID
 import org.medtroniclabs.uhis.common.DefinedParams.ID
 import org.medtroniclabs.uhis.common.DefinedParams.NAME
 import org.medtroniclabs.uhis.common.DefinedParams.TB
@@ -174,7 +174,7 @@ class AssessmentTBFragment : BaseFragment(), FormEventListener, View.OnClickList
                         0,
                         hashMapOf<String, Any>(
                             NAME to getString(R.string.please_select),
-                            ID to DefaultID,
+                            ID to DEFAULT_ID,
                         ),
                     )
 
@@ -243,7 +243,7 @@ class AssessmentTBFragment : BaseFragment(), FormEventListener, View.OnClickList
                 val option = view.optionsList
                 val sleepLocationId = resultMap?.get(SleepLocation)
                 option?.forEach { item ->
-                    if (item[DefinedParams.id] == sleepLocationId) {
+                    if (item[DefinedParams.ID] == sleepLocationId) {
                         item[DefinedParams.NAME]?.let {
                             resultMap?.put(SleepLocation, it)
                         }
@@ -330,6 +330,9 @@ class AssessmentTBFragment : BaseFragment(), FormEventListener, View.OnClickList
         /*
        Never used
          */
+    }
+
+    override fun onQRScanRequested() {
     }
 
     override fun onClick(view: View) {

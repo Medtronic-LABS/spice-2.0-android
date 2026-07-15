@@ -7,8 +7,10 @@ import org.medtroniclabs.uhis.db.entity.ChiefDomEntity
 import org.medtroniclabs.uhis.db.entity.DistrictEntity
 import org.medtroniclabs.uhis.db.entity.HealthFacilityEntity
 import org.medtroniclabs.uhis.db.entity.HouseholdMemberEntity
+import org.medtroniclabs.uhis.db.entity.ShasthyaKormiEntity
 import org.medtroniclabs.uhis.db.entity.ShasthyaShebikaEntity
 import org.medtroniclabs.uhis.db.entity.SignsAndSymptomsEntity
+import org.medtroniclabs.uhis.db.entity.SiteEntity
 import org.medtroniclabs.uhis.db.entity.SubVillageEntity
 import org.medtroniclabs.uhis.db.entity.VillageEntity
 
@@ -31,7 +33,19 @@ object EntityMapper {
         map: HashMap<String, Any>,
     ) {
         when (properties) {
+            is SiteEntity -> {
+                updateMapsIdName(map, properties.id, properties.name)
+            }
+
+            is ChiefDomEntity -> {
+                updateMapsIdName(map, properties.id, properties.name)
+            }
+
             is VillageEntity -> {
+                updateMapsIdName(map, properties.id, properties.name)
+            }
+
+            is SubVillageEntity -> {
                 updateMapsIdName(map, properties.id, properties.name)
             }
 
@@ -43,16 +57,21 @@ object EntityMapper {
                 updateMapsIdName(map, properties.id, properties.name)
             }
 
-            is ChiefDomEntity -> {
-                updateMapsIdName(map, properties.id, properties.name)
-            }
-
             is DistrictEntity -> {
                 updateMapsIdName(map, properties.id, properties.name)
             }
 
             is ProgramEntity -> {
                 updateMapsIdName(map, properties.id, properties.name)
+            }
+
+            is ShasthyaKormiEntity -> {
+                val displayName = if (properties.firstName.isNotBlank() && properties.lastName.isNotBlank()) {
+                    "${properties.firstName} ${properties.lastName}"
+                } else {
+                    properties.firstName
+                }
+                updateMapsIdName(map, properties.id, displayName)
             }
 
             is ShasthyaShebikaEntity -> {
@@ -63,10 +82,6 @@ object EntityMapper {
                     properties.name
                 }
                 updateMapsIdName(map, properties.id, displayName)
-            }
-
-            is SubVillageEntity -> {
-                updateMapsIdName(map, properties.id, properties.name)
             }
 
             is HouseholdMemberEntity -> {
@@ -107,7 +122,7 @@ object EntityMapper {
                     symptom = it[DefinedParams.NAME] as String,
                     type = it[DefinedParams.type] as? String ?: type,
                     value = it[DefinedParams.Value] as? String,
-                    displayOrder = it[DefinedParams.DisplayOrder] as? Int,
+                    displayOrder = it[DefinedParams.DISPLAY_ORDER] as? Int,
                     displayValue = it[DefinedParams.CULTURE_VALUE] as? String,
                 ),
             )

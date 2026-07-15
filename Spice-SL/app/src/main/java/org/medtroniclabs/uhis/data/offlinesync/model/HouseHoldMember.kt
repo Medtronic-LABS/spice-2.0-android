@@ -37,6 +37,10 @@ data class HouseHoldMember(
     val villageId: Long,
     @ColumnInfo(name = "sub_village_name")
     val subVillage: String? = null,
+    @ColumnInfo("shasthya_kormi_id")
+    var shasthyaKormiId: Long? = null,
+    @ColumnInfo("chiefdom_id")
+    var chiefdomId: Long? = null,
     @ColumnInfo(name = "sub_village_id")
     val subVillageId: Long? = null,
     @ColumnInfo(name = "shasthya_shebika_id")
@@ -64,6 +68,9 @@ data class HouseHoldMember(
     val maritalStatus: String? = null,
     @ColumnInfo("disability")
     val disability: String? = null,
+    @ColumnInfo("qr_code")
+    var qrCode: String? = null,
+    val createdByRoleName: String? = null,
 ) {
     @Ignore
     var isChild: Boolean? = false
@@ -96,6 +103,8 @@ data class HouseHoldMember(
             patientId = this.patientId,
             villageId = this.villageId,
             shasthyaShebikaId = this.shasthyaShebikaId,
+            shasthyaKormiId = this.shasthyaKormiId,
+            chiefdomId = this.chiefdomId,
             subVillageId = this.subVillageId,
             isActive = this.isActive,
             version = this.version,
@@ -112,6 +121,8 @@ data class HouseHoldMember(
             guardianFhirId = this.guardianFhirId,
             maritalStatus = this.maritalStatus,
             disability = this.disability,
+            qrCode = this.qrCode,
+            createdByRoleName = this.createdByRoleName,
         ).apply {
             val newCreateAt = if (this@HouseHoldMember.createdAt == null ||
                 this@HouseHoldMember.createdAt == 0L

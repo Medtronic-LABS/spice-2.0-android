@@ -27,10 +27,10 @@ import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.CBS
 import org.medtroniclabs.uhis.common.DefinedParams.CONTACT_TRACING
 import org.medtroniclabs.uhis.common.DefinedParams.CbsNotifiableCondition
-import org.medtroniclabs.uhis.common.DefinedParams.IccmDiarrheaNotifiableCondition
-import org.medtroniclabs.uhis.common.DefinedParams.IccmFeverNotifiableCondition
-import org.medtroniclabs.uhis.common.DefinedParams.NotifiableConditions
-import org.medtroniclabs.uhis.common.DefinedParams.OtherNotifiableConditions
+import org.medtroniclabs.uhis.common.DefinedParams.ICCM_DIARRHEA_NOTIFIABLE_CONDITION
+import org.medtroniclabs.uhis.common.DefinedParams.ICCM_FEVER_NOTIFIABLE_CONDITION
+import org.medtroniclabs.uhis.common.DefinedParams.NOTIFIABLE_CONDITIONS
+import org.medtroniclabs.uhis.common.DefinedParams.OTHER_NOTIFIABLE_CONDITIONS
 import org.medtroniclabs.uhis.common.DefinedParams.OtherNotifiableConditionsForDiarrhoea
 import org.medtroniclabs.uhis.common.DefinedParams.OtherNotifiableConditionsForFever
 import org.medtroniclabs.uhis.common.DefinedParams.RmnchNotifiableCondition
@@ -93,6 +93,7 @@ import org.medtroniclabs.uhis.ui.MenuConstants.EYE_CARE_MENU_ID
 import org.medtroniclabs.uhis.ui.MenuConstants.ICCM_MENU_ID
 import org.medtroniclabs.uhis.ui.MenuConstants.NCD_MENU_ID
 import org.medtroniclabs.uhis.ui.MenuConstants.OTHER_SYMPTOMS
+import org.medtroniclabs.uhis.ui.MenuConstants.PNC_MOTHER
 import org.medtroniclabs.uhis.ui.MenuConstants.PREGNANCY_OUTCOME
 import org.medtroniclabs.uhis.ui.MenuConstants.PREGNANT_WOMEN_PROFILE
 import org.medtroniclabs.uhis.ui.MenuConstants.TB_MENU_ID
@@ -105,8 +106,6 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.EYE_DISEASE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.EYE_DISEASE_
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.EYE_TEST_OUTCOME
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.EYE_TEST_OUTCOMES
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FACILITY_TYPE_COMMUNITY_CLINIC
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FACILITY_TYPE_UPAZILA
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FamilyPlanning
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.FamilyPlanningDetails
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.GLUCOSE_LOG
@@ -118,8 +117,6 @@ import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.OPERATION_NA
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.REASON_
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.REFERRAL_FACILITY_TYPE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.REFERRED_SITE
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.STATUS_FACILITY_TYPE_COMMUNITY_CLINIC
-import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.STATUS_FACILITY_TYPE_UPAZILA
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.TBContactTracing
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.TBRxBuddyFollowUp
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.TBRxBuddyRegister
@@ -137,7 +134,9 @@ import org.medtroniclabs.uhis.ui.assessment.referrallogic.utils.ReferralStatus
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH.ANC
 import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH.DEATH_OF_MOTHER
+import org.medtroniclabs.uhis.ui.assessment.rmnch.RMNCH.PNC
 import org.medtroniclabs.uhis.ui.assessment.statuslogic.AssessmentStatusGenerator
+import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentObservationUtils
 import org.medtroniclabs.uhis.ui.assessment.utils.AssessmentUtil
 import org.medtroniclabs.uhis.ui.boarding.repo.MetaRepository
 import java.lang.reflect.Type
@@ -145,12 +144,10 @@ import java.time.LocalDate
 import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.Any
-import kotlin.collections.HashMap
 
 @HiltViewModel
 class AssessmentViewModel @Inject constructor(
-    @IoDispatcher override var dispatcherIO: CoroutineDispatcher,
+    @param:IoDispatcher override var dispatcherIO: CoroutineDispatcher,
     private var memberRegistrationRepository: HouseholdMemberRepository,
     private var assessmentRepository: AssessmentRepository,
     private val metaRepository: MetaRepository,
@@ -177,6 +174,7 @@ class AssessmentViewModel @Inject constructor(
     val formLayoutsLiveData = MutableLiveData<Resource<FormResponse>>()
     val nearestFacilityLiveData = MutableLiveData<Resource<ArrayList<Map<String, Any>>>>()
     var referralStatus: String? = null
+    var isFollowupVisit: Boolean = false
     var lastLocation: Location? = null
     val memberClinicalLiveData = MutableLiveData<MemberClinicalEntity?>()
     var dosageListModel: ArrayList<RecommendedDosageListModel>? = null
@@ -192,7 +190,6 @@ class AssessmentViewModel @Inject constructor(
     var complianceMap: ArrayList<HashMap<String, Any>>? = null
     var bioDataMap: HashMap<String, Any>? = null
     var bioMetric: HashMap<String, Any>? = null
-    var riskClassificationModels = ArrayList<RiskClassificationModel>()
     private var fbsBloodGlucose: Double? = null
     private var rbsBloodGlucose: Double? = null
     var assessmentType: String? = null
@@ -219,19 +216,7 @@ class AssessmentViewModel @Inject constructor(
 
     var dangerSingsKey: String? = null
 
-    @Inject
-    lateinit var connectivityManager: ConnectivityManager
-
     var isAssessmentCancelLiveData = MutableLiveData<Boolean>()
-
-    init {
-        SecuredPreference.getFollowUpCriteria()?.let { followUpCriteria ->
-            treatmentDays[ReferralReasons.Pneumonia.name] = followUpCriteria.pneumonia
-            treatmentDays[ReferralReasons.Diarrhoea.name] = followUpCriteria.diarrhea
-            treatmentDays[ReferralReasons.MUAC.name] = followUpCriteria.muac
-            treatmentDays[ReferralReasons.Malaria.name] = followUpCriteria.malaria
-        }
-    }
 
     var nameOfDangerSignClicked: String? = null
 
@@ -245,6 +230,29 @@ class AssessmentViewModel @Inject constructor(
      * Live data storing pregnancy details
      */
     val pregnancyDetailLiveData = MutableLiveData<PregnancyDetail?>()
+
+    /**
+     * Latest assessment based on menu/workflow
+     */
+    var previousAssessment: MemberAssessmentHistoryEntity? = null
+        private set
+
+    /**
+     * Pregnancy detail pregnancy episodeId
+     */
+    private var pregnancyEpisodeId: String? = ""
+
+    @Inject
+    lateinit var connectivityManager: ConnectivityManager
+
+    init {
+        SecuredPreference.getFollowUpCriteria()?.let { followUpCriteria ->
+            treatmentDays[ReferralReasons.Pneumonia.name] = followUpCriteria.pneumonia
+            treatmentDays[ReferralReasons.Diarrhoea.name] = followUpCriteria.diarrhea
+            treatmentDays[ReferralReasons.MUAC.name] = followUpCriteria.muac
+            treatmentDays[ReferralReasons.Malaria.name] = followUpCriteria.malaria
+        }
+    }
 
     fun getMemberDetailsById() {
         if (selectedHouseholdMemberId == -1L) {
@@ -366,23 +374,6 @@ class AssessmentViewModel @Inject constructor(
                     status = status,
                 )
 
-                assessmentResult.data?.let {
-                    val history = MemberAssessmentHistoryEntity(
-                        memberFhirId = details.memberId,
-                        memberId = details.id,
-                        visitDate = DateUtils.formatDate(
-                            it.createdAt,
-                        ),
-                        serviceProvided = menuId?.uppercase(Locale.ENGLISH),
-                        customStatus = status,
-                        latestVisit = true,
-                        referralStatus = getReferralStatus(referralStatus, assessmentMap),
-                        referralReason = referralReason.toString(),
-                        nextFollowUpDate = getNextFollowUpDate(otherDetails),
-                    )
-                    assessmentHistoryResultLiveData.postValue(assessmentRepository.saveAssessmentHistory(history))
-                }
-
                 if (menuId == PREGNANT_WOMEN_PROFILE &&
                     assessmentResult.isSuccess()
                 ) {
@@ -400,6 +391,29 @@ class AssessmentViewModel @Inject constructor(
                     assessmentResult.isSuccess()
                 ) {
                     saveAncPregnancyDetails(details, assessmentMap)
+                }
+
+                assessmentResult.data?.let {
+                    val serviceProvider = getServiceProviderInfo()
+                    val history = MemberAssessmentHistoryEntity(
+                        memberFhirId = details.memberId,
+                        memberId = details.id,
+                        visitDate = DateUtils.formatDate(
+                            it.createdAt,
+                        ),
+                        serviceProvided = menuId?.uppercase(Locale.ENGLISH),
+                        customStatus = status,
+                        latestVisit = true,
+                        referralStatus = referralStatus,
+                        referralFacilityType = resolveReferralFacilityType(referralStatus, assessmentMap),
+                        referralReason = referralReason.toString(),
+                        nextFollowUpDate = getNextFollowUpDate(otherDetails),
+                        serviceProvidedByName = serviceProvider.first,
+                        serviceProvidedByRole = serviceProvider.second,
+                        practitionerId = SecuredPreference.getUserFhirId(),
+                        observations = AssessmentObservationUtils.buildMemberAssessmentObservations(assessmentMap, menuId, pregnancyEpisodeId),
+                    )
+                    assessmentHistoryResultLiveData.postValue(assessmentRepository.saveAssessmentHistory(history))
                 }
 
                 assessmentSaveLiveData.postValue(
@@ -471,10 +485,10 @@ class AssessmentViewModel @Inject constructor(
         val maternalDeath = pregnancyOutcomeMap[AssessmentDefinedParams.MATERNAL_DEATH] as? Map<String, Any?>
         val timeOfDeath = maternalDeath?.get(AssessmentDefinedParams.TIME_OF_DEATH)
         val hasTimeOfDeath = when (timeOfDeath) {
-            is String -> timeOfDeath.isNotBlank() && timeOfDeath != DefinedParams.DefaultID
+            is String -> timeOfDeath.isNotBlank() && timeOfDeath != DefinedParams.DEFAULT_ID
             is Map<*, *> -> {
                 val timeOfDeathId = timeOfDeath[DefinedParams.ID]?.toString()
-                !timeOfDeathId.isNullOrBlank() && timeOfDeathId != DefinedParams.DefaultID
+                !timeOfDeathId.isNullOrBlank() && timeOfDeathId != DefinedParams.DEFAULT_ID
             }
 
             else -> false
@@ -538,7 +552,7 @@ class AssessmentViewModel @Inject constructor(
                 if (babyData is Map<*, *>) {
                     val isBabyAlive = babyData[AssessmentDefinedParams.IS_BABY_ALIVE]?.toString()
                     // Only create members for live babies
-                    if (isBabyAlive.equals(DefinedParams.yes, ignoreCase = true)) {
+                    if (isBabyAlive.equals(DefinedParams.YES_SMALL, ignoreCase = true)) {
                         val babyNumber = index + 1
                         val babyMap = HashMap<String, Any>()
                         babyMap[MemberRegistration.NAME] = "Baby $babyNumber of ${details.name}"
@@ -710,8 +724,8 @@ class AssessmentViewModel @Inject constructor(
 
         if (referralStatus != null && referralStatus == ReferralStatus.Referred.name) {
             // Add referralFacilityType to otherDetails if it does NOT exist in otherAssessmentDetails
-            if (!otherAssessmentDetails.containsKey(AssessmentDefinedParams.ReferralFacilityType)) {
-                otherDetails[AssessmentDefinedParams.ReferralFacilityType] =
+            if (!otherAssessmentDetails.containsKey(REFERRAL_FACILITY_TYPE)) {
+                otherDetails[REFERRAL_FACILITY_TYPE] =
                     SecuredPreference.getString(SecuredPreference.EnvironmentKey.DEFAULT_SITE_ID.name)
                         ?: "-1"
             }
@@ -730,8 +744,8 @@ class AssessmentViewModel @Inject constructor(
                     inUTC = true,
                 )
             // Add referralFacilityType to otherDetails if it does NOT exist in otherAssessmentDetails
-            if (!otherAssessmentDetails.containsKey(AssessmentDefinedParams.ReferralFacilityType)) {
-                otherDetails[AssessmentDefinedParams.ReferralFacilityType] =
+            if (!otherAssessmentDetails.containsKey(REFERRAL_FACILITY_TYPE)) {
+                otherDetails[REFERRAL_FACILITY_TYPE] =
                     otherDetails[AssessmentDefinedParams.ReferredPHUSiteID]
                         ?: "-1"
             }
@@ -816,16 +830,16 @@ class AssessmentViewModel @Inject constructor(
             if (iccm.containsKey(Diarrhoea)) {
                 val diarrhoea = iccm[Diarrhoea] as HashMap<Any, Any>
 
-                if (diarrhoea.containsKey(IccmDiarrheaNotifiableCondition)) {
+                if (diarrhoea.containsKey(ICCM_DIARRHEA_NOTIFIABLE_CONDITION)) {
                     val cbsData = hashMapOf<String, Any>()
-                    diarrhoea[IccmDiarrheaNotifiableCondition]?.let {
-                        cbsData[NotifiableConditions] = it
+                    diarrhoea[ICCM_DIARRHEA_NOTIFIABLE_CONDITION]?.let {
+                        cbsData[NOTIFIABLE_CONDITIONS] = it
                     }
                     if (diarrhoea.containsKey(OtherNotifiableConditionsForDiarrhoea)) {
-                        cbsData[OtherNotifiableConditions] =
+                        cbsData[OTHER_NOTIFIABLE_CONDITIONS] =
                             diarrhoea[OtherNotifiableConditionsForDiarrhoea] as String
                     }
-                    diarrhoea.remove(IccmDiarrheaNotifiableCondition)
+                    diarrhoea.remove(ICCM_DIARRHEA_NOTIFIABLE_CONDITION)
                     diarrhoea.remove(OtherNotifiableConditionsForDiarrhoea)
                     diarrhoea[CBS.lowercase()] = cbsData
                 }
@@ -833,16 +847,16 @@ class AssessmentViewModel @Inject constructor(
 
             if (iccm.containsKey(fever.lowercase())) {
                 val fever = iccm[fever.lowercase()] as HashMap<Any, Any>
-                if (fever.containsKey(IccmFeverNotifiableCondition)) {
+                if (fever.containsKey(ICCM_FEVER_NOTIFIABLE_CONDITION)) {
                     val cbsData = hashMapOf<String, Any>()
-                    fever[IccmFeverNotifiableCondition]?.let {
-                        cbsData[NotifiableConditions] = it
+                    fever[ICCM_FEVER_NOTIFIABLE_CONDITION]?.let {
+                        cbsData[NOTIFIABLE_CONDITIONS] = it
                     }
                     if (fever.containsKey(OtherNotifiableConditionsForFever)) {
-                        cbsData[OtherNotifiableConditions] =
+                        cbsData[OTHER_NOTIFIABLE_CONDITIONS] =
                             fever[OtherNotifiableConditionsForFever] as String
                     }
-                    fever.remove(IccmFeverNotifiableCondition)
+                    fever.remove(ICCM_FEVER_NOTIFIABLE_CONDITION)
                     fever.remove(OtherNotifiableConditionsForFever)
                     fever[CBS.lowercase()] = cbsData
                 }
@@ -881,19 +895,25 @@ class AssessmentViewModel @Inject constructor(
             if (ncdMap.containsKey(BP_LOG)) {
                 updateBPLogs(ncdMap[BP_LOG] as HashMap<Any, Any>)
             }
+            // Request modification for syncing EyeCare Symptoms to Backend
+            if (ncdMap.containsKey(EYE_CARE)) {
+                val eyeCareMap = ncdMap[EYE_CARE] as HashMap<Any, Any>
+                if (eyeCareMap.containsKey(EYE_TEST_OUTCOME)) {
+                    val eyeTestOutCome = eyeCareMap[EYE_TEST_OUTCOME] as String
+                    eyeCareMap[EYE_TEST_OUTCOMES] = listOf(eyeTestOutCome)
+                    eyeCareMap.remove(EYE_TEST_OUTCOME)
+                }
+            }
         }
 
-        // Request modification for syncing EyeCare Symptoms to Backend
+        // Eye care: transform eyeTestOutcome only; keep generalInformation (camp_type) under eye_care.
         if (map.containsKey(EYE_CARE_MENU_ID)) {
             val eyeCareMainMap = map[EYE_CARE_MENU_ID] as HashMap<Any, Any>
-            if (eyeCareMainMap.containsKey(EYE_CARE)) {
-                val eyeCareMap = eyeCareMainMap[EYE_CARE] as HashMap<Any, Any>
+            val eyeCareMap = eyeCareMainMap[EYE_CARE] as? HashMap<Any, Any>
+            if (eyeCareMap != null && eyeCareMap.containsKey(EYE_TEST_OUTCOME)) {
                 val eyeTestOutCome = eyeCareMap[EYE_TEST_OUTCOME] as String
                 eyeCareMap[EYE_TEST_OUTCOMES] = listOf(eyeTestOutCome)
-
                 eyeCareMap.remove(EYE_TEST_OUTCOME)
-                map[EYE_CARE] = eyeCareMap
-                map.remove(EYE_CARE_MENU_ID)
             }
         }
 
@@ -927,7 +947,7 @@ class AssessmentViewModel @Inject constructor(
 
                     cbs.remove(CbsNotifiableCondition)
                     cbs.remove(RmnchNotifiableCondition)
-                    cbs[NotifiableConditions] = conditions
+                    cbs[NOTIFIABLE_CONDITIONS] = conditions
 
                     map[CBS.lowercase()] = cbs
                 }
@@ -1043,7 +1063,7 @@ class AssessmentViewModel @Inject constructor(
 
     private fun getFlagTypeValue(value: Any): Boolean =
         when (value) {
-            is String -> value == DefinedParams.Yes
+            is String -> value == DefinedParams.YES
             is Boolean -> value
             else -> false
         }
@@ -1068,8 +1088,8 @@ class AssessmentViewModel @Inject constructor(
                 val isTakenToClinical = otherAssessmentDetails[IsClinicTaken] as String
                 otherAssessmentDetails[IsClinicTaken] = (isTakenToClinical == "Yes")
             }
-            if (!otherAssessmentDetails.containsKey(AssessmentDefinedParams.ReferralFacilityType)) {
-                otherAssessmentDetails[AssessmentDefinedParams.ReferralFacilityType] =
+            if (!otherAssessmentDetails.containsKey(REFERRAL_FACILITY_TYPE)) {
+                otherAssessmentDetails[REFERRAL_FACILITY_TYPE] =
                     otherAssessmentDetails[AssessmentDefinedParams.ReferredPHUSiteID]
                         ?: "-1"
                 otherAssessmentDetails.remove(AssessmentDefinedParams.ReferredPHUSiteID)
@@ -1129,7 +1149,9 @@ class AssessmentViewModel @Inject constructor(
     ) {
         viewModelScope.launch(dispatcherIO) {
             formLayoutsLiveData.postLoading()
-            formLayoutsLiveData.postValue(assessmentRepository.getFormData(formType, tbType))
+            val formData = assessmentRepository.getFormData(formType, tbType)
+            applyBdCampFieldVisibility(formData, formType)
+            formLayoutsLiveData.postValue(formData)
         }
     }
 
@@ -1147,8 +1169,68 @@ class AssessmentViewModel @Inject constructor(
             } else if (isTbPatient == true) {
                 updateRxBuddyFieldViewStatus(formData, isRxBuddy)
             }
+            applyBdCampFieldVisibility(formData, formType)
 
             formLayoutsLiveData.postValue(formData)
+        }
+    }
+
+    /**
+     * Bangladesh FO/PO flows: show camp date (cataract) or camp type (eye care / NCD)
+     * from assets JSON where those rows default to [gone].
+     */
+    private fun applyBdCampFieldVisibility(
+        formResponse: Resource<FormResponse>,
+        formType: String,
+    ) {
+        if (formResponse.state != ResourceState.SUCCESS) return
+        val layout = formResponse.data?.formLayout ?: return
+        when (formType) {
+            CATARACT_MENU_ID -> {
+                if (!CommonUtils.isFoOrPo()) return
+                revealBdCampFields(layout, showCampDate = true, showCampType = false)
+            }
+
+            EYE_CARE_MENU_ID -> {
+                if (!CommonUtils.isFoOrPo()) return
+                revealBdCampFields(layout, showCampDate = false, showCampType = true)
+            }
+
+            NCD_MENU_ID -> {
+                if (!CommonUtils.isFoOrPo()) return
+                revealBdCampFields(layout, showCampDate = false, showCampType = true)
+            }
+
+            else -> return
+        }
+    }
+
+    private fun revealBdCampFields(
+        layout: List<FormLayout>,
+        showCampDate: Boolean,
+        showCampType: Boolean,
+    ) {
+        val showGeneralCard = showCampDate || showCampType
+        layout.forEach { field ->
+            when (field.id) {
+                AssessmentDefinedParams.GENERAL_INFORMATION -> {
+                    if (showGeneralCard) {
+                        field.visibility = "visible"
+                    }
+                }
+
+                AssessmentDefinedParams.CAMP_DATE -> {
+                    if (showCampDate) {
+                        field.visibility = "visible"
+                    }
+                }
+
+                AssessmentDefinedParams.CAMP_TYPE -> {
+                    if (showCampType) {
+                        field.visibility = "visible"
+                    }
+                }
+            }
         }
     }
 
@@ -1252,6 +1334,7 @@ class AssessmentViewModel @Inject constructor(
         if (pregnancyDetail.pregnancyEpisodeId.isNullOrBlank()) {
             pregnancyDetail.pregnancyEpisodeId = UUID.randomUUID().toString()
         }
+        pregnancyEpisodeId = pregnancyDetail.pregnancyEpisodeId
 
         // Set startAt when creating new pregnancyEpisodeId (first time)
         if (pregnancyDetail.startAt.isNullOrBlank() && !pregnancyDetail.pregnancyEpisodeId.isNullOrBlank()) {
@@ -1510,6 +1593,7 @@ class AssessmentViewModel @Inject constructor(
                 status = status,
             )
             assessmentResult.data?.let {
+                val serviceProvider = getServiceProviderInfo()
                 val history = MemberAssessmentHistoryEntity(
                     memberFhirId = memberDetail.memberId,
                     memberId = memberDetail.id,
@@ -1521,6 +1605,14 @@ class AssessmentViewModel @Inject constructor(
                     latestVisit = true,
                     referralStatus = referralStatus,
                     referralReason = referralReason.toString(),
+                    serviceProvidedByName = serviceProvider.first,
+                    serviceProvidedByRole = serviceProvider.second,
+                    practitionerId = SecuredPreference.getUserFhirId(),
+                    observations = AssessmentObservationUtils.buildMemberAssessmentObservations(
+                        assessmentMap,
+                        RMNCH.PNC_MOTHER_MENU,
+                        pregnancyEpisodeId,
+                    ),
                 )
                 assessmentHistoryResultLiveData.postValue(assessmentRepository.saveAssessmentHistory(history))
             }
@@ -1534,27 +1626,25 @@ class AssessmentViewModel @Inject constructor(
         }
     }
 
-    private fun getReferralStatus(
+    private fun resolveReferralFacilityType(
         status: String?,
         assessmentMap: HashMap<String, Any>,
     ): String? {
-        if (status != ReferralStatus.Referred.name) return status
+        if (status != ReferralStatus.Referred.name) return null
 
-        var type: String? = null
         if (assessmentMap.containsKey(NCD_MENU_ID)) {
-            type = (assessmentMap[NCD_MENU_ID] as? Map<*, *>)
-                ?.get(REFERRAL_FACILITY_TYPE) as? String
-        } else if (assessmentMap.containsKey(CATARACT_MENU_ID)) {
-            val catMap = assessmentMap[CATARACT_MENU_ID] as HashMap<Any, Any>
-            type = (catMap[NCD_MENU_ID] as? Map<*, *>)
+            return (assessmentMap[NCD_MENU_ID] as? Map<*, *>)
                 ?.get(REFERRAL_FACILITY_TYPE) as? String
         }
 
-        return when (type) {
-            FACILITY_TYPE_UPAZILA -> STATUS_FACILITY_TYPE_UPAZILA
-            FACILITY_TYPE_COMMUNITY_CLINIC -> STATUS_FACILITY_TYPE_COMMUNITY_CLINIC
-            else -> status
+        if (assessmentMap.containsKey(CATARACT_MENU_ID)) {
+            val catMap = assessmentMap[CATARACT_MENU_ID] as? HashMap<*, *> ?: return null
+            return (catMap[NCD_MENU_ID] as? Map<*, *>)
+                ?.get(REFERRAL_FACILITY_TYPE) as? String
+                ?: catMap[REFERRAL_FACILITY_TYPE] as? String
         }
+
+        return null
     }
 
     fun fetchCurrentLocation(context: Context) {
@@ -2003,17 +2093,68 @@ class AssessmentViewModel @Inject constructor(
         }
     }
 
-    fun getRiskEntityList() {
-        viewModelScope.launch(dispatcherIO) {
-            val resultOne = metaRepository.riskFactorListing()
-            val baseType: Type = object : TypeToken<ArrayList<RiskClassificationModel>>() {}.type
-            if (resultOne.isNotEmpty()) {
-                val resultList = Gson().fromJson<ArrayList<RiskClassificationModel>>(
-                    resultOne[0].nonLabEntity,
-                    baseType,
-                )
-                riskClassificationModels.clear()
-                riskClassificationModels.addAll(resultList)
+    suspend fun loadRiskClassificationModels(): ArrayList<RiskClassificationModel> {
+        val resultOne = metaRepository.riskFactorListing()
+        if (resultOne.isEmpty()) return arrayListOf()
+        val baseType: Type = object : TypeToken<ArrayList<RiskClassificationModel>>() {}.type
+        return Gson().fromJson<ArrayList<RiskClassificationModel>>(
+            resultOne[0].nonLabEntity,
+            baseType,
+        ) ?: arrayListOf()
+    }
+
+    private suspend fun getServiceProviderInfo(): Pair<String?, String?> {
+        val providerName = AssessmentUtil.getLocalServiceProvidedByName()
+        val providerRole = metaRepository
+            .getUserProfile()
+            .data
+            ?.roles
+            ?.firstOrNull()
+            ?.displayName
+            ?.takeIf { it.isNotBlank() }
+            ?: AssessmentUtil.getLocalServiceProvidedByRole()
+        return providerName to providerRole
+    }
+
+    suspend fun getLastServiceHistory(type: String): MemberAssessmentHistoryEntity? =
+        assessmentRepository.getLastServiceHistory(
+            selectedHouseholdMemberId,
+            type.lowercase(),
+        )
+
+    suspend fun getLatestHeightWeightFromServiceHistory(): Pair<String?, String?>? {
+        val histories = listOfNotNull(
+            getLastServiceHistory(MenuConstants.NCD_MENU_ID),
+            getLastServiceHistory(MenuConstants.CATARACT_MENU_ID),
+        )
+        return AssessmentUtil.getLatestHeightWeightFromHistories(histories)
+    }
+
+    /**
+     * Fetches latest assessment based on menu/workflow
+     */
+    fun fetchLatestAssessment(type: String) {
+        launch(dispatcherIO) {
+            previousAssessment = when (type.lowercase()) {
+                ANC.lowercase() -> {
+                    assessmentRepository.getLatestMemberServiceBAfterServiceA(
+                        selectedHouseholdMemberId,
+                        PREGNANT_WOMEN_PROFILE.uppercase(),
+                        ANC.uppercase(),
+                    )
+                }
+
+                PNC.lowercase() -> {
+                    assessmentRepository.getLatestMemberServiceBAfterServiceA(
+                        selectedHouseholdMemberId,
+                        PREGNANCY_OUTCOME.uppercase(),
+                        PNC_MOTHER.uppercase(),
+                    )
+                }
+
+                else -> {
+                    null
+                }
             }
         }
     }

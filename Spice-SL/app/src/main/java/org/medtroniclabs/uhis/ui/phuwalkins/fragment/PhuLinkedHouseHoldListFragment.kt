@@ -20,7 +20,7 @@ import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams.FhirMemberID
 import org.medtroniclabs.uhis.common.DefinedParams.MEMBER_ID
-import org.medtroniclabs.uhis.common.DefinedParams.VillageId
+import org.medtroniclabs.uhis.common.DefinedParams.VILLAGE_ID
 import org.medtroniclabs.uhis.common.DefinedParams.isCreateHouseholdForPhu
 import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.data.offlinesync.model.UnAssignedHouseholdMemberDetail
@@ -161,7 +161,7 @@ class PhuLinkedHouseHoldListFragment(private val patientLinkedDetails: UnAssigne
             R.id.btnAddHousehold -> {
                 withLocationCheck({
                     val intent = Intent(requireContext(), ConsentFormActivity::class.java)
-                    intent.putExtra(VillageId, patientLinkedDetails.villageId)
+                    intent.putExtra(VILLAGE_ID, patientLinkedDetails.villageId)
                     intent.putExtra(IS_PHU_WALK_INS_FLOW, true)
                     intent.putExtra(isCreateHouseholdForPhu, true)
                     intent.putExtra(MEMBER_ID, patientLinkedDetails.lMemberId.toLongOrNull())

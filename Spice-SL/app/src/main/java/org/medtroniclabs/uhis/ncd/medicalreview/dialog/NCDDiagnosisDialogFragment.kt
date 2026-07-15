@@ -179,8 +179,8 @@ class NCDDiagnosisDialogFragment : DialogFragment(), View.OnClickListener {
                                                     patientDiagnosis.add(NCDMRUtil.HYPERTENSION.lowercase())
                                                 }
                                             }
-                                            if (values.contains(DefinedParams.Other.lowercase())) {
-                                                patientDiagnosis.add(DefinedParams.Other.lowercase())
+                                            if (values.contains(DefinedParams.OTHER.lowercase())) {
+                                                patientDiagnosis.add(DefinedParams.OTHER.lowercase())
                                             }
                                             liveData
                                                 .filter { db ->

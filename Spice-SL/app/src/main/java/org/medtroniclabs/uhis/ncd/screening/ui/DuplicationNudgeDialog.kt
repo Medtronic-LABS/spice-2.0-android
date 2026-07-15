@@ -9,19 +9,18 @@ import android.view.Window
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import org.medtroniclabs.uhis.R
-import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.appextensions.setDialogPercent
 import org.medtroniclabs.uhis.appextensions.setVisible
 import org.medtroniclabs.uhis.appextensions.textOrHyphen
 import org.medtroniclabs.uhis.appextensions.visible
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
-import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.StringConverter
 import org.medtroniclabs.uhis.databinding.DialogDuplicationNudgeBinding
 import org.medtroniclabs.uhis.databinding.LayoutDuplicatePatientBinding
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.mappingkey.Screening
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams as ConfigDefinedParam
 
 class DuplicationNudgeDialog(private val callback: (doAssessment: Boolean) -> Unit) :
     DialogFragment(), View.OnClickListener {
@@ -74,29 +73,21 @@ class DuplicationNudgeDialog(private val callback: (doAssessment: Boolean) -> Un
                 binding.apply {
                     addView(
                         Pair(
-                            getString(R.string.first_name),
-                            map[Screening.firstName]?.toString().textOrHyphen(),
+                            getString(R.string.name),
+                            map[ConfigDefinedParam.NAME]?.toString().textOrHyphen(),
                         ),
-                        Pair(
-                            getString(R.string.last_name),
-                            map[Screening.lastName]?.toString().textOrHyphen(),
-                        ),
-                    )
-                    addView(
                         Pair(
                             getString(R.string.mobile_number),
                             map[Screening.phoneNumber]?.toString().textOrHyphen(),
                         ),
-                        Pair(
-                            getString(R.string.national_id),
-                            map[Screening.identityValue]?.toString().textOrHyphen(),
-                        ),
                     )
+
                     val patientId = map[DefinedParams.ProgramId]?.toString()
+
                     addView(
                         Pair(
-                            getString(R.string.facility_name),
-                            map[Screening.healthFacilityName]?.toString().textOrHyphen(),
+                            getIdentityLabel(map[ConfigDefinedParam.IDENTITY_TYPE] as String),
+                            map[Screening.identityValue]?.toString().textOrHyphen(),
                         ),
                         if (patientId.isNullOrBlank()) {
                             Pair(
@@ -111,24 +102,7 @@ class DuplicationNudgeDialog(private val callback: (doAssessment: Boolean) -> Un
                         },
                     )
 
-                    val isPatientEnrolled = map[AnalyticsDefinedParams.PatientStatus]
-                        ?.toString()
-                        .equals(DefinedParams.ENROLLED, true)
-                    val sameOperatingUnit = map[Screening.CHIEFDOM_ID]
-                        ?.toString()
-                        .equals(SecuredPreference.getChiefdomId().toString())
-                    val sameAccount = map[Screening.DISTRICT_ID]
-                        ?.toString()
-                        .equals(SecuredPreference.getDistrictId().toString())
-                    if (isFromEnrollment) {
-                        if (isPatientEnrolled) {
-                            doAssessment(sameAccount)
-                        } else {
-                            doEnrollment()
-                        }
-                    } else {
-                        doAssessment(sameAccount)
-                    }
+                    doEnrollment()
 
                     btnEdit.safeClickListener(this@DuplicationNudgeDialog)
                     btnPrimary.safeClickListener(this@DuplicationNudgeDialog)
@@ -137,6 +111,13 @@ class DuplicationNudgeDialog(private val callback: (doAssessment: Boolean) -> Un
             }
         }
     }
+
+    private fun getIdentityLabel(identityType: String?): String =
+        when {
+            identityType.isNullOrEmpty() || identityType == ConfigDefinedParam.NA -> ""
+            identityType == ConfigDefinedParam.IDENTITY_TYPE_BRN -> requireContext().getString(R.string.brn)
+            else -> requireContext().getString(R.string.national_id)
+        }
 
     private fun addView(
         left: Pair<String, String>,

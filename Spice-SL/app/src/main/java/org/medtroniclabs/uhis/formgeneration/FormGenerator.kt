@@ -46,6 +46,7 @@ import androidx.core.widget.NestedScrollView
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import org.medtroniclabs.uhis.BuildConfig
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.appextensions.gone
 import org.medtroniclabs.uhis.appextensions.invisible
@@ -60,7 +61,7 @@ import org.medtroniclabs.uhis.common.DateUtils.DATE_ddMMyyyy
 import org.medtroniclabs.uhis.common.DateUtils.convertDateFormat
 import org.medtroniclabs.uhis.common.DefinedParams.BOLD
 import org.medtroniclabs.uhis.common.DefinedParams.BOLD_ITALIC
-import org.medtroniclabs.uhis.common.DefinedParams.DefaultID
+import org.medtroniclabs.uhis.common.DefinedParams.DEFAULT_ID
 import org.medtroniclabs.uhis.common.DefinedParams.GENDER_FEMALE
 import org.medtroniclabs.uhis.common.DefinedParams.ITALIC
 import org.medtroniclabs.uhis.common.SecuredPreference
@@ -77,6 +78,7 @@ import org.medtroniclabs.uhis.databinding.CustomSpinnerBinding
 import org.medtroniclabs.uhis.databinding.DatepickerLayoutBinding
 import org.medtroniclabs.uhis.databinding.EdittextAreaLayoutBinding
 import org.medtroniclabs.uhis.databinding.EdittextLayoutBinding
+import org.medtroniclabs.uhis.databinding.FormQrScanViewBinding
 import org.medtroniclabs.uhis.databinding.InstructionLayoutBinding
 import org.medtroniclabs.uhis.databinding.LayoutInformationLabelBinding
 import org.medtroniclabs.uhis.databinding.LayoutSingleSelectionBinding
@@ -93,13 +95,13 @@ import org.medtroniclabs.uhis.formgeneration.FormSupport.updateTitle
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.GONE
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.INVISIBLE
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.Month
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.OtherMethodSpecify
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.MONTH_KEY
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.OTHER_METHOD_SPECIFY
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.SSP16
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.VALUE
 import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.VISIBLE
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.Week
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.Year
-import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.value
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.WEEK_KEY
+import org.medtroniclabs.uhis.formgeneration.config.DefinedParams.YEAR_KEY
 import org.medtroniclabs.uhis.formgeneration.config.EditTextOptionType
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_INFORMATION_LABEL
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_DIALOG_CHECKBOX
@@ -113,6 +115,7 @@ import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_EDIT
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_EDITTEXT_AREA
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_MULTISELECT_DATEPICKER
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_MULTI_SELECT_SPINNER
+import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_QR
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_RADIOGROUP
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_SPINNER
 import org.medtroniclabs.uhis.formgeneration.config.ViewType.VIEW_TYPE_FORM_TEXTLABEL
@@ -152,9 +155,12 @@ import org.medtroniclabs.uhis.mappingkey.Screening
 import org.medtroniclabs.uhis.mappingkey.Screening.DateOfBirth
 import org.medtroniclabs.uhis.mappingkey.Screening.Hour
 import org.medtroniclabs.uhis.mappingkey.Screening.Minute
+import org.medtroniclabs.uhis.mappingkey.Screening.TODAY
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams
+import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.CAMP_DATE
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.MUAC
 import org.medtroniclabs.uhis.ui.assessment.AssessmentDefinedParams.muacCode
+import timber.log.Timber
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.Period
@@ -179,9 +185,14 @@ class FormGenerator(
     private val tvKey = AssessmentDefinedParams.summaryKey
     private val tvValue = AssessmentDefinedParams.SUMMARY_VALUE
     private val rootSummary = AssessmentDefinedParams.SUMMARY_ROOT
+
+    private val scanDoneButtonSuffix = "scanDone"
+    private val scanImageView = "scanImageView"
+
+    private val innerRootSuffix = "innerRootView"
     private var editScreen: Boolean? = null
     private var focusNeeded: View? = null
-    private val infoSuffix = DefinedParams.Information
+    private val infoSuffix = DefinedParams.INFORMATION
     private val infoSuffixText = AssessmentDefinedParams.infoSuffixText
     private val generateNationalIdSuffix = "generateNationalId"
     private val diastolicSuffix = "DiastolicSuffix"
@@ -191,6 +202,38 @@ class FormGenerator(
     val lastMealTypeDateSuffix = Screening.lastMealTypeDateSuffix
     private var mentalHealthQuestions: HashMap<String, ArrayList<MentalHealthOption>>? = null
     private var mentalHealthEditList: ArrayList<Map<String, Any>>? = null
+
+    companion object {
+        private const val TAG_VALIDATE = "FormValidation"
+    }
+
+    private fun logValidationFailure(
+        formLayout: FormLayout,
+        message: String?,
+    ) {
+        if (!BuildConfig.DEBUG) return
+        val id = formLayout.id
+        val current = resultHashMap[id]
+        val valueStr =
+            when (current) {
+                null -> "<no value in map>"
+                is String ->
+                    if (current.isEmpty()) {
+                        "\"\" (empty string)"
+                    } else {
+                        val t = current.take(100)
+                        "\"$t\"${if (current.length > 100) "…" else ""}"
+                    }
+
+                else -> "${current.javaClass.simpleName}: ${current.toString().take(120)}"
+            }
+        val reason = message ?: formLayout.errorMessage ?: formLayout.cultureErrorMessage ?: "validation failed"
+        Timber.tag(TAG_VALIDATE).w(
+            "Invalid field id=\"$id\" title=\"${formLayout.title}\" viewType=${formLayout.viewType} " +
+                "mandatory=${formLayout.isMandatory} visible=${isViewVisible(id)} enabled=${isViewEnabled(id)} " +
+                "value=$valueStr reason=$reason",
+        )
+    }
 
     fun populateViews(serverData: List<FormLayout>) {
         this.serverData = serverData
@@ -216,6 +259,7 @@ class FormGenerator(
                 VIEW_TYPE_FORM_DATEPICKER -> createDatePicker(formLayout)
                 VIEW_TYPE_FORM_BP -> createBPView(formLayout)
                 VIEW_TYPE_TIME -> createTimeView(formLayout)
+                VIEW_TYPE_FORM_QR -> addScannerView(formLayout)
                 VIEW_TYPE_FORM_MULTISELECT_DATEPICKER -> createMultiSelectDatePicker(formLayout)
             }
         }
@@ -512,6 +556,7 @@ class FormGenerator(
                         }
                         setConditionalVisibility(formLayout, null)
                         resultHashMap.remove(id + Screening.unitMeasurement_KEY)
+                        binding.tvErrorMessage.gone()
                     }
 
                     else -> {
@@ -534,6 +579,7 @@ class FormGenerator(
                         unitMeasurement?.let {
                             it.also { resultHashMap[id + Screening.unitMeasurement_KEY] = it }
                         }
+                        validateInputs(formLayout.id)
                     }
                 }
                 callback?.invoke(resultHashMap, id)
@@ -546,26 +592,19 @@ class FormGenerator(
         }
     }
 
-    private fun generateNationalId() {
+    private fun generateNationalId(viewId: String) {
         var nationalId = ""
         var errorVisibility = View.GONE
-        val firstName = firstName(Screening.firstName)
-        firstName.first?.let {
+
+        // Full Name
+        val fullName = firstName(Screening.FULL_NAME)
+        fullName.first?.let {
             nationalId = it
         }
         focusNeeded = null
-        firstNameError(nationalId, Screening.firstName, firstName.second)
-        val lastName = lastName(nationalId)
-        lastName.let {
-            it.first?.let { nId ->
-                nationalId = nId
-            }
-            it.second?.let { errVisibility ->
-                errorVisibility = errVisibility
-            }
-        }
-        lastNameError(errorVisibility, lastName.third)
+        fullNameError(nationalId, Screening.FULL_NAME, fullName.second)
 
+        // Phone number
         phoneNumber(nationalId).let {
             it.first?.let { nId ->
                 nationalId = nId
@@ -577,12 +616,12 @@ class FormGenerator(
         phoneNumberError(errorVisibility)
 
         if (nationalId.isNotEmpty()) {
-            getViewByTag(Screening.identityValue)?.let { editText ->
+            getViewByTag(viewId)?.let { editText ->
                 if (editText is AppCompatEditText) {
                     editText.setText(nationalId.uppercase())
                     editText.isEnabled = false
                 }
-                getViewByTag("${Screening.identityValue}$errorSuffix")?.let { error ->
+                getViewByTag("${viewId}$errorSuffix")?.let { error ->
                     (error as TextView).apply {
                         gone()
                     }
@@ -610,7 +649,7 @@ class FormGenerator(
         }
     }
 
-    private fun firstNameError(
+    private fun fullNameError(
         nationalId: String,
         id: String,
         errorMessage: String,
@@ -745,21 +784,26 @@ class FormGenerator(
             ) {
                 val input = editText.text!!.trim().replace("\\s".toRegex(), "")
                 if (onlyAlphabet(id, input)) {
-                    nationalId =
-                        if (input.length >= 4) {
-                            input.substring(
-                                0,
-                                4,
-                            )
-                        } else {
-                            input
-                        }
+                    val input = if (input.length >= 4) {
+                        input.substring(
+                            0,
+                            4,
+                        )
+                    } else {
+                        input
+                    }
+                    nationalId = to4DigitHash(input)
                 } else {
                     errorMessage = getString(R.string.only_alphabets_validation)
                 }
             }
         }
         return Pair(nationalId, errorMessage)
+    }
+
+    private fun to4DigitHash(input: String): String {
+        val number = kotlin.math.abs(input.hashCode()) % 10000
+        return number.toString().padStart(4, '0')
     }
 
     private fun checkMinLength(
@@ -876,12 +920,32 @@ class FormGenerator(
                 checkInputsAndEnableNextField(binding.tvSnoReadingThree.text, binding, list)
             }
 
+            if (showPulse == false) {
+                hidePulseColumn(binding)
+            }
+
             getFamilyView(family)?.addView(binding.root) ?: run {
                 parentLayout.addView(binding.root)
             }
             setViewVisibility(visibility, binding.root)
             // setViewEnableDisable(isEnabled, binding.root)
         }
+    }
+
+    /**
+     * Hides the pulse column for a [VIEW_TYPE_FORM_BP] view when the form config disables it.
+     * The BP layout is a weighted constraint chain, so setting the pulse header, spacers, and
+     * pulse inputs to GONE lets the remaining columns redistribute and fill the row.
+     */
+    private fun hidePulseColumn(binding: BpReadingLayoutBinding) {
+        binding.textView13.gone()
+        binding.space02.gone()
+        binding.spaceRow12.gone()
+        binding.etPulseOne.gone()
+        binding.spaceRow22.gone()
+        binding.etPulseTwo.gone()
+        binding.spaceRow33.gone()
+        binding.etPulseThree.gone()
     }
 
     private fun checkInputsAndEnableNextField(
@@ -990,6 +1054,55 @@ class FormGenerator(
         }
     }
 
+    private fun addScannerView(formLayout: FormLayout) {
+        formLayout.apply {
+            val binding = FormQrScanViewBinding.inflate(LayoutInflater.from(context))
+            binding.root.tag = id + rootSuffix
+            binding.tvTitle.tag = id + titleSuffix
+            binding.tvErrorMessage.tag = id + errorSuffix
+            binding.etQRCode.tag = id
+            binding.ivScanDone.visibility = View.GONE
+            binding.ivScanDone.tag = id + scanDoneButtonSuffix
+            binding.ivScan.tag = id + scanImageView
+            binding.tvTitle.text = CommonUtils.getTitle(formLayout, translate)
+            binding.tvNewScan.visibility = View.GONE
+            binding.tvNewScan.tag = id + innerRootSuffix
+            if (isMandatory) {
+                binding.tvTitle.markMandatory()
+            }
+            binding.ivScan.safeClickListener { listener.onQRScanRequested() }
+            binding.tvTitle.safeClickListener { listener.onQRScanRequested() }
+            binding.etQRCode.addTextChangedListener { editable ->
+                resultHashMap[id] = editable.toString()
+                binding.tvTitle.text = getString(R.string.qr_code_scanned)
+                binding.ivScan.safeClickListener(null)
+                binding.tvTitle.safeClickListener(null)
+                binding.ivScanDone.visibility = View.VISIBLE
+                binding.tvNewScan.visibility = View.VISIBLE
+            }
+
+            val clickableSpan = object : ClickableSpan() {
+                override fun onClick(mView: View) {
+                    listener.onQRScanRequested()
+                }
+
+                override fun updateDrawState(ds: TextPaint) {
+                    super.updateDrawState(ds)
+                    ds.isUnderlineText = false
+                }
+            }
+            binding.tvNewScan.text = CommonUtils.getSpannableString(
+                clickableSpan,
+                getString(R.string.scan_new_qr),
+            )
+            binding.tvNewScan.movementMethod = LinkMovementMethod.getInstance()
+
+            getFamilyView(family)?.addView(binding.root) ?: kotlin.run {
+                parentLayout.addView(binding.root)
+            }
+        }
+    }
+
     private var singleSelectionCallbackForDate: ((selectedID: Any?, elementId: Pair<String, String?>, formLayout: FormLayout, name: String?) -> Unit)? =
         { selectedId, elementID, formLayout, _ ->
             saveSelectedOptionValue(elementID, selectedId, formLayout)
@@ -1075,7 +1188,7 @@ class FormGenerator(
                 inputFilter.add(DigitsInputFilter())
             }
 
-            if (id == DefinedParams.NationalId) {
+            if (id == DefinedParams.NATIONAL_ID) {
                 inputFilter.add(InputFilter.AllCaps())
             }
 
@@ -1192,12 +1305,12 @@ class FormGenerator(
         formLayout.apply {
             if (isNeedAction) {
                 when (id) {
-                    Screening.identityValue -> {
+                    Screening.identityValue, Screening.nationalId -> {
                         binding.tvNationalIdAction.visibility = View.VISIBLE
                         val clickableSpan = object : ClickableSpan() {
                             override fun onClick(mView: View) {
                                 // action click
-                                generateNationalId()
+                                generateNationalId(id)
                             }
 
                             override fun updateDrawState(ds: TextPaint) {
@@ -1457,7 +1570,7 @@ class FormGenerator(
             dropDownList.add(
                 hashMapOf<String, Any>(
                     DefinedParams.NAME to getString(R.string.please_select),
-                    DefinedParams.ID to DefaultID,
+                    DefinedParams.ID to DEFAULT_ID,
                 ),
             )
             if (isMandatory) {
@@ -1649,7 +1762,7 @@ class FormGenerator(
             dropDownList.add(
                 hashMapOf<String, Any>(
                     DefinedParams.NAME to getString(R.string.please_select),
-                    DefinedParams.ID to DefaultID,
+                    DefinedParams.ID to DEFAULT_ID,
                 ),
             )
             (view.adapter as CustomSpinnerAdapter).setData(dropDownList)
@@ -1869,7 +1982,31 @@ class FormGenerator(
             }
             setViewVisibility(visibility, binding.root)
             setViewEnableDisable(isEnabled, binding.root)
+            applyTodayDefaultForVisibleCampDate(this, binding)
         }
+    }
+
+    /**
+     * BD cataract camp date: when field is shown with [Screening.TODAY] in JSON, pre-fill today
+     * only if empty so drafts / [FormAutofill] can still replace with a saved value.
+     */
+    private fun applyTodayDefaultForVisibleCampDate(
+        formLayout: FormLayout,
+        binding: DatepickerLayoutBinding,
+    ) {
+        if (formLayout.id != CAMP_DATE) return
+        if (formLayout.visibility != VISIBLE) return
+        if (formLayout.defaultValue != TODAY) return
+        if (binding.etUserInput.text?.isNotBlank() == true) return
+        if (resultHashMap.containsKey(formLayout.id)) return
+        val now = Calendar.getInstance().time
+        binding.etUserInput.setText(DateUtils.getDateDDMMYYYY().format(now))
+        resultHashMap[formLayout.id] =
+            DateUtils.getDateString(
+                now.time,
+                inputFormat = DateUtils.DATE_FORMAT_yyyyMMdd,
+                outputFormat = DATE_FORMAT_yyyyMMddHHmmssZZZZZ,
+            )
     }
 
     private lateinit var textWatcher: TextWatcher
@@ -1883,10 +2020,10 @@ class FormGenerator(
             binding.etYears.inputType = InputType.TYPE_CLASS_NUMBER
             binding.etMonths.inputType = InputType.TYPE_CLASS_NUMBER
             binding.etWeeks.inputType = InputType.TYPE_CLASS_NUMBER
-            binding.etYears.tag = id + Year
-            binding.etMonths.tag = id + Month
-            binding.etWeeks.tag = id + Week
-            binding.ageValue.tag = id + value
+            binding.etYears.tag = id + YEAR_KEY
+            binding.etMonths.tag = id + MONTH_KEY
+            binding.etWeeks.tag = id + WEEK_KEY
+            binding.ageValue.tag = id + VALUE
             binding.tvKey.text = updateTitle(title, translate, titleCulture, unitMeasurement)
             binding.tvErrorMessage.tag = id + errorSuffix
             binding.tvDateOfBirth.tag = id + titleSuffix
@@ -1997,9 +2134,9 @@ class FormGenerator(
                     }
                 },
             )
-            binding.etYears.tag = id + Year
-            binding.etMonths.tag = id + Month
-            binding.etDays.tag = id + DefinedParams.Days
+            binding.etYears.tag = id + YEAR_KEY
+            binding.etMonths.tag = id + MONTH_KEY
+            binding.etDays.tag = id + DefinedParams.DAYS
             binding.tvErrorMessage.tag = id + errorSuffix
             binding.tvDateOfBirth.tag = id + titleSuffix
             binding.tvTitle.text = updateTitle(title, translate, titleCulture, unitMeasurement)
@@ -2115,9 +2252,9 @@ class FormGenerator(
         isEnabled: Boolean,
         id: String,
     ) {
-        val yearView = getViewByTag(id + Year)
-        val monthView = getViewByTag(id + Month)
-        val dayView = getViewByTag(id + DefinedParams.Days)
+        val yearView = getViewByTag(id + YEAR_KEY)
+        val monthView = getViewByTag(id + MONTH_KEY)
+        val dayView = getViewByTag(id + DefinedParams.DAYS)
         if (yearView is AppCompatEditText && monthView is AppCompatEditText && dayView is AppCompatEditText) {
             removeWatcherYMD(yearView, monthView, dayView)
         }
@@ -2138,17 +2275,17 @@ class FormGenerator(
             yearMonthDays.years.let { year ->
                 yearView.setText(year.toString())
                 yearView.isEnabled = isEnabled
-                resultHashMap[Year] = year
+                resultHashMap[YEAR_KEY] = year
             }
             yearMonthDays.months.let { month ->
                 monthView.setText(month.toString())
                 monthView.isEnabled = isEnabled
-                resultHashMap[Month] = month
+                resultHashMap[MONTH_KEY] = month
             }
             yearMonthDays.days.let { day ->
                 dayView.setText(day.toString())
                 dayView.isEnabled = isEnabled
-                resultHashMap[DefinedParams.Days] = day
+                resultHashMap[DefinedParams.DAYS] = day
             }
             listener.onAgeCheckForPregnancy()
             addWatcherYMD(yearView, monthView, dayView)
@@ -2186,13 +2323,13 @@ class FormGenerator(
         if (years == 0 && months == 0 && days == 0) {
             etDateOfBirth.text = ""
             removeIfContains(id)
-            removeIfContains(Year)
-            removeIfContains(Month)
-            removeIfContains(DefinedParams.Days)
+            removeIfContains(YEAR_KEY)
+            removeIfContains(MONTH_KEY)
+            removeIfContains(DefinedParams.DAYS)
         } else {
-            resultHashMap[Year] = years
-            resultHashMap[Month] = months
-            resultHashMap[DefinedParams.Days] = days
+            resultHashMap[YEAR_KEY] = years
+            resultHashMap[MONTH_KEY] = months
+            resultHashMap[DefinedParams.DAYS] = days
 
             val calculatedBirthDate = DateUtils.calculateBirthDateYMD(years, months, days)
 
@@ -2440,12 +2577,14 @@ class FormGenerator(
                     } else {
                         context.getString(R.string.days)
                     }
+
                 AgeOrDobDisplay.AgeOrDobUnit.MONTH ->
                     if (v == 1) {
                         context.getString(R.string.month)
                     } else {
                         context.getString(R.string.months)
                     }
+
                 AgeOrDobDisplay.AgeOrDobUnit.YEAR ->
                     if (v == 1) {
                         context.getString(R.string.year)
@@ -2491,16 +2630,8 @@ class FormGenerator(
                 etAge.setText(display.value.toString())
                 applyAgeOrDobUnitToView(tvAgeUnit, display)
             } else {
-                var age = CommonUtils.getAgeInYearsByDOB(dobFormatted)
-                if (age < 1) {
-                    age = 1
-                }
-                etAge.setText(age.toString())
-                tvAgeUnit.text = if (age == 1) {
-                    context.getString(R.string.year)
-                } else {
-                    context.getString(R.string.years)
-                }
+                etAge.setText("")
+                tvAgeUnit.text = context.getString(R.string.years)
             }
             etAge.alpha = 0.6f
             tvAgeUnit.alpha = 0.6f
@@ -2577,6 +2708,20 @@ class FormGenerator(
         }
     }
 
+    fun showErrorAndScrollTo(
+        id: String,
+        message: String,
+    ) {
+        showError(id, message)
+        val focusView =
+            getViewByTag(id + titleSuffix)
+                ?: getViewByTag(id + rootSuffix)
+                ?: getViewByTag(id)
+        focusView?.let { view ->
+            scrollView?.let { scrollToView(it, view) }
+        }
+    }
+
     fun hideError(id: String) {
         val errorView = getViewByTag(id + errorSuffix)
         errorView?.visibility = View.GONE
@@ -2587,9 +2732,9 @@ class FormGenerator(
         isEnabled: Boolean,
         id: String = DATE_OF_BIRTH,
     ) {
-        val yearView = getViewByTag(id + Year)
-        val monthView = getViewByTag(id + Month)
-        val weekView = getViewByTag(id + Week)
+        val yearView = getViewByTag(id + YEAR_KEY)
+        val monthView = getViewByTag(id + MONTH_KEY)
+        val weekView = getViewByTag(id + WEEK_KEY)
         if (yearView is AppCompatEditText && monthView is AppCompatEditText && weekView is AppCompatEditText) {
             removeWatcher(yearView, monthView, weekView)
         }
@@ -2610,17 +2755,17 @@ class FormGenerator(
             yearMonthWeeks.years.let { year ->
                 yearView.setText(year.toString())
                 yearView.isEnabled = isEnabled
-                resultHashMap[Year] = year
+                resultHashMap[YEAR_KEY] = year
             }
             yearMonthWeeks.months.let { month ->
                 monthView.setText(month.toString())
                 monthView.isEnabled = isEnabled
-                resultHashMap[Month] = month
+                resultHashMap[MONTH_KEY] = month
             }
             yearMonthWeeks.weeks.let { week ->
                 weekView.setText(week.toString())
                 weekView.isEnabled = isEnabled
-                resultHashMap[Week] = week
+                resultHashMap[WEEK_KEY] = week
             }
             listener.onAgeCheckForPregnancy()
             updateAgeView(id)
@@ -2659,13 +2804,13 @@ class FormGenerator(
         if (years == 0 && months == 0 && weeks == 0) {
             etDateOfBirth.text = ""
             removeIfContains(id)
-            removeIfContains(Year)
-            removeIfContains(Month)
-            removeIfContains(Week)
+            removeIfContains(YEAR_KEY)
+            removeIfContains(MONTH_KEY)
+            removeIfContains(WEEK_KEY)
         } else {
-            resultHashMap[Year] = years
-            resultHashMap[Month] = months
-            resultHashMap[Week] = weeks
+            resultHashMap[YEAR_KEY] = years
+            resultHashMap[MONTH_KEY] = months
+            resultHashMap[WEEK_KEY] = weeks
 
             val calculatedBirthDate = DateUtils.calculateBirthDate(years, months, weeks)
 
@@ -2681,7 +2826,7 @@ class FormGenerator(
 
     private fun updateAgeView(id: String) {
         val dobString = resultHashMap[id] as? String
-        val ageView = getViewByTag(id + value)
+        val ageView = getViewByTag(id + VALUE)
         dobString?.let { dob ->
             val age = displayAge(dob, context)
             ageView?.let { view ->
@@ -3269,13 +3414,21 @@ class FormGenerator(
         view?.apply {
             val model = serverData?.find { it.id == tag }
             when (model?.viewType) {
-                VIEW_TYPE_FORM_DATEPICKER,
+                VIEW_TYPE_FORM_DATEPICKER -> {
+                    resetEditTextDatePicker(
+                        this,
+                        model,
+                    )
+                    resultHashMap.remove(model.id)
+                }
+
                 VIEW_TYPE_FORM_SPINNER,
                 VIEW_TYPE_FORM_EDITTEXT, VIEW_TYPE_NO_OF_DAYS,
                 -> resetEditTextDatePicker(
                     this,
                     model,
                 )
+
                 VIEW_TYPE_FORM_AGE -> resetAgeView(this, model)
                 VIEW_TYPE_FORM_AGE_YMD -> resetAgeYMDView(this, model)
                 VIEW_TYPE_FORM_AGE_OR_DOB -> resetAgeOrDobView(this, model)
@@ -3283,6 +3436,7 @@ class FormGenerator(
                 VIEW_INFORMATION_LABEL -> {
                     resetInformationLabel(this, model)
                 }
+
                 VIEW_TYPE_FORM_CARD_FAMILY -> resetCardView(model)
                 else -> {
                     if (view.tag
@@ -3336,12 +3490,20 @@ class FormGenerator(
             if (restrictReset(model)) return@apply
             model?.let {
                 when (model.viewType) {
-                    VIEW_TYPE_FORM_DATEPICKER,
+                    VIEW_TYPE_FORM_DATEPICKER -> {
+                        resetEditTextDatePicker(
+                            this,
+                            model,
+                        )
+                        resultHashMap.remove(model.id)
+                    }
+
                     VIEW_TYPE_FORM_EDITTEXT, VIEW_TYPE_NO_OF_DAYS,
                     -> resetEditTextDatePicker(
                         this,
                         model,
                     )
+
                     VIEW_TYPE_FORM_CARD_FAMILY -> resetCardView(model)
                     VIEW_TYPE_FORM_MULTI_SELECT_SPINNER -> resetMultiSelectSpinner(this)
                     VIEW_TYPE_FORM_SPINNER -> resetSpinner(this)
@@ -3621,252 +3783,252 @@ class FormGenerator(
         getDeepChildOffset(mainParent, parentGroup.parent, parentGroup, accumulatedOffset)
     }
 
-    fun validateInputs(): Boolean {
+    fun validateInputs(fieldId: String? = null): Boolean {
         var isValid = true
         focusNeeded = null
         serverData?.forEach { data ->
-            data.apply {
-                if ((
-                        isMandatory &&
-                            !resultHashMap.containsKey(id) &&
-                            isViewVisible(id) &&
-                            isViewEnabled(id)
-                    ) ||
-                    (
-                        isMandatory &&
-                            resultHashMap.containsKey(id) &&
-                            resultHashMap[id] is String &&
-                            (resultHashMap[id] as String).isEmpty()
-                    )
-                ) {
-                    isValid = false
-                    requestFocusView(data)
-                } else if (viewType == VIEW_TYPE_FORM_EDITTEXT && isPhoneNumberField(id)) {
-                    val actualValue = if (resultHashMap.containsKey(id)) {
-                        resultHashMap[id] as? String
-                    } else {
-                        null
-                    }
-                    if (isMandatory && actualValue == null) {
+            if (fieldId == null || fieldId == data.id) {
+                data.apply {
+                    if ((isMandatory && !resultHashMap.containsKey(id) && isViewVisible(id) && isViewEnabled(id)) ||
+                        (isMandatory && resultHashMap.containsKey(id) && resultHashMap[id] is String && (resultHashMap[id] as String).isEmpty())
+                    ) {
                         isValid = false
                         requestFocusView(data)
-                    } else {
-                        actualValue?.let {
-                            if (naValue == actualValue.toDoubleOrNull()) {
-                                hideValidationField(data)
-                            } else if (!startsWith.isNullOrEmpty() &&
-                                !checkPhoneNumberValidOrNot(
-                                    it,
-                                    startsWith,
-                                )
-                            ) {
-                                isValid = false
-                                requestFocusView(
-                                    data,
-                                    getString(
-                                        R.string.start_with_validation,
-                                        startsWith?.joinToString(separator = " ${getString(R.string.or)} ")
-                                            ?: "",
-                                    ),
-                                )
-                            } else if (!phoneNumberContainMaxLength(
-                                    contentLength ?: maxLength,
-                                    it,
-                                )
-                            ) {
-                                isValid = false
-                                requestFocusView(data)
-                            } else if (!FormFieldValidator.isValidMobileNumber(it)) {
-                                isValid = false
-                                requestFocusView(
-                                    data,
-                                    getString(
-                                        R.string.phone_number_invalid,
-                                    ),
-                                )
-                            } else {
-                                hideValidationField(data)
-                            }
-                        }
-                    }
-                } else if ((id == DATE_OF_BIRTH || id == DateOfBirth) &&
-                    !data.viewType.equals(VIEW_TYPE_FORM_AGE_OR_DOB, true) &&
-                    isMandatory &&
-                    resultHashMap.containsKey(id)
-                ) {
-                    val actualValue = resultHashMap[id] as? String
-                    maxAge?.let { ageLimit ->
-                        val isValidAge = actualValue?.let {
-                            val dob = DateUtils.getV2YearMonthAndWeek(it)
-                            dob.years < ageLimit || (dob.years == ageLimit && dob.months == 0 && dob.weeks == 0 && dob.days == 0)
-                        } ?: false
-
-                        if (!isValidAge) {
-                            isValid = false
-                            requestFocusView(data, getString(R.string.dob_invalid, maxAge))
+                    } else if (viewType == VIEW_TYPE_FORM_EDITTEXT && isPhoneNumberField(id)) {
+                        val actualValue = if (resultHashMap.containsKey(id)) {
+                            resultHashMap[id] as? String
                         } else {
-                            hideValidationField(data)
+                            null
                         }
-                    } ?: run {
-                        actualValue?.let {
-                            hideValidationField(data)
-                        } ?: run {
+                        if (isMandatory && actualValue == null) {
                             isValid = false
                             requestFocusView(data)
-                        }
-                    }
-                } else if (data.viewType.equals(VIEW_TYPE_FORM_AGE_OR_DOB, true) && isMandatory) {
-                    // AgeOrDob component validation - check if DOB exists
-                    val actualValue = resultHashMap[id] as? String
-                    if (actualValue.isNullOrBlank()) {
-                        isValid = false
-                        requestFocusView(data)
-                    } else {
-                        // AgeOrDob component already validates maxAge in its own logic
-                        hideValidationField(data)
-                    }
-                } else if (data.viewType.equals(VIEW_TYPE_FORM_BP, true)) {
-                    if (getViewByTag(AssessmentDefinedParams.BP_LOG + rootSuffix)?.visibility == View.VISIBLE) {
-                        val list = resultHashMap[id] as ArrayList<BPModel>
-                        val validationBPResultModel = Validator.checkValidBPInput(
-                            context,
-                            list,
-                            data,
-                        )
-                        if (validationBPResultModel.status) {
-                            hideValidationField(data)
                         } else {
-                            isValid = false
-                            requestFocusView(data, validationBPResultModel.message)
-                        }
-                    }
-                } else if (data.viewType.equals(VIEW_TYPE_TIME, true)) {
-                    val dateKey = id + lastMealTypeDateSuffix
-                    val timeKey = id + lastMealTypeMeridiem
-                    if (resultHashMap.containsKey(Screening.BloodGlucoseID) && resultHashMap[Screening.BloodGlucoseID] != null) {
-                        if (resultHashMap[dateKey] != null) {
-                            val result = resultHashMap[id] as? MutableMap<*, *>
-                            val hour = (result?.get(Hour) as? String)?.toIntOrNull()
-                            val minute = (result?.get(Minute) as? String)?.toIntOrNull()
-                            if (hour != null && minute != null && hour != 0 && resultHashMap[timeKey] != null) {
-                                val minHour = data.minValueForHour
-                                val maxHour = data.maxValueForHour
-                                val minMinute = data.minValueForMinute
-                                val maxMinute = data.maxValueForMinute
-
-                                val isValidHour =
-                                    minHour != null && maxHour != null && hour in minHour..maxHour
-                                val isValidMinute =
-                                    minMinute != null && maxMinute != null && minute in minMinute..maxMinute
-
-                                if (((!(minHour != null && maxHour != null)) && (!(minMinute != null && maxMinute != null))) ||
-                                    (isValidHour && isValidMinute)
+                            actualValue?.let {
+                                if (naValue == actualValue.toDoubleOrNull()) {
+                                    hideValidationField(data)
+                                } else if (!startsWith.isNullOrEmpty() &&
+                                    !checkPhoneNumberValidOrNot(
+                                        it,
+                                        startsWith,
+                                    )
                                 ) {
-                                    val res = (resultHashMap[dateKey] as? String)?.let { date ->
-                                        if (date.equals(Screening.Today, ignoreCase = true) &&
-                                            resultHashMap[timeKey] != null
-                                        ) {
-                                            DateUtils.isValidTimeForLastMealTime(
-                                                hour,
-                                                minute,
-                                                resultHashMap[timeKey] as String,
-                                            )
-                                        } else {
-                                            true
-                                        }
-                                    } ?: false
-                                    if (res) {
-                                        hideValidationField(data)
-                                    } else {
-                                        isValid = false
-                                        requestFocusView(data)
-                                    }
-                                } else {
                                     isValid = false
                                     requestFocusView(
                                         data,
                                         getString(
-                                            R.string.time_meal_error,
-                                            minHour,
-                                            maxHour,
-                                            minMinute,
-                                            maxMinute,
+                                            R.string.start_with_validation,
+                                            startsWith?.joinToString(separator = " ${getString(R.string.or)} ")
+                                                ?: "",
                                         ),
                                     )
+                                } else if (!phoneNumberContainMaxLength(
+                                        contentLength ?: maxLength,
+                                        it,
+                                    )
+                                ) {
+                                    isValid = false
+                                    requestFocusView(data)
+                                } else if (!FormFieldValidator.isValidMobileNumber(it)) {
+                                    isValid = false
+                                    requestFocusView(
+                                        data,
+                                        getString(
+                                            R.string.phone_number_invalid,
+                                        ),
+                                    )
+                                } else {
+                                    hideValidationField(data)
+                                }
+                            }
+                        }
+                    } else if ((id == DATE_OF_BIRTH || id == DateOfBirth) &&
+                        !data.viewType.equals(VIEW_TYPE_FORM_AGE_OR_DOB, true) &&
+                        isMandatory &&
+                        resultHashMap.containsKey(id)
+                    ) {
+                        val actualValue = resultHashMap[id] as? String
+                        maxAge?.let { ageLimit ->
+                            val isValidAge = actualValue?.let {
+                                val dob = DateUtils.getV2YearMonthAndWeek(it)
+                                dob.years < ageLimit || (dob.years == ageLimit && dob.months == 0 && dob.weeks == 0 && dob.days == 0)
+                            } ?: false
+
+                            if (!isValidAge) {
+                                isValid = false
+                                requestFocusView(data, getString(R.string.dob_invalid, maxAge))
+                            } else {
+                                hideValidationField(data)
+                            }
+                        } ?: run {
+                            actualValue?.let {
+                                hideValidationField(data)
+                            } ?: run {
+                                isValid = false
+                                requestFocusView(data)
+                            }
+                        }
+                    } else if (data.viewType.equals(VIEW_TYPE_FORM_BP, true)) {
+                        if (getViewByTag(AssessmentDefinedParams.BP_LOG + rootSuffix)?.visibility == View.VISIBLE) {
+                            val list = resultHashMap[id] as ArrayList<BPModel>
+                            val validationBPResultModel = Validator.checkValidBPInput(
+                                context,
+                                list,
+                                data,
+                            )
+                            if (validationBPResultModel.status) {
+                                hideValidationField(data)
+                            } else {
+                                isValid = false
+                                requestFocusView(data, validationBPResultModel.message)
+                            }
+                        }
+                    } else if (data.viewType.equals(VIEW_TYPE_TIME, true)) {
+                        val dateKey = id + lastMealTypeDateSuffix
+                        val timeKey = id + lastMealTypeMeridiem
+                        if (resultHashMap.containsKey(Screening.BloodGlucoseID) && resultHashMap[Screening.BloodGlucoseID] != null) {
+                            if (resultHashMap[dateKey] != null) {
+                                val result = resultHashMap[id] as? MutableMap<*, *>
+                                val hour = (result?.get(Hour) as? String)?.toIntOrNull()
+                                val minute = (result?.get(Minute) as? String)?.toIntOrNull()
+                                if (hour != null && minute != null && hour != 0 && resultHashMap[timeKey] != null) {
+                                    val minHour = data.minValueForHour
+                                    val maxHour = data.maxValueForHour
+                                    val minMinute = data.minValueForMinute
+                                    val maxMinute = data.maxValueForMinute
+
+                                    val isValidHour =
+                                        minHour != null && maxHour != null && hour in minHour..maxHour
+                                    val isValidMinute =
+                                        minMinute != null && maxMinute != null && minute in minMinute..maxMinute
+
+                                    if (((!(minHour != null && maxHour != null)) && (!(minMinute != null && maxMinute != null))) ||
+                                        (isValidHour && isValidMinute)
+                                    ) {
+                                        val res = (resultHashMap[dateKey] as? String)?.let { date ->
+                                            if (date.equals(Screening.Today, ignoreCase = true) &&
+                                                resultHashMap[timeKey] != null
+                                            ) {
+                                                DateUtils.isValidTimeForLastMealTime(
+                                                    hour,
+                                                    minute,
+                                                    resultHashMap[timeKey] as String,
+                                                )
+                                            } else {
+                                                true
+                                            }
+                                        } ?: false
+                                        if (res) {
+                                            hideValidationField(data)
+                                        } else {
+                                            isValid = false
+                                            requestFocusView(data)
+                                        }
+                                    } else {
+                                        isValid = false
+                                        requestFocusView(
+                                            data,
+                                            getString(
+                                                R.string.time_meal_error,
+                                                minHour,
+                                                maxHour,
+                                                minMinute,
+                                                maxMinute,
+                                            ),
+                                        )
+                                    }
+                                } else {
+                                    isValid = false
+                                    requestFocusView(data)
                                 }
                             } else {
                                 isValid = false
                                 requestFocusView(data)
                             }
-                        } else {
+                        }
+                    } else if (id == MemberRegistration.ID_GUARDIAN &&
+                        resultHashMap.containsKey(id) &&
+                        isViewVisible(id) &&
+                        isViewEnabled(id)
+                    ) {
+                        val id = CommonUtils.getLongOrNull(resultHashMap[id]) ?: 0
+                        // For guardian if the selected id is less than 0,
+                        // that means either the user selected --Select-- or + Add guardian
+                        if (id < 0) {
                             isValid = false
                             requestFocusView(data)
                         }
-                    }
-                } else if (id == MemberRegistration.ID_GUARDIAN &&
-                    resultHashMap.containsKey(id) &&
-                    isViewVisible(id) &&
-                    isViewEnabled(id)
-                ) {
-                    val id = CommonUtils.getLongOrNull(resultHashMap[id]) ?: 0
-                    // For guardian if the selected id is less than 0,
-                    // that means either the user selected --Select-- or + Add guardian
-                    if (id < 0) {
-                        isValid = false
-                        requestFocusView(data)
-                    }
-                } else {
-                    if (resultHashMap.containsKey(id) &&
-                        data.viewType.equals(
-                            VIEW_TYPE_FORM_EDITTEXT,
-                            true,
-                        )
-                    ) {
-                        val actualValue = resultHashMap[id]
-                        if (id == Screening.NoOfNeonates && resultHashMap[id].toString().toIntOrNull() == 0) {
+                    } else if (data.viewType.equals(VIEW_TYPE_FORM_QR, true)) {
+                        if (isMandatory && !resultHashMap.containsKey(id)) {
                             isValid = false
-                            requestFocusView(data)
+                            getViewByTag(id + errorSuffix)?.let { view ->
+                                view as TextView
+                                view.visibility = View.VISIBLE
+                                view.text = errorMessage
+                                    ?: getString(R.string.linking_qr_code_is_mandatory)
+                            }
                         } else {
-                            isValid = validateMinMaxLength(
-                                actualValue,
-                                isValid,
-                                data,
+                            getViewByTag(id + errorSuffix)?.visibility = View.GONE
+                        }
+                    } else {
+                        if (resultHashMap.containsKey(id) &&
+                            data.viewType.equals(
+                                VIEW_TYPE_FORM_EDITTEXT,
+                                true,
                             )
-                            if (isValid && data.onlyAlphabets == true) {
-                                isValid = checkOnlyAlphabets(
+                        ) {
+                            val actualValue = resultHashMap[id]
+                            if (id == Screening.NO_OF_NEONATES && resultHashMap[id].toString().toIntOrNull() == 0) {
+                                isValid = false
+                                requestFocusView(data)
+                            } else {
+                                isValid = validateMinMaxLength(
                                     actualValue,
                                     isValid,
                                     data,
                                 )
-                            } else if (isValid && data.optionType == EditTextOptionType.PERSON_NAME) {
-                                val validationRegex = Regex(PersonNameFilter.VALIDATION_PATTERN)
-                                isValid = validationRegex.matches((resultHashMap[id] as? String) ?: "")
-                                if (isValid) {
-                                    hideValidationField(data)
-                                } else {
-                                    requestFocusView(data, context.getString(R.string.error_person_name))
-                                }
-                            }
-                        }
-                    } else {
-                        when (data.viewType) {
-                            VIEW_TYPE_MENTAL_HEALTH -> {
-                                if (isViewVisible(id)) {
-                                    if (checkValidMentalHealth(this, id)) {
+                                if (isValid && data.onlyAlphabets == true) {
+                                    isValid = checkOnlyAlphabets(
+                                        actualValue,
+                                        isValid,
+                                        data,
+                                    )
+                                } else if (isValid && data.optionType == EditTextOptionType.PERSON_NAME) {
+                                    val validationRegex = Regex(PersonNameFilter.VALIDATION_PATTERN)
+                                    isValid = validationRegex.matches((resultHashMap[id] as? String) ?: "")
+                                    if (isValid) {
                                         hideValidationField(data)
                                     } else {
-                                        isValid = false
-                                        requestFocusView(data)
+                                        requestFocusView(data, context.getString(R.string.error_person_name))
                                     }
                                 }
                             }
-                            else -> {
-                                hideValidationField(data)
+                        } else {
+                            when (data.viewType) {
+                                VIEW_TYPE_MENTAL_HEALTH -> {
+                                    if (isViewVisible(id)) {
+                                        if (checkValidMentalHealth(this, id)) {
+                                            hideValidationField(data)
+                                        } else {
+                                            isValid = false
+                                            requestFocusView(data)
+                                        }
+                                    }
+                                }
+
+                                else -> {
+                                    hideValidationField(data)
+                                }
                             }
                         }
                     }
                 }
             }
+        }
+        if (!isValid && BuildConfig.DEBUG) {
+            Timber.tag(TAG_VALIDATE).w(
+                "validateInputs(): submit blocked — one or more fields failed (see \"Invalid field\" lines above; first field is scrolled into view).",
+            )
         }
         return isValid
     }
@@ -3902,7 +4064,7 @@ class FormGenerator(
 
     fun isViewVisible(id: String): Boolean {
         val view = getViewByTag(id + rootSuffix)
-        return view != null && view.isVisible
+        return view != null && view.isShown
     }
 
     fun isViewEnabled(id: String): Boolean {
@@ -3932,6 +4094,7 @@ class FormGenerator(
         formLayout: FormLayout,
         message: String? = null,
     ) {
+        logValidationFailure(formLayout, message)
         if (focusNeeded == null) {
             focusNeeded = showValidationMessage(formLayout, message)
         } else {
@@ -4141,7 +4304,7 @@ class FormGenerator(
         // Prioritize 'value' (JSON id) over 'ID' (database id) for condition matching
         val selectedValues = ArrayList<String>()
         resultMap.forEach { item ->
-            val selectedId = item[value]?.toString()
+            val selectedId = item[VALUE]?.toString()
                 ?: item[DefinedParams.ID]?.toString()
             selectedId?.let { selectedValues.add(it) }
         }
@@ -4149,7 +4312,7 @@ class FormGenerator(
         if (isContainsOther(resultMap)) {
             setConditionalVisibility(
                 formLayout,
-                DefinedParams.Other,
+                DefinedParams.OTHER,
                 isCheckBox = true,
                 selectedValues = selectedValues,
             )
@@ -4171,7 +4334,7 @@ class FormGenerator(
         mapList.forEach { map ->
             if (map is HashMap<*, *>) {
                 val name = map[DefinedParams.NAME]
-                if (name is String && (name.equals(DefinedParams.Other, true) || name.equals(OtherMethodSpecify, true))) {
+                if (name is String && (name.equals(DefinedParams.OTHER, true) || name.equals(OTHER_METHOD_SPECIFY, true))) {
                     status = true
                     return@forEach
                 }
@@ -4285,7 +4448,7 @@ class FormGenerator(
     fun createDefaultMap(): Map<String, Any> =
         hashMapOf(
             DefinedParams.NAME to getString(R.string.please_select),
-            DefinedParams.ID to DefaultID,
+            DefinedParams.ID to DEFAULT_ID,
         )
 
     fun resetSingleSelection(id: String) {
@@ -4606,6 +4769,7 @@ class FormGenerator(
                 VIEW_TYPE_FORM_DATEPICKER -> createDatePicker(formLayout)
                 VIEW_TYPE_FORM_BP -> createBPView(formLayout)
                 VIEW_TYPE_TIME -> createTimeView(formLayout)
+                VIEW_TYPE_FORM_QR -> addScannerView(formLayout)
             }
         }
     }
@@ -4676,7 +4840,7 @@ class FormGenerator(
                         handleSelectedItem(
                             hashMapOf<String, Any>().apply {
                                 put(DefinedParams.ID, DefinedParams.DEFAULT_ID)
-                                put(DefinedParams.NAME, DefinedParams.DefaultIDLabel)
+                                put(DefinedParams.NAME, DefinedParams.DEFAULT_ID_LABEL)
                             },
                             id,
                             dependentID,
@@ -4826,11 +4990,13 @@ class FormGenerator(
     fun updateNationalIdLabelForIdType(
         selectedIdType: String?,
         translate: Boolean,
+        optionsViewId: String = MemberRegistration.ID_TYPE,
+        viewId: String = MemberRegistration.NATIONAL_ID,
     ) {
-        val idTypeLayout = getFormLayout(MemberRegistration.ID_TYPE) ?: return
-        val nationalIdLayout = getFormLayout(MemberRegistration.NATIONAL_ID) ?: return
-        val titleView = getViewByTag(MemberRegistration.NATIONAL_ID + titleSuffix) as? TextView
-        val nationalIdInput = getViewByTag(MemberRegistration.NATIONAL_ID) as? EditText
+        val idTypeLayout = getFormLayout(optionsViewId) ?: return
+        val nationalIdLayout = getFormLayout(viewId) ?: return
+        val titleView = getViewByTag(viewId + titleSuffix) as? TextView
+        val nationalIdInput = getViewByTag(viewId) as? EditText
 
         val options = idTypeLayout.optionsList
         val option =
@@ -4863,6 +5029,251 @@ class FormGenerator(
             titleView?.markMandatory()
         } else {
             titleView?.markNonMandatory()
+        }
+    }
+
+    private fun defaultError(itemId: String): String {
+        val error: String? = if (SecuredPreference.getIsTranslationEnabled()) {
+            serverData?.firstOrNull { it.id == itemId }?.cultureErrorMessage
+        } else {
+            serverData?.firstOrNull { it.id == itemId }?.errorMessage
+        }
+        return if (error.isNullOrBlank()) getString(R.string.default_user_input_error) else error
+    }
+
+    private fun upazilaId(): Pair<Long, String> {
+        var upazilaId: Long = 0
+        val errorMessage: String = defaultError(DefinedParams.UPAZILA)
+        getViewByTag(DefinedParams.UPAZILA)?.let { view ->
+            if (view is Spinner) {
+                val adapter = view.adapter
+                if (adapter != null && adapter is CustomSpinnerAdapter) {
+                    val pos = view.selectedItemPosition
+                    if (pos > 0 && adapter.getData(pos) != null) {
+                        adapter.getData(pos)?.let {
+                            val id = it[DefinedParams.ID]
+                            if (id is Long) {
+                                upazilaId = id
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return Pair(upazilaId, errorMessage)
+    }
+
+    private fun upazilaIdError(
+        upazilaId: Long,
+        errorMessage: String,
+    ) {
+        getViewByTag(DefinedParams.UPAZILA + errorSuffix)?.let { tvError ->
+            (tvError as TextView).apply {
+                text = errorMessage
+                if (upazilaId > 0) {
+                    visibility = View.GONE
+                } else {
+                    visibility = View.VISIBLE
+                    focusNeeded = getViewByTag(DefinedParams.UPAZILA + titleSuffix) ?: this
+                }
+            }
+        }
+    }
+
+    private fun villageIdError(
+        villageId: Long,
+        errorMessage: String,
+    ) {
+        getViewByTag(DefinedParams.VILLAGE + errorSuffix)?.let { tvError ->
+            (tvError as TextView).apply {
+                text = errorMessage
+                if (villageId > 0) {
+                    visibility = View.GONE
+                } else {
+                    visibility = View.VISIBLE
+                    focusNeeded = getViewByTag(DefinedParams.VILLAGE + titleSuffix) ?: this
+                }
+            }
+        }
+    }
+
+    private fun villageId(): Pair<Long, String> {
+        var villageId: Long = 0
+        val errorMessage: String = defaultError(DefinedParams.VILLAGE)
+        getViewByTag(DefinedParams.VILLAGE)?.let { view ->
+            if (view is Spinner) {
+                val adapter = view.adapter
+                if (adapter != null && adapter is CustomSpinnerAdapter) {
+                    val pos = view.selectedItemPosition
+                    if (pos > 0 && adapter.getData(pos) != null) {
+                        adapter.getData(pos)?.let {
+                            val id = it[DefinedParams.ID]
+                            if (id is Long) {
+                                villageId = id
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return Pair(villageId, errorMessage)
+    }
+
+    private fun unionIdError(
+        unionId: Long,
+        errorMessage: String,
+    ) {
+        getViewByTag(DefinedParams.UNION + errorSuffix)?.let { tvError ->
+            (tvError as TextView).apply {
+                text = errorMessage
+                if (unionId > 0) {
+                    visibility = View.GONE
+                } else {
+                    visibility = View.VISIBLE
+                    focusNeeded = getViewByTag(DefinedParams.UNION + titleSuffix) ?: this
+                }
+            }
+        }
+    }
+
+    private fun unionId(): Pair<Long, String> {
+        var unionId: Long = 0
+        val errorMessage: String = defaultError(DefinedParams.UNION)
+        getViewByTag(DefinedParams.UNION)?.let { view ->
+            if (view is Spinner) {
+                val adapter = view.adapter
+                if (adapter != null && adapter is CustomSpinnerAdapter) {
+                    val pos = view.selectedItemPosition
+                    if (pos > 0 && adapter.getData(pos) != null) {
+                        adapter.getData(pos)?.let {
+                            val id = it[DefinedParams.ID]
+                            if (id is Long) {
+                                unionId = id
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return Pair(unionId, errorMessage)
+    }
+
+    fun generateUniqueNationalId(
+        postValue: Boolean,
+        level1SiteId: Long = 0,
+    ) {
+        val isParacounselorEnabled = false
+        var upazilaId: Long = 0
+        if (!isParacounselorEnabled) {
+            if (level1SiteId > 0) {
+                upazilaId = level1SiteId
+            } else {
+                val upazila = upazilaId()
+                upazila.first.let {
+                    upazilaId = it
+                }
+                focusNeeded = null
+                if (postValue) {
+                    upazilaIdError(upazilaId, upazila.second)
+                }
+            }
+        }
+
+        var unionId: Long
+        val union = unionId()
+        union.first.let {
+            unionId = it
+        }
+        focusNeeded = null
+        if (postValue) {
+            unionIdError(unionId, union.second)
+        }
+
+        var villageId: Long
+        val village = villageId()
+        village.first.let {
+            villageId = it
+        }
+        focusNeeded = null
+        if (postValue) {
+            villageIdError(villageId, village.second)
+        }
+
+        val upazilaCodeValidation = upazilaId > 0 || isParacounselorEnabled
+
+        if (upazilaCodeValidation && unionId > 0 && villageId > 0) { // listener.generateNationalID(Triple(upazilaId, unionId, villageId), postValue)
+        } else {
+            focusNeeded?.let { focusNeeded ->
+                scrollView?.let { scrollView ->
+                    scrollToView(scrollView, focusNeeded)
+                }
+            }
+        }
+    }
+
+    fun showQRScannedText(
+        resultString: String,
+        tag: String,
+    ) {
+        getViewByTag(tag)?.let {
+            (it as? AppCompatEditText)?.apply {
+                setText(resultString)
+            }
+        }
+
+        getViewByTag(tag + errorSuffix)?.visibility = View.GONE
+    }
+
+    /**
+     * Edit flow: a community patient already has a QR linked at enrollment, but the patient-details
+     * API does not return the QR value. This shows the "linked successfully" state (with the
+     * "Scan New QR Code?" option still available) WITHOUT writing a value into [resultHashMap], so
+     * submitting preserves the existing link unless the user explicitly re-scans a new code.
+     */
+    fun markQrAlreadyLinked(tag: String) {
+        getViewByTag(tag + titleSuffix)?.let {
+            if (it is TextView) {
+                it.text = getString(R.string.qr_code_scanned)
+            }
+        }
+        getViewByTag(tag + scanDoneButtonSuffix)?.visibility = View.VISIBLE
+        getViewByTag(tag + innerRootSuffix)?.visibility = View.VISIBLE
+        getViewByTag(tag + errorSuffix)?.visibility = View.GONE
+    }
+
+    fun showErrorQRScanned(
+        tag: String,
+        message: String? = null,
+    ) {
+        val errorTextView = getViewByTag(tag + errorSuffix)
+        message?.let {
+            if (errorTextView is TextView) {
+                errorTextView.text = message
+            }
+        }
+        errorTextView?.visibility = View.VISIBLE
+        val modelList = serverData?.filter { it.id == tag }
+        resultHashMap.remove(tag)
+        getViewByTag(tag + titleSuffix)?.let { view ->
+            if (view is TextView && !modelList.isNullOrEmpty()) {
+                view.text = CommonUtils.getTitle(modelList[0], translate)
+                if (modelList[0].isMandatory) {
+                    view.markMandatory()
+                }
+                view.safeClickListener { listener.onQRScanRequested() }
+            }
+        }
+
+        getViewByTag(tag + scanImageView)?.let { view ->
+            view.safeClickListener { listener.onQRScanRequested() }
+        }
+
+        getViewByTag(tag + scanDoneButtonSuffix)?.let { view ->
+            view.visibility = View.GONE
+        }
+
+        getViewByTag(tag + innerRootSuffix)?.let { view ->
+            view.visibility = View.GONE
         }
     }
 }
