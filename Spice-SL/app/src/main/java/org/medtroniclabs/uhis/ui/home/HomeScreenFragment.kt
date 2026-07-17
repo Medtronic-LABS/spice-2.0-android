@@ -1,13 +1,11 @@
 package org.medtroniclabs.uhis.ui.home
 
 import android.content.Intent
-import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -64,7 +62,6 @@ import org.medtroniclabs.uhis.ui.peersupervisor.PerformanceMonitoringActivity
 import org.medtroniclabs.uhis.ui.services.ServicesActivity
 import java.time.LocalDate
 import javax.inject.Inject
-import android.net.ConnectivityManager as AndroidConnectivityManager
 
 @AndroidEntryPoint
 class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
@@ -226,74 +223,13 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
     }
 
     /**
-     * Open [CoachingChatBottomSheet] if the on-device LLM model is staged; otherwise
-     * prompt the CHW to download it. Low-end devices (< 3 GB RAM) run retrieval-only,
-     * so no model download is needed.
+     * Open [CoachingChatBottomSheet]. All download UX (AI model, voice/TTS packs)
+     * now lives on the SDK's coaching setup screen inside the sheet, so the host
+     * no longer prompts to download the model — it just opens the sheet.
      */
     private fun launchCoachingChatSheet() {
         if (!MicroCoachingSDK.isInitialized()) return
-        val sdk = MicroCoachingSDK.getInstance()
-        if (sdk.isLowEndDevice || sdk.modelManager.isModelPresent()) {
-            CoachingChatBottomSheet.show(parentFragmentManager)
-        } else {
-            showCoachingModelDownloadPrompt()
-        }
-    }
-
-    /**
-     * Single-dialog model-download confirmation. The metered-network hint is baked
-     * into the message so the user gives one explicit yes; the download size is read
-     * live from the SDK's configured model variant (not a hard-coded value).
-     */
-    private fun showCoachingModelDownloadPrompt() {
-        val activity = (activity as? BaseActivity) ?: return
-        val metered = isOnMeteredNetwork()
-        val messageRes = if (metered) {
-            R.string.coaching_model_download_message_metered
-        } else {
-            R.string.coaching_model_download_message
-        }
-        val sizeLabel = runCatching {
-            android.text.format.Formatter.formatShortFileSize(
-                requireContext(),
-                MicroCoachingSDK.getInstance().selectedModelVariant().sizeInBytes,
-            )
-        }.getOrDefault("")
-        activity.showErrorDialogue(
-            title = getString(R.string.coaching_model_download_title),
-            message = getString(messageRes, sizeLabel),
-            isNegativeButtonNeed = true,
-            positiveButtonName = getString(R.string.yes),
-            cancelBtnName = getString(R.string.no),
-        ) { isPositive ->
-            Log.i(TAG, "ModelDownloadPrompt dismissed — positive=$isPositive metered=$metered")
-            if (isPositive) triggerCoachingModelDownload()
-        }
-    }
-
-    private fun triggerCoachingModelDownload() {
-        Log.i(TAG, "triggerCoachingModelDownload — calling modelManager.triggerDownload()")
-        runCatching { MicroCoachingSDK.getInstance().modelManager.triggerDownload() }
-            .onFailure { Log.e(TAG, "modelManager.triggerDownload threw", it) }
-        Toast
-            .makeText(
-                requireContext(),
-                getString(R.string.coaching_download_started),
-                Toast.LENGTH_LONG,
-            ).show()
-        // Open the chat sheet so the CHW lands on a screen showing live download progress.
-        runCatching { CoachingChatBottomSheet.show(parentFragmentManager) }
-            .onFailure { Log.e(TAG, "CoachingChatBottomSheet.show threw", it) }
-    }
-
-    /**
-     * Default to `true` (assume metered) when the connectivity manager or the active
-     * network is null — a transient null read shouldn't bypass the user's consent step.
-     */
-    private fun isOnMeteredNetwork(): Boolean {
-        val cm = requireContext().getSystemService(AndroidConnectivityManager::class.java) ?: return true
-        val caps = cm.getNetworkCapabilities(cm.activeNetwork) ?: return true
-        return !caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
+        CoachingChatBottomSheet.show(parentFragmentManager)
     }
 
     override fun onResume() {
