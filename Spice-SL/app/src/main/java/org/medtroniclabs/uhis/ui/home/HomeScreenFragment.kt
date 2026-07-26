@@ -6,17 +6,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.unit.dp
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -25,10 +17,7 @@ import com.medtroniclabs.microcoaching.Language
 import com.medtroniclabs.microcoaching.MicroCoachingSDK
 import com.medtroniclabs.microcoaching.ui.chat.CoachingChatBottomSheet
 import com.medtroniclabs.microcoaching.ui.components.ChatFab
-import com.medtroniclabs.microcoaching.ui.components.MorningCard
 import com.medtroniclabs.microcoaching.ui.flow.CoachingFlowActivity
-import com.medtroniclabs.microcoaching.ui.learn.modules.QuickLearnViewModel
-import com.medtroniclabs.microcoaching.ui.learn.modules.bottomsheet.RefresherBottomSheet
 import com.medtroniclabs.microcoaching.ui.theme.MicroCoachingTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -78,12 +67,6 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
     companion object {
         const val TAG = "HomeScreenFragment"
 
-        /**
-         * How long the pull-to-refresh spinner lingers after [MicroCoachingSDK.refreshRefreshers]
-         * (which is fire-and-forget; the MorningCard updates reactively). Purely cosmetic feedback.
-         */
-        private const val COACHING_REFRESH_SPINNER_MS = 1200L
-
         fun newInstance(): HomeScreenFragment = HomeScreenFragment()
     }
 
@@ -107,10 +90,9 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
     }
 
     /**
-     * Wire up the MicroCoaching SDK surfaces on the home screen:
-     *   1. MorningCard banner pinned above the menu grid — the gap-prioritised
-     *      morning module with Start / Skip actions (collapses when empty).
-     *   2. CHW AI chat FAB at bottom-right (opens the chat bottom sheet).
+     * Wire up the MicroCoaching SDK surfaces on the home screen: feed the SDK stores
+     * that back the Coaching grid tile (badge + Practice Zone refreshers), and mount
+     * the CHW AI chat FAB at bottom-right (opens the chat bottom sheet).
      */
     private fun setupCoachingSurfaces() {
         if (!MicroCoachingSDK.isInitialized()) return
@@ -119,78 +101,8 @@ class HomeScreenFragment : BaseFragment(), MenuSelectionListener {
         sdk.onHomeScreenShown(chwId)
         pushTodaysVisits(sdk)
 
-        // Pull-to-refresh → re-fetch the morning refreshers (backend re-runs its gap
-        // algorithm + on-device re-evaluation). refreshRefreshers() is fire-and-forget;
-        // the MorningCard updates reactively, so stop the spinner after a short delay.
-        binding.coachingSwipeRefresh.setOnRefreshListener {
-            sdk.refreshRefreshers()
-            val swipeRefresh = binding.coachingSwipeRefresh
-            swipeRefresh.postDelayed({ swipeRefresh.isRefreshing = false }, COACHING_REFRESH_SPINNER_MS)
-        }
         // The Coaching grid tile + its skipped-refresher badge are rendered by the
         // SDK's CoachingGridTile (see DashboardMenuItemsAdapter) — no host wiring needed.
-
-        // ── MorningCard banner (above grid) ───────────────────────────────
-        binding.coachingCardBanner.apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                MicroCoachingTheme {
-                    // Featured refresher from the shared store (the SAME pick the modules
-                    // screen shows). Collected as state so the card advances live when the
-                    // CHW skips/finishes, and hides when every refresher is skipped.
-                    val top by sdk.selectedMorningModule.collectAsState()
-
-                    val morningVm: QuickLearnViewModel = viewModel(
-                        factory = QuickLearnViewModel.factory(
-                            androidx.compose.ui.platform.LocalContext.current.applicationContext,
-                            chwId,
-                        ),
-                    )
-                    val wrongCount by morningVm.wrongQuestionCount.collectAsState()
-
-                    LaunchedEffect(top?.moduleId) {
-                        morningVm.computeWrongQuestionCount()
-                    }
-
-                    val current = top
-                    if (current != null) {
-                        val title = if (sdk.config.language == Language.ENGLISH) {
-                            current.titleEn ?: current.titleBn
-                        } else {
-                            current.titleBn
-                        }
-                        // Effective question count: wrong answers if any; total otherwise.
-                        val effectiveQuestionCount = if (wrongCount > 0) wrongCount else current.questionCount
-
-                        val onSkip: () -> Unit = {
-                            // Skip = advance: mark this refresher skipped → the store
-                            // promotes the next pending refresher (card re-renders) or
-                            // hides when none remain. Also feeds the Coaching tile badge.
-                            sdk.markRefresherSkipped(current.moduleFamilyId)
-                        }
-                        val onStart: () -> Unit = {
-                            RefresherBottomSheet.show(
-                                parentFragmentManager,
-                                chwId,
-                                fromHomeScreen = true,
-                                entryMode = RefresherBottomSheet.EntryMode.CARDS_FIRST,
-                                targetModuleFamilyId = current.moduleFamilyId,
-                            )
-                        }
-
-                        MorningCard(
-                            moduleTitle = title,
-                            cardCount = current.cardCount,
-                            questionCount = effectiveQuestionCount,
-                            estimatedMinutes = current.estimatedMinutes,
-                            onStart = onStart,
-                            onSkip = onSkip,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        )
-                    }
-                }
-            }
-        }
 
         // ── Chat FAB (bottom-right) ────────────────────────────────────────
         binding.chatFab.apply {
