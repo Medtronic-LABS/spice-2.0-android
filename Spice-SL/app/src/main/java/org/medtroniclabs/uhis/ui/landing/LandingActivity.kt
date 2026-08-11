@@ -1141,9 +1141,14 @@ class LandingActivity :
         val token = SecuredPreference.getString(SecuredPreference.EnvironmentKey.TOKEN.name)
         if (token.isNullOrEmpty() || !MicroCoachingSDK.isInitialized()) return
         val modelDir = getExternalFilesDir(null)
+        // Only `.task` (MediaPipe) is runnable by the bundled inference engine, so
+        // a leftover `.litertlm` must not be adopted as the provided model — it
+        // would point `modelPath` at a file no engine can load. This runs after
+        // SpiceBaseApplication.initCoachingSdk and overwrites its config, so it
+        // must apply the same filter.
         val existingModel = modelDir
             ?.listFiles()
-            ?.firstOrNull { it.extension == "task" || it.extension == "litertlm" }
+            ?.firstOrNull { it.extension == "task" }
         val downloadStrategy = if (existingModel != null) {
             ModelDownloadStrategy.PROVIDED
         } else {

@@ -74,9 +74,14 @@ class SpiceBaseApplication : Application(), Configuration.Provider {
      */
     private fun initCoachingSdk() {
         val modelDir = getExternalFilesDir(null)
+        // Only `.task` (MediaPipe) is runnable by the bundled inference engine —
+        // the LiteRT-LM runtime was dropped for APK size. A leftover `.litertlm`
+        // must NOT be adopted as the provided model: it would point `modelPath` at
+        // an unloadable file, and "Go to Chat" would silently bounce back to the
+        // setup screen after a successful download.
         val existingModel = modelDir
             ?.listFiles()
-            ?.firstOrNull { it.extension == "task" || it.extension == "litertlm" }
+            ?.firstOrNull { it.extension == "task" }
         val downloadStrategy = if (existingModel != null) {
             ModelDownloadStrategy.PROVIDED
         } else {
