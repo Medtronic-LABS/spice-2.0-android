@@ -15,7 +15,7 @@ dependencies, host changes, available hooks and UI components, and the rationale
 
 ```kotlin
 // resolved from mavenLocal() — declared in settings.gradle.kts
-implementation("com.medtroniclabs.microcoaching:sdk-android:0.5.2-SNAPSHOT")
+implementation("com.medtroniclabs.microcoaching:sdk-android:0.5.3-SNAPSHOT")
 implementation("com.medtroniclabs.microcoaching:sdk-android-sherpa:0.4.0-SNAPSHOT") // optional, offline Bengali STT
 ```
 

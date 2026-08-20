@@ -1140,20 +1140,9 @@ class LandingActivity :
     private fun reinitCoachingSdkWithToken() {
         val token = SecuredPreference.getString(SecuredPreference.EnvironmentKey.TOKEN.name)
         if (token.isNullOrEmpty() || !MicroCoachingSDK.isInitialized()) return
-        val modelDir = getExternalFilesDir(null)
-        // Only `.task` (MediaPipe) is runnable by the bundled inference engine, so
-        // a leftover `.litertlm` must not be adopted as the provided model — it
-        // would point `modelPath` at a file no engine can load. This runs after
-        // SpiceBaseApplication.initCoachingSdk and overwrites its config, so it
-        // must apply the same filter.
-        val existingModel = modelDir
-            ?.listFiles()
-            ?.firstOrNull { it.extension == "task" }
-        val downloadStrategy = if (existingModel != null) {
-            ModelDownloadStrategy.PROVIDED
-        } else {
-            ModelDownloadStrategy.ON_FIRST_USE
-        }
+        // Model discovery is the SDK's job — see the note in
+        // SpiceBaseApplication.initCoachingSdk. This method overwrites that config, so it
+        // has to make the same choice: no directory scan, no modelPath, ON_FIRST_USE.
         MicroCoachingSDK
             .Builder(applicationContext)
             .language(SpiceBaseApplication.spiceLanguageToSdkLanguage(SecuredPreference.getCultureName()))
@@ -1166,9 +1155,8 @@ class LandingActivity :
             .enableApplyModule(true)
             .enableVoice(true)
             .offlineSttEngineFactory(SherpaOnnxStt.factory)
-            .modelDownloadStrategy(downloadStrategy)
+            .modelDownloadStrategy(ModelDownloadStrategy.ON_FIRST_USE)
             .modelProviders(listOf(ModelProvider.HuggingFace))
-            .modelPath(existingModel?.absolutePath ?: "")
             .huggingFaceToken(BuildConfig.HF_TOKEN)
             .wifiOnlyModelDownload(false)
             .forceMode(CoachingMode.EDGE)

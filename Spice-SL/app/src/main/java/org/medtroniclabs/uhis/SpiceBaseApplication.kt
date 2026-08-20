@@ -73,20 +73,14 @@ class SpiceBaseApplication : Application(), Configuration.Provider {
      * with the freshly issued JWT after a successful login.
      */
     private fun initCoachingSdk() {
-        val modelDir = getExternalFilesDir(null)
-        // Only `.task` (MediaPipe) is runnable by the bundled inference engine —
-        // the LiteRT-LM runtime was dropped for APK size. A leftover `.litertlm`
-        // must NOT be adopted as the provided model: it would point `modelPath` at
-        // an unloadable file, and "Go to Chat" would silently bounce back to the
-        // setup screen after a successful download.
-        val existingModel = modelDir
-            ?.listFiles()
-            ?.firstOrNull { it.extension == "task" }
-        val downloadStrategy = if (existingModel != null) {
-            ModelDownloadStrategy.PROVIDED
-        } else {
-            ModelDownloadStrategy.ON_FIRST_USE
-        }
+        // No model scan here on purpose. Adopting "the first `.task` in the model dir"
+        // looks harmless but `listFiles()` returns an unordered list, so on a device
+        // carrying a leftover from an earlier default model it can hand the SDK a
+        // different bundle than the one the SDK considers selected — the engine then
+        // loads a stale, possibly-partial file while the setup card reports the current
+        // model as downloaded. The SDK resolves the selected variant's file itself, and
+        // ON_FIRST_USE already no-ops when that file is present and valid, so PROVIDED
+        // bought nothing and cost correctness.
         val authToken = SecuredPreference.getString(
             SecuredPreference.EnvironmentKey.TOKEN.name,
         ) ?: ""
@@ -102,9 +96,8 @@ class SpiceBaseApplication : Application(), Configuration.Provider {
             .enableApplyModule(true)
             .enableVoice(true)
             .offlineSttEngineFactory(SherpaOnnxStt.factory)
-            .modelDownloadStrategy(downloadStrategy)
+            .modelDownloadStrategy(ModelDownloadStrategy.ON_FIRST_USE)
             .modelProviders(listOf(ModelProvider.HuggingFace))
-            .modelPath(existingModel?.absolutePath ?: "")
             .huggingFaceToken(BuildConfig.HF_TOKEN)
             .wifiOnlyModelDownload(false)
             .forceMode(CoachingMode.ONLINE)
