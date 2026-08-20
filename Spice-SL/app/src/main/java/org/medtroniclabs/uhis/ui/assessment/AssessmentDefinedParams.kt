@@ -699,4 +699,9 @@ object AssessmentDefinedParams {
     const val IS_BEFORE_DIABETES_DIAGNOSIS = "isBeforeDiabetesDiagnosis"
 
     const val IS_BEFORE_HTN_DIAGNOSIS = "isBeforeHtnDiagnosis"
+
+    // Tier of the PHU facility the CHW picked (from HealthFacilityEntity.type).
+    // Stored in otherAssessmentDetails and forwarded to the MicroCoaching SDK as
+    // actual.destinationTier for the referral_location_* compliance gaps.
+    const val PICKED_FACILITY_TYPE = "pickedFacilityType"
 }

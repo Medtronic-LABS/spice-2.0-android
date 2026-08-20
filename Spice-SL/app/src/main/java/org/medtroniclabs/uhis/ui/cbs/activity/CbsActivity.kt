@@ -4,10 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
 import com.google.gson.internal.LinkedTreeMap
 import com.google.gson.reflect.TypeToken
+import com.medtroniclabs.microcoaching.MicroCoachingSDK
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
@@ -16,8 +20,12 @@ import org.medtroniclabs.uhis.appextensions.startBackgroundOfflineSync
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.DefinedParams.ASSESSMENT_ID
 import org.medtroniclabs.uhis.common.DefinedParams.CBS
+import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.databinding.ActivityAssessmentBinding
+import org.medtroniclabs.uhis.db.dao.MetaDataDAO
+import org.medtroniclabs.uhis.db.entity.AssessmentEntity
 import org.medtroniclabs.uhis.formgeneration.extension.capitalizeFirstChar
+import org.medtroniclabs.uhis.microcoaching.toSdkAssessmentMap
 import org.medtroniclabs.uhis.network.resource.Resource
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
@@ -33,11 +41,21 @@ import org.medtroniclabs.uhis.ui.cbs.fragment.CbsSummaryFragment
 import org.medtroniclabs.uhis.ui.household.HouseholdSearchActivity
 import org.medtroniclabs.uhis.ui.landing.LandingActivity
 import org.medtroniclabs.uhis.ui.landing.OnDialogDismissListener
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CbsActivity : BaseActivity(), OnDialogDismissListener {
     private lateinit var binding: ActivityAssessmentBinding
     private val viewModel: AssessmentViewModel by viewModels()
+
+    /**
+     * Used by [notifyMicroCoachingSDK] to resolve `villageId → chiefdomId`
+     * (SPICE's equivalent of the backend's `upazila_id`). Mirrors the
+     * field-injection style in
+     * [org.medtroniclabs.uhis.ui.assessment.AssessmentActivity].
+     */
+    @Inject
+    lateinit var metaDataDAO: MetaDataDAO
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -157,7 +175,8 @@ class CbsActivity : BaseActivity(), OnDialogDismissListener {
 
                 ResourceState.SUCCESS -> {
                     hideLoading()
-                    resource.data?.let {
+                    resource.data?.let { (_, assessmentEntity) ->
+                        notifyMicroCoachingSDK(assessmentEntity)
                         // insertOtherAssessmentDetails()
                         if (intent.getBooleanExtra(DEATH_OF_NEWBORN, false) ||
                             intent.getBooleanExtra(DEATH_OF_MOTHER, false)
@@ -417,5 +436,51 @@ class CbsActivity : BaseActivity(), OnDialogDismissListener {
             bundle = bundle,
             tag = CbsFragment.TAG,
         )
+    }
+
+    /**
+     * Hand the just-submitted CBS assessment off to the MicroCoaching SDK
+     * so it can emit the `clinical_observed` family events
+     * (`spice_action_observed`, conditional `risk_flag_observed`) plus the
+     * stub `card_shown` row.
+     *
+     * Fires *before* the deceased-status update + `loadSummaryFragment()`
+     * so the event row exists regardless of what happens next in the
+     * (DEATH_OF_MOTHER / DEATH_OF_NEWBORN) handling branch. See
+     * [org.medtroniclabs.uhis.ui.assessment.AssessmentActivity.notifyMicroCoachingSDK]
+     * for the equivalent NCD-side hook, the rationale for the blank
+     * `encounterId`, and the design notes on what `viewModel.referralStatus`
+     * / `viewModel.referralReason` / `chiefdomId` map to in the backend
+     * three-axis `correctReferral*` payload.
+     */
+    private fun notifyMicroCoachingSDK(assessmentEntity: AssessmentEntity) {
+        if (!MicroCoachingSDK.isInitialized()) return
+        val chwId = runCatching { SecuredPreference.getUserId().toString() }
+            .getOrDefault("")
+        if (chwId.isBlank()) return
+
+        // Snapshot mutable VM fields now (they may be reset by a subsequent
+        // submission before the IO coroutine resumes).
+        val systemReferralStatus = viewModel.referralStatus
+        val systemReferralReasons = viewModel.referralReason
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val upazilaId = runCatching {
+                assessmentEntity.villageId
+                    .toLongOrNull()
+                    ?.let { metaDataDAO.getVillageByID(it).chiefdomId }
+                    ?.toString()
+            }.getOrNull()
+
+            MicroCoachingSDK.getInstance().onAssessmentSubmitted(
+                encounterId = "",
+                patientId = assessmentEntity.patientId.orEmpty(),
+                assessmentData = assessmentEntity.toSdkAssessmentMap(
+                    systemReferralStatus = systemReferralStatus,
+                    systemReferralReasons = systemReferralReasons,
+                    upazilaId = upazilaId,
+                ),
+            )
+        }
     }
 }

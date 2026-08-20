@@ -4,17 +4,26 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
+import com.medtroniclabs.microcoaching.MicroCoachingSDK
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.app.analytics.model.UserDetail
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.appextensions.startBackgroundOfflineSync
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
+import org.medtroniclabs.uhis.common.SecuredPreference
 import org.medtroniclabs.uhis.common.SpiceLocationManager
 import org.medtroniclabs.uhis.databinding.ActivityAssessmentBinding
+import org.medtroniclabs.uhis.db.dao.MetaDataDAO
+import org.medtroniclabs.uhis.db.entity.AssessmentEntity
 import org.medtroniclabs.uhis.formgeneration.extension.capitalizeFirstChar
 import org.medtroniclabs.uhis.mappingkey.Screening
+import org.medtroniclabs.uhis.microcoaching.toComplianceState
+import org.medtroniclabs.uhis.microcoaching.toSdkAssessmentMap
 import org.medtroniclabs.uhis.network.resource.ResourceState
 import org.medtroniclabs.uhis.ui.BaseActivity
 import org.medtroniclabs.uhis.ui.MenuConstants
@@ -59,11 +68,19 @@ import org.medtroniclabs.uhis.ui.household.summary.HouseholdSummaryActivity
 import org.medtroniclabs.uhis.ui.landing.LandingActivity
 import org.medtroniclabs.uhis.ui.membersearch.MemberSearchActivity
 import org.medtroniclabs.uhis.ui.services.ServicesActivity
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AssessmentActivity : BaseActivity() {
     private lateinit var binding: ActivityAssessmentBinding
     private val viewModel: AssessmentViewModel by viewModels()
+
+    /**
+     * Used by [notifyMicroCoachingSDK] to resolve `villageId → chiefdomId`
+     * (SPICE's equivalent of the backend's `upazila_id`).
+     */
+    @Inject
+    lateinit var metaDataDAO: MetaDataDAO
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -575,7 +592,8 @@ class AssessmentActivity : BaseActivity() {
 
                 ResourceState.SUCCESS -> {
                     hideLoading()
-                    resource.data?.let {
+                    resource.data?.let { (_, assessmentEntity) ->
+                        notifyMicroCoachingSDK(assessmentEntity)
                         loadSummaryFragment()
                     }
                 }
@@ -590,6 +608,16 @@ class AssessmentActivity : BaseActivity() {
             when (resource.state) {
                 ResourceState.SUCCESS -> {
                     hideLoading()
+                    // Referral committed on the summary screen (PHU pick + "Done").
+                    // Fire the SDK referral hook for community assessments — the
+                    // ones with a referral picker. Compliance gaps evaluate here
+                    // (the `actual.*` side now exists), not at assessment-submit.
+                    // Fired before finishSuccessFlow() so lifecycleScope is alive.
+                    if (!CommonUtils.isNonCommunity()) {
+                        viewModel.assessmentSaveLiveData.value?.data?.second?.let { entity ->
+                            notifyMicroCoachingSDK(entity, asReferral = true)
+                        }
+                    }
                     finishSuccessFlow()
                     if (!CommonUtils.isNonCommunity()) {
                         startBackgroundOfflineSync()
@@ -804,4 +832,66 @@ class AssessmentActivity : BaseActivity() {
     }
 
     override fun consumeImeInsets() = true
+
+    /**
+     * Hand the just-submitted assessment off to the MicroCoaching SDK so it
+     * can emit the `clinical_observed` family events plus the stub `card_shown` row,
+     * and (on referral commit) evaluate the referral-compliance gaps.
+     *
+     * Surfaces real SPICE data the SDK uses to compute referral correctness:
+     * `viewModel.referralStatus` / `viewModel.referralReason` (system-prescribed,
+     * set before SUCCESS posts) and `chiefdomId` (SPICE's `upazila_id` equivalent)
+     * resolved via [MetaDataDAO.getVillageByID]. `encounterId` is intentionally
+     * blank — the Intent extras carry no visit id and the SDK accepts blank.
+     * The SDK wraps event recording in `runCatching`, so the host flow is never
+     * blocked by telemetry failures.
+     */
+    private fun notifyMicroCoachingSDK(
+        assessmentEntity: AssessmentEntity,
+        asReferral: Boolean = false,
+    ) {
+        if (!MicroCoachingSDK.isInitialized()) return
+        val chwId = runCatching { SecuredPreference.getUserId().toString() }
+            .getOrDefault("")
+        if (chwId.isBlank()) return
+
+        // Snapshot mutable VM fields now (they may be reset by a subsequent
+        // submission before the IO coroutine resumes).
+        val systemReferralStatus = viewModel.referralStatus
+        val systemReferralReasons = viewModel.referralReason
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val upazilaId = runCatching {
+                // SPICE hierarchy: village → chiefdom → district. The closest
+                // match for the backend's `upazila_id` is `chiefdomId`.
+                assessmentEntity.villageId
+                    .toLongOrNull()
+                    ?.let { metaDataDAO.getVillageByID(it).chiefdomId }
+                    ?.toString()
+            }.getOrNull()
+
+            val sdk = MicroCoachingSDK.getInstance()
+            if (asReferral) {
+                sdk.onReferralSubmitted(
+                    encounterId = "",
+                    patientId = assessmentEntity.patientId.orEmpty(),
+                    referralData = assessmentEntity.toComplianceState(
+                        systemReferralStatus = systemReferralStatus,
+                        systemReferralReasons = systemReferralReasons,
+                        upazilaId = upazilaId,
+                    ),
+                )
+            } else {
+                sdk.onAssessmentSubmitted(
+                    encounterId = "",
+                    patientId = assessmentEntity.patientId.orEmpty(),
+                    assessmentData = assessmentEntity.toSdkAssessmentMap(
+                        systemReferralStatus = systemReferralStatus,
+                        systemReferralReasons = systemReferralReasons,
+                        upazilaId = upazilaId,
+                    ),
+                )
+            }
+        }
+    }
 }

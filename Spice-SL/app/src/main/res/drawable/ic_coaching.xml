@@ -1,0 +1,24 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="62dp"
+    android:height="62dp"
+    android:viewportWidth="62"
+    android:viewportHeight="62">
+    <!-- Mortarboard cap top (diamond) -->
+    <path
+        android:fillColor="#6165DE"
+        android:pathData="M31,8 L58,22 L31,36 L4,22 Z" />
+    <!-- Hat brim / cylindrical body -->
+    <path
+        android:fillColor="#6165DE"
+        android:pathData="M16,26 L16,42 Q16,48 31,48 Q46,48 46,42 L46,26 L31,33 Z" />
+    <!-- Tassel string -->
+    <path
+        android:fillColor="#BCB6F5"
+        android:strokeColor="#BCB6F5"
+        android:strokeWidth="2"
+        android:pathData="M58,22 L58,36" />
+    <!-- Tassel end -->
+    <path
+        android:fillColor="#BCB6F5"
+        android:pathData="M54,34 Q58,40 62,34 L58,36 Z" />
+</vector>

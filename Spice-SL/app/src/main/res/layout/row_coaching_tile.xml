@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Coaching grid cell — rendered by the MicroCoaching SDK's CoachingGridTile
+     Composable (tile + skipped-refresher badge live in the SDK). -->
+<androidx.compose.ui.platform.ComposeView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/coachingTileComposeView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />

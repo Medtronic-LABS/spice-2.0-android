@@ -184,7 +184,9 @@ class OfflineSyncActivity : BaseActivity() {
 
         val data = Data
             .Builder()
-            .putStringArray(KEY_REQUESTS_ID, requestIds)
+            // WorkManager 2.10+ tightened the signature of putStringArray to accept
+            // Array<String?>; cast to satisfy the new nullability annotations.
+            .putStringArray(KEY_REQUESTS_ID, requestIds as Array<String?>)
             .build()
 
         val constrain = Constraints
@@ -200,7 +202,9 @@ class OfflineSyncActivity : BaseActivity() {
 
         workManager.enqueue(getSyncStatusWorker)
 
+        // WorkManager 2.10+ exposes the LiveData with a nullable WorkInfo.
         workManager.getWorkInfoByIdLiveData(getSyncStatusWorker.id).observe(this) { workerInfo ->
+            workerInfo ?: return@observe
             if (workerInfo.state == WorkInfo.State.SUCCEEDED) {
                 binding.btnOkay.text = getString(R.string.okay)
                 viewModel.syncCompleted(true)

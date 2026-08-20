@@ -687,6 +687,7 @@ class MetaRepository @Inject constructor(
                     },
                     isUserSite = userHealthFacilities?.any { userSiteFacility -> userSiteFacility.id == healthFacility.id } ?: false,
                     phoneNumber = healthFacility.phuFocalPersonNumber?.toString() ?: "",
+                    type = healthFacility.type,
                 ),
             )
         }
@@ -703,6 +704,7 @@ class MetaRepository @Inject constructor(
                     isDefault = healthFacility.id == defaultId,
                     isUserSite = userHealthFacilities.any { userSiteFacility -> userSiteFacility.id == healthFacility.id },
                     phoneNumber = healthFacility.phuFocalPersonNumber?.toString(),
+                    type = healthFacility.type,
                 ),
             )
         }

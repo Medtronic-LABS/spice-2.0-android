@@ -155,3 +155,10 @@
 -dontwarn org.medtroniclabs.uhis.app.analytics.model.UserDetail
 -dontwarn org.medtroniclabs.uhis.app.analytics.model.UserJourneyAnalytics
 -dontwarn org.medtroniclabs.uhis.app.analytics.utils.CommonUtils
+
+# MediaPipe protobuf annotation types not present at build time (MicroCoaching SDK dependency)
+-dontwarn com.google.protobuf.Internal$ProtoMethodMayReturnNull
+-dontwarn com.google.protobuf.Internal$ProtoNonnullApi
+-dontwarn com.google.protobuf.ProtoField
+-dontwarn com.google.protobuf.ProtoPresenceBits
+-dontwarn com.google.protobuf.ProtoPresenceCheckedField

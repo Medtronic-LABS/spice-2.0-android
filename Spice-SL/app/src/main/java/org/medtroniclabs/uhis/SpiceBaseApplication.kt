@@ -10,6 +10,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import com.medtroniclabs.microcoaching.Language
+import com.medtroniclabs.microcoaching.MicroCoachingSDK
+import com.medtroniclabs.microcoaching.ModelDownloadStrategy
+import com.medtroniclabs.microcoaching.ai.model.ModelProvider
+import com.medtroniclabs.microcoaching.domain.decision.CoachingMode
+import com.medtroniclabs.microcoaching.sherpa.SherpaOnnxStt
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -21,8 +27,10 @@ import org.medtroniclabs.uhis.app.analytics.model.UserJourneyAnalytics
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsDefinedParams
 import org.medtroniclabs.uhis.app.analytics.utils.AnalyticsUtils
 import org.medtroniclabs.uhis.appextensions.isDebug
+import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.common.SPICE
 import org.medtroniclabs.uhis.common.SecuredPreference
+import org.medtroniclabs.uhis.common.resolveCoachingPersona
 import org.medtroniclabs.uhis.log.CrashReportingTree
 import timber.log.Timber
 import java.util.UUID
@@ -48,9 +56,74 @@ class SpiceBaseApplication : Application(), Configuration.Provider {
         super.onCreate()
         initTimber()
         initPreference()
+        initCoachingSdk()
         saveApplicationType()
         getUserJourneyAnalytics()
         handleAppForeground()
+    }
+
+    /**
+     * Initialise the MicroCoaching SDK. Mirrors the v1 spice-android pattern.
+     * Must run after [initPreference] so [SecuredPreference] is ready, and on the
+     * Application thread so the SDK singleton is available before any Activity
+     * (including the splash) tries to access it.
+     *
+     * The auth token is read opportunistically here; it may be empty on first
+     * install. [LandingActivity.reinitCoachingSdkWithToken] re-builds the SDK
+     * with the freshly issued JWT after a successful login.
+     */
+    private fun initCoachingSdk() {
+        // No model scan here on purpose. Adopting "the first `.task` in the model dir"
+        // looks harmless but `listFiles()` returns an unordered list, so on a device
+        // carrying a leftover from an earlier default model it can hand the SDK a
+        // different bundle than the one the SDK considers selected — the engine then
+        // loads a stale, possibly-partial file while the setup card reports the current
+        // model as downloaded. The SDK resolves the selected variant's file itself, and
+        // ON_FIRST_USE already no-ops when that file is present and valid, so PROVIDED
+        // bought nothing and cost correctness.
+        val authToken = SecuredPreference.getString(
+            SecuredPreference.EnvironmentKey.TOKEN.name,
+        ) ?: ""
+        MicroCoachingSDK
+            .Builder(this)
+            .language(spiceLanguageToSdkLanguage(SecuredPreference.getCultureName()))
+            .backendUrl(BuildConfig.COACHING_BACKEND_URL)
+            .authToken(authToken)
+            .persona(resolveCoachingPersona())
+            .enableTelemetry(BuildConfig.ENABLE_COACHING_TELEMETRY)
+            .enableChat(true)
+            .enableLearnModule(true)
+            .enableApplyModule(true)
+            .enableVoice(true)
+            .offlineSttEngineFactory(SherpaOnnxStt.factory)
+            .modelDownloadStrategy(ModelDownloadStrategy.ON_FIRST_USE)
+            .modelProviders(listOf(ModelProvider.HuggingFace))
+            .huggingFaceToken(BuildConfig.HF_TOKEN)
+            .wifiOnlyModelDownload(false)
+            .forceMode(CoachingMode.ONLINE)
+            .build()
+        if (BuildConfig.DEBUG) {
+            Timber.i("MicroCoachingSDK health: %s", MicroCoachingSDK.getInstance().checkHealth())
+        }
+    }
+
+    companion object {
+        /**
+         * Map SPICE 2.0's stored culture display name to the SDK's [Language] enum.
+         * SPICE stores "English" or "বাংলা" (Bengali in Bengali) — the SDK enum needs
+         * the language code, so we branch on the Bengali display name.
+         */
+        fun spiceLanguageToSdkLanguage(cultureName: String?): Language {
+            // cultureName may be the bare "বাংলা" or the full "বাংলা (Bangla)" display string —
+            // use contains (case-insensitive) to match either form, consistent with CommonUtils.
+            val resolvedLanguage = if (cultureName?.contains(DefinedParams.BN_LOCALE, ignoreCase = true) == true) {
+                Language.BANGLA
+            } else {
+                Language.ENGLISH
+            }
+            Timber.i("spiceLanguageToSdkLanguage: resolved $cultureName to $resolvedLanguage")
+            return resolvedLanguage
+        }
     }
 
     private fun logActivityState(
@@ -162,7 +235,9 @@ class SpiceBaseApplication : Application(), Configuration.Provider {
 
     private fun unRegisterFragmentLifecycleCallbacks(activity: AppCompatActivity?) {
         activity ?: return
-        val listener = fragmentCallbacks[activity] ?: return
+        // remove() (not just a lookup) — leaving the entry keyed the map on the
+        // destroyed Activity forever, retaining it and its view tree.
+        val listener = fragmentCallbacks.remove(activity) ?: return
         activity.supportFragmentManager.unregisterFragmentLifecycleCallbacks(listener)
     }
 

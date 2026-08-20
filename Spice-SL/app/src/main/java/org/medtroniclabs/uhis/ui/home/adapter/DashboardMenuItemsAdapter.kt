@@ -5,12 +5,19 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.Recomposer
+import androidx.compose.ui.platform.AndroidUiDispatcher
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.medtroniclabs.microcoaching.ui.components.CoachingGridTile
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.medtroniclabs.uhis.R
 import org.medtroniclabs.uhis.common.CommonUtils
 import org.medtroniclabs.uhis.common.DefinedParams
 import org.medtroniclabs.uhis.databinding.RowActivitiesBinding
+import org.medtroniclabs.uhis.databinding.RowCoachingTileBinding
 import org.medtroniclabs.uhis.db.entity.MenuEntity
 import org.medtroniclabs.uhis.formgeneration.extension.safeClickListener
 import org.medtroniclabs.uhis.ui.MenuConstants
@@ -21,29 +28,101 @@ class DashboardMenuItemsAdapter(
     private val roleBasedActivitiesList: List<MenuEntity>,
     private val listener: MenuSelectionListener,
 ) :
-    RecyclerView.Adapter<DashboardMenuItemsAdapter.ActivitiesViewHolder>() {
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    /** Default menu tile (icon + title), inflated from `row_activities`. */
     class ActivitiesViewHolder(val binding: RowActivitiesBinding) :
         RecyclerView.ViewHolder(binding.root) {
         val context: Context = binding.root.context
     }
 
+    /**
+     * Coaching tile — the whole tile (and its skipped-refresher badge) is owned
+     * by the MicroCoaching SDK's [CoachingGridTile] Composable, so the host just
+     * forwards the click.
+     */
+    class CoachingViewHolder(val binding: RowCoachingTileBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
+    /**
+     * Explicit, lifecycle-scoped parent composition context for the coaching tile's
+     * ComposeView. On tablets the grid uses FlexboxLayoutManager, which measures item
+     * views before attaching them; AbstractComposeView.onMeasure then can't find a
+     * window recomposer and crashes. Supplying this [Recomposer] via
+     * `setParentCompositionContext` short-circuits that window lookup. Created when
+     * the adapter attaches to the RecyclerView and cancelled when it detaches.
+     */
+    private var recomposer: Recomposer? = null
+    private var recomposeScope: CoroutineScope? = null
+
+    override fun getItemViewType(position: Int): Int =
+        if (roleBasedActivitiesList[position]
+                .menuId
+                .equals(MenuConstants.COACHING_MENU_ID, ignoreCase = true)
+        ) {
+            VIEW_TYPE_COACHING
+        } else {
+            VIEW_TYPE_DEFAULT
+        }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        // AndroidUiDispatcher.CurrentThread supplies a Choreographer-backed frame
+        // clock; the Recomposer drives the coaching tile's composition off it.
+        val dispatcher = AndroidUiDispatcher.CurrentThread
+        val scope = CoroutineScope(dispatcher)
+        val newRecomposer = Recomposer(dispatcher)
+        recomposeScope = scope
+        recomposer = newRecomposer
+        scope.launch { newRecomposer.runRecomposeAndApplyChanges() }
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        recomposer?.cancel()
+        recomposer = null
+        recomposeScope = null
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): ActivitiesViewHolder =
-        ActivitiesViewHolder(
-            RowActivitiesBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false,
-            ),
-        )
+    ): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        return if (viewType == VIEW_TYPE_COACHING) {
+            CoachingViewHolder(RowCoachingTileBinding.inflate(inflater, parent, false)).also {
+                it.binding.coachingTileComposeView.apply {
+                    // Explicit parent context — see [recomposer]. Must be set before
+                    // the first onMeasure (which is why it's here, not at bind).
+                    setParentCompositionContext(recomposer)
+                    setViewCompositionStrategy(
+                        ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool,
+                    )
+                }
+            }
+        } else {
+            ActivitiesViewHolder(RowActivitiesBinding.inflate(inflater, parent, false))
+        }
+    }
 
     override fun onBindViewHolder(
-        holder: ActivitiesViewHolder,
+        holder: RecyclerView.ViewHolder,
         position: Int,
     ) {
         val model = roleBasedActivitiesList[position]
+        when (holder) {
+            is CoachingViewHolder -> holder.binding.coachingTileComposeView.setContent {
+                CoachingGridTile(
+                    onClick = { listener.onMenuSelected(model.menuId, model.subModule) },
+                )
+            }
+            is ActivitiesViewHolder -> bindActivityTile(holder, model)
+        }
+    }
+
+    private fun bindActivityTile(
+        holder: ActivitiesViewHolder,
+        model: MenuEntity,
+    ) {
         holder.binding.tvTitle.text =
             if (CommonUtils.parseUserLocale() == DefinedParams.EN) {
                 model.name
@@ -302,4 +381,9 @@ class DashboardMenuItemsAdapter(
         }
 
     override fun getItemCount(): Int = roleBasedActivitiesList.size
+
+    companion object {
+        private const val VIEW_TYPE_DEFAULT = 0
+        private const val VIEW_TYPE_COACHING = 1
+    }
 }
